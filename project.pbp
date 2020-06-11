@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.72 (Windows - x64)">
+  <section name="config">
+    <options closefiles="1" openmode="0" name="KuriBrawl"/>
+  </section>
+  <section name="data">
+    <explorer view="src\" pattern="0"/>
+    <log show="1"/>
+    <lastopen date="2020-06-09 23:34" user="Téo" host="RASKALITO-XPS"/>
+  </section>
+  <section name="files">
+    <file name="src\gamelib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="8eaa123b23a4ab9269028325372be967"/>
+    </file>
+    <file name="src\inputlib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="5733fdf6a2c266558da8c95f63a1139d"/>
+    </file>
+    <file name="src\inputlibConstants.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="e94a20521d2471f01515e1f3a5a58aa7"/>
+    </file>
+    <file name="src\inputlibData.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="ec4afaafcecc6f7ec47bd96671edf4a6"/>
+    </file>
+    <file name="src\main.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="6a741739c2da40617b45b1942676d399"/>
+    </file>
+    <file name="src\physicslib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="3d0b37fdc3cd13a06ea0a35fad50deb8"/>
+    </file>
+    <file name="src\utilCore.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="dcc374275f1dfb6bda05a9c23e95debe"/>
+    </file>
+  </section>
+  <section name="targets">
+    <target name="Default Target" enabled="1" default="1">
+      <inputfile value="src\main.pb"/>
+      <outputfile value="bin\KuriBrawl.exe"/>
+      <options xpskin="1" debug="1"/>
+    </target>
+  </section>
+</project>
