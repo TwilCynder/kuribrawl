@@ -13,7 +13,12 @@ Structure Vector
   y.l
 EndStructure
 
-Structure Rect_ Extends Vector 
+Structure VectorDouble
+  x.d
+  y.d
+EndStructure
+
+Structure Rect_ Extends Vector
   w.l
   h.l
 EndStructure
@@ -78,6 +83,6 @@ Procedure QIterate(*q.Queue, callback.QCallback)
 EndProcedure
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 5
+; CursorPosition = 10
 ; Folding = --
 ; EnableXP

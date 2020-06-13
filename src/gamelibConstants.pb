@@ -1,0 +1,54 @@
+﻿#SCREEN_W = 960
+#SCREEN_H = 540
+
+Enumeration 
+  #ACTION_WALK
+  #ACTION_DASH
+  #ACTION_JUMP
+  #ACTION_ATTACK
+  #ACTION_NORMAL_ATTACK
+  #ACTION_SPECIAL_ATTACK
+  #ACTION_SHIELD
+  #ACTION_DODGE
+  #ACTION_GRAB
+  
+  #ACTIONS_TOTAL
+EndEnumeration  
+
+Enumeration
+  #CBOX_TYPE_HURT
+  #CBOX_TYPE_HIT
+EndEnumeration
+
+Enumeration
+  #CBOX_SHAPE_CIRCLE
+  #CBOX_SHAPE_BUBBLE
+  #CBOX_SHAPE_SQUARE
+  #CBOX_SHAPE_RECT
+EndEnumeration
+
+Enumeration
+  #STATE_IDLE
+  ;IDLE_AIR = IDLE && !grounded
+  #STATE_CROUCH
+  #STATE_WALK
+  #STATE_WALK_TURN
+  #STATE_DASH_START
+  #STATE_DASH
+  #STATE_DASH_TURN
+  #STATE_DASH_STOP
+  #STATE_JUMPSQUAT
+  #STATE_LANDING
+  #STATE_ATTACK
+  ;ATTACK_AIR = ATTACK && !grounded
+  #STATE_LANDING_LAG
+EndEnumeration
+
+Enumeration
+  #JUMP_NORMAL
+  #JUMP_WALKING
+  #JUMP_BACKWARDS
+Enumeration
+; IDE Options = PureBasic 5.72 (Windows - x64)
+; CursorPosition = 50
+; EnableXP

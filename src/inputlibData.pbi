@@ -28,8 +28,8 @@ With defaultBind
 EndWith
 
 Dim defaultInputDurability(#INPUTS)
-defaultInputDurability(#INPUT_Attack) = 0
 defaultInputDurability(#INPUT_Special) = 0
+defaultInputDurability(#INPUT_Attack) = 0
 defaultInputDurability(#INPUT_Jump) = 0
 defaultInputDurability(#INPUT_Grab) = 0
 defaultInputDurability(#INPUT_Guard) = 0
@@ -37,15 +37,14 @@ defaultInputDurability(#INPUT_ControlStick_SRIGHT) = 5
 defaultInputDurability(#INPUT_ControlStick_SDOWN) = 5
 defaultInputDurability(#INPUT_ControlStick_SLEFT) = 5
 defaultInputDurability(#INPUT_ControlStick_SUP) = 5
-defaultInputDurability(#INPUT_ControlStick_RIGHT) = 2
-defaultInputDurability(#INPUT_ControlStick_DOWN) = 2
-defaultInputDurability(#INPUT_ControlStick_LEFT) = 2
-defaultInputDurability(#INPUT_ControlStick_UP) = 2
+defaultInputDurability(#INPUT_ControlStick_RIGHT) = 0
+defaultInputDurability(#INPUT_ControlStick_DOWN) = 0
+defaultInputDurability(#INPUT_ControlStick_LEFT) = 0
+defaultInputDurability(#INPUT_ControlStick_UP) = 0
 
 Prototype inputManager(*port.Port, *info.inputData)
 
 Dim *inputManagers(#INPUTS)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 33
-; FirstLine = 13
+; CursorPosition = 44
 ; EnableXP

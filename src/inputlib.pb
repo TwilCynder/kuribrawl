@@ -39,6 +39,7 @@ EndStructure
 
 Structure inputData
   directionAxis.b
+  additionalInfo.b
 EndStructure
 
 Structure Port
@@ -151,6 +152,7 @@ Procedure readInputs()
     If *port\currentControlStickState\x > stickSmashTreshold
       If *port\previousState\axis[id]\x < stickTreshold XOr *port\controlStickBuffer[#DIRECTION_RIGHT] = 1
         registerInput(i, #INPUT_ControlStick_SRIGHT)
+        registerInput(i, #INPUT_ControlStick_RIGHT)
       EndIf 
       *port\controlStickBuffer[#DIRECTION_RIGHT] = 0
     ElseIf *port\currentControlStickState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold And 
@@ -159,6 +161,7 @@ Procedure readInputs()
     ElseIf *port\currentControlStickState\x < -stickSmashTreshold
       If *port\previousState\axis[id]\x > -stickTreshold XOr *port\controlStickBuffer[#DIRECTION_LEFT] = 1
         registerInput(i, #INPUT_ControlStick_SLEFT)
+        registerInput(i, #INPUT_ControlStick_LEFT)
       EndIf 
       *port\controlStickBuffer[#DIRECTION_LEFT] = 0
     ElseIf *port\currentControlStickState\x < -stickTreshold And *port\previousState\axis[id]\x > -stickTreshold
@@ -173,6 +176,7 @@ Procedure readInputs()
     If *port\currentControlStickState\y > stickSmashTreshold
       If *port\previousState\axis[id]\y < stickTreshold XOr *port\controlStickBuffer[#DIRECTION_RIGHT] = 1
         registerInput(i, #INPUT_ControlStick_SDOWN)
+        registerInput(i, #INPUT_ControlStick_DOWN)
       EndIf 
       *port\controlStickBuffer[#DIRECTION_DOWN] = 0
     ElseIf *port\currentControlStickState\y > stickTreshold And *port\previousState\axis[id]\y < stickTreshold
@@ -181,6 +185,7 @@ Procedure readInputs()
     ElseIf *port\currentControlStickState\y < -stickSmashTreshold
       If *port\previousState\axis[id]\y > -stickTreshold XOr *port\controlStickBuffer[#DIRECTION_LEFT] = 1
         registerInput(i, #INPUT_ControlStick_SUP)
+        registerInput(i, #INPUT_ControlStick_UP)
       EndIf         
       *port\controlStickBuffer[#DIRECTION_UP] = 0
     ElseIf *port\currentControlStickState\y < -stickTreshold And *port\previousState\axis[id]\y > -stickTreshold
@@ -237,48 +242,47 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
   Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
   If isFighterGrounded(*port\figher)
-    If *port\figher\currentAnimationName = "dash"
+    If *info\directionAxis < #MAX_AXIS_NB
+      state.AxisState
+      readAxis(@state, *info\directionAxis, *port)
+      direction = stickDirection(@state)
+    Else 
+      direction = controlStickDirection(*port)
+    EndIf 
+
+    ForEach inputQ()
+      input.b = inputQ() & %11111
+      If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
+        DeleteElement(inputQ())
+        Select input
+          Case #INPUT_ControlStick_SUP
+            Debug "Upsmash (" + *port\figher\name + ")"
+          Case #INPUT_ControlStick_SDOWN
+            Debug "Dsmash (" + *port\figher\name + ")"
+          Case #INPUT_ControlStick_SLEFT, #INPUT_ControlStick_SRIGHT  ;ou reverse fsmash ? à voir si je fais un truc restrictif sur les reverse à la brawl
+            Debug "FSmash (" + *port\figher\name + ")"
+        EndSelect
+        ProcedureReturn 1
+      EndIf 
+    Next 
+    If *port\figher\state = #STATE_DASH
       Debug "Dash Attack (" + *port\figher\name + ")"
       ProcedureReturn 1
-    Else 
-      If *info\directionAxis < #MAX_AXIS_NB
-        state.AxisState
-        readAxis(@state, *info\directionAxis, *port)
-        direction = stickDirection(@state)
-      Else 
-        direction = controlStickDirection(*port)
-      EndIf 
-
-      ForEach inputQ()
-        input.b = inputQ() & %11111
-        If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
-          DeleteElement(inputQ())
-          Select input
-            Case #INPUT_ControlStick_SUP
-              Debug "Upsmash (" + *port\figher\name + ")"
-            Case #INPUT_ControlStick_SDOWN
-              Debug "Dsmash (" + *port\figher\name + ")"
-            Case #INPUT_ControlStick_SLEFT, #INPUT_ControlStick_SRIGHT  ;ou reverse fsmash ? à voir si je fais un truc restrictif sur les reverse à la brawl
-              Debug "FSmash (" + *port\figher\name + ")"
-          EndSelect
-          ProcedureReturn 1
-        EndIf 
-      Next 
-      Select direction
-        Case #DIRECTION_NONE
-          Debug "Jab (" + *port\figher\name + ")"
-          ProcedureReturn 1
-        Case #DIRECTION_RIGHT, #DIRECTION_LEFT
-          Debug "Ftilt (" + *port\figher\name + ")"  ;ou reverse ftilt ? à voir si je fais un truc restrictif sur les reverse à la brawl
-          ProcedureReturn 1
-        Case #DIRECTION_UP
-          Debug "Utilt (" + *port\figher\name + ")"
-          ProcedureReturn 1
-        Case #DIRECTION_DOWN
-          Debug "Dtilt (" + *port\figher\name + ")"
-          ProcedureReturn 1
-      EndSelect 
-    EndIf 
+    EndIf
+    Select direction
+      Case #DIRECTION_NONE
+        Debug "Jab (" + *port\figher\name + ")"
+        ProcedureReturn 1
+      Case #DIRECTION_RIGHT, #DIRECTION_LEFT
+        Debug "Ftilt (" + *port\figher\name + ")"  ;ou reverse ftilt ? à voir si je fais un truc restrictif sur les reverse à la brawl
+        ProcedureReturn 1
+      Case #DIRECTION_UP
+        Debug "Utilt (" + *port\figher\name + ")"
+        ProcedureReturn 1
+      Case #DIRECTION_DOWN
+        Debug "Dtilt (" + *port\figher\name + ")"
+        ProcedureReturn 1
+    EndSelect 
   Else
     Select direction
       Case #DIRECTION_NONE
@@ -300,15 +304,42 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
 EndProcedure
 *inputManagers(#INPUT_Attack) = @inputManager_Attack()
 
+Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
+  If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
+    setState(*port\figher, #STATE_DASH)
+    *port\figher\facing = 1
+  EndIf 
+  ProcedureReturn 1
+EndProcedure
+*inputManagers(#INPUT_ControlStick_RIGHT) = @inputManager_smashStickRight()
+
+Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
+  Debug *port\figher\state
+  If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
+    setState(*port\figher, #STATE_DASH)
+    *port\figher\facing = -1
+  EndIf 
+  ProcedureReturn 1
+EndProcedure
+*inputManagers(#INPUT_ControlStick_LEFT) = @inputManager_smashStickLeft()
+
+Procedure inputManager_jump(*port.Port, *info.inputData)
+  If *port\figher\grounded
+    setState(*port\figher, #STATE_JUMPSQUAT)
+  EndIf 
+EndProcedure
+*inputManagers(#INPUT_Jump) = @inputManager_jump()
+
 Procedure updateInputs()
-  Shared inputQ(), frame, ports(), *inputManagers()
+  Shared inputQ(), frame, ports(), *inputManagers(), *port.Port, inputConfig
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
   readInputs()
   ForEach inputQ()
     input = inputQ() & %11111
     durability = (inputQ() & %111100000) >> 5
     port = (inputQ() & %111000000000) >> 9
-    info\directionAxis = (inputQ() & %111000000000000) >> 12 
+    info\directionAxis = (inputQ() & %111000000000000) >> 12
+    
     ;Debug Str(input) + " "  + Str(durability) + " "+ Str(port) + " (frame : " + Str(frame) + ")"
     
     If *inputManagers(input)
@@ -321,22 +352,53 @@ Procedure updateInputs()
         Continue 
       EndIf 
     EndIf 
-    
+
     durability - 1
     If durability < 1
       DeleteElement(inputQ())
     Else
       inputQ() = makeInputValue(input, durability, port, directionAxis)
-    EndIf   
+    EndIf  
   Next 
-  
+  For i = 0 To 3
+    If Not ports(i)\active
+      Continue  
+    EndIf 
+    *port = ports(i)
+    
+    If *port\figher\state = #STATE_IDLE
+      If Abs(*port\currentControlStickState\x) > stickTreshold
+        If *port\figher\grounded
+          setState(*port\figher, #STATE_WALK)
+        Else 
+          If *port\figher\physics\v\x < *port\figher\character\maxAirSpeed 
+            *port\figher\physics\v\x + *port\figher\character\airAcceleration * Sign(*port\currentControlStickState\x)
+            If *port\figher\physics\v\x > *port\figher\character\maxAirSpeed 
+              *port\figher\physics\v\x = *port\figher\character\maxAirSpeed 
+            EndIf 
+          EndIf 
+        EndIf 
+        *port\figher\facing = Sign(*port\currentControlStickState\x)
+      EndIf 
+    EndIf 
+    If *port\figher\state = #STATE_WALK
+      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+        setState(*port\figher, #STATE_IDLE)
+      EndIf
+    EndIf 
+    If *port\figher\state = #STATE_DASH
+      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+        setState(*port\figher, #STATE_IDLE)
+      EndIf
+    EndIf 
+  Next
 EndProcedure
   
 availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 296
-; FirstLine = 265
-; Folding = ---
+; CursorPosition = 378
+; FirstLine = 343
+; Folding = ----
 ; EnableXP
