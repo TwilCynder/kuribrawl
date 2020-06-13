@@ -1,4 +1,8 @@
-﻿XIncludeFile "utilCore.pb"
+﻿;FINIR LES JUMPS (DASH JUMP, BACK JUMP, DOUBLE JUMP)
+;SYSTEM DE DEBUG INTERGRE A LA FENETRE
+;BINARY DATA (WRITE + READ)
+
+XIncludeFile "utilCore.pb"
 XIncludeFile "gamelib.pbi"
 XIncludeFile "inputlib.pb"
 XIncludeFile "physicslib.pb"
@@ -30,7 +34,7 @@ setPortFighter(0, *f1)
 
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l
-frameDuration.f = 1000.0 / 30
+frameDuration.f = 1000.0 / 60
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 lastFrameDuration = 16
@@ -67,7 +71,6 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 32
-; FirstLine = 6
+; CursorPosition = 2
 ; EnableXP
 ; EnableUnicode

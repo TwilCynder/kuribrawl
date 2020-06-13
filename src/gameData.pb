@@ -28,12 +28,12 @@ addFrame(*testAnim, 0, 0, 40, 56, 20, 56)
 *c1\dashSpeed = 8.0
 *c1\initialDashSpeed = 110.0
 *c1\walkSpeed = 4.5
-*c1\maxAirSpeed = 40.0
+*c1\maxAirSpeed = 5.0
 *c1\airAcceleration = 0.3
 *c1\traction = 0.7
 *c1\jumpSpeed = 13.0
 *c1\jumpsquatDuration = 5
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 31
+; CursorPosition = 30
 ; EnableXP

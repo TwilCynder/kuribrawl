@@ -48,7 +48,7 @@ Enumeration
   #JUMP_NORMAL
   #JUMP_WALKING
   #JUMP_BACKWARDS
-Enumeration
+EndEnumeration
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 50
 ; EnableXP
