@@ -44,6 +44,7 @@ Procedure applyPhysics(*game.Game)
     nx = *fighter\x + *fighter\physics\v\x
     ny = *fighter\y + *fighter\physics\v\y
     If groundCollision(nx, ny)
+      *fighter\jumps = 1
       *fighter\grounded = 1
       *fighter\physics\v\y = 0
       ny = 0
@@ -56,7 +57,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 40
+; CursorPosition = 46
 ; FirstLine = 6
 ; Folding = -
 ; EnableXP

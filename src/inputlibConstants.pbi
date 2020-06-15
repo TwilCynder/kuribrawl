@@ -1,7 +1,4 @@
-﻿#MAX_BUTTON_NB = 32
-#MAX_AXIS_NB = 7
-
-Enumeration ;inputs
+﻿Enumeration ;inputs
   #INPUT_Attack
   #INPUT_Special
   #INPUT_Jump
@@ -67,5 +64,4 @@ Enumeration ;same
   #AXISES
 EndEnumeration
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 7
 ; EnableXP

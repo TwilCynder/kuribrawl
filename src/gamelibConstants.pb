@@ -42,6 +42,7 @@ Enumeration
   #STATE_ATTACK
   ;ATTACK_AIR = ATTACK && !grounded
   #STATE_LANDING_LAG
+  #STATES
 EndEnumeration
 
 Enumeration
@@ -49,6 +50,16 @@ Enumeration
   #JUMP_WALKING
   #JUMP_BACKWARDS
 EndEnumeration
+
+Enumeration
+  #YJUMP_NORMAL
+  #YJUMP_SHORT
+  #YJUMP_DOUBLE
+EndEnumeration
+
+#MAX_BUTTON_NB = 31
+#MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 50
+; CursorPosition = 57
+; FirstLine = 8
 ; EnableXP

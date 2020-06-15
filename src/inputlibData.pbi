@@ -1,20 +1,4 @@
-﻿Dim InputNames.s(#INPUTS)
-InputNames(#INPUT_Attack) = "Attack"
-InputNames(#INPUT_Special) = "Special"
-InputNames(#INPUT_Jump) = "Jump"
-InputNames(#INPUT_Grab) = "Grab"
-InputNames(#INPUT_Guard) = "Guard"
-InputNames(#INPUT_ControlStick_RIGHT) = "Control Stick Right"
-InputNames(#INPUT_ControlStick_UP) = "Control Stick Up"
-InputNames(#INPUT_ControlStick_DOWN) = "Control Stick Down"
-InputNames(#INPUT_ControlStick_LEFT) = "Control Stick Left"
-InputNames(#INPUT_ControlStick_SRIGHT) = "Control Stick Smash Right"
-InputNames(#INPUT_ControlStick_SUP) = "Control Stick Smash Up"
-InputNames(#INPUT_ControlStick_SDOWN) = "Control Stick Smash Down"
-InputNames(#INPUT_ControlStick_SLEFT) = "Control Stick Smash Left"
-
-
-defaultBind.InputBinding
+﻿defaultBind.InputBinding
 With defaultBind
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_A : \buttons()\input = #INPUT_Attack
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_B : \buttons()\input = #INPUT_Special
@@ -46,5 +30,4 @@ Prototype inputManager(*port.Port, *info.inputData)
 
 Dim *inputManagers(#INPUTS)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 44
 ; EnableXP

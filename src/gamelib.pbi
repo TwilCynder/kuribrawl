@@ -57,10 +57,18 @@ Structure Champion
   traction.d
   jumpSpeed.d
   jumpsquatDuration.d
+  shorthopSpeed.d
+  doubleJumpSpeed.d
+EndStructure
+
+Structure GameVariables
+  backwardJumpBoost.d
+  walkingJumpBoost.d
 EndStructure
 
 Structure GameData
   Map characters.Champion()
+  variables.GameVariables
 EndStructure  
 Global kuribrawl.GameData
   
@@ -79,12 +87,37 @@ Structure Fighter
   state.b
   stateInfo.b ;attack, direction
   stateTimer.u
+  jumps.b
 EndStructure
 
 Structure Game
   List fighters.Fighter()
   window.l
 EndStructure
+
+Structure AxisState
+  x.l
+  y.l
+  z.l
+EndStructure
+
+Structure ControllerState
+  buttons.b[#MAX_BUTTON_NB]
+  axis.AxisState[#MAX_AXIS_NB]
+EndStructure
+
+Structure Port
+  joyID.l
+  previousState.ControllerState
+  currentControlStickState.AxisState
+  controlStickBuffer.b[4]
+  active.b
+  *figher.Fighter
+EndStructure
+Dim ports.Port(4)
+
+Declare readButton(button.b, *port.Port)
+Declare readAxis(*state.AxisState, axis.b, *port.Port)
 
 Prototype.i f_callback(*fighter.Fighter)
 
@@ -197,9 +230,49 @@ Procedure figherDirection(*fighter.Fighter)
   ProcedureReturn *fighter\facing
 EndProcedure
 
-Procedure setState(*fighter.Fighter, state.b)
+CompilerIf #DEBUG
+  Declare logState(state.b)
+CompilerEndIf
+Procedure setState(*fighter.Fighter, state.b, info.l = 0)
   *fighter\state = state
+  *fighter\stateInfo = info
   *fighter\stateTimer = 0
+  CompilerIf #DEBUG
+    logState(state)
+  CompilerEndIf
+EndProcedure
+
+Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
+  Select jumpType
+    Case #JUMP_WALKING
+      *fighter\physics\v\x + (kuribrawl\variables\walkingJumpBoost * *fighter\facing)
+    Case #JUMP_BACKWARDS
+      *fighter\physics\v\x + (kuribrawl\variables\backwardJumpBoost * -*fighter\facing)
+  EndSelect    
+     
+  Select jumpTypeY
+    Case #YJUMP_SHORT
+      *fighter\physics\v\y = *fighter\character\shorthopSpeed
+    Case #YJUMP_NORMAL
+      *fighter\physics\v\y = *fighter\character\jumpSpeed
+    Case #YJUMP_DOUBLE
+      *fighter\physics\v\y = *fighter\character\doubleJumpSpeed
+  EndSelect
+  setState(*fighter, #STATE_IDLE)
+EndProcedure
+
+Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
+  Shared ports()
+  Define jumpType.b, button.b, axis.AxisState
+  
+  jumpType = stateinfo & %11
+  button = (stateinfo & %1111100) >> 2
+  
+  If Abs(ports(*fighter\port)\currentControlStickState\x) > stickTreshold And Sign(ports(*fighter\port)\currentControlStickState\x) <> *fighter\facing 
+    jumpType = #JUMP_BACKWARDS
+  EndIf 
+  
+  jump(*fighter, jumpType, 1 - readButton(button, ports(*fighter\port)))
 EndProcedure
 
 Procedure manageStates(*game.Game)
@@ -210,8 +283,7 @@ Procedure manageStates(*game.Game)
     Select *fighter\state
       Case #STATE_JUMPSQUAT
         If *fighter\stateTimer >= *fighter\character\jumpsquatDuration
-          setState(*fighter, #STATE_IDLE)
-          *fighter\physics\v\y = *fighter\character\jumpSpeed
+          stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
         EndIf 
     EndSelect
     *fighter\stateTimer + 1
@@ -238,9 +310,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 79
-; FirstLine = 76
-; Folding = ---
+; CursorPosition = 249
+; FirstLine = 236
+; Folding = ----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

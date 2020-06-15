@@ -14,17 +14,6 @@ Macro stickTreshold : inputConfig\analogStickThreshold : EndMacro
 Macro stickSmashTreshold : inputConfig\analogStickSmashThreshold : EndMacro
 Macro triggerTreshold : inputConfig\analogTriggerThreshold : EndMacro
 
-Structure AxisState
-  x.l
-  y.l
-  z.l
-EndStructure
-
-Structure ControllerState
-  buttons.b[#MAX_BUTTON_NB]
-  axis.AxisState[#MAX_AXIS_NB]
-EndStructure
-
 Structure Bind
   ID.b
   input.b
@@ -38,24 +27,15 @@ Structure InputBinding
 EndStructure
 
 Structure inputData
-  directionAxis.b
-  additionalInfo.b
-EndStructure
-
-Structure Port
-  joyID.l
-  previousState.ControllerState
-  currentControlStickState.AxisState
-  controlStickBuffer.b[4]
-  active.b
-  *figher.Fighter
+  element.b ; the element (stick/button) responsible for this input
+  stick.b ;wheter the said element was a stick or not
 EndStructure
 
 XIncludeFile "inputlibData.pbi"
 
-NewList inputQ.l()
+;NOTE : the port and states structures were moved to the gamelib.pb, as they are needed for state handling
 
-Dim ports.Port(4)
+NewList inputQ.l()
 
 Procedure setPort(port, joyID, active = 1)
   Shared ports()
@@ -66,6 +46,7 @@ EndProcedure
 Procedure setPortFighter(port, *fighter.Fighter)
   Shared ports()
   ports(port)\figher = *fighter
+  *fighter\port = port
 EndProcedure
 
 Procedure readButton(button.b, *port.Port) ;examineJoystick not included !
@@ -107,14 +88,19 @@ Procedure readTrigger(axis.b, *port.Port) ;keep in mind that a trigger is just t
   ProcedureReturn res
 EndProcedure
 
-Procedure makeInputValue(input.b, time.b, port.b, directionAxis.b)
-  ProcedureReturn input + (time << 5) + (port << 9) + (directionAxis << 12)
+Procedure makeInputValue(input.b, time.b, port.b, element.b, stick.b)
+  ProcedureReturn input + (time << 5) + (port << 9) + (stick << 12) + (element << 13)
 EndProcedure
 
-Procedure registerInput(port, input, directionAxis.b = #MAX_AXIS_NB)
-  Shared InputNames(), inputQ(), defaultInputDurability()
-  Debug "Port " + port + " : " + InputNames(input)
-  AddElement(inputQ()) : inputQ() = makeInputValue(input, defaultInputDurability(input), port, directionAxis)
+CompilerIf #DEBUG
+  Declare logInput(port.b, input.b, element.b, stick.b)
+CompilerEndIf
+Procedure registerInput(port, input, element = #MAX_BUTTON_NB, stick = 0)
+  Shared inputQ(), defaultInputDurability()
+  AddElement(inputQ()) : inputQ() = makeInputValue(input, defaultInputDurability(input), port, element, stick)
+  CompilerIf #DEBUG
+   logInput(port, input, element, stick)
+  CompilerEndIf
 EndProcedure
 
 Procedure readInputs()
@@ -139,7 +125,7 @@ Procedure readInputs()
       state = readButton(id, *port)
       
       If state And Not ports(i)\previousState\buttons[id]
-        registerInput(i, defaultBind\buttons()\input)
+        registerInput(i, defaultBind\buttons()\input, id)
       EndIf
       *port\previousState\buttons[id] = state
     Next 
@@ -205,18 +191,18 @@ Procedure readInputs()
       id = defaultBind\axises()\ID
       readAxis(@axisState, defaultBind\axises()\ID, *port)
       If axisState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold
-        registerInput(i, defaultBind\axises()\input, id)
+        registerInput(i, defaultBind\axises()\input, id, 1)
         ;registerInput(i, #INPUT_ControlStick_RIGHT)
       ElseIf axisState\x < -stickTreshold And *port\previousState\axis[id]\x > -stickTreshold
-        registerInput(i, defaultBind\axises()\input, id)
+        registerInput(i, defaultBind\axises()\input, id, 1)
         ;registerInput(i, #INPUT_ControlStick_LEFT)
       EndIf 
         
       If axisState\y > stickTreshold And *port\previousState\axis[id]\y < stickTreshold
-        registerInput(i, defaultBind\axises()\input, id)
+        registerInput(i, defaultBind\axises()\input, id, 1)
         ;registerInput(i, #INPUT_ControlStick_DOWN)
       ElseIf  axisState\y < -stickTreshold And *port\previousState\axis[id]\y > -stickTreshold
-        registerInput(i, defaultBind\axises()\input, id)
+        registerInput(i, defaultBind\axises()\input, id, 1)
         ;registerInput(i, #INPUT_ControlStick_UP)
       EndIf 
       *port\previousState\axis[id]\x = axisState\x
@@ -242,9 +228,9 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
   Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
   If isFighterGrounded(*port\figher)
-    If *info\directionAxis < #MAX_AXIS_NB
+    If *info\stick
       state.AxisState
-      readAxis(@state, *info\directionAxis, *port)
+      readAxis(@state, *info\element, *port)
       direction = stickDirection(@state)
     Else 
       direction = controlStickDirection(*port)
@@ -314,7 +300,6 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_RIGHT) = @inputManager_smashStickRight()
 
 Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
-  Debug *port\figher\state
   If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
     setState(*port\figher, #STATE_DASH)
     *port\figher\facing = -1
@@ -324,8 +309,26 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_LEFT) = @inputManager_smashStickLeft()
 
 Procedure inputManager_jump(*port.Port, *info.inputData)
+  Shared inputConfig.inputConfig
+  Define jumpType.b
   If *port\figher\grounded
-    setState(*port\figher, #STATE_JUMPSQUAT)
+    If *port\figher\state = #STATE_WALK Or *port\figher\state = #STATE_DASH
+      jumpType = #JUMP_WALKING
+    Else 
+      jumpType = #JUMP_NORMAL
+    EndIf 
+    setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (*info\element << 2))
+  ElseIf *port\figher\jumps > 0
+    If Abs(*port\currentControlStickState\x) > stickTreshold
+      If  Sign(*port\currentControlStickState\x) = *port\figher\facing 
+        jump(*port\figher, #JUMP_WALKING, #YJUMP_DOUBLE)
+      Else
+        jump(*port\figher, #JUMP_BACKWARDS, #YJUMP_DOUBLE)
+      EndIf 
+    Else
+      jump(*port\figher, #JUMP_NORMAL, #YJUMP_DOUBLE)
+    EndIf
+    *port\figher\jumps - 1  
   EndIf 
 EndProcedure
 *inputManagers(#INPUT_Jump) = @inputManager_jump()
@@ -338,7 +341,8 @@ Procedure updateInputs()
     input = inputQ() & %11111
     durability = (inputQ() & %111100000) >> 5
     port = (inputQ() & %111000000000) >> 9
-    info\directionAxis = (inputQ() & %111000000000000) >> 12
+    info\stick = (inputQ() & %1000000000000) >> 12
+    info\element = (inputQ() & %11111 << 13) >> 13
     
     ;Debug Str(input) + " "  + Str(durability) + " "+ Str(port) + " (frame : " + Str(frame) + ")"
     
@@ -357,7 +361,7 @@ Procedure updateInputs()
     If durability < 1
       DeleteElement(inputQ())
     Else
-      inputQ() = makeInputValue(input, durability, port, directionAxis)
+      inputQ() = makeInputValue(input, durability, port, element, stick)
     EndIf  
   Next 
   For i = 0 To 3
@@ -370,15 +374,17 @@ Procedure updateInputs()
       If Abs(*port\currentControlStickState\x) > stickTreshold
         If *port\figher\grounded
           setState(*port\figher, #STATE_WALK)
+          *port\figher\facing = Sign(*port\currentControlStickState\x)
         Else 
-          If *port\figher\physics\v\x < *port\figher\character\maxAirSpeed 
+          If *port\figher\physics\v\x < *port\figher\character\maxAirSpeed And *port\figher\physics\v\x > -*port\figher\character\maxAirSpeed
             *port\figher\physics\v\x + *port\figher\character\airAcceleration * Sign(*port\currentControlStickState\x)
             If *port\figher\physics\v\x > *port\figher\character\maxAirSpeed 
               *port\figher\physics\v\x = *port\figher\character\maxAirSpeed 
-            EndIf 
+            ElseIf *port\figher\physics\v\x < -*port\figher\character\maxAirSpeed 
+              *port\figher\physics\v\x = -*port\figher\character\maxAirSpeed 
+            EndIf
           EndIf 
         EndIf 
-        *port\figher\facing = Sign(*port\currentControlStickState\x)
       EndIf 
     EndIf 
     If *port\figher\state = #STATE_WALK
@@ -398,7 +404,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 378
-; FirstLine = 343
+; CursorPosition = 324
+; FirstLine = 287
 ; Folding = ----
 ; EnableXP

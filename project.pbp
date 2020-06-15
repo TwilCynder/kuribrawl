@@ -7,12 +7,12 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-06-13 23:06" user="twilc" host="DESKTOP-NLNR9CI"/>
+    <lastopen date="2020-06-15 00:41" user="twilc" host="DESKTOP-NLNR9CI"/>
   </section>
   <section name="files">
     <file name="src\gameData.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="0dcec4c9aa48be753efba6fc650169db"/>
+      <fingerprint md5="b735e74bc82e615b4371249eb5ba9eb7"/>
     </file>
     <file name="src\gamelib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -20,11 +20,11 @@
     </file>
     <file name="src\gamelibConstants.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="b504e1c9ef4362fa5eaed58dacf683d8"/>
+      <fingerprint md5="aad838ca554dde3c88600a2cfe03bff5"/>
     </file>
     <file name="src\inputlib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="f0d4f15e534cb029d3e8d10b382ab61e"/>
+      <fingerprint md5="208a43f9b1d410a573388ff2cb679a0c"/>
     </file>
     <file name="src\inputlibConstants.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -32,11 +32,11 @@
     </file>
     <file name="src\inputlibData.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="fe16c6aaa60db880426771db222a35d8"/>
+      <fingerprint md5="bddd7ceb5b241f967734a82b6b7fcd2e"/>
     </file>
     <file name="src\main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="3732dfbb96ad924ea934682678bfab02"/>
+      <fingerprint md5="3ab465826ca0fa1d001ade02337ce462"/>
     </file>
     <file name="src\physicslib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -46,12 +46,22 @@
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
       <fingerprint md5="4a34f0f5af95f8c018a905069c8a8c8f"/>
     </file>
+    <file name="src\debug.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="66d32e7e82e16d7a6e5a4804688fd391"/>
+    </file>
+    <file name="src\debugData.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="d6c808e29924375c937ace8b9e255382"/>
+    </file>
   </section>
   <section name="targets">
     <target name="Default Target" enabled="1" default="1">
       <inputfile value="src\main.pb"/>
       <outputfile value="bin\KuriBrawl.exe"/>
+      <executable value="build\KuriBrawl.exe"/>
       <options xpskin="1" debug="1"/>
+      <icon enable="1">icon.ico</icon>
     </target>
   </section>
 </project>

@@ -1,4 +1,7 @@
-﻿*c1.Champion = newCharacter("Acid Rainbows")
+﻿kuribrawl\variables\walkingJumpBoost = 3.0
+kuribrawl\variables\backwardJumpBoost = 3.0
+
+*c1.Champion = newCharacter("Acid Rainbows")
 *testAnim.Animation = newAnimation(*c1, "idle", "res/idle_strip4.png", 0.05)
 addFrame(*testAnim, 0, 0, 34, 72, 17, 72)
 addFrame(*testAnim, 34, 0, 34, 72, 17, 72)
@@ -33,7 +36,9 @@ addFrame(*testAnim, 0, 0, 40, 56, 20, 56)
 *c1\traction = 0.7
 *c1\jumpSpeed = 13.0
 *c1\jumpsquatDuration = 5
+*c1\shortHopSpeed = 7.5
+*c1\doubleJumpSpeed = 12.0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 30
+; CursorPosition = 39
 ; EnableXP

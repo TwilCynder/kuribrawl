@@ -1,4 +1,6 @@
-﻿;FINIR LES JUMPS (DASH JUMP, BACK JUMP, DOUBLE JUMP)
+﻿#DEBUG = 1
+
+;FINIR LES JUMPS (DASH JUMP, BACK JUMP, DOUBLE JUMP)
 ;SYSTEM DE DEBUG INTERGRE A LA FENETRE
 ;BINARY DATA (WRITE + READ)
 
@@ -6,15 +8,20 @@ XIncludeFile "utilCore.pb"
 XIncludeFile "gamelib.pbi"
 XIncludeFile "inputlib.pb"
 XIncludeFile "physicslib.pb"
+CompilerIf #DEBUG
+  XIncludeFile "debug.pb"
+CompilerEndIf
 
 InitSprite()
 UsePNGImageDecoder()
 
 
-window.l = OpenWindow(-1, 0, 0, #SCREEN_W, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
-OpenWindowedScreen(WindowID(window), 0, 0, #SCREEN_W, #SCREEN_H, 0, 0, 0, #PB_Screen_NoSynchronization   )
+window.l = OpenWindow(-1, 0, 0, #SCREEN_W + 170, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
+OpenWindowedScreen(WindowID(window), 0, 0, #SCREEN_W, #SCREEN_H, 0, 0, 0, #PB_Screen_NoSynchronization )
+SetWindowColor(window, $aaaaaa)
+InputLogGadget(#SCREEN_W + 5, 5, 160, #SCREEN_H - 120)
+StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
 XIncludeFile "gameData.pb"
-
 
 *game.Game = initGame(window)
 *f1.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
@@ -49,7 +56,7 @@ Repeat
   updateAnimations(*game)
   renderFrame(*game)
   
-  SetWindowTitle(window, Str(1000 / lastFrameDuration))
+  SetWindowTitle(window, Str(lastFrameDuration))
   
   currentTime = ElapsedMilliseconds()
   frameWait = nextFrame - currentTime
@@ -71,6 +78,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 2
+; CursorPosition = 43
+; FirstLine = 15
+; Folding = -
 ; EnableXP
 ; EnableUnicode
