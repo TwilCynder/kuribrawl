@@ -41,6 +41,7 @@ Enumeration
   #STATE_LANDING
   #STATE_ATTACK
   ;ATTACK_AIR = ATTACK && !grounded
+  #STATE_TUMBLE
   #STATE_LANDING_LAG
   #STATES
 EndEnumeration
@@ -60,6 +61,6 @@ EndEnumeration
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 57
+; CursorPosition = 43
 ; FirstLine = 8
 ; EnableXP

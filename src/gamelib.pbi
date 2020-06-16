@@ -44,6 +44,7 @@ Structure Animation
   spriteSheet.l ;handle de l'image servant de spritesheet
   List frames.Frame()
   frameMultiplier.b
+  frameCount.b
 EndStructure  
 
 Structure Champion
@@ -57,13 +58,18 @@ Structure Champion
   traction.d
   jumpSpeed.d
   jumpsquatDuration.d
+  dashStopDuration.d
   shorthopSpeed.d
   doubleJumpSpeed.d
+  maxFallSpeed.d
+  fastFallSpeed.d
+  airFriction.d
 EndStructure
 
 Structure GameVariables
   backwardJumpBoost.d
   walkingJumpBoost.d
+  doubleJumpBackwardSpeed.d
 EndStructure
 
 Structure GameData
@@ -170,6 +176,7 @@ Procedure addFrame(*animation.Animation, x.l, y.l, w.l, h.l, xo.l, yo.l)
   *f\display\h = h
   *f\origin\x = xo
   *f\origin\y = yo
+  *animation\frameCount + *animation\frameMultiplier
 EndProcedure
 
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
@@ -186,6 +193,7 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   ForEach *character\animations()
     *anim = AddMapElement(*r\animations(), MapKey(*character\animations()))
     *anim\frameMultiplier = *character\animations()\frameMultiplier
+    *anim\frameCount = *character\animations()\frameCount
     *anim\spriteSheet = *character\animations()\spriteSheet
     CopyList(*character\animations()\frames(), *anim\frames())
     setAnimation(*r, MapKey(*character\animations()))
@@ -231,23 +239,27 @@ Procedure figherDirection(*fighter.Fighter)
 EndProcedure
 
 CompilerIf #DEBUG
-  Declare logState(state.b)
+  Declare logState(state.b, facing.b = 0)
 CompilerEndIf
 Procedure setState(*fighter.Fighter, state.b, info.l = 0)
   *fighter\state = state
   *fighter\stateInfo = info
   *fighter\stateTimer = 0
   CompilerIf #DEBUG
-    logState(state)
+    logState(state, *fighter\facing)
   CompilerEndIf
 EndProcedure
 
 Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
-  Select jumpType
+  Select jumpTypeX
     Case #JUMP_WALKING
       *fighter\physics\v\x + (kuribrawl\variables\walkingJumpBoost * *fighter\facing)
     Case #JUMP_BACKWARDS
-      *fighter\physics\v\x + (kuribrawl\variables\backwardJumpBoost * -*fighter\facing)
+      If jumpTypeY = #YJUMP_DOUBLE
+        *fighter\physics\v\x = (kuribrawl\variables\doubleJumpBackwardSpeed * -*fighter\facing)
+      Else  
+        *fighter\physics\v\x + (kuribrawl\variables\backwardJumpBoost * -*fighter\facing)
+      EndIf 
   EndSelect    
      
   Select jumpTypeY
@@ -275,16 +287,30 @@ Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
   jump(*fighter, jumpType, 1 - readButton(button, ports(*fighter\port)))
 EndProcedure
 
+;TODO URG : REWORK CETTE PARTIE AVEC UN SYSTEME D'ANIM PAR DEF POUR UN STATE 
+
 Procedure manageStates(*game.Game)
-  Define *fighter.Fighter
+  Define *fighter.Fighter, max.b
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    
     Select *fighter\state
       Case #STATE_JUMPSQUAT
-        If *fighter\stateTimer >= *fighter\character\jumpsquatDuration
-          stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
+        max = *fighter\character\jumpsquatDuration
+        If max < 1
+          max = *fighter\currentAnimation\frameCount
         EndIf 
+        Debug max
+        If *fighter\stateTimer >= max
+          stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
+        EndIf
+      Case #STATE_DASH_STOP
+        max = *fighter\character\dashStopDuration
+        If max < 1
+          max = *fighter\currentAnimation\frameCount
+        EndIf 
+        If *fighter\stateTimer >= max
+          setState(*fighter, #STATE_IDLE)
+        EndIf  
     EndSelect
     *fighter\stateTimer + 1
   Next 
@@ -304,14 +330,16 @@ Procedure updateAnimations(*game.Game)
         setAnimation(*fighter, "dash")
       Case #STATE_JUMPSQUAT
         setAnimation(*fighter, "jumpsquat")
+      Case #STATE_DASH_STOP
+        setAnimation(*fighter, "dashStop")
     EndSelect
   Next 
 EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 249
-; FirstLine = 236
+; CursorPosition = 178
+; FirstLine = 151
 ; Folding = ----
 ; EnableXP
 ; SubSystem = OpenGL

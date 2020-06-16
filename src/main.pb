@@ -34,7 +34,7 @@ For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 0)
+setPort(0, 5)
 setPortFighter(0, *f1)
 ;setPort(1, 1)
 ;setPortFighter(1, *f2)
@@ -79,7 +79,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 43
-; FirstLine = 15
+; FirstLine = 28
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

@@ -227,15 +227,14 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
   Define direction.b
   Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
+  If *info\stick
+    state.AxisState
+    readAxis(@state, *info\element, *port)
+    direction = stickDirection(@state)
+  Else 
+    direction = controlStickDirection(*port)
+  EndIf 
   If isFighterGrounded(*port\figher)
-    If *info\stick
-      state.AxisState
-      readAxis(@state, *info\element, *port)
-      direction = stickDirection(@state)
-    Else 
-      direction = controlStickDirection(*port)
-    EndIf 
-
     ForEach inputQ()
       input.b = inputQ() & %11111
       If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
@@ -275,7 +274,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
         Debug "Nair (" + *port\figher\name + ")"
         ProcedureReturn 1
       Case #DIRECTION_LEFT, #DIRECTION_RIGHT
-        If direction = figherDirection(*port\figher) * 2
+        If direction - 1 = -*port\figher\facing
           Debug "Fair (" + *port\figher\name + ")"
         Else 
           Debug "Bair (" + *port\figher\name + ")"
@@ -292,8 +291,8 @@ EndProcedure
 
 Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
   If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
-    setState(*port\figher, #STATE_DASH)
     *port\figher\facing = 1
+    setState(*port\figher, #STATE_DASH)
   EndIf 
   ProcedureReturn 1
 EndProcedure
@@ -301,8 +300,8 @@ EndProcedure
 
 Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
   If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
-    setState(*port\figher, #STATE_DASH)
     *port\figher\facing = -1
+    setState(*port\figher, #STATE_DASH)
   EndIf 
   ProcedureReturn 1
 EndProcedure
@@ -333,8 +332,47 @@ Procedure inputManager_jump(*port.Port, *info.inputData)
 EndProcedure
 *inputManagers(#INPUT_Jump) = @inputManager_jump()
 
+Procedure inputManager_smashStickDown(*port.Port, *info.inputData)
+  If *port\figher\state = #STATE_IDLE And *port\figher\physics\v\y < 0
+    Debug "fast fall"
+    *port\figher\physics\v\y = -*port\figher\character\fastFallSpeed
+  EndIf 
+EndProcedure    
+*inputManagers(#INPUT_ControlStick_DOWN) = @inputManager_smashStickDown()
+
+Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
+  Shared inputConfig
+  If *port\figher\state = #STATE_IDLE
+    If Abs(*port\currentControlStickState\x) > stickTreshold
+      If *port\figher\grounded
+        *port\figher\facing = Sign(*port\currentControlStickState\x)
+        setState(*port\figher, #STATE_WALK)
+      Else 
+        If *port\figher\physics\v\x < *port\figher\character\maxAirSpeed And *port\figher\physics\v\x > -*port\figher\character\maxAirSpeed
+          *port\figher\physics\v\x + *port\figher\character\airAcceleration * Sign(*port\currentControlStickState\x)
+          If *port\figher\physics\v\x > *port\figher\character\maxAirSpeed 
+            *port\figher\physics\v\x = *port\figher\character\maxAirSpeed 
+          ElseIf *port\figher\physics\v\x < -*port\figher\character\maxAirSpeed 
+            *port\figher\physics\v\x = -*port\figher\character\maxAirSpeed 
+          EndIf
+        EndIf 
+      EndIf 
+    EndIf 
+  EndIf 
+  If *port\figher\state = #STATE_WALK
+    If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+      setState(*port\figher, #STATE_IDLE)
+    EndIf
+  EndIf
+  If *port\figher\state = #STATE_DASH
+    If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+      setState(*port\figher, #STATE_DASH_STOP)
+    EndIf
+  EndIf 
+EndProcedure
+
 Procedure updateInputs()
-  Shared inputQ(), frame, ports(), *inputManagers(), *port.Port, inputConfig
+  Shared inputQ(), ports(), *inputManagers(), *port.Port
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
   readInputs()
   ForEach inputQ()
@@ -343,8 +381,6 @@ Procedure updateInputs()
     port = (inputQ() & %111000000000) >> 9
     info\stick = (inputQ() & %1000000000000) >> 12
     info\element = (inputQ() & %11111 << 13) >> 13
-    
-    ;Debug Str(input) + " "  + Str(durability) + " "+ Str(port) + " (frame : " + Str(frame) + ")"
     
     If *inputManagers(input)
       *currentElement = @inputQ()
@@ -362,41 +398,14 @@ Procedure updateInputs()
       DeleteElement(inputQ())
     Else
       inputQ() = makeInputValue(input, durability, port, element, stick)
-    EndIf  
+    EndIf 
   Next 
   For i = 0 To 3
     If Not ports(i)\active
       Continue  
     EndIf 
     *port = ports(i)
-    
-    If *port\figher\state = #STATE_IDLE
-      If Abs(*port\currentControlStickState\x) > stickTreshold
-        If *port\figher\grounded
-          setState(*port\figher, #STATE_WALK)
-          *port\figher\facing = Sign(*port\currentControlStickState\x)
-        Else 
-          If *port\figher\physics\v\x < *port\figher\character\maxAirSpeed And *port\figher\physics\v\x > -*port\figher\character\maxAirSpeed
-            *port\figher\physics\v\x + *port\figher\character\airAcceleration * Sign(*port\currentControlStickState\x)
-            If *port\figher\physics\v\x > *port\figher\character\maxAirSpeed 
-              *port\figher\physics\v\x = *port\figher\character\maxAirSpeed 
-            ElseIf *port\figher\physics\v\x < -*port\figher\character\maxAirSpeed 
-              *port\figher\physics\v\x = -*port\figher\character\maxAirSpeed 
-            EndIf
-          EndIf 
-        EndIf 
-      EndIf 
-    EndIf 
-    If *port\figher\state = #STATE_WALK
-      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
-        setState(*port\figher, #STATE_IDLE)
-      EndIf
-    EndIf 
-    If *port\figher\state = #STATE_DASH
-      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
-        setState(*port\figher, #STATE_IDLE)
-      EndIf
-    EndIf 
+    inputManager_controlStickState(*port)
   Next
 EndProcedure
   
@@ -404,7 +413,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 324
-; FirstLine = 287
+; CursorPosition = 368
+; FirstLine = 336
 ; Folding = ----
 ; EnableXP

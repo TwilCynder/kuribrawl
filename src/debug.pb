@@ -23,12 +23,17 @@ Procedure StatesGadgets(x.l, y.l, w.l)
   stateGadget = StringGadget(-1, x, y + 75, w, 20, "")
 EndProcedure
 
-Procedure logState(state.b)
+Procedure logState(state.b, facing.b = 0)
   Shared stateGadget, previousStateGadget, StateNames()
   SetGadgetText(previousStateGadget, GetGadgetText(stateGadget))
   SetGadgetText(stateGadget, StateNames(state))
+  If facing = 1
+    SetGadgetColor(stateGadget, #PB_Gadget_BackColor,  #Cyan)
+  ElseIf facing = -1
+    SetGadgetColor(stateGadget, #PB_Gadget_BackColor,  #Red)
+  EndIf 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 22
+; CursorPosition = 30
 ; Folding = -
 ; EnableXP

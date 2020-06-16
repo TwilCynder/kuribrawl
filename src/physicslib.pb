@@ -23,16 +23,23 @@ EndProcedure
 Procedure applyPhysics(*game.Game)
   Shared ports()
   Define nx.l, ny.l, *fighter.Fighter
-  
+
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    If isFighterGrounded(*fighter)
-      substractValue(@*fighter\physics\v\x, *fighter\character\traction)
-    EndIf 
     
     If *fighter\facing = 0
       *fighter\facing = 1
     EndIf 
+    
+    ;--- Aplication de la traction/friction
+    
+    If isFighterGrounded(*fighter)
+      substractValue(@*fighter\physics\v\x, *fighter\character\traction)
+    Else
+      substractValue(@*fighter\physics\v\x, *fighter\character\airFriction)
+    EndIf 
+    
+    ;--- Application des vitesses dues aux états (walk/dashà
     
     Select *fighter\state
       Case #STATE_WALK  
@@ -40,9 +47,22 @@ Procedure applyPhysics(*game.Game)
       Case #STATE_DASH
         *fighter\physics\v\x = *fighter\character\dashSpeed * *fighter\facing
     EndSelect
-    *fighter\physics\v\y - #GRAVITY
+    
+    ;--- Gravité (fastfall, etc)
+    
+    If *fighter\physics\v\y > -*fighter\character\maxFallSpeed
+      *fighter\physics\v\y - #GRAVITY
+      If *fighter\physics\v\y < -*fighter\character\maxFallSpeed
+        *fighter\physics\v\y = -*fighter\character\maxFallSpeed
+      EndIf 
+    EndIf 
+    
+    ;--- Pré-application des vitesses
+    
     nx = *fighter\x + *fighter\physics\v\x
     ny = *fighter\y + *fighter\physics\v\y
+    
+    ;--- Calcul des collisions avec le terrain
     If groundCollision(nx, ny)
       *fighter\jumps = 1
       *fighter\grounded = 1
@@ -51,13 +71,15 @@ Procedure applyPhysics(*game.Game)
     Else 
       *fighter\grounded = 0
     EndIf 
-
+    
+    ;--- Application des vitesses
+    
     *fighter\x = nx
     *fighter\y = ny
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 46
-; FirstLine = 6
+; CursorPosition = 74
+; FirstLine = 27
 ; Folding = -
 ; EnableXP

@@ -1,5 +1,6 @@
 ﻿kuribrawl\variables\walkingJumpBoost = 3.0
 kuribrawl\variables\backwardJumpBoost = 3.0
+kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 
 *c1.Champion = newCharacter("Acid Rainbows")
 *testAnim.Animation = newAnimation(*c1, "idle", "res/idle_strip4.png", 0.05)
@@ -18,15 +19,19 @@ addFrame(*testAnim, 120, 0, 30, 70, 15, 70)
 addFrame(*testAnim, 150, 0, 30, 70, 15, 70)
 resetAnimation(*testAnim)
 
-*testAnim.Animation = newAnimation(*c1, "dash", "res/dash_strip4.png", 0.18)
+*testAnim = newAnimation(*c1, "dash", "res/dash_strip4.png", 0.18)
 addFrame(*testAnim, 0, 0, 62, 62, 31, 62)
 addFrame(*testAnim, 62, 0, 62, 62, 31, 62)
 addFrame(*testAnim, 124, 0, 62, 62, 31, 62)
 addFrame(*testAnim, 186, 0, 62, 62, 31, 62)
 resetAnimation(*testAnim)
 
-*testAnim.Animation = newAnimation(*c1, "jumpsquat", "res/jumpstart.png", -1)
+*testAnim = newAnimation(*c1, "jumpsquat", "res/jumpstart.png", -1)
 addFrame(*testAnim, 0, 0, 40, 56, 20, 56)
+
+*testAnim = newAnimation(*c1, "dashStop", "res/dashstop_strip2.png", 0.4)
+addFrame(*testAnim, 0, 0, 50, 68, 25, 68)
+addFrame(*testAnim, 50, 0, 50, 68, 25, 68)
 
 *c1\dashSpeed = 8.0
 *c1\initialDashSpeed = 110.0
@@ -38,7 +43,11 @@ addFrame(*testAnim, 0, 0, 40, 56, 20, 56)
 *c1\jumpsquatDuration = 5
 *c1\shortHopSpeed = 7.5
 *c1\doubleJumpSpeed = 12.0
+*c1\fastFallSpeed = 16.0
+*c1\maxFallSpeed = 11.0
+*c1\dashStopDuration = 0
+
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 39
+; CursorPosition = 31
 ; EnableXP
