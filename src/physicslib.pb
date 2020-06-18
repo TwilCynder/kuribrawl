@@ -46,6 +46,10 @@ Procedure applyPhysics(*game.Game)
         *fighter\physics\v\x = *fighter\character\walkSpeed * *fighter\facing
       Case #STATE_DASH
         *fighter\physics\v\x = *fighter\character\dashSpeed * *fighter\facing
+      Case #STATE_DASH_START
+        *fighter\physics\v\x = *fighter\character\initialDashSpeed * *fighter\facing
+      Case #STATE_DASH_TURN
+        *fighter\physics\v\x + *fighter\character\dashTurnAccel * *fighter\facing
     EndSelect
     
     ;--- Gravité (fastfall, etc)
@@ -79,7 +83,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 74
-; FirstLine = 27
+; CursorPosition = 51
+; FirstLine = 31
 ; Folding = -
 ; EnableXP

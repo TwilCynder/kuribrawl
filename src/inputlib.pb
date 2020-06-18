@@ -290,18 +290,30 @@ EndProcedure
 *inputManagers(#INPUT_Attack) = @inputManager_Attack()
 
 Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
-  If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
+  Define state.b
+  state = *port\figher\state
+  If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
     *port\figher\facing = 1
-    setState(*port\figher, #STATE_DASH)
+    setState(*port\figher, #STATE_DASH_START)
+  EndIf 
+  If (state = #STATE_DASH Or state = #STATE_DASH_STOP) And *port\figher\facing = -1
+    *port\figher\facing = 1
+    setState(*port\figher, #STATE_DASH_TURN)
   EndIf 
   ProcedureReturn 1
 EndProcedure
 *inputManagers(#INPUT_ControlStick_RIGHT) = @inputManager_smashStickRight()
 
 Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
-  If *port\figher\state = #STATE_WALK Or (*port\figher\state = #STATE_IDLE And *port\figher\grounded)
+  Define state.b
+  state = *port\figher\state
+  If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
     *port\figher\facing = -1
-    setState(*port\figher, #STATE_DASH)
+    setState(*port\figher, #STATE_DASH_START)
+  EndIf 
+  If (state = #STATE_DASH Or state = #STATE_DASH_STOP) And *port\figher\facing = 1
+    *port\figher\facing = -1
+    setState(*port\figher, #STATE_DASH_TURN)
   EndIf 
   ProcedureReturn 1
 EndProcedure
@@ -413,7 +425,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 368
-; FirstLine = 336
+; CursorPosition = 291
+; FirstLine = 288
 ; Folding = ----
 ; EnableXP

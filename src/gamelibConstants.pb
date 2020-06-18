@@ -61,6 +61,6 @@ EndEnumeration
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 43
-; FirstLine = 8
+; CursorPosition = 58
+; FirstLine = 11
 ; EnableXP

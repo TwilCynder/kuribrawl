@@ -1,4 +1,4 @@
-﻿Define stateGadget.q, previousStateGadget.q, inputConsole.q
+﻿Define stateGadget.q, previousStateGadget.q, previousStateTimeGadget.q, inputConsole.q
 
 XIncludeFile "debugData.pbi"
 
@@ -16,16 +16,18 @@ Procedure logInput(port.b, input.b, element.b, stick.b)
 EndProcedure
 
 Procedure StatesGadgets(x.l, y.l, w.l)
-  Shared stateGadget, previousStateGadget 
+  Shared stateGadget, previousStateGadget, previousStateTimeGadget
   TextGadget(-1, x, y, w, 20, "Previous State")
-  previousStateGadget = StringGadget(-1, x, y + 25, w, 20, "")
+  previousStateGadget = StringGadget(-1, x, y + 25, w - 35, 20, "")
+  previousStateTimeGadget = StringGadget(-1, x + w - 30, y + 25, 30, 20, "")
   TextGadget(-1, x, y + 50, w, 20, "Current State")
   stateGadget = StringGadget(-1, x, y + 75, w, 20, "")
 EndProcedure
 
-Procedure logState(state.b, facing.b = 0)
-  Shared stateGadget, previousStateGadget, StateNames()
+Procedure logState(state.b, facing.b = 0, previousTime.b = 0)
+  Shared stateGadget, previousStateGadget, previousStateTimeGadget, StateNames()
   SetGadgetText(previousStateGadget, GetGadgetText(stateGadget))
+  SetGadgetText(previousStateTimeGadget, Str(previousTime))
   SetGadgetText(stateGadget, StateNames(state))
   If facing = 1
     SetGadgetColor(stateGadget, #PB_Gadget_BackColor,  #Cyan)
@@ -34,6 +36,6 @@ Procedure logState(state.b, facing.b = 0)
   EndIf 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 30
+; CursorPosition = 27
 ; Folding = -
 ; EnableXP

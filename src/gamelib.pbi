@@ -46,6 +46,7 @@ Structure Animation
   frameMultiplier.b
   frameCount.b
 EndStructure  
+Dim stateDefaultAnimation.s(#STATES)
 
 Structure Champion
   Map animations.Animation()
@@ -53,12 +54,15 @@ Structure Champion
   walkSpeed.d
   dashSpeed.d
   initialDashSpeed.d
+  dashTurnAccel.d
   maxAirSpeed.d
   airAcceleration.d
   traction.d
   jumpSpeed.d
-  jumpsquatDuration.d
-  dashStopDuration.d
+  jumpsquatDuration.b
+  dashStopDuration.b
+  dashStartDuration.b
+  dashTurnDuration.b
   shorthopSpeed.d
   doubleJumpSpeed.d
   maxFallSpeed.d
@@ -239,15 +243,15 @@ Procedure figherDirection(*fighter.Fighter)
 EndProcedure
 
 CompilerIf #DEBUG
-  Declare logState(state.b, facing.b = 0)
+  Declare logState(state.b, facing.b = 0, previousTime.b = 0)
 CompilerEndIf
 Procedure setState(*fighter.Fighter, state.b, info.l = 0)
   *fighter\state = state
   *fighter\stateInfo = info
-  *fighter\stateTimer = 0
   CompilerIf #DEBUG
-    logState(state, *fighter\facing)
+    logState(state, *fighter\facing, *fighter\stateTimer)
   CompilerEndIf
+  *fighter\stateTimer = 0
 EndProcedure
 
 Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
@@ -287,8 +291,6 @@ Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
   jump(*fighter, jumpType, 1 - readButton(button, ports(*fighter\port)))
 EndProcedure
 
-;TODO URG : REWORK CETTE PARTIE AVEC UN SYSTEME D'ANIM PAR DEF POUR UN STATE 
-
 Procedure manageStates(*game.Game)
   Define *fighter.Fighter, max.b
   ForEach *game\fighters()
@@ -299,7 +301,6 @@ Procedure manageStates(*game.Game)
         If max < 1
           max = *fighter\currentAnimation\frameCount
         EndIf 
-        Debug max
         If *fighter\stateTimer >= max
           stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
         EndIf
@@ -311,35 +312,43 @@ Procedure manageStates(*game.Game)
         If *fighter\stateTimer >= max
           setState(*fighter, #STATE_IDLE)
         EndIf  
+      Case #STATE_DASH_START
+        max = *fighter\character\dashStartDuration
+        If max < 1
+          max = *fighter\currentAnimation\frameCount
+        EndIf 
+        If *fighter\stateTimer >= max
+          setState(*fighter, #STATE_DASH)
+        EndIf 
+      Case #STATE_DASH_TURN
+        max = *fighter\character\dashTurnDuration
+        If max < 1
+          max = *fighter\currentAnimation\frameCount
+        EndIf 
+        If *fighter\stateTimer >= max
+          setState(*fighter, #STATE_DASH)
+        EndIf 
     EndSelect
     *fighter\stateTimer + 1
   Next 
 EndProcedure
 
 Procedure updateAnimations(*game.Game)
-  Define *fighter.Fighter
+  Define *fighter.Fighter, animation.s
+  Shared stateDefaultAnimation()
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    
-    Select *fighter\state
-      Case #STATE_WALK
-        setAnimation(*fighter, "walk")
-      Case #STATE_IDLE
-        setAnimation(*fighter, "idle")   
-      Case #STATE_DASH
-        setAnimation(*fighter, "dash")
-      Case #STATE_JUMPSQUAT
-        setAnimation(*fighter, "jumpsquat")
-      Case #STATE_DASH_STOP
-        setAnimation(*fighter, "dashStop")
-    EndSelect
+    animation = stateDefaultAnimation(*fighter\state)
+    If animation And Not animation = *fighter\currentAnimationName
+      setAnimation(*fighter, animation)
+    EndIf 
   Next 
 EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 178
-; FirstLine = 151
+; CursorPosition = 302
+; FirstLine = 297
 ; Folding = ----
 ; EnableXP
 ; SubSystem = OpenGL
