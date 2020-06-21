@@ -16,14 +16,16 @@ kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 
 
 *c1.Champion = newCharacter("Acid Rainbows")
-*testAnim.Animation = newAnimation(*c1, "idle", "res/idle_strip4.png", 0.05)
+*testAnim.Animation = newAnimation(*c1, "idle", "Acid/idle", 0.05)
+addLeftSpritesheet(*testAnim, "Acid/idleL")
 addFrame(*testAnim, 0, 0, 34, 72, 17, 72)
 addFrame(*testAnim, 34, 0, 34, 72, 17, 72)
 addFrame(*testAnim, 68, 0, 34, 72, 17, 72)
 addFrame(*testAnim, 102, 0, 34, 72, 17, 72)
 resetAnimation(*testAnim)
 
-*testAnim.Animation = newAnimation(*c1, "walk", "res/walk_strip6.png", 0.15)
+*testAnim.Animation = newAnimation(*c1, "walk", "Acid/walk", 0.15)
+addLeftSpritesheet(*testAnim, "Acid/walkL")
 addFrame(*testAnim, 0, 0, 30, 70, 15, 70)
 addFrame(*testAnim, 30, 0, 30, 70, 15, 70)
 addFrame(*testAnim, 60, 0, 30, 70, 15, 70)
@@ -32,25 +34,30 @@ addFrame(*testAnim, 120, 0, 30, 70, 15, 70)
 addFrame(*testAnim, 150, 0, 30, 70, 15, 70)
 resetAnimation(*testAnim)
 
-*testAnim = newAnimation(*c1, "dash", "res/dash_strip4.png", 0.18)
+*testAnim = newAnimation(*c1, "dash", "Acid/dash", 0.18)
+addLeftSpritesheet(*testAnim, "Acid/dashL")
 addFrame(*testAnim, 0, 0, 62, 62, 31, 62)
 addFrame(*testAnim, 62, 0, 62, 62, 31, 62)
 addFrame(*testAnim, 124, 0, 62, 62, 31, 62)
 addFrame(*testAnim, 186, 0, 62, 62, 31, 62)
 resetAnimation(*testAnim)
 
-*testAnim = newAnimation(*c1, "jumpsquat", "res/jumpstart.png", -1)
+*testAnim = newAnimation(*c1, "jumpsquat", "Acid/jumpsquat", -1)
+addLeftSpritesheet(*testAnim, "Acid/jumpsquatL")
 addFrame(*testAnim, 0, 0, 40, 56, 20, 56)
 
-*testAnim = newAnimation(*c1, "dashStop", "res/dashstop_strip2.png")
+*testAnim = newAnimation(*c1, "dashStop", "Acid/dashStop")
+addLeftSpritesheet(*testAnim, "Acid/dashStopL")
 addFrame(*testAnim, 0, 0, 50, 68, 25, 68)
 addFrame(*testAnim, 50, 0, 50, 68, 25, 68)
 
-*testAnim = newAnimation(*c1, "dashStart", "res/dashstart_strip2.png", 0.25)
+*testAnim = newAnimation(*c1, "dashStart", "Acid/dashStart", 0.25)
+addLeftSpritesheet(*testAnim, "Acid/dashStartL")
 addFrame(*testAnim, 0, 0, 44, 66, 22, 66)
 addFrame(*testAnim, 44, 0, 44, 66, 22, 66)
 
-*testAnim = newAnimation(*c1, "dashTurn", "res/dashturn_strip3.png", 0.2)
+*testAnim = newAnimation(*c1, "dashTurn", "Acid/dashTurn", 0.2)
+addLeftSpritesheet(*testAnim, "Acid/dashTurnL")
 addFrame(*testAnim, 0, 0, 44, 64, 22, 64)
 addFrame(*testAnim, 44, 0, 44, 64, 22, 64)
 addFrame(*testAnim, 88, 0, 44, 64, 22, 64)
@@ -75,6 +82,6 @@ addFrame(*testAnim, 88, 0, 44, 64, 22, 64)
 *c1\dashTurnDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 52
-; FirstLine = 25
+; CursorPosition = 59
+; FirstLine = 20
 ; EnableXP

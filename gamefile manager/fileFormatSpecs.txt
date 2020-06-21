@@ -1,0 +1,10 @@
+﻿- Signature : 0x54 54 54 54
+- 1 octet version majeure
+- 1 octet version mineure
+- 1 octet révision
+- Fichiers : 
+- - - 1 octet type (0 : image d'anim)
+- - - Intitulé en ASCII (pour les images d'anim <character name>
+- - - 4 octets : longueur du fichier
+- - - Données
+- - - 0x54

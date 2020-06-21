@@ -42,6 +42,7 @@ EndStructure
   
 Structure Animation
   spriteSheet.l ;handle de l'image servant de spritesheet
+  spriteSheetL.l ;image pour les sprite retournés
   List frames.Frame()
   frameMultiplier.b
   frameCount.b
@@ -105,30 +106,6 @@ Structure Game
   window.l
 EndStructure
 
-Structure AxisState
-  x.l
-  y.l
-  z.l
-EndStructure
-
-Structure ControllerState
-  buttons.b[#MAX_BUTTON_NB]
-  axis.AxisState[#MAX_AXIS_NB]
-EndStructure
-
-Structure Port
-  joyID.l
-  previousState.ControllerState
-  currentControlStickState.AxisState
-  controlStickBuffer.b[4]
-  active.b
-  *figher.Fighter
-EndStructure
-Dim ports.Port(4)
-
-Declare readButton(button.b, *port.Port)
-Declare readAxis(*state.AxisState, axis.b, *port.Port)
-
 Prototype.i f_callback(*fighter.Fighter)
 
 Procedure initGame(window.l)
@@ -146,12 +123,18 @@ Procedure getCharacter(name.s)
   ProcedureReturn @kuribrawl\characters(name)
 EndProcedure
 
-Procedure newAnimation(*character.Champion, name.s, spritePath.s, speed.d = 1)
-  *character\animations(name)\spriteSheet = LoadSprite(-1, spritePath, #PB_Sprite_AlphaBlending )
+Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
+  Shared loadedSprites()
+  *character\animations(name)\spriteSheet = loadedSprites(spriteTag)
   *animation.Animation = @*character\animations()
   
   *animation\frameMultiplier = Int(1 / speed)
   ProcedureReturn *animation
+EndProcedure
+
+Procedure addLeftSpritesheet(*animation.Animation, tag.s)
+  Shared loadedSprites()
+  *animation\spriteSheetL = loadedSprites(tag)
 EndProcedure
 
 Procedure resetAnimation(*animation.Animation)
@@ -199,6 +182,7 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
     *anim\frameMultiplier = *character\animations()\frameMultiplier
     *anim\frameCount = *character\animations()\frameCount
     *anim\spriteSheet = *character\animations()\spriteSheet
+    *anim\spriteSheetL = *character\animations()\spriteSheetL
     CopyList(*character\animations()\frames(), *anim\frames())
     setAnimation(*r, MapKey(*character\animations()))
   Next 
@@ -210,13 +194,19 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
 EndProcedure
 
 Procedure renderFrame(*game.Game)
-  Define y.l
+  Define *fighter.Fighter, y.l, spriteSheet
   ClearScreen(#White)
   ForEach *game\fighters()
-    With *game\fighters()\currentAnimation\frames()
-      y = #SCREEN_H - *game\fighters()\y - \origin\y
-      ClipSprite(*game\fighters()\currentAnimation\spriteSheet, \display\x, \display\y, \display\w, \display\h)
-      DisplayTransparentSprite(*game\fighters()\currentAnimation\spriteSheet, *game\fighters()\x - \origin\x, y)
+    *fighter = @*game\fighters()
+    If *fighter\facing = -1 And *fighter\currentAnimation\spriteSheetL
+      spriteSheet = *fighter\currentAnimation\spriteSheetL
+    Else
+      spriteSheet = *fighter\currentAnimation\spriteSheet
+    EndIf 
+    With *fighter\currentAnimation\frames()
+      y = #SCREEN_H - *fighter\y - \origin\y
+      ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
+      DisplayTransparentSprite(spriteSheet, *fighter\x - \origin\x, y)
     EndWith
   Next
   FlipBuffers()
@@ -277,62 +267,6 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
   setState(*fighter, #STATE_IDLE)
 EndProcedure
 
-Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
-  Shared ports()
-  Define jumpType.b, button.b, axis.AxisState
-  
-  jumpType = stateinfo & %11
-  button = (stateinfo & %1111100) >> 2
-  
-  If Abs(ports(*fighter\port)\currentControlStickState\x) > stickTreshold And Sign(ports(*fighter\port)\currentControlStickState\x) <> *fighter\facing 
-    jumpType = #JUMP_BACKWARDS
-  EndIf 
-  
-  jump(*fighter, jumpType, 1 - readButton(button, ports(*fighter\port)))
-EndProcedure
-
-Procedure manageStates(*game.Game)
-  Define *fighter.Fighter, max.b
-  ForEach *game\fighters()
-    *fighter = @*game\fighters()
-    Select *fighter\state
-      Case #STATE_JUMPSQUAT
-        max = *fighter\character\jumpsquatDuration
-        If max < 1
-          max = *fighter\currentAnimation\frameCount
-        EndIf 
-        If *fighter\stateTimer >= max
-          stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
-        EndIf
-      Case #STATE_DASH_STOP
-        max = *fighter\character\dashStopDuration
-        If max < 1
-          max = *fighter\currentAnimation\frameCount
-        EndIf 
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_IDLE)
-        EndIf  
-      Case #STATE_DASH_START
-        max = *fighter\character\dashStartDuration
-        If max < 1
-          max = *fighter\currentAnimation\frameCount
-        EndIf 
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_DASH)
-        EndIf 
-      Case #STATE_DASH_TURN
-        max = *fighter\character\dashTurnDuration
-        If max < 1
-          max = *fighter\currentAnimation\frameCount
-        EndIf 
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_DASH)
-        EndIf 
-    EndSelect
-    *fighter\stateTimer + 1
-  Next 
-EndProcedure
-
 Procedure updateAnimations(*game.Game)
   Define *fighter.Fighter, animation.s
   Shared stateDefaultAnimation()
@@ -347,8 +281,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 302
-; FirstLine = 297
+; CursorPosition = 136
+; FirstLine = 132
 ; Folding = ----
 ; EnableXP
 ; SubSystem = OpenGL
