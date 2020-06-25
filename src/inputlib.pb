@@ -246,6 +246,16 @@ Procedure readInputs()
   
 EndProcedure
 
+;- STATE ACTIONS
+Procedure state_can_jump(state.b)
+  If state = #STATE_LANDING Or state = #STATE_LANDING_LAG
+    ProcedureReturn 0
+  EndIf 
+  ProcedureReturn 1
+EndProcedure 
+
+;- INPUT MANAGERS
+
 Procedure inputManager_Attack(*port.Port, *info.inputData)
   Define direction.b
   Shared inputQ()
@@ -346,12 +356,16 @@ Procedure inputManager_jump(*port.Port, *info.inputData)
   Shared defaultControler
   Define jumpType.b
   If *port\figher\grounded
+    If Not state_can_jump(*port\figher\state)
+      ProcedureReturn 0
+    EndIf 
     If *port\figher\state = #STATE_WALK Or *port\figher\state = #STATE_DASH
       jumpType = #JUMP_WALKING
     Else 
       jumpType = #JUMP_NORMAL
     EndIf 
     setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (*info\element << 2))
+    ProcedureReturn 1
   ElseIf *port\figher\jumps > 0
     If Abs(*port\currentControlStickState\x) > stickTreshold
       If  Sign(*port\currentControlStickState\x) = *port\figher\facing 
@@ -380,6 +394,7 @@ Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
   If *port\figher\state = #STATE_IDLE
     If Abs(*port\currentControlStickState\x) > stickTreshold
       If *port\figher\grounded
+        Debug "yes"
         *port\figher\facing = Sign(*port\currentControlStickState\x)
         setState(*port\figher, #STATE_WALK)
       Else 
@@ -448,7 +463,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 378
-; FirstLine = 361
+; CursorPosition = 396
+; FirstLine = 381
 ; Folding = ----
 ; EnableXP

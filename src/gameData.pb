@@ -1,10 +1,11 @@
 ﻿stateDefaultAnimation(#STATE_WALK) = "walk"
-stateDefaultAnimation(#STATE_IDLE) = "idle"
+;stateDefaultAnimation(#STATE_IDLE) = "idle"
 stateDefaultAnimation(#STATE_DASH) = "dash"
 stateDefaultAnimation(#STATE_JUMPSQUAT) = "jumpsquat"
 stateDefaultAnimation(#STATE_DASH_STOP) = "dashStop"
 stateDefaultAnimation(#STATE_DASH_START) = "dashStart"
 stateDefaultAnimation(#STATE_DASH_TURN) = "dashTurn"
+stateDefaultAnimation(#STATE_LANDING) = "land"
 
 ;- ========VARIABLES=====================
 
@@ -62,6 +63,24 @@ addFrame(*testAnim, 0, 0, 44, 64, 22, 64)
 addFrame(*testAnim, 44, 0, 44, 64, 22, 64)
 addFrame(*testAnim, 88, 0, 44, 64, 22, 64)
 
+*testAnim = newAnimation(*c1, "jump", "Acid/jump", 0.5)
+addLeftSpritesheet(*testAnim, "Acid/jumpL")
+addFrame(*testAnim, 0, 0, 38, 86, 19, 86)
+addFrame(*testAnim, 38, 0, 38, 86, 19, 86)
+addFrame(*testAnim, 76, 0, 38, 86, 19, 86)
+addFrame(*testAnim, 114, 0, 38, 86, 19, 86)
+addFrame(*testAnim, 152, 0, 38, 86, 19, 86)
+
+*testAnim = newAnimation(*c1, "airIdle", "Acid/airIdle", -1)
+addLeftSpritesheet(*testAnim, "Acid/airIdleL")
+addFrame(*testAnim, 0, 0, 38, 86, 19, 86)
+
+*testAnim = newAnimation(*c1, "land", "Acid/land", 0.5)
+addLeftSpritesheet(*testAnim, "Acid/landL")
+addFrame(*testAnim, 0, 0, 44, 64, 22, 64)
+addFrame(*testAnim, 44, 0, 44, 64, 22, 64)
+
+initDefaultAnimationsConfig(*c1)
 
 *c1\dashSpeed = 8.0
 *c1\initialDashSpeed = 10.0
@@ -80,8 +99,9 @@ addFrame(*testAnim, 88, 0, 44, 64, 22, 64)
 *c1\dashStopDuration = 0
 *c1\dashStartDuration = 0
 *c1\dashTurnDuration = 0
+*c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 59
-; FirstLine = 20
+; CursorPosition = 65
+; FirstLine = 52
 ; EnableXP

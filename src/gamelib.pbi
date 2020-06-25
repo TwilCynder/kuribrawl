@@ -34,19 +34,21 @@ Structure Frame
   display.Rect_
   origin.Vector
   actionnable.b
-  actions.b[#ACTIONS_TOTAL] ;1 = bloqué
   List *collisionBoxes.CollisionBox()
-  *callback.f_callback
   duration.b
 EndStructure  
-  
+
+Prototype.i f_callback(*fighter, *data)
+
 Structure Animation
   spriteSheet.l ;handle de l'image servant de spritesheet
   spriteSheetL.l ;image pour les sprite retournés
   List frames.Frame()
   frameMultiplier.b
   frameCount.b
+  endCallback.f_callback
 EndStructure  
+
 Dim stateDefaultAnimation.s(#STATES)
 
 Structure Champion
@@ -69,6 +71,7 @@ Structure Champion
   maxFallSpeed.d
   fastFallSpeed.d
   airFriction.d
+  landingDuration.d
 EndStructure
 
 Structure GameVariables
@@ -98,6 +101,7 @@ Structure Fighter
   state.b
   stateInfo.b ;attack, direction
   stateTimer.u
+  stateUpdated.b ;wheter state has been changed since last animation change
   jumps.b
 EndStructure
 
@@ -105,8 +109,6 @@ Structure Game
   List fighters.Fighter()
   window.l
 EndStructure
-
-Prototype.i f_callback(*fighter.Fighter)
 
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
@@ -126,6 +128,9 @@ EndProcedure
 Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
   Shared loadedSprites()
   *character\animations(name)\spriteSheet = loadedSprites(spriteTag)
+  If Not loadedSprites(spriteTag)
+    Debug "Can't find spritesheet with tag " + spriteTag
+  EndIf
   *animation.Animation = @*character\animations()
   
   *animation\frameMultiplier = Int(1 / speed)
@@ -135,6 +140,10 @@ EndProcedure
 Procedure addLeftSpritesheet(*animation.Animation, tag.s)
   Shared loadedSprites()
   *animation\spriteSheetL = loadedSprites(tag)
+EndProcedure
+
+Procedure setAnimationEndCallback(*animation.Animation, f.f_callback)
+  *animation\endCallback = f
 EndProcedure
 
 Procedure resetAnimation(*animation.Animation)
@@ -183,6 +192,7 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
     *anim\frameCount = *character\animations()\frameCount
     *anim\spriteSheet = *character\animations()\spriteSheet
     *anim\spriteSheetL = *character\animations()\spriteSheetL
+    *anim\endCallback = *character\animations()\endCallback
     CopyList(*character\animations()\frames(), *anim\frames())
     setAnimation(*r, MapKey(*character\animations()))
   Next 
@@ -213,13 +223,18 @@ Procedure renderFrame(*game.Game)
 EndProcedure
 
 Procedure NextFrame(*game.Game)
+  Define *fighter.Fighter
   ForEach *game\fighters()
-    If *game\fighters()\currentAnimation\frames()\duration > 1
-      *game\fighters()\currentAnimation\frames()\duration - 1
-    ElseIf NextElement(*game\fighters()\currentAnimation\frames()) = 0
-      resetAnimation(*game\fighters()\currentAnimation)
-    ElseIf *game\fighters()\currentAnimation\frameMultiplier > 1
-      *game\fighters()\currentAnimation\frames()\duration = *game\fighters()\currentAnimation\frameMultiplier
+    *fighter = *game\fighters()
+    If *fighter\currentAnimation\frames()\duration > 1
+      *fighter\currentAnimation\frames()\duration - 1
+    ElseIf NextElement(*fighter\currentAnimation\frames()) = 0
+      If *fighter\currentAnimation\endCallback
+        ProcedureReturn *fighter\currentAnimation\endCallback(*fighter, 0)
+      EndIf 
+      resetAnimation(*fighter\currentAnimation)
+    ElseIf *fighter\currentAnimation\frameMultiplier > 1
+      *fighter\currentAnimation\frames()\duration = *fighter\currentAnimation\frameMultiplier
     EndIf
   Next
 EndProcedure
@@ -242,6 +257,8 @@ Procedure setState(*fighter.Fighter, state.b, info.l = 0)
     logState(state, *fighter\facing, *fighter\stateTimer)
   CompilerEndIf
   *fighter\stateTimer = 0
+  *fighter\stateUpdated = 1
+  
 EndProcedure
 
 Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
@@ -264,25 +281,52 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
     Case #YJUMP_DOUBLE
       *fighter\physics\v\y = *fighter\character\doubleJumpSpeed
   EndSelect
-  setState(*fighter, #STATE_IDLE)
+  setState(*fighter, #STATE_IDLE, 1)
 EndProcedure
 
+;système d'acceptable animations
+
 Procedure updateAnimations(*game.Game)
-  Define *fighter.Fighter, animation.s
   Shared stateDefaultAnimation()
+  Define animation.s, *fighter.Fighter
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    animation = stateDefaultAnimation(*fighter\state)
-    If animation And Not animation = *fighter\currentAnimationName
-      setAnimation(*fighter, animation)
-    EndIf 
+    If *fighter\stateUpdated
+      animation = stateDefaultAnimation(*fighter\state)
+      If animation And Not animation = *fighter\currentAnimationName
+        setAnimation(*fighter, animation)
+      EndIf 
+      ;case by case
+      If *fighter\state = #STATE_IDLE
+        If *fighter\grounded = 0
+          If *fighter\stateInfo & 1
+            setAnimation(*fighter, "jump")
+          Else
+            setAnimation(*fighter, "airIdle")
+          EndIf 
+        ElseIf *fighter\grounded = 1
+          setAnimation(*fighter, "idle")
+        EndIf 
+      EndIf
+    EndIf
+    *fighter\stateUpdated = 0
   Next 
+EndProcedure
+
+Procedure defaultJumpAnimCallback(*fighter.Fighter, *data)
+  setAnimation(*fighter, "airIdle")
+EndProcedure
+
+Procedure initDefaultAnimationsConfig(*char.Champion)
+  If *char\animations("jump")
+    setAnimationEndCallback(@*char\animations("jump"), @defaultJumpAnimCallback())
+  EndIf 
 EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 136
-; FirstLine = 132
+; CursorPosition = 35
+; FirstLine = 21
 ; Folding = ----
 ; EnableXP
 ; SubSystem = OpenGL
