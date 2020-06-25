@@ -62,6 +62,7 @@ Repeat
   NextFrame(*game)
   updateAnimations(*game)
   renderFrame(*game)
+  
   SetWindowTitle(window, Str(lastFrameDuration))
   
   currentTime = ElapsedMilliseconds()
@@ -83,7 +84,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 57
+; CursorPosition = 61
 ; FirstLine = 33
 ; Folding = -
 ; EnableXP
