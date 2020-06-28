@@ -7,6 +7,28 @@ Procedure groundCollision(x.l, y.l) ;ajouter le fighter au cas où les ECB pourr
   ProcedureReturn 0
 EndProcedure
 
+Procedure landCallback(*fighter.Fighter)
+  If *fighter\state = #STATE_ATTACK
+    lag = *fighter\character\moves(*fighter\stateInfo)\landLag
+    If lag
+      setState(*fighter, #STATE_LANDING_LAG, lag)
+    EndIf 
+  Else
+    setState(*fighter, #STATE_LANDING)
+  EndIf 
+EndProcedure
+
+Procedure applyAirAccel(*fighter.Fighter, direction.b)
+  If *fighter\physics\v\x < *fighter\character\maxAirSpeed And *fighter\physics\v\x > -*fighter\character\maxAirSpeed
+    *fighter\physics\v\x + *fighter\character\airAcceleration * direction
+    If *fighter\physics\v\x > *fighter\character\maxAirSpeed 
+      *fighter\physics\v\x = *fighter\character\maxAirSpeed 
+    ElseIf *fighter\physics\v\x < -*fighter\character\maxAirSpeed 
+      *fighter\physics\v\x = -*fighter\character\maxAirSpeed 
+    EndIf
+  EndIf 
+EndProcedure
+
 Procedure substractValue(*v1.Double, v2.d)
   Define sign.b
   sign = Sign(*v1\d)
@@ -21,7 +43,6 @@ Procedure substractValue(*v1.Double, v2.d)
 EndProcedure
 
 Procedure applyPhysics(*game.Game)
-  Shared ports()
   Define nx.l, ny.l, *fighter.Fighter
 
   ForEach *game\fighters()
@@ -69,7 +90,7 @@ Procedure applyPhysics(*game.Game)
     ;--- Calcul des collisions avec le terrain
     If groundCollision(nx, ny)
       If *fighter\grounded = 0
-        setState(*fighter, #STATE_LANDING)
+        landCallback(*fighter)
       EndIf 
       *fighter\jumps = 1
       *fighter\grounded = 1
@@ -86,7 +107,6 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 71
-; FirstLine = 33
+; CursorPosition = 13
 ; Folding = -
 ; EnableXP

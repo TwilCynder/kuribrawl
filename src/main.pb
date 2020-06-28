@@ -5,9 +5,10 @@
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
 XIncludeFile "gamelib.pbi"
+XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
-XIncludeFile "physicslib.pb"
+
 CompilerIf #DEBUG
   XIncludeFile "debug.pb"
 CompilerEndIf
@@ -28,7 +29,9 @@ CompilerEndIf
 loadGameData()
 XIncludeFile "gameData.pb"
 
+
 *game.Game = initGame(window)
+
 *f1.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
 *f1\name = "Test One"
 ;*f2.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
@@ -39,7 +42,7 @@ For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 5)
+setPort(0, 0)
 setPortFighter(0, *f1)
 ;setPort(1, 1)
 ;setPortFighter(1, *f2)
@@ -59,7 +62,7 @@ Repeat
   updateInputs()
   manageStates(*game)
   applyPhysics(*game)
-  NextFrame(*game)
+  advanceAnimations(*game)
   updateAnimations(*game)
   renderFrame(*game)
   
@@ -84,8 +87,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 61
-; FirstLine = 33
+; CursorPosition = 34
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

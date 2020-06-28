@@ -34,7 +34,7 @@ With defaultControler\defaultBinding
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_Z : \buttons()\input = #INPUT_Grab
   AddElement(\axises()) : \axises()\ID = #AXIS_RIGHT : \axises()\input = #INPUT_Attack
   AddElement(\triggers()) : \triggers()\ID = #AXIS_LEFT : \triggers()\input = #INPUT_Guard
-  AddElement(\triggers()) : \triggers()\ID = #AXIS_RIGHT : \triggers()\input = #INPUT_Guard
+  AddElement(\triggers()) : \triggers()\ID = #AXIS_RIGHT : \triggers()\input = #INPUT_Jump
   \controlStickID = 0
 EndWith
 
@@ -61,5 +61,5 @@ EndWith
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 28
+; CursorPosition = 36
 ; EnableXP

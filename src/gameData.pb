@@ -6,6 +6,13 @@ stateDefaultAnimation(#STATE_DASH_STOP) = "dashStop"
 stateDefaultAnimation(#STATE_DASH_START) = "dashStart"
 stateDefaultAnimation(#STATE_DASH_TURN) = "dashTurn"
 stateDefaultAnimation(#STATE_LANDING) = "land"
+stateDefaultAnimation(#STATE_LANDING_LAG) = "land"
+
+commandDefaultAnimation(#COMMAND_NAir) = "nair"
+commandDefaultAnimation(#COMMAND_FAir) = "nair"
+commandDefaultAnimation(#COMMAND_UAir) = "nair"
+commandDefaultAnimation(#COMMAND_BAir) = "nair"
+commandDefaultAnimation(#COMMAND_DAir) = "nair"
 
 ;- ========VARIABLES=====================
 
@@ -57,7 +64,7 @@ addLeftSpritesheet(*testAnim, "Acid/dashStartL")
 addFrame(*testAnim, 0, 0, 44, 66, 22, 66)
 addFrame(*testAnim, 44, 0, 44, 66, 22, 66)
 
-*testAnim = newAnimation(*c1, "dashTurn", "Acid/dashTurn", 0.2)
+*testAnim = newAnimation(*c1, "dashTurn", "Acid/dashTurn", 13)
 addLeftSpritesheet(*testAnim, "Acid/dashTurnL")
 addFrame(*testAnim, 0, 0, 44, 64, 22, 64)
 addFrame(*testAnim, 44, 0, 44, 64, 22, 64)
@@ -79,6 +86,21 @@ addFrame(*testAnim, 0, 0, 38, 86, 19, 86)
 addLeftSpritesheet(*testAnim, "Acid/landL")
 addFrame(*testAnim, 0, 0, 44, 64, 22, 64)
 addFrame(*testAnim, 44, 0, 44, 64, 22, 64)
+
+*testAnim = newAnimation(*c1, "nair", "Acid/nair")
+addLeftSpritesheet(*testAnim, "Acid/nairL")
+addFrame(*testAnim, 0, 0, 68, 66, 34, 66, 4)
+addFrame(*testAnim, 68, 0, 68, 66, 34, 66, 3)
+addFrame(*testAnim, 136, 0, 68, 66, 34, 66, 2)
+addFrame(*testAnim, 204, 0, 68, 66, 34, 66, 13)
+addFrame(*testAnim, 272, 0, 68, 66, 34, 66, 3)
+addFrame(*testAnim, 340, 0, 68, 66, 34, 66, 3)
+
+*c1\moves(#COMMAND_NAir)\landLag = 20
+*c1\moves(#COMMAND_UAir)\landLag = 20
+*c1\moves(#COMMAND_DAir)\landLag = 20
+*c1\moves(#COMMAND_BAir)\landLag = 20
+*c1\moves(#COMMAND_FAir)\landLag = 20
 
 initDefaultAnimationsConfig(*c1)
 
@@ -102,6 +124,6 @@ initDefaultAnimationsConfig(*c1)
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 65
-; FirstLine = 52
+; CursorPosition = 102
+; FirstLine = 79
 ; EnableXP

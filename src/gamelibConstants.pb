@@ -58,9 +58,40 @@ Enumeration
   #YJUMP_DOUBLE
 EndEnumeration
 
+Enumeration ;commands
+  #COMMAND_Jab
+  #COMMAND_FTilt
+  #COMMAND_UTilt
+  #COMMAND_DTilt
+  #COMMAND_FSmash
+  #COMMAND_USmash
+  #COMMAND_DSmash
+  #COMMAND_DashAttack
+  #COMMAND_NAir
+  #COMMAND_FAir
+  #COMMAND_BAir
+  #COMMAND_UAir
+  #COMMAND_DAir
+  #COMMAND_ZAir
+  #COMMAND_NSpecial
+  #COMMAND_SSpecial
+  #COMMAND_USpecial
+  #COMMAND_DSpecial ;haha flip kick go brr
+  #Command_Walk
+  #Command_Dash
+  #Command_Jump
+  #COMMAND_Grab
+  #COMMAND_Shield
+  #COMMAND_Roll
+  #COMMAND_SpotDodge
+  #COMMAND_AirDodge
+  #COMMAND_DirectionalAirDodge
+  #COMMANDS
+EndEnumeration
+
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 58
-; FirstLine = 11
+; CursorPosition = 89
+; FirstLine = 45
 ; EnableXP

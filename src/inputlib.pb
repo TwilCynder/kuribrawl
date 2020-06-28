@@ -55,7 +55,6 @@ Structure Port
 EndStructure
 Dim ports.Port(4)
 
-
 XIncludeFile "inputlibData.pbi"
 
 NewList inputQ.l()
@@ -305,17 +304,22 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     Select direction
       Case #DIRECTION_NONE
         Debug "Nair (" + *port\figher\name + ")"
+        attack(*port\figher, #COMMAND_NAir)
         ProcedureReturn 1
       Case #DIRECTION_LEFT, #DIRECTION_RIGHT
         If direction - 1 = -*port\figher\facing
+          attack(*port\figher, #COMMAND_FAir)
           Debug "Fair (" + *port\figher\name + ")"
         Else 
+          attack(*port\figher, #COMMAND_BAir)
           Debug "Bair (" + *port\figher\name + ")"
         EndIf 
         ProcedureReturn 1
       Case #DIRECTION_UP
+        attack(*port\figher, #COMMAND_UAir)
         Debug "Uair (" + *port\figher\name + ")"
       Case #DIRECTION_DOWN
+        attack(*port\figher, #COMMAND_DAir)
         Debug "Dair (" + *port\figher\name + ")"
     EndSelect
   EndIf 
@@ -391,34 +395,30 @@ EndProcedure
 
 Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
   Shared defaultControler
-  If *port\figher\state = #STATE_IDLE
-    If Abs(*port\currentControlStickState\x) > stickTreshold
-      If *port\figher\grounded
-        Debug "yes"
-        *port\figher\facing = Sign(*port\currentControlStickState\x)
-        setState(*port\figher, #STATE_WALK)
-      Else 
-        If *port\figher\physics\v\x < *port\figher\character\maxAirSpeed And *port\figher\physics\v\x > -*port\figher\character\maxAirSpeed
-          *port\figher\physics\v\x + *port\figher\character\airAcceleration * Sign(*port\currentControlStickState\x)
-          If *port\figher\physics\v\x > *port\figher\character\maxAirSpeed 
-            *port\figher\physics\v\x = *port\figher\character\maxAirSpeed 
-          ElseIf *port\figher\physics\v\x < -*port\figher\character\maxAirSpeed 
-            *port\figher\physics\v\x = -*port\figher\character\maxAirSpeed 
-          EndIf
+  Select *port\figher\state
+    Case #STATE_IDLE
+      If Abs(*port\currentControlStickState\x) > stickTreshold
+        If *port\figher\grounded
+          *port\figher\facing = Sign(*port\currentControlStickState\x)
+          setState(*port\figher, #STATE_WALK)
+        Else 
+          applyAirAccel(*port\figher, Sign(*port\currentControlStickState\x))
         EndIf 
+      EndIf     
+    Case #STATE_WALK
+      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+        setState(*port\figher, #STATE_IDLE)
+      EndIf
+    Case #STATE_DASH
+      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+        setState(*port\figher, #STATE_DASH_STOP)
+      EndIf
+    Case #STATE_ATTACK
+      If *port\figher\grounded
+      Else 
+        applyAirAccel(*port\figher, Sign(*port\currentControlStickState\x))
       EndIf 
-    EndIf 
-  EndIf 
-  If *port\figher\state = #STATE_WALK
-    If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
-      setState(*port\figher, #STATE_IDLE)
-    EndIf
-  EndIf
-  If *port\figher\state = #STATE_DASH
-    If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
-      setState(*port\figher, #STATE_DASH_STOP)
-    EndIf
-  EndIf 
+  EndSelect 
 EndProcedure
 
 Procedure updateInputs()
@@ -463,7 +463,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 396
-; FirstLine = 381
+; CursorPosition = 38
+; FirstLine = 26
 ; Folding = ----
 ; EnableXP

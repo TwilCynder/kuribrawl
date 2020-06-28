@@ -36,6 +36,7 @@ Structure Frame
   actionnable.b
   List *collisionBoxes.CollisionBox()
   duration.b
+  timeLeft.d
 EndStructure  
 
 Prototype.i f_callback(*fighter, *data)
@@ -44,15 +45,24 @@ Structure Animation
   spriteSheet.l ;handle de l'image servant de spritesheet
   spriteSheetL.l ;image pour les sprite retournés
   List frames.Frame()
+  baseSpeed.d
+  speed.d
   frameMultiplier.b
-  frameCount.b
+  carry.f ;for animations with speed
+  currentCarry.f
   endCallback.f_callback
 EndStructure  
 
 Dim stateDefaultAnimation.s(#STATES)
+Dim commandDefaultAnimation.s(#COMMANDS)
+
+Structure moveInfo
+  landLag.b
+EndStructure
 
 Structure Champion
   Map animations.Animation()
+  Array moves.moveInfo(#Commands)
   name.s
   walkSpeed.d
   dashSpeed.d
@@ -72,6 +82,11 @@ Structure Champion
   fastFallSpeed.d
   airFriction.d
   landingDuration.d
+EndStructure
+
+Structure ArtifactModel
+  Map animations.Animation()
+  durability.b
 EndStructure
 
 Structure GameVariables
@@ -133,7 +148,8 @@ Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
   EndIf
   *animation.Animation = @*character\animations()
   
-  *animation\frameMultiplier = Int(1 / speed)
+  *animation\baseSpeed = speed
+  
   ProcedureReturn *animation
 EndProcedure
 
@@ -150,21 +166,55 @@ Procedure resetAnimation(*animation.Animation)
   ResetList(*animation\frames())
   NextElement(*animation\frames())
   If *animation\frameMultiplier > 1
-    *animation\frames()\duration = *animation\frameMultiplier
+    *animation\currentCarry = 0
+    *animation\frames()\timeLeft = *animation\frameMultiplier
   EndIf 
 EndProcedure
 
-Procedure setAnimation(*fighter.Fighter, name.s)
+Procedure framesCount(*anim.Animation)
+  ProcedureReturn ListSize(*anim\frames())
+EndProcedure
+
+;nécessite un setAnimation préalable
+Procedure animLength(*anim.Animation)
+  Define multiplier.b
+  If *anim\speed > 1
+    ProcedureReturn *anim\speed
+  Else
+    ProcedureReturn ListSize(*anim\frames()) * Abs(Int(1 / *anim\speed))
+  EndIf 
+EndProcedure
+
+Procedure setAnimationSpeed(*anim.Animation, speed.d = 0)
+  If speed <> 0
+    *anim\speed = speed
+  Else
+    *anim\speed = *anim\baseSpeed
+  EndIf 
+  
+  If *anim\speed > 1
+    ratio = *anim\speed / framesCount(*anim)
+  Else
+    ratio = 1 / *anim\speed
+  EndIf 
+  *anim\frameMultiplier = ratio
+  *anim\carry = ratio - Int(ratio)
+  resetAnimation(*anim)
+EndProcedure
+
+Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
+  Define ratio.d
   If *fighter\currentAnimationName = name
     ProcedureReturn 0
   EndIf
-  
+
   *fighter\currentAnimation = @*fighter\animations(name)
   *fighter\currentAnimationName = name
-  resetAnimation(*fighter\currentAnimation)
+  
+  setAnimationSpeed(*fighter\currentAnimation, speed)
 EndProcedure
 
-Procedure addFrame(*animation.Animation, x.l, y.l, w.l, h.l, xo.l, yo.l)
+Procedure addFrame(*animation.Animation, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
   *f.Frame = AddElement(*animation\frames())
   *f\display\x = x
   *f\display\y = y
@@ -172,9 +222,9 @@ Procedure addFrame(*animation.Animation, x.l, y.l, w.l, h.l, xo.l, yo.l)
   *f\display\h = h
   *f\origin\x = xo
   *f\origin\y = yo
-  *animation\frameCount + *animation\frameMultiplier
+  *f\duration = duration
 EndProcedure
-
+;optimiser la copie des anim
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   Define *anim.Animation
   *r.Fighter = AddElement(*game\fighters())
@@ -189,10 +239,10 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   ForEach *character\animations()
     *anim = AddMapElement(*r\animations(), MapKey(*character\animations()))
     *anim\frameMultiplier = *character\animations()\frameMultiplier
-    *anim\frameCount = *character\animations()\frameCount
     *anim\spriteSheet = *character\animations()\spriteSheet
     *anim\spriteSheetL = *character\animations()\spriteSheetL
     *anim\endCallback = *character\animations()\endCallback
+    *anim\baseSpeed = *character\animations()\baseSpeed
     CopyList(*character\animations()\frames(), *anim\frames())
     setAnimation(*r, MapKey(*character\animations()))
   Next 
@@ -222,20 +272,33 @@ Procedure renderFrame(*game.Game)
   FlipBuffers()
 EndProcedure
 
-Procedure NextFrame(*game.Game)
+Procedure nextFrame(*animation.Animation, *fighter.Fighter)
+  If NextElement(*animation\frames()) = 0
+    If *animation\endCallback
+      ProcedureReturn *animation\endCallback(*fighter, 0)
+    EndIf 
+    resetAnimation(*animation)
+  ElseIf *animation\frames()\duration
+    *animation\frames()\timeLeft = *animation\frames()\duration
+  ElseIf Not *animation\speed = 1
+    *animation\frames()\timeLeft = *animation\frameMultiplier
+    If *animation\currentCarry >= 1
+      *animation\currentCarry - 1
+      *animation\frames()\timeLeft - 1
+    EndIf 
+  EndIf
+EndProcedure
+
+Procedure advanceAnimations(*game.Game)
   Define *fighter.Fighter
   ForEach *game\fighters()
     *fighter = *game\fighters()
-    If *fighter\currentAnimation\frames()\duration > 1
-      *fighter\currentAnimation\frames()\duration - 1
-    ElseIf NextElement(*fighter\currentAnimation\frames()) = 0
-      If *fighter\currentAnimation\endCallback
-        ProcedureReturn *fighter\currentAnimation\endCallback(*fighter, 0)
-      EndIf 
-      resetAnimation(*fighter\currentAnimation)
-    ElseIf *fighter\currentAnimation\frameMultiplier > 1
-      *fighter\currentAnimation\frames()\duration = *fighter\currentAnimation\frameMultiplier
-    EndIf
+    If *fighter\currentAnimation\frames()\timeLeft >= 1
+      *fighter\currentAnimation\frames()\timeLeft - 1
+    ElseIf Not *fighter\currentAnimation\speed = -1
+      *fighter\currentAnimation\currentCarry + *fighter\currentAnimation\carry
+      nextFrame(*fighter\currentAnimation, *fighter)
+    EndIf 
   Next
 EndProcedure
 
@@ -284,29 +347,42 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
   setState(*fighter, #STATE_IDLE, 1)
 EndProcedure
 
+Procedure attack(*fighter, attack.b)
+  setState(*fighter, #STATE_ATTACK, attack)
+EndProcedure
+
 ;système d'acceptable animations
 
 Procedure updateAnimations(*game.Game)
-  Shared stateDefaultAnimation()
+  Shared stateDefaultAnimation(), commandDefaultAnimation()
   Define animation.s, *fighter.Fighter
   ForEach *game\fighters()
     *fighter = @*game\fighters()
     If *fighter\stateUpdated
-      animation = stateDefaultAnimation(*fighter\state)
-      If animation And Not animation = *fighter\currentAnimationName
-        setAnimation(*fighter, animation)
-      EndIf 
+
       ;case by case
-      If *fighter\state = #STATE_IDLE
-        If *fighter\grounded = 0
-          If *fighter\stateInfo & 1
-            setAnimation(*fighter, "jump")
-          Else
-            setAnimation(*fighter, "airIdle")
+      Select *fighter\state
+        Case #STATE_IDLE
+          If *fighter\grounded = 0
+            If *fighter\stateInfo & 1
+              setAnimation(*fighter, "jump")
+            Else
+              setAnimation(*fighter, "airIdle")
+            EndIf 
+          ElseIf *fighter\grounded = 1
+            setAnimation(*fighter, "idle")
           EndIf 
-        ElseIf *fighter\grounded = 1
-          setAnimation(*fighter, "idle")
-        EndIf 
+        Case #STATE_ATTACK
+          setAnimation(*fighter, commandDefaultAnimation(*fighter\stateInfo))
+        Default 
+          animation = stateDefaultAnimation(*fighter\state)
+          If animation And Not animation = *fighter\currentAnimationName
+            setAnimation(*fighter, animation)
+          EndIf 
+      EndSelect
+      
+      If *fighter\state = #STATE_LANDING_LAG
+        setAnimationSpeed(*fighter\currentAnimation, *fighter\stateInfo)
       EndIf
     EndIf
     *fighter\stateUpdated = 0
@@ -317,17 +393,26 @@ Procedure defaultJumpAnimCallback(*fighter.Fighter, *data)
   setAnimation(*fighter, "airIdle")
 EndProcedure
 
+Procedure defaultAttackAnimCallback(*fighter.Fighter, *data)
+  setState(*fighter, #STATE_IDLE)
+EndProcedure
+  
 Procedure initDefaultAnimationsConfig(*char.Champion)
+  Shared commandDefaultAnimation()
   If *char\animations("jump")
     setAnimationEndCallback(@*char\animations("jump"), @defaultJumpAnimCallback())
   EndIf 
+  For i = 0 To #COMMANDS - 1
+    If *char\animations(commandDefaultAnimation(i))
+      setAnimationEndCallback(*char\animations(commandDefaultAnimation(i)), @defaultAttackAnimCallback())
+    EndIf
+  Next 
 EndProcedure
 
-
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 35
-; FirstLine = 21
-; Folding = ----
+; CursorPosition = 295
+; FirstLine = 266
+; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

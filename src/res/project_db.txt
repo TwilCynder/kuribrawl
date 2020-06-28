@@ -38,3 +38,7 @@ land_strip2.png
 A:Acid/land
 land_strip2L.png
 A:Acid/landL
+nair_strip6.png
+A:Acid/nair
+nair_strip6L.png
+A:Acid/nairL
