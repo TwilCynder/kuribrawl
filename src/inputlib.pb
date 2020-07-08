@@ -32,7 +32,6 @@ Structure inputData
   stick.b ;wheter the said element was a stick or not
 EndStructure
 
-
 Structure AxisState
   x.l
   y.l
@@ -463,7 +462,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 38
+; CursorPosition = 33
 ; FirstLine = 26
 ; Folding = ----
 ; EnableXP

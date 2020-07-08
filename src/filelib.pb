@@ -1,4 +1,8 @@
-﻿NewMap loadedSprites.l()
+﻿Enumeration 
+  #FILETYPE_ANIMATION
+EndEnumeration
+
+NewMap loadedSprites.l()
 
 Procedure checkSignature()
   If Not ReadInteger(0) = $54545454
@@ -36,43 +40,9 @@ Procedure readFileData(size.l, *buffer)
 EndProcedure
 
 Procedure checkInterfile()
-  If Not ReadAsciiCharacter(0) = $54
-    Debug "error"
-    End
-  EndIf
+ ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
-
-Procedure LoadSprite_(*buffer, tag.s)
-  Shared loadedSprites()
-  loadedSprites(tag) = CatchSprite(#PB_Any, *buffer, #PB_Sprite_AlphaBlending)
-EndProcedure
-
-Procedure loadGameData()
-  Shared loadedSprites()
-  If #DEBUG
-    OpenFile(0, "res/data.twl")
-  Else 
-    OpenFile(0, "data.twl")
-  EndIf 
-  checkSignature()
-  readVersion()
-
-  Define type.b, tag.s, size.l, *buffer
-
-  *buffer = 0
-  Repeat
-    type = readFileType()
-    tag = readFileTag()
-    size = readFileLength()
-    *buffer = readFileData(size, *buffer)
-    LoadSprite_(*buffer, tag)
-    checkInterfile()
-  Until Eof(0)
-  
-  CloseFile(0)
- EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 55
-; FirstLine = 19
+; CursorPosition = 41
 ; Folding = --
 ; EnableXP

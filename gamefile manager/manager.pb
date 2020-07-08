@@ -1,5 +1,15 @@
-﻿Enumeration 
+﻿#FILEMARKER_DESCRIPTORSTART = $53
+#FILEMARKER_ANIMSPEED = 1
+#FILEMARKER_FRAMEINFO = 2
+#FILEMARKER_FRAMEDURATION = $20
+#FILEMARKER_FRAMEORIGIN = $21
+#FILEMARKER_HURTBOXINFO = 3
+#FILEMARKER_HITBOXINFO = 4
+#FILEMARKER_INTERFILE = $54
+
+Enumeration 
   #FILETYPE_ANIMATION
+  #FILETYPE_LEFTANIM
 EndEnumeration
 
 Structure loadedFile
@@ -10,6 +20,7 @@ EndStructure
 Structure toLoad
   tag.s
   type.b
+  infos.s
 EndStructure
 
 Procedure readFileToMemory(filename$, *file.loadedFile)
@@ -49,15 +60,101 @@ Procedure writeMemoryToFile(file, *file.loadedFile)
 EndProcedure
 
 Procedure writeInterfile()
-  WriteAsciiCharacter(1, $54)
+  WriteAsciiCharacter(1, #FILEMARKER_INTERFILE)
 EndProcedure
 
-Procedure addFile(*f.loadedFile, path.s, tag.s, type.b)
+Procedure writeFileDescriptor(type.b, infos.s)
+  Define line.s, value.s, i.b
+  
+  If infos = ""
+    ProcedureReturn 0
+  EndIf   
+  Select type
+    Case #FILETYPE_ANIMATION
+      PrintN("- starting descriptor")
+      WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
+      
+      If Right(infos, 4) = ".dat"
+
+        PrintN("- descriptor file : " + infos)
+        ReadFile(2, infos)
+        line = ReadString(2)
+        WriteByte(1, Val(line))
+        PrintN("- - frame number : " + line)
+        While Not Eof(2)
+          line = ReadString(2)
+          Select Left(line, 1)
+            Case "s"
+              value = Mid(line, 2)
+              PrintN("- - anim speed : " + value)
+              WriteByte(1, #FILEMARKER_ANIMSPEED)
+              WriteFloat(1, ValF(value))
+            Case "f"
+              value = Mid(StringField(line, 1, " "), 2)
+              WriteByte(1, #FILEMARKER_FRAMEINFO)
+              WriteByte(1, Val(value))
+              PrintN("- - frame modified : " + value)
+              i = 2
+              value = StringField(line, i, " ")
+              While value
+                If Left(value, 1) = "d"
+                  WriteByte(1, $20)
+                  WriteUnicodeCharacter(1, Val(Mid(value, 2)))
+                  PrintN("- - - modified duration : " + Mid(value, 2))
+                EndIf 
+                i + 1
+                value = StringField(line, i, " ")
+              Wend 
+            Case "c"
+              value = Mid(StringField(line, 1, " "), 2)
+              WriteByte(1, #FILEMARKER_HURTBOXINFO)
+              WriteByte(1, Val(value))
+              PrintN("- - adding hurtbox to frame : " + value)
+              For i = 2 To 5
+                value = StringField(line, i, " ")
+                PrintN("- - - value : " + value)
+                WriteUnicodeCharacter(1, Val(value))
+              Next 
+            Case "h"
+              value = Mid(StringField(line, 1, " "), 2)
+              WriteByte(1, #FILEMARKER_HITBOXINFO)
+              WriteByte(1, Val(value))
+              PrintN("- - adding hitbox to frame : " + value)
+              For i = 2 To 5
+                PrintN("- - - value : " + value)
+                value = StringField(line, i, " ")
+                WriteUnicodeCharacter(1, Val(value))
+              Next 
+              PrintN("- - - damages : " + StringField(line, 6, " "))
+              WriteFloat(1, Val(StringField(line, 6, " ")))
+          EndSelect
+        Wend 
+      Else
+        value = StringField(infos, 1, " ")
+        PrintN("- frame number : " + value)
+        WriteByte(1, Val(value))
+        value = StringField(infos, 2, " ")
+        If value
+          PrintN("- speed : " + value)
+          WriteByte(1, #FILEMARKER_ANIMSPEED)
+          WriteFloat(1, ValF(value))
+        EndIf 
+      EndIf
+    Case #FILETYPE_LEFTANIM
+      PrintN(">> left anim")
+  EndSelect
+EndProcedure
+
+
+Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
+  PrintN("file path : " + path)
+  PrintN("tag : " + tag)
   readFileToMemory(path, *f)
   writeType(type)
   writeFileTag(tag)
   WriteFileLength(*f\size)
   writeMemoryToFile(1, *f)
+  writeFileDescriptor(type, info)
   writeInterfile()
 EndProcedure
 
@@ -66,46 +163,54 @@ file\buffer = #Null
 
 NewMap fileList.toLoad()
 
+OpenConsole()
+
 CreateFile(1, "data.twl")
 writeSignature()
 writeVersion(1, 3, 2)
 
-Define tag.s, path.s, type.b
+Define tag.s, path.s, type.b, infos.s
 ReadFile(2, "project_db.txt")
 While Not Eof(2)
   path = ReadString(2)
   tag = ReadString(2)
+  
+  infos = Mid(tag, FindString(tag, " ") + 1)
+  tag = StringField(tag, 1, " ")
+  ;parse tag  
   Select StringField(tag, 1, ":")
     Case "A"
       type = #FILETYPE_ANIMATION
+    Case "AL"
+      type = #FILETYPE_LEFTANIM
     Default:Continue
   EndSelect
   tag = StringField(tag, 2, ":")
+  
   AddMapElement(fileList(), path)
 
   fileList()\tag = tag
   fileList()\type = type
+  fileList()\infos = infos
 Wend
 CloseFile(2)
 
 ForEach fileList()
-  addFile(@file, MapKey(fileList()), fileList()\tag, fileList()\type)
+  addFile(@file, MapKey(fileList()), fileList()\tag, fileList()\type, fileList()\infos)
 Next 
 
 CloseFile(1)
 FreeMemory(file\buffer)
 
-InitSprite()
+Input()
 
-UsePNGImageDecoder()
-OpenWindow(0, 0, 0, 400, 400, "Test", #PB_Window_ScreenCentered)
-OpenWindowedScreen(WindowID(0), 0, 0, 400, 400)
 
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 68
-; FirstLine = 45
+; ExecutableFormat = Console
+; CursorPosition = 62
+; FirstLine = 36
 ; Folding = --
 ; EnableXP
-; Executable = datafileMaker.exe
+; Executable = ..\src\res\datafileMaker.exe

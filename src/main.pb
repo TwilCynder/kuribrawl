@@ -5,6 +5,7 @@
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
 XIncludeFile "gamelib.pbi"
+XIncludeFile "loadlib.pb"
 XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
@@ -25,14 +26,18 @@ CompilerIf #DEBUG
   StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
 CompilerEndIf 
 
-
-loadGameData()
 XIncludeFile "gameData.pb"
 
+CompilerIf #DEBUG
+  loadGameData("res/data.twl")
+CompilerElse 
+  loadGameData("data.twl")
+CompilerEndIf
+initDefaultAnimationsConfig(*c1)
 
 *game.Game = initGame(window)
 
-*f1.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
+*f1.Fighter = newFighter(*game, getCharacter("Acid"), 48, 500)
 *f1\name = "Test One"
 ;*f2.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
 ;*f2\name = "Test Two"
@@ -42,18 +47,19 @@ For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 0)
+setPort(0, 4)
 setPortFighter(0, *f1)
 ;setPort(1, 1)
 ;setPortFighter(1, *f2)
 
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 60
+frameDuration.f = 1000.0 / 15
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
 lastFrameDuration = 16
+initFighters(*game)
 Repeat
   startTime = endTime
   nextFrame = nextFrame + frameDuration
@@ -87,7 +93,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 34
+; CursorPosition = 70
+; FirstLine = 30
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

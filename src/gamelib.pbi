@@ -29,23 +29,33 @@ Structure Hitbox Extends CollisionBox
   angle.d
   hit.b
 EndStructure  
- 
-Structure Frame
+
+Structure FrameModel
   display.Rect_
   origin.Vector
   actionnable.b
-  List *collisionBoxes.CollisionBox()
   duration.b
+  List *collisionBoxes.CollisionBox()
+EndStructure
+
+Structure Frame
+  *model.FrameModel
   timeLeft.d
 EndStructure  
 
 Prototype.i f_callback(*fighter, *data)
 
-Structure Animation
+Structure AnimationModel
+  List frames.FrameModel()
   spriteSheet.l ;handle de l'image servant de spritesheet
-  spriteSheetL.l ;image pour les sprite retournés
-  List frames.Frame()
+  spriteSheetL.l;image pour les sprite retournés
   baseSpeed.d
+  endCallback.f_callback
+EndStructure
+
+Structure Animation
+  *model.AnimationModel
+  List frames.Frame()
   speed.d
   frameMultiplier.b
   carry.f ;for animations with speed
@@ -61,9 +71,10 @@ Structure moveInfo
 EndStructure
 
 Structure Champion
-  Map animations.Animation()
+  Map animations.AnimationModel()
   Array moves.moveInfo(#Commands)
   name.s
+  displayName.s
   walkSpeed.d
   dashSpeed.d
   initialDashSpeed.d
@@ -133,6 +144,8 @@ EndProcedure
 
 Procedure newCharacter(name.s)
   *r = AddMapElement(kuribrawl\characters(), name)
+  kuribrawl\characters(name)\name = name
+  kuribrawl\characters(name)\displayName = name
   ProcedureReturn *r
 EndProcedure
 
@@ -140,29 +153,38 @@ Procedure getCharacter(name.s)
   ProcedureReturn @kuribrawl\characters(name)
 EndProcedure
 
+Procedure getAnimation(*character.Champion, name.s)
+  ProcedureReturn FindMapElement(*character\animations(), name)
+EndProcedure
+
 Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
+  ;Debug "New animation " + name
   Shared loadedSprites()
-  *character\animations(name)\spriteSheet = loadedSprites(spriteTag)
+
+  *animation.AnimationModel = AddMapElement(*character\animations(), name)
+  If spriteTag
+    *animation\spriteSheet = loadedSprites(spriteTag)
+  EndIf 
   If Not loadedSprites(spriteTag)
     Debug "Can't find spritesheet with tag " + spriteTag
   EndIf
-  *animation.Animation = @*character\animations()
   
   *animation\baseSpeed = speed
   
   ProcedureReturn *animation
 EndProcedure
 
-Procedure addLeftSpritesheet(*animation.Animation, tag.s)
+Procedure addLeftSpritesheet(*animation.AnimationModel, tag.s)
   Shared loadedSprites()
   *animation\spriteSheetL = loadedSprites(tag)
 EndProcedure
 
-Procedure setAnimationEndCallback(*animation.Animation, f.f_callback)
+Procedure setAnimationEndCallback(*animation.AnimationModel, f.f_callback)
   *animation\endCallback = f
 EndProcedure
 
 Procedure resetAnimation(*animation.Animation)
+  
   ResetList(*animation\frames())
   NextElement(*animation\frames())
   If *animation\frameMultiplier > 1
@@ -186,10 +208,11 @@ Procedure animLength(*anim.Animation)
 EndProcedure
 
 Procedure setAnimationSpeed(*anim.Animation, speed.d = 0)
+  Define ratio.d
   If speed <> 0
     *anim\speed = speed
   Else
-    *anim\speed = *anim\baseSpeed
+    *anim\speed = *anim\model\baseSpeed
   EndIf 
   
   If *anim\speed > 1
@@ -198,24 +221,33 @@ Procedure setAnimationSpeed(*anim.Animation, speed.d = 0)
     ratio = 1 / *anim\speed
   EndIf 
   *anim\frameMultiplier = ratio
-  *anim\carry = ratio - Int(ratio)
   resetAnimation(*anim)
+    
+  *anim\carry = ratio - Int(ratio)
 EndProcedure
 
 Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
-  Define ratio.d
+  Define *anim.Animation
   If *fighter\currentAnimationName = name
     ProcedureReturn 0
   EndIf
-
-  *fighter\currentAnimation = @*fighter\animations(name)
-  *fighter\currentAnimationName = name
   
-  setAnimationSpeed(*fighter\currentAnimation, speed)
+  *anim = FindMapElement(*fighter\animations(), name)
+ 
+  If Not *anim
+    Debug "Can't set animation to " + name
+    ProcedureReturn 0
+  EndIf 
+  *fighter\currentAnimation = *anim
+  *fighter\currentAnimationName = name
+  ;Debug *anim
+
+  setAnimationSpeed(*anim, speed)
+  resetAnimation(*anim)
 EndProcedure
 
-Procedure addFrame(*animation.Animation, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
-  *f.Frame = AddElement(*animation\frames())
+Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
+  *f.FrameModel = AddElement(*animation\frames())
   *f\display\x = x
   *f\display\y = y
   *f\display\w = w
@@ -224,9 +256,10 @@ Procedure addFrame(*animation.Animation, x.l, y.l, w.l, h.l, xo.l, yo.l, duratio
   *f\origin\y = yo
   *f\duration = duration
 EndProcedure
-;optimiser la copie des anim
+
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
-  Define *anim.Animation
+  
+  Define *anim.Animation, *model.AnimationModel
   *r.Fighter = AddElement(*game\fighters())
   *r\x = x
   *r\y = y
@@ -237,19 +270,20 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   *r\character = *character
   
   ForEach *character\animations()
+    *model = @*character\animations()
     *anim = AddMapElement(*r\animations(), MapKey(*character\animations()))
-    *anim\frameMultiplier = *character\animations()\frameMultiplier
-    *anim\spriteSheet = *character\animations()\spriteSheet
-    *anim\spriteSheetL = *character\animations()\spriteSheetL
-    *anim\endCallback = *character\animations()\endCallback
-    *anim\baseSpeed = *character\animations()\baseSpeed
-    CopyList(*character\animations()\frames(), *anim\frames())
+    *anim\endCallback = *model\endCallback
+    *anim\model = *model
+    
+    ForEach *model\frames()
+      AddElement(*anim\frames())
+      *anim\frames()\model = @*model\frames()
+    Next 
     setAnimation(*r, MapKey(*character\animations()))
   Next 
   *r\state = #STATE_IDLE
   
   *r\port = port
-  
   ProcedureReturn *r
 EndProcedure
 
@@ -258,12 +292,12 @@ Procedure renderFrame(*game.Game)
   ClearScreen(#White)
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    If *fighter\facing = -1 And *fighter\currentAnimation\spriteSheetL
-      spriteSheet = *fighter\currentAnimation\spriteSheetL
+    If *fighter\facing = -1 And *fighter\currentAnimation\model\spriteSheetL
+      spriteSheet = *fighter\currentAnimation\model\spriteSheetL
     Else
-      spriteSheet = *fighter\currentAnimation\spriteSheet
+      spriteSheet = *fighter\currentAnimation\model\spriteSheet
     EndIf 
-    With *fighter\currentAnimation\frames()
+    With *fighter\currentAnimation\frames()\model
       y = #SCREEN_H - *fighter\y - \origin\y
       ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
       DisplayTransparentSprite(spriteSheet, *fighter\x - \origin\x, y)
@@ -278,8 +312,8 @@ Procedure nextFrame(*animation.Animation, *fighter.Fighter)
       ProcedureReturn *animation\endCallback(*fighter, 0)
     EndIf 
     resetAnimation(*animation)
-  ElseIf *animation\frames()\duration
-    *animation\frames()\timeLeft = *animation\frames()\duration
+  ElseIf *animation\frames()\model\duration
+    *animation\frames()\timeLeft = *animation\frames()\model\duration
   ElseIf Not *animation\speed = 1
     *animation\frames()\timeLeft = *animation\frameMultiplier
     If *animation\currentCarry >= 1
@@ -293,6 +327,9 @@ Procedure advanceAnimations(*game.Game)
   Define *fighter.Fighter
   ForEach *game\fighters()
     *fighter = *game\fighters()
+    If *fighter\currentAnimationName = "land"
+      Debug *fighter\currentAnimation\frames()\timeLeft
+    EndIf 
     If *fighter\currentAnimation\frames()\timeLeft >= 1
       *fighter\currentAnimation\frames()\timeLeft - 1
     ElseIf Not *fighter\currentAnimation\speed = -1
@@ -359,7 +396,6 @@ Procedure updateAnimations(*game.Game)
   ForEach *game\fighters()
     *fighter = @*game\fighters()
     If *fighter\stateUpdated
-
       ;case by case
       Select *fighter\state
         Case #STATE_IDLE
@@ -409,9 +445,16 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 
+Procedure initFighters(*game.Game)
+  ForEach *game\fighters()
+    *game\fighters()\grounded = 0
+    setState(*game\fighters(), #STATE_IDLE, 0)
+  Next 
+  updateAnimations(*game)
+EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 295
-; FirstLine = 266
+; CursorPosition = 223
+; FirstLine = 190
 ; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL
