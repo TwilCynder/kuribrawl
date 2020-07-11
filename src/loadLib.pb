@@ -25,13 +25,14 @@ Procedure.s LoadSprite_(*buffer, tag.s)
   ProcedureReturn tag
 EndProcedure
 
-Procedure makeFrames(*animation.Animation, w.l, h.l, nb.b)
+Procedure makeFrames(*animation.Animation, w.l, h.l, nb.b, Array *frames.FrameModel(1))
   Define x.l, y.l, w.l, h.l
+  ReDim *frames(nb - 1)
   x = 0
   y = 0
   w = w / nb
-  For i = 1 To nb
-    addFrame(*animation, x, y, w, h, w / 2, h)
+  For i = 0 To nb - 1
+    *frames(i) = addFrame(*animation, x, y, w, h, w / 2, h)
     x + w
   Next
 EndProcedure
@@ -44,6 +45,7 @@ Procedure loadGameData(path.s)
   readVersion()
 
   Define type.b, tag.s, size.l, *buffer, byte.a, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f
+  Dim *frames.FrameModel(0)
   
   *buffer = 0
   Repeat
@@ -59,7 +61,6 @@ Procedure loadGameData(path.s)
         
         character.s = StringField(tag, 1, "/")
         animationName.s = StringField(tag, 2, "/")
-        
         LoadSprite_(*buffer, tag)
         
         *animation = getAnimation(getCharacter(character), animationName)
@@ -82,7 +83,7 @@ Procedure loadGameData(path.s)
         ;- reading descriptor
         
         byte = ReadByte(0)
-        makeFrames(*animation, w, h, byte)
+        makeFrames(*animation, w, h, byte, *frames())
         
         Repeat 
           byte = ReadByte(0)
@@ -92,6 +93,14 @@ Procedure loadGameData(path.s)
               *animation\baseSpeed = valueF
             Case #FILEMARKER_INTERFILE
               Break 
+            Case #FILEMARKER_FRAMEINFO
+              selectedElement = ReadByte(0)
+            Case #FILEMARKER_FRAMEDURATION
+              *frames(selectedElement)\duration = ReadUnicodeCharacter(0)
+            Case #FILEMARKER_HITBOXINFO
+              selectedElement = ReadByte(0)
+              addHitbox(*frames(selectedElement), ReadUnicodeCharacter(0), ReadUnicodeCharacter(0), ReadUnicodeCharacter(0), ReadUnicodeCharacter(0))
+              *frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
           EndSelect
         ForEver
       Case #FILETYPE_LEFTANIM
@@ -112,8 +121,10 @@ Procedure loadGameData(path.s)
   Until Eof(0)
   CloseFile(0)
 EndProcedure
+
+UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 73
-; FirstLine = 54
+; CursorPosition = 39
+; FirstLine = 7
 ; Folding = -
 ; EnableXP

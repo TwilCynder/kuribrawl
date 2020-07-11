@@ -39,10 +39,10 @@ A:Acid/land 2 0.5
 land_strip2L.png
 AL:Acid/land
 nair_strip6.png
-A:Acid/nair 6 0.2
+A:Acid/nair nair.dat
 nair_strip6L.png
 AL:Acid/nair
 uair_strip8.png
-A:Acid/uair 8 0.2
+A:Acid/uair uair.dat
 uair_strip8L.png
 AL:Acid/uair

@@ -86,7 +86,7 @@ Procedure applyPhysics(*game.Game)
     
     nx = *fighter\x + *fighter\physics\v\x
     ny = *fighter\y + *fighter\physics\v\y
-    
+        
     ;--- Calcul des collisions avec le terrain
     If groundCollision(nx, ny)
       If *fighter\grounded = 0
@@ -107,6 +107,6 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 13
+; CursorPosition = 20
 ; Folding = -
 ; EnableXP

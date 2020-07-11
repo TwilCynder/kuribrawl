@@ -35,7 +35,8 @@ Structure FrameModel
   origin.Vector
   actionnable.b
   duration.b
-  List *collisionBoxes.CollisionBox()
+  List hurtoxes.Hurtbox()
+  List hitboxes.Hitbox()
 EndStructure
 
 Structure Frame
@@ -136,6 +137,8 @@ Structure Game
   window.l
 EndStructure
 
+InitSprite()
+
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
   *game\window = window
@@ -165,9 +168,6 @@ Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
   If spriteTag
     *animation\spriteSheet = loadedSprites(spriteTag)
   EndIf 
-  If Not loadedSprites(spriteTag)
-    Debug "Can't find spritesheet with tag " + spriteTag
-  EndIf
   
   *animation\baseSpeed = speed
   
@@ -255,6 +255,19 @@ Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, du
   *f\origin\x = xo
   *f\origin\y = yo
   *f\duration = duration
+  ProcedureReturn *f
+EndProcedure
+
+Procedure addHitbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
+  *r.Hitbox = AddElement(*frame\hitboxes())
+  Select shape
+    Case #CBOX_SHAPE_RECT
+      *r\x = x
+      *r\y = y
+      *r\x2 = w
+      *r\y2 = h
+  EndSelect
+  *r\shape = shape
 EndProcedure
 
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
@@ -328,7 +341,6 @@ Procedure advanceAnimations(*game.Game)
   ForEach *game\fighters()
     *fighter = *game\fighters()
     If *fighter\currentAnimationName = "land"
-      Debug *fighter\currentAnimation\frames()\timeLeft
     EndIf 
     If *fighter\currentAnimation\frames()\timeLeft >= 1
       *fighter\currentAnimation\frames()\timeLeft - 1
@@ -452,10 +464,12 @@ Procedure initFighters(*game.Game)
   Next 
   updateAnimations(*game)
 EndProcedure
+
+
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 223
-; FirstLine = 190
-; Folding = -----
+; CursorPosition = 169
+; FirstLine = 159
+; Folding = ------
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

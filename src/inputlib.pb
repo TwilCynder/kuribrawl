@@ -415,7 +415,9 @@ Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
     Case #STATE_ATTACK
       If *port\figher\grounded
       Else 
-        applyAirAccel(*port\figher, Sign(*port\currentControlStickState\x))
+        If Abs(*port\currentControlStickState\x) > stickTreshold
+          applyAirAccel(*port\figher, Sign(*port\currentControlStickState\x))
+        EndIf 
       EndIf 
   EndSelect 
 EndProcedure
@@ -462,7 +464,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 33
-; FirstLine = 26
+; CursorPosition = 419
+; FirstLine = 382
 ; Folding = ----
 ; EnableXP

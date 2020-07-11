@@ -14,10 +14,7 @@ CompilerIf #DEBUG
   XIncludeFile "debug.pb"
 CompilerEndIf
 
-InitSprite()
-UsePNGImageDecoder()
-
-
+;- Game window
 window.l = OpenWindow(-1, 0, 0, #SCREEN_W + 170, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
 OpenWindowedScreen(WindowID(window), 0, 0, #SCREEN_W, #SCREEN_H, 0, 0, 0, #PB_Screen_NoSynchronization)
 SetWindowColor(window, $aaaaaa)
@@ -25,6 +22,8 @@ CompilerIf #DEBUG
   InputLogGadget(#SCREEN_W + 5, 5, 160, #SCREEN_H - 120)
   StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
 CompilerEndIf 
+
+;- Game data
 
 XIncludeFile "gameData.pb"
 
@@ -35,6 +34,7 @@ CompilerElse
 CompilerEndIf
 initDefaultAnimationsConfig(*c1)
 
+;- Test game (game, fighters, ports)
 *game.Game = initGame(window)
 
 *f1.Fighter = newFighter(*game, getCharacter("Acid"), 48, 500)
@@ -42,19 +42,19 @@ initDefaultAnimationsConfig(*c1)
 ;*f2.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
 ;*f2\name = "Test Two"
 
-
 For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 4)
+setPort(0, 5)
 setPortFighter(0, *f1)
 ;setPort(1, 1)
 ;setPortFighter(1, *f2)
 
+;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 15
+frameDuration.f = 1000.0 / 60
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -93,8 +93,6 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 70
-; FirstLine = 30
 ; Folding = -
 ; EnableXP
 ; EnableUnicode
