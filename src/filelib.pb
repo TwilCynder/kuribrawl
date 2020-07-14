@@ -16,9 +16,6 @@ Procedure readVersion()
   maj = ReadAsciiCharacter(0)
   min = ReadAsciiCharacter(0)
   rev = ReadAsciiCharacter(0)
-  Debug maj
-  Debug min
-  Debug rev
 EndProcedure
 
 Procedure readFileType()
@@ -43,6 +40,6 @@ Procedure checkInterfile()
  ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 41
+; CursorPosition = 17
 ; Folding = --
 ; EnableXP

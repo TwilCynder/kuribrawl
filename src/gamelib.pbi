@@ -1,58 +1,10 @@
 ﻿frame.l = 0
 
-XIncludeFile "gamelibConstants.pb"
-
-Structure Physics
-  v.VectorDouble
-  a.VectorDouble
-EndStructure
-
-Structure CollisionBox
-  x.l
-  y.l
-  shape.b
-  s.l  ;"size" = side length for a square, radius for a circle
-  s2.l
-  x2.l
-  y2.l
-EndStructure
-
-Structure Hurtbox Extends CollisionBox
-  invincible.b
-EndStructure
-
-Structure Hitbox Extends CollisionBox
-  damage.l
-  hitstunModifier.l
-  bkb.d ;base knockback
-  skb.d ;scaling klockback
-  angle.d
-  hit.b
-EndStructure  
-
-Structure FrameModel
-  display.Rect_
-  origin.Vector
-  actionnable.b
-  duration.b
-  List hurtoxes.Hurtbox()
-  List hitboxes.Hitbox()
-EndStructure
 
 Structure Frame
   *model.FrameModel
   timeLeft.d
 EndStructure  
-
-Prototype.i f_callback(*fighter, *data)
-
-Structure AnimationModel
-  List frames.FrameModel()
-  spriteSheet.l ;handle de l'image servant de spritesheet
-  spriteSheetL.l;image pour les sprite retournés
-  baseSpeed.d
-  endCallback.f_callback
-EndStructure
 
 Structure Animation
   *model.AnimationModel
@@ -64,55 +16,6 @@ Structure Animation
   endCallback.f_callback
 EndStructure  
 
-Dim stateDefaultAnimation.s(#STATES)
-Dim commandDefaultAnimation.s(#COMMANDS)
-
-Structure moveInfo
-  landLag.b
-EndStructure
-
-Structure Champion
-  Map animations.AnimationModel()
-  Array moves.moveInfo(#Commands)
-  name.s
-  displayName.s
-  walkSpeed.d
-  dashSpeed.d
-  initialDashSpeed.d
-  dashTurnAccel.d
-  maxAirSpeed.d
-  airAcceleration.d
-  traction.d
-  jumpSpeed.d
-  jumpsquatDuration.b
-  dashStopDuration.b
-  dashStartDuration.b
-  dashTurnDuration.b
-  shorthopSpeed.d
-  doubleJumpSpeed.d
-  maxFallSpeed.d
-  fastFallSpeed.d
-  airFriction.d
-  landingDuration.d
-EndStructure
-
-Structure ArtifactModel
-  Map animations.Animation()
-  durability.b
-EndStructure
-
-Structure GameVariables
-  backwardJumpBoost.d
-  walkingJumpBoost.d
-  doubleJumpBackwardSpeed.d
-EndStructure
-
-Structure GameData
-  Map characters.Champion()
-  variables.GameVariables
-EndStructure  
-Global kuribrawl.GameData
-  
 Structure Fighter
   x.l
   y.l
@@ -137,50 +40,10 @@ Structure Game
   window.l
 EndStructure
 
-InitSprite()
-
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
   *game\window = window
   ProcedureReturn *game
-EndProcedure
-
-Procedure newCharacter(name.s)
-  *r = AddMapElement(kuribrawl\characters(), name)
-  kuribrawl\characters(name)\name = name
-  kuribrawl\characters(name)\displayName = name
-  ProcedureReturn *r
-EndProcedure
-
-Procedure getCharacter(name.s)
-  ProcedureReturn @kuribrawl\characters(name)
-EndProcedure
-
-Procedure getAnimation(*character.Champion, name.s)
-  ProcedureReturn FindMapElement(*character\animations(), name)
-EndProcedure
-
-Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
-  ;Debug "New animation " + name
-  Shared loadedSprites()
-
-  *animation.AnimationModel = AddMapElement(*character\animations(), name)
-  If spriteTag
-    *animation\spriteSheet = loadedSprites(spriteTag)
-  EndIf 
-  
-  *animation\baseSpeed = speed
-  
-  ProcedureReturn *animation
-EndProcedure
-
-Procedure addLeftSpritesheet(*animation.AnimationModel, tag.s)
-  Shared loadedSprites()
-  *animation\spriteSheetL = loadedSprites(tag)
-EndProcedure
-
-Procedure setAnimationEndCallback(*animation.AnimationModel, f.f_callback)
-  *animation\endCallback = f
 EndProcedure
 
 Procedure resetAnimation(*animation.Animation)
@@ -246,30 +109,6 @@ Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
   resetAnimation(*anim)
 EndProcedure
 
-Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
-  *f.FrameModel = AddElement(*animation\frames())
-  *f\display\x = x
-  *f\display\y = y
-  *f\display\w = w
-  *f\display\h = h
-  *f\origin\x = xo
-  *f\origin\y = yo
-  *f\duration = duration
-  ProcedureReturn *f
-EndProcedure
-
-Procedure addHitbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
-  *r.Hitbox = AddElement(*frame\hitboxes())
-  Select shape
-    Case #CBOX_SHAPE_RECT
-      *r\x = x
-      *r\y = y
-      *r\x2 = w
-      *r\y2 = h
-  EndSelect
-  *r\shape = shape
-EndProcedure
-
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   
   Define *anim.Animation, *model.AnimationModel
@@ -300,21 +139,27 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   ProcedureReturn *r
 EndProcedure
 
+Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l)
+  With *frame
+    ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
+    DisplayTransparentSprite(spriteSheet, x - \origin\x, y - \origin\y)
+  EndWith
+EndProcedure
+
+Procedure renderFighter(*fighter.Fighter)
+  Define spriteSheet.l
+  If *fighter\facing = -1 And *fighter\currentAnimation\model\spriteSheetL
+    spriteSheet = *fighter\currentAnimation\model\spriteSheetL
+  Else
+    spriteSheet = *fighter\currentAnimation\model\spriteSheet
+  EndIf 
+  drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y)
+EndProcedure
+
 Procedure renderFrame(*game.Game)
-  Define *fighter.Fighter, y.l, spriteSheet
   ClearScreen(#White)
   ForEach *game\fighters()
-    *fighter = @*game\fighters()
-    If *fighter\facing = -1 And *fighter\currentAnimation\model\spriteSheetL
-      spriteSheet = *fighter\currentAnimation\model\spriteSheetL
-    Else
-      spriteSheet = *fighter\currentAnimation\model\spriteSheet
-    EndIf 
-    With *fighter\currentAnimation\frames()\model
-      y = #SCREEN_H - *fighter\y - \origin\y
-      ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
-      DisplayTransparentSprite(spriteSheet, *fighter\x - \origin\x, y)
-    EndWith
+    renderFighter(@*game\fighters())
   Next
   FlipBuffers()
 EndProcedure
@@ -444,18 +289,6 @@ EndProcedure
 Procedure defaultAttackAnimCallback(*fighter.Fighter, *data)
   setState(*fighter, #STATE_IDLE)
 EndProcedure
-  
-Procedure initDefaultAnimationsConfig(*char.Champion)
-  Shared commandDefaultAnimation()
-  If *char\animations("jump")
-    setAnimationEndCallback(@*char\animations("jump"), @defaultJumpAnimCallback())
-  EndIf 
-  For i = 0 To #COMMANDS - 1
-    If *char\animations(commandDefaultAnimation(i))
-      setAnimationEndCallback(*char\animations(commandDefaultAnimation(i)), @defaultAttackAnimCallback())
-    EndIf
-  Next 
-EndProcedure
 
 Procedure initFighters(*game.Game)
   ForEach *game\fighters()
@@ -467,9 +300,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 169
-; FirstLine = 159
-; Folding = ------
+; CursorPosition = 157
+; FirstLine = 136
+; Folding = ----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

@@ -25,7 +25,7 @@ Procedure.s LoadSprite_(*buffer, tag.s)
   ProcedureReturn tag
 EndProcedure
 
-Procedure makeFrames(*animation.Animation, w.l, h.l, nb.b, Array *frames.FrameModel(1))
+Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.FrameModel(1))
   Define x.l, y.l, w.l, h.l
   ReDim *frames(nb - 1)
   x = 0
@@ -99,7 +99,11 @@ Procedure loadGameData(path.s)
               *frames(selectedElement)\duration = ReadUnicodeCharacter(0)
             Case #FILEMARKER_HITBOXINFO
               selectedElement = ReadByte(0)
-              addHitbox(*frames(selectedElement), ReadUnicodeCharacter(0), ReadUnicodeCharacter(0), ReadUnicodeCharacter(0), ReadUnicodeCharacter(0))
+              x.l = ReadWord(0)
+              y.l = ReadWord(0)
+              w.l = ReadWord(0)
+              h.l = ReadWord(0)
+              addHitbox(*frames(selectedElement), x, y, w, h)
               *frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
           EndSelect
         ForEver
@@ -124,7 +128,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 39
-; FirstLine = 7
+; CursorPosition = 104
+; FirstLine = 74
 ; Folding = -
 ; EnableXP

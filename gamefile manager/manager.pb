@@ -113,7 +113,7 @@ Procedure writeFileDescriptor(type.b, infos.s)
               For i = 2 To 5
                 value = StringField(line, i, " ")
                 PrintN("- - - value : " + value)
-                WriteUnicodeCharacter(1, Val(value))
+                WriteWord(1, Val(value))
               Next 
             Case "h"
               value = Mid(StringField(line, 1, " "), 2)
@@ -123,7 +123,7 @@ Procedure writeFileDescriptor(type.b, infos.s)
               For i = 2 To 5
                 PrintN("- - - value : " + value)
                 value = StringField(line, i, " ")
-                WriteUnicodeCharacter(1, Val(value))
+                WriteWord(1, Val(value))
               Next 
               PrintN("- - - damages : " + StringField(line, 6, " "))
               WriteFloat(1, Val(StringField(line, 6, " ")))
@@ -167,7 +167,7 @@ OpenConsole()
 
 CreateFile(1, "data.twl")
 writeSignature()
-writeVersion(1, 3, 2)
+writeVersion(0, 0, 1)
 
 Define tag.s, path.s, type.b, infos.s
 ReadFile(2, "project_db.txt")
@@ -209,8 +209,8 @@ Input()
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 117
-; FirstLine = 81
+; CursorPosition = 115
+; FirstLine = 115
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe

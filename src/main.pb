@@ -4,8 +4,9 @@
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
-XIncludeFile "gamelib.pbi"
+XIncludeFile "gameDataLib.pbi"
 XIncludeFile "loadlib.pb"
+XIncludeFile "gamelib.pbi"
 XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
@@ -46,7 +47,7 @@ For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 5)
+setPort(0, 0)
 setPortFighter(0, *f1)
 ;setPort(1, 1)
 ;setPortFighter(1, *f2)
@@ -93,6 +94,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+; CursorPosition = 49
 ; Folding = -
 ; EnableXP
 ; EnableUnicode
