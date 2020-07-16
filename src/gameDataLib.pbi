@@ -33,7 +33,7 @@ Structure FrameModel
   origin.Vector
   actionnable.b
   duration.b
-  List hurtoxes.Hurtbox()
+  List hurtboxes.Hurtbox()
   List hitboxes.Hitbox()
 EndStructure
 
@@ -115,7 +115,6 @@ Procedure getAnimation(*character.Champion, name.s)
 EndProcedure
 
 Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
-  ;Debug "New animation " + name
   Shared loadedSprites()
 
   *animation.AnimationModel = AddMapElement(*character\animations(), name)
@@ -162,6 +161,18 @@ Procedure addHitbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_R
   *r\shape = shape
 EndProcedure
 
+Procedure addHurtbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
+  *r.Hurtbox = AddElement(*frame\hurtboxes())
+  Select shape
+    Case #CBOX_SHAPE_RECT
+      *r\x = x
+      *r\y = y
+      *r\x2 = w
+      *r\y2 = h
+  EndSelect
+  *r\shape = shape
+EndProcedure
+
 Declare defaultJumpAnimCallback(*fighter, *data)
 Declare defaultAttackAnimCallback(*fighter, *data)
 Procedure initDefaultAnimationsConfig(*char.Champion)
@@ -176,7 +187,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 152
-; FirstLine = 110
+; CursorPosition = 174
+; FirstLine = 137
 ; Folding = --
 ; EnableXP

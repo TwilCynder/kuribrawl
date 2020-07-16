@@ -15,7 +15,7 @@ A:Acid/dashTurn 3 13
 dashturn_strip3L.png
 AL:Acid/dashTurn
 idle_strip4.png
-A:Acid/idle 4 0.05
+A:Acid/idle idle.dat
 idle_strip4L.png
 AL:Acid/idle
 jumpstart.png

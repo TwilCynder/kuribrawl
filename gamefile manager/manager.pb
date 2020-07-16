@@ -110,11 +110,19 @@ Procedure writeFileDescriptor(type.b, infos.s)
               WriteByte(1, #FILEMARKER_HURTBOXINFO)
               WriteByte(1, Val(value))
               PrintN("- - adding hurtbox to frame : " + value)
-              For i = 2 To 5
-                value = StringField(line, i, " ")
-                PrintN("- - - value : " + value)
+              value = StringField(line, 2, " ")
+              If value
                 WriteWord(1, Val(value))
-              Next 
+                PrintN("- - - value : " + value)
+                For i = 3 To 5
+                  value = StringField(line, i, " ")
+                  PrintN("- - - value : " + value)
+                  WriteWord(1, Val(value))
+                Next 
+              Else
+                WriteWord(1, $5454)
+                PrintN("- - - no value specified")
+              EndIf 
             Case "h"
               value = Mid(StringField(line, 1, " "), 2)
               WriteByte(1, #FILEMARKER_HITBOXINFO)
@@ -209,8 +217,8 @@ Input()
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 115
-; FirstLine = 115
+; CursorPosition = 112
+; FirstLine = 93
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe

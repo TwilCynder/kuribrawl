@@ -105,6 +105,20 @@ Procedure loadGameData(path.s)
               h.l = ReadWord(0)
               addHitbox(*frames(selectedElement), x, y, w, h)
               *frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
+            Case #FILEMARKER_HURTBOXINFO
+              selectedElement = ReadByte(0)
+              x.l = ReadWord(0)
+              If x = $5454
+                x = - *frames(selectedElement)\origin\x
+                y = - *frames(selectedElement)\origin\y
+                w = *frames(selectedElement)\display\w
+                h = *frames(selectedElement)\display\h
+              Else
+                y.l = ReadWord(0)
+                w.l = ReadWord(0)
+                h.l = ReadWord(0)
+              EndIf 
+              addHurtbox(*frames(selectedElement), x, y, w, h)
           EndSelect
         ForEver
       Case #FILETYPE_LEFTANIM
@@ -128,7 +142,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 104
+; CursorPosition = 120
 ; FirstLine = 74
 ; Folding = -
 ; EnableXP

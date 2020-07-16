@@ -143,6 +143,14 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l)
   With *frame
     ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
     DisplayTransparentSprite(spriteSheet, x - \origin\x, y - \origin\y)
+    CompilerIf #DEBUG
+      StartDrawing(ScreenOutput())
+      DrawingMode(#PB_2DDrawing_Outlined)
+      ForEach *frame\hitboxes()
+        Box(x + *frame\hitboxes()\x, y + *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+      Next
+      StopDrawing()
+    CompilerEndIf
   EndWith
 EndProcedure
 
@@ -300,9 +308,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 157
-; FirstLine = 136
-; Folding = ----
+; CursorPosition = 148
+; FirstLine = 127
+; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode
