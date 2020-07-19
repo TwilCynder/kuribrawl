@@ -1,17 +1,17 @@
 dash_strip4.png
-A:Acid/dash 4 0.18
+A:Acid/dash dash.dat
 dash_strip4L.png
 AL:Acid/dash
 dashstart_strip2.png
-A:Acid/dashStart 2 0.25
+A:Acid/dashStart dashstart.dat
 dashstart_strip2L.png
 AL:Acid/dashStart
 dashstop_strip2.png
-A:Acid/dashStop 2
+A:Acid/dashStop dashStop.dat
 dashstop_strip2L.png
 AL:Acid/dashStop
 dashturn_strip3.png
-A:Acid/dashTurn 3 13
+A:Acid/dashTurn dashTurn.dat
 dashturn_strip3L.png
 AL:Acid/dashTurn
 idle_strip4.png
@@ -19,23 +19,23 @@ A:Acid/idle idle.dat
 idle_strip4L.png
 AL:Acid/idle
 jumpstart.png
-A:Acid/jumpsquat 1 -1
+A:Acid/jumpsquat jumpsquat.dat
 jumpstartL.png
 AL:Acid/jumpsquat
 walk_strip6.png
-A:Acid/walk 6 0.15
+A:Acid/walk walk.dat
 walk_strip6L.png
 AL:Acid/walk
 air_idle.png 
-A:Acid/airIdle 1 -1
+A:Acid/airIdle airIdle.dat
 air_idleL.png
 AL:Acid/airIdle
 jump_strip5.png
-A:Acid/jump 5 0.5
+A:Acid/jump jump.dat
 jump_strip5L.png
 AL:Acid/jump
 land_strip2.png
-A:Acid/land 2 0.5
+A:Acid/land land.dat
 land_strip2L.png
 AL:Acid/land
 nair_strip6.png

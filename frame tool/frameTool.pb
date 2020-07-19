@@ -1,8 +1,16 @@
-﻿Enumeration
+﻿;todo : menu option to make the data file
+;only *try* loading the data file at start : if it fails, can be tried manually directly, and then with a menu option
+;menu option to save + make + load
+
+Enumeration
   #MENUITEM_SAVE
+  #MENUITEM_SAVEALL
+  #MENUITEM_SETDESCRIPTOR
+  #MENUITEM_LOADPROJECTDB
   #MENUITEM_ADDHITBOX
   #MENUITEM_ADDHURTBOX
   #MENUITEM_DELETEBOX
+  #MENUITEM_GENERATEHURTBOXES
   #MENUITEMS
 EndEnumeration
 
@@ -94,12 +102,15 @@ Procedure selectCollisionBox(*b.CollisionBox, type.b)
   drawFrame(*selectedAnim, 1)
 EndProcedure
 
+Declare.s findAnimationDescriptor(*animation)
 Procedure setAnimation(*animation.AnimationModel)
   Shared *selectedAnim
   *selectedAnim = *animation
   ResetList(*selectedAnim\frames())
   NextElement(*selectedAnim\frames())
   onFrameChanged(*selectedAnim)
+  
+  SetGadgetText(11, findAnimationDescriptor(*animation))
 EndProcedure
 
 Procedure newHitbox()
@@ -270,16 +281,19 @@ Procedure.s findAnimationDescriptor(*animation)
   ProcedureReturn ""
 EndProcedure
 
-Procedure saveAnimationDescriptor(*animation.AnimationModel)
+Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
   Define i.b = 0
-  path.s = findAnimationDescriptor(*animation)
   If path = ""
     ProcedureReturn 0
   EndIf 
   CreateFile(0, path)
   WriteStringN(0, Str(ListSize(*animation\frames())))
   If Not *animation\baseSpeed = 1
-    WriteStringN(0, "s" + Str(*animation\baseSpeed))
+    If *animation\baseSpeed < 1 And Not *animation\baseSpeed = -1
+      WriteStringN(0, "s" + StrF(*animation\baseSpeed, 3))
+    Else
+      WriteStringN(0, "s" + Str(*animation\baseSpeed))
+    EndIf 
   EndIf 
   ForEach *animation\frames()
     If *animation\frames()\duration
@@ -289,10 +303,88 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel)
       WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " + Str(*animation\frames()\hitboxes()\y2) + " " + Str(*animation\frames()\hitboxes()\damage))
     Next 
     ForEach *animation\frames()\hurtboxes()
-      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hurtboxes()\x) + " " + Str(*animation\frames()\hurtboxes()\y) + " " + Str(*animation\frames()\hurtboxes()\x2) + " " + Str(*animation\frames()\hurtboxes()\y2))
-    Next    
+      WriteStringN(0, "c" + Str(i) + " " + Str(*animation\frames()\hurtboxes()\x) + " " + Str(*animation\frames()\hurtboxes()\y) + " " + Str(*animation\frames()\hurtboxes()\x2) + " " + Str(*animation\frames()\hurtboxes()\y2))
+    Next 
+    i + 1
   Next 
   CloseFile(0)
+EndProcedure
+
+Procedure saveAll()
+  Shared animationDescriptorFiles()
+  ForEach animationDescriptorFiles()
+    saveAnimationDescriptor(animationDescriptorFiles()\animation, animationDescriptorFiles()\descriptor)
+  Next
+EndProcedure
+
+Procedure setDescriptorFile(*animation)
+  Shared animationDescriptorFiles()
+  If findAnimationDescriptor(*animation) = ""
+    AddElement(animationDescriptorFiles())
+    animationDescriptorFiles()\animation = *animation
+  EndIf 
+  animationDescriptorFiles()\descriptor = InputRequester("Kuribrawl Frame Tool", "Name/Path of the descriptor file for this animation : ", "")
+  SetGadgetText(11, animationDescriptorFiles()\descriptor)
+EndProcedure
+
+Procedure generateDefaultHurtboxes(*animation.AnimationModel)
+  ForEach *animation\frames()
+    addHurtbox(*animation\frames(), -*animation\frames()\origin\x, -*animation\frames()\origin\y, *animation\frames()\display\w, *animation\frames()\display\h)
+  Next
+  FirstElement(*animation\frames())
+  drawFrame(*animation, 1)
+EndProcedure
+
+Procedure setProjectDBLoaded(state.b)
+  Shared projectDBLoaded, firstNonAnimItem
+  projectDBLoaded = state
+  DisableMenuItem(0, firstNonAnimItem + #MENUITEM_SAVE, 1 - state)
+  DisableMenuItem(0, firstNonAnimItem + #MENUITEM_SAVEALL, 1 - state)
+  DisableMenuItem(0, firstNonAnimItem + #MENUITEM_SETDESCRIPTOR, 1 - state)
+EndProcedure
+
+Procedure loadProjectDB(path.s)
+  Shared animationDescriptorFiles(), characters()
+  Define tag.s, infos.s, file.s, *animation
+  If Not ReadFile(0, path)
+    ProcedureReturn 0
+  EndIf 
+  ClearList(animationDescriptorFiles())
+  While Not Eof(0)
+    ReadString(0) ;osef
+    tag = ReadString(0)
+    infos = StringField(tag, 2, " ")
+    tag = StringField(tag, 1, " ")
+    If Not StringField(tag, 1, ":") = "A"
+      Continue
+    EndIf 
+    tag = StringField(tag, 2, ":")
+    If Right(infos, 4) = ".dat"
+      *animation = characters(StringField(tag, 1, "/"))\animations(StringField(tag, 2, "/"))
+      AddElement(animationDescriptorFiles())
+      animationDescriptorFiles()\animation = *animation
+      animationDescriptorFiles()\descriptor = infos
+    EndIf  
+  Wend 
+  CloseFile(0)
+  SetCurrentDirectory(GetPathPart(path))
+  ProcedureReturn 1 
+EndProcedure
+
+Procedure tryLoadProjectDB(path.s)
+  loading:
+  If loadProjectDB(path)
+    ProcedureReturn 1
+  EndIf 
+  If MessageRequester("Error", "Can't find project_db.txt in this directory. Do you want to find it yourself ?", #PB_MessageRequester_YesNo) = #PB_MessageRequester_Yes
+    path.s = OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0)
+    If path = ""
+      ProcedureReturn 0
+    EndIf 
+    Goto loading
+  Else
+    ProcedureReturn 0
+  EndIf   
 EndProcedure
 
 Procedure menuCallback()
@@ -309,51 +401,29 @@ Procedure menuCallback()
       Case firstNonAnimItem + #MENUITEM_DELETEBOX
         deleteBox() 
       Case firstNonAnimItem + #MENUITEM_SAVE
-        saveAnimationDescriptor(*selectedAnim)
+        If *selectedAnim 
+          saveAnimationDescriptor(*selectedAnim, findAnimationDescriptor(*selectedAnim))
+        EndIf     
+      Case firstNonAnimItem + #MENUITEM_SAVEALL
+        saveAll()
+      Case firstNonAnimItem + #MENUITEM_SETDESCRIPTOR
+        If *selectedAnim
+          setDescriptorFile(*selectedAnim)
+        EndIf 
+      Case firstNonAnimItem + #MENUITEM_GENERATEHURTBOXES
+        If *selectedAnim
+          generateDefaultHurtboxes(*selectedAnim)
+        EndIf 
+      Case firstNonAnimItem + #MENUITEM_LOADPROJECTDB
+        setProjectDBLoaded(Bool(loadProjectDB(OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0))))
     EndSelect
   EndIf 
 EndProcedure  
+ 
 
-Procedure loadProjectDB(path.s)
-  Shared animationDescriptorFiles(), characters()
-  Define tag.s, infos.s, file.s, *animation
-  If Not ReadFile(0, path)
-    ProcedureReturn 0
-  EndIf 
-  While Not Eof(0)
-    file = ReadString(0)
-    tag = ReadString(0)
-    infos = StringField(tag, 2, " ")
-    tag = StringField(tag, 1, " ")
-    If Not StringField(tag, 1, ":") = "A"
-      Continue
-    EndIf 
-    tag = StringField(tag, 2, ":")
-    If Right(infos, 4) = ".dat"
-      *animation = characters(StringField(tag, 1, "/"))\animations(StringField(tag, 2, "/"))
-      AddElement(animationDescriptorFiles())
-      animationDescriptorFiles()\animation = *animation
-      animationDescriptorFiles()\descriptor = file
-    EndIf  
-  Wend 
-  CloseFile(0)
-  ProcedureReturn 1 
-EndProcedure
-
-Procedure tryLoadProjectDB(path.s)
-  loading:
-  If Not loadProjectDB(path)
-    projectDBLoaded = 0
-    If MessageRequester("Error", "Can't find project_db.txt in this directory. Do you want to find it yourself ?", #PB_MessageRequester_YesNo) = #PB_MessageRequester_Yes
-      path.s = OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0)
-      If path = ""
-        ProcedureReturn 0
-      EndIf 
-      Goto loading
-    EndIf 
-  EndIf   
-  projectDBLoaded = 1
-EndProcedure
+;Procedure onLoad()
+  
+;EndProcedure
 
 ForEach kuribrawl\characters()
   ForEach kuribrawl\characters()\animations()
@@ -376,6 +446,7 @@ TextGadget(7, #CANVAS_W + 80, 90, 10, 20, "h")
 SpinGadget(8, #CANVAS_W + 95, 90, 45, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
 ButtonGadget(9, #CANVAS_W + 10, 120, 20, 20, "OK")
 StringGadget(10, #CANVAS_W + 35, 120, 150, 20, "")
+TextGadget(11, 5, #CANVAS_H + 10, #CANVAS_W, 20, "")
 
 CreateMenu(0, WindowID(0))
 MenuTitle("Animation")
@@ -397,15 +468,20 @@ Next
 CloseSubMenu()
 firstNonAnimItem = i
 
-MenuTitle("File")
 MenuItem(firstNonAnimItem + #MENUITEM_SAVE, "Save")
+MenuItem(firstNonAnimItem + #MENUITEM_SAVEALL, "Save All")
+MenuItem(firstNonAnimItem + #MENUITEM_SETDESCRIPTOR, "Set descriptor file")
+
+MenuTitle("Project")
+MenuItem(firstNonAnimItem + #MENUITEM_LOADPROJECTDB, "Load project_db")
 
 MenuTitle("Cboxes")
 MenuItem(firstNonAnimItem + #MENUITEM_ADDHITBOX, "Add hitbox")
 MenuItem(firstNonAnimItem + #MENUITEM_ADDHURTBOX, "Add hurtbox")
 MenuItem(firstNonAnimItem + #MENUITEM_DELETEBOX, "Delete collision box")
+MenuItem(firstNonAnimItem + #MENUITEM_GENERATEHURTBOXES, "Generate default hurtboxes")
 
-tryLoadProjectDB("project_db.txt")
+setProjectDBLoaded(tryLoadProjectDB("project_db.txt"))
 
 Define event.l
 Repeat
@@ -419,7 +495,7 @@ Repeat
 Until event = #PB_Event_CloseWindow
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 400
-; FirstLine = 370
-; Folding = ---
+; CursorPosition = 273
+; FirstLine = 270
+; Folding = ----
 ; EnableXP

@@ -218,7 +218,7 @@ Input()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
 ; CursorPosition = 112
-; FirstLine = 93
+; FirstLine = 69
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe
