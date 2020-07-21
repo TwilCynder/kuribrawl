@@ -5,10 +5,7 @@ EndEnumeration
 NewMap loadedSprites.l()
 
 Procedure checkSignature()
-  If Not ReadInteger(0) = $54545454
-    Debug "error"
-    End
-  EndIf
+  ProcedureReturn Bool(ReadInteger(0) = $54545454)
 EndProcedure
 
 Procedure readVersion()
@@ -40,6 +37,6 @@ Procedure checkInterfile()
  ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 17
+; CursorPosition = 7
 ; Folding = --
 ; EnableXP

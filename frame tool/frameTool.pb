@@ -1,12 +1,21 @@
-﻿;todo : menu option to make the data file
-;only *try* loading the data file at start : if it fails, can be tried manually directly, and then with a menu option
+﻿#DEBUG = 1
+
+;todo : menu option to make the data file
 ;menu option to save + make + load
+
+CompilerIf #DEBUG
+  #DEFAULT_DATAFILE_PATH = "../src/res/data.twl"
+CompilerElse
+  #DEFAULT_DATAFILE_PATH = "../data.twl"
+CompilerEndIf
 
 Enumeration
   #MENUITEM_SAVE
   #MENUITEM_SAVEALL
   #MENUITEM_SETDESCRIPTOR
+  #MENUITEM_LOADDATAFILE
   #MENUITEM_LOADPROJECTDB
+  #MENUITEM_RELOAD
   #MENUITEM_ADDHITBOX
   #MENUITEM_ADDHURTBOX
   #MENUITEM_DELETEBOX
@@ -17,7 +26,9 @@ EndEnumeration
 #CANVAS_W = 200
 #CANVAS_H = 200
 
-#DEBUG = 0
+Macro rmii
+  firstNonAnimItem +
+EndMacro
 
 XIncludeFile "../src/utilCore.pb"
 XIncludeFile "../src/filelib.pb"
@@ -35,7 +46,8 @@ Structure AnimationDescriptorPair
   descriptor.s
 EndStructure
 
-Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstNonAnimItem.l, projectDBLoaded.b
+Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstNonAnimItem.l, projectDBLoaded.b, dataFilePath.s
+NewMap characters.Champion()
 
 ImportC "user32.lib" ;importing the msvcrt lib, granting access to the windows API
   GetCursorPos_(*p.Point)
@@ -261,15 +273,9 @@ OpenWindow(0, 0, 0, 400, 250, "Kuribrawl Frame Tool", #PB_Window_ScreenCentered 
 OpenWindowedScreen(WindowID(0), 5, 5, #CANVAS_W, #CANVAS_H)
 
 IncludeFile "../src/gameData.pb"
-loadGameData("../src/res/data.twl")
+Dim *itemAnims.AnimationModel(0)
 
-ForEach kuribrawl\characters()
-  totalAnims + MapSize(kuribrawl\characters()\animations())
-Next  
-Dim *itemAnims.AnimationModel(totalAnims)
 NewList animationDescriptorFiles.AnimationDescriptorPair()
-NewMap characters.Champion()
-
 
 Procedure.s findAnimationDescriptor(*animation)
   Shared animationDescriptorFiles()
@@ -287,6 +293,7 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
     ProcedureReturn 0
   EndIf 
   CreateFile(0, path)
+  Debug *animation
   WriteStringN(0, Str(ListSize(*animation\frames())))
   If Not *animation\baseSpeed = 1
     If *animation\baseSpeed < 1 And Not *animation\baseSpeed = -1
@@ -338,9 +345,9 @@ EndProcedure
 Procedure setProjectDBLoaded(state.b)
   Shared projectDBLoaded, firstNonAnimItem
   projectDBLoaded = state
-  DisableMenuItem(0, firstNonAnimItem + #MENUITEM_SAVE, 1 - state)
-  DisableMenuItem(0, firstNonAnimItem + #MENUITEM_SAVEALL, 1 - state)
-  DisableMenuItem(0, firstNonAnimItem + #MENUITEM_SETDESCRIPTOR, 1 - state)
+  DisableMenuItem(0, rmii #MENUITEM_SAVE, 1 - state)
+  DisableMenuItem(0, rmii #MENUITEM_SAVEALL, 1 - state)
+  DisableMenuItem(0, rmii #MENUITEM_SETDESCRIPTOR, 1 - state)
 EndProcedure
 
 Procedure loadProjectDB(path.s)
@@ -377,7 +384,7 @@ Procedure tryLoadProjectDB(path.s)
     ProcedureReturn 1
   EndIf 
   If MessageRequester("Error", "Can't find project_db.txt in this directory. Do you want to find it yourself ?", #PB_MessageRequester_YesNo) = #PB_MessageRequester_Yes
-    path.s = OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0)
+    path.s = OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "project_db.txt|*.txt", 0)
     If path = ""
       ProcedureReturn 0
     EndIf 
@@ -387,6 +394,89 @@ Procedure tryLoadProjectDB(path.s)
   EndIf   
 EndProcedure
 
+Procedure makeMenu()
+  Shared *itemAnims(), totalAnims, characters(), firstNonAnimItem
+  Dim *itemAnims.AnimationModel(totalAnims)
+  CreateMenu(0, WindowID(0))
+  MenuTitle("Animation")
+  OpenSubMenu("Open")
+  
+  Define i.l
+  ForEach characters()
+    OpenSubMenu(characters()\name)
+    ForEach characters()\animations()
+      MenuItem(i, MapKey(characters()\animations()))
+      *itemAnims(i) = @characters()\animations()
+      i + 1
+    Next 
+    CloseSubMenu()
+  Next   
+  CloseSubMenu()
+  firstNonAnimItem = i
+  
+  MenuItem(rmii #MENUITEM_SAVE, "Save")
+  MenuItem(rmii #MENUITEM_SAVEALL, "Save All")
+  MenuItem(rmii #MENUITEM_SETDESCRIPTOR, "Set descriptor file")
+  
+  MenuTitle("Project")
+  MenuItem(rmii #MENUITEM_LOADPROJECTDB, "Load project_db")
+  MenuItem(rmii #MENUITEM_LOADDATAFILE, "Load Data File (data.twl)")
+  MenuItem(rmii #MENUITEM_RELOAD, ""
+  
+  MenuTitle("Cboxes")
+  MenuItem(rmii #MENUITEM_ADDHITBOX, "Add hitbox")
+  MenuItem(rmii #MENUITEM_ADDHURTBOX, "Add hurtbox")
+  MenuItem(rmii #MENUITEM_DELETEBOX, "Delete collision box")
+  MenuItem(rmii #MENUITEM_GENERATEHURTBOXES, "Generate default hurtboxes")
+EndProcedure  
+
+Procedure onLoad()
+  Shared characters(), totalAnims
+  
+  totalAnims = 0
+  ForEach kuribrawl\characters()
+    ForEach kuribrawl\characters()\animations()
+      CopyList(kuribrawl\characters()\animations()\frames(), characters(MapKey(kuribrawl\characters()))\animations(MapKey(kuribrawl\characters()\animations()))\frames())
+      characters()\animations()\spriteSheet = kuribrawl\characters()\animations()\spriteSheet.l
+      characters()\animations()\spriteSheetL = kuribrawl\characters()\animations()\spriteSheetL.l
+      characters()\animations()\baseSpeed = kuribrawl\characters()\animations()\baseSpeed.d
+      totalAnims + 1
+    Next 
+    characters()\name = kuribrawl\characters()\name
+  Next
+  makeMenu()
+EndProcedure
+
+Procedure load(path.s)
+  Shared dataFilePath
+  loadDatafile:
+  If Not loadGameData(path)
+    If MessageRequester("Kuribrawl Frame Tool", "Can't find data file (data.twl). Do you want to look for it maunally ?", #PB_MessageRequester_YesNo) = #PB_MessageRequester_Yes
+      path = OpenFileRequester("Find data.twl", "", "Kuribrawl Data File (data.twl) | data.twl", 0)
+      If Not path = ""
+        Goto loadDataFile
+      EndIf 
+    EndIf
+    ProcedureReturn 0 
+  EndIf
+  dataFilePath = path
+  onLoad()
+  ProcedureReturn 1
+EndProcedure
+
+Procedure reload()
+  Shared characters(), dataFilePath, animationDescriptorFiles()
+  ForEach kuribrawl\characters()
+    ClearMap(kuribrawl\characters()\animations())
+  Next
+  ClearMap(characters())
+  ClearList(animationDescriptorFiles())
+  *selectedAnim = 0
+  load(dataFilePath)
+  SetGadgetText(11, "")
+  tryLoadProjectDB("project_db.txt")
+EndProcedure 
+
 Procedure menuCallback()
   Shared *itemAnims(), firstNonAnimItem, *selectedAnim
   event.l = EventMenu()
@@ -394,46 +484,38 @@ Procedure menuCallback()
     setAnimation(*itemAnims(event))
   Else
     Select event
-      Case firstNonAnimItem + #MENUITEM_ADDHITBOX
+      Case rmii #MENUITEM_ADDHITBOX
         newHitbox()
-      Case firstNonAnimItem + #MENUITEM_ADDHURTBOX
+      Case rmii #MENUITEM_ADDHURTBOX
         newHurtbox()
-      Case firstNonAnimItem + #MENUITEM_DELETEBOX
+      Case rmii #MENUITEM_DELETEBOX
         deleteBox() 
-      Case firstNonAnimItem + #MENUITEM_SAVE
+      Case rmii #MENUITEM_SAVE
         If *selectedAnim 
           saveAnimationDescriptor(*selectedAnim, findAnimationDescriptor(*selectedAnim))
         EndIf     
-      Case firstNonAnimItem + #MENUITEM_SAVEALL
+      Case rmii #MENUITEM_SAVEALL
         saveAll()
-      Case firstNonAnimItem + #MENUITEM_SETDESCRIPTOR
+      Case rmii #MENUITEM_SETDESCRIPTOR
         If *selectedAnim
           setDescriptorFile(*selectedAnim)
         EndIf 
-      Case firstNonAnimItem + #MENUITEM_GENERATEHURTBOXES
+      Case rmii #MENUITEM_GENERATEHURTBOXES
         If *selectedAnim
           generateDefaultHurtboxes(*selectedAnim)
         EndIf 
-      Case firstNonAnimItem + #MENUITEM_LOADPROJECTDB
+      Case rmii #MENUITEM_LOADPROJECTDB
         setProjectDBLoaded(Bool(loadProjectDB(OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0))))
+      Case rmii #MENUITEM_LOADDATAFILE
+        reload()
+      Case rmii #MENUITEM_RELOAD
     EndSelect
   EndIf 
-EndProcedure  
- 
+EndProcedure   
 
-;Procedure onLoad()
-  
-;EndProcedure
-
-ForEach kuribrawl\characters()
-  ForEach kuribrawl\characters()\animations()
-    CopyList(kuribrawl\characters()\animations()\frames(), characters(MapKey(kuribrawl\characters()))\animations(MapKey(kuribrawl\characters()\animations()))\frames())
-    characters()\animations()\spriteSheet = kuribrawl\characters()\animations()\spriteSheet.l
-    characters()\animations()\spriteSheetL = kuribrawl\characters()\animations()\spriteSheetL.l
-    characters()\animations()\baseSpeed = kuribrawl\characters()\animations()\baseSpeed.d
-  Next 
-  characters()\name = kuribrawl\characters()\name
-Next
+BindEvent(#PB_Event_Menu, @menuCallback())
+BindEvent(#PB_Event_LeftClick, @clickCallback())
+BindEvent(#PB_Event_Gadget, @gadgetCallback())
 
 SpinGadget(0, #CANVAS_W + 10, 5, 20, 50, 0, 1, #PB_Spin_ReadOnly)
 TextGadget(1, #CANVAS_W + 10, 60, 10, 20, "x")
@@ -448,38 +530,9 @@ ButtonGadget(9, #CANVAS_W + 10, 120, 20, 20, "OK")
 StringGadget(10, #CANVAS_W + 35, 120, 150, 20, "")
 TextGadget(11, 5, #CANVAS_H + 10, #CANVAS_W, 20, "")
 
-CreateMenu(0, WindowID(0))
-MenuTitle("Animation")
-OpenSubMenu("Open")
-BindEvent(#PB_Event_Menu, @menuCallback())
-BindEvent(#PB_Event_LeftClick, @clickCallback())
-BindEvent(#PB_Event_Gadget, @gadgetCallback())
-
-Define i.l
-ForEach characters()
-  OpenSubMenu(characters()\name)
-  ForEach characters()\animations()
-    MenuItem(i, MapKey(characters()\animations()))
-    *itemAnims(i) = @characters()\animations()
-    i + 1
-  Next 
-  CloseSubMenu()
-Next   
-CloseSubMenu()
-firstNonAnimItem = i
-
-MenuItem(firstNonAnimItem + #MENUITEM_SAVE, "Save")
-MenuItem(firstNonAnimItem + #MENUITEM_SAVEALL, "Save All")
-MenuItem(firstNonAnimItem + #MENUITEM_SETDESCRIPTOR, "Set descriptor file")
-
-MenuTitle("Project")
-MenuItem(firstNonAnimItem + #MENUITEM_LOADPROJECTDB, "Load project_db")
-
-MenuTitle("Cboxes")
-MenuItem(firstNonAnimItem + #MENUITEM_ADDHITBOX, "Add hitbox")
-MenuItem(firstNonAnimItem + #MENUITEM_ADDHURTBOX, "Add hurtbox")
-MenuItem(firstNonAnimItem + #MENUITEM_DELETEBOX, "Delete collision box")
-MenuItem(firstNonAnimItem + #MENUITEM_GENERATEHURTBOXES, "Generate default hurtboxes")
+If Not load(#DEFAULT_DATAFILE_PATH)
+  End
+EndIf 
 
 setProjectDBLoaded(tryLoadProjectDB("project_db.txt"))
 
@@ -495,7 +548,7 @@ Repeat
 Until event = #PB_Event_CloseWindow
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 273
-; FirstLine = 270
-; Folding = ----
+; CursorPosition = 474
+; FirstLine = 437
+; Folding = -----
 ; EnableXP

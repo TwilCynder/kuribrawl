@@ -40,8 +40,9 @@ EndProcedure
 Procedure loadGameData(path.s)
   Shared loadedSprites()
   ;- opening file
-  OpenFile(0, path)
-  checkSignature()
+  If Not (ReadFile(0, path) And checkSignature())
+    ProcedureReturn 0
+  EndIf 
   readVersion()
 
   Define type.b, tag.s, size.l, *buffer, byte.a, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f
@@ -138,11 +139,12 @@ Procedure loadGameData(path.s)
     EndSelect  
   Until Eof(0)
   CloseFile(0)
+  ProcedureReturn 1
 EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 84
-; FirstLine = 47
+; CursorPosition = 42
+; FirstLine = 30
 ; Folding = -
 ; EnableXP
