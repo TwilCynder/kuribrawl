@@ -308,10 +308,18 @@ Procedure initFighters(*game.Game)
   updateAnimations(*game)
 EndProcedure
 
+Procedure getRealCboxPos(*cbox.CollisionBox, *fighter.Fighter
+  
+EndProcedure
+
+Procedure manageHitboxes()
+  
+EndProcedure
+
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 151
-; FirstLine = 107
+; CursorPosition = 311
+; FirstLine = 264
 ; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL

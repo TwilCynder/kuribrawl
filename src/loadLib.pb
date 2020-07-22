@@ -138,13 +138,14 @@ Procedure loadGameData(path.s)
         checkInterfile()
     EndSelect  
   Until Eof(0)
+
   CloseFile(0)
   ProcedureReturn 1
 EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 55
-; FirstLine = 36
+; CursorPosition = 41
+; FirstLine = 20
 ; Folding = -
 ; EnableXP

@@ -173,14 +173,40 @@ file\buffer = #Null
 
 NewMap fileList.toLoad()
 
+Define param.s, silent.b, buildPath.s
 OpenConsole()
 
-CreateFile(1, "data.twl")
+PrintN("start")
+
+For i = 1 To CountProgramParameters()
+  param = ProgramParameter()
+  If Left(param, 1) = "-"
+    If param = "-s"
+      silent = 1
+    EndIf
+  ElseIf CheckFilename(param)
+    SetCurrentDirectory(param)
+    PrintN(GetCurrentDirectory())
+  EndIf 
+Next 
+
+
+Define tag.s, path.s, type.b, infos.s
+If Not ReadFile(2, "project_db.txt")
+  PrintN("Can't find project DB")
+  End
+EndIf
+If ReadFile(3, "buildinfo")
+  buildPath = ReadString(3)
+  CloseFile(3)
+EndIf 
+
+If buildPath = "" Or Not CreateFile(1, buildPath)
+  CreateFile(1, "data.twl")
+EndIf 
 writeSignature()
 writeVersion(0, 0, 1)
 
-Define tag.s, path.s, type.b, infos.s
-ReadFile(2, "project_db.txt")
 While Not Eof(2)
   path = ReadString(2)
   tag = ReadString(2)
@@ -212,15 +238,17 @@ Next
 CloseFile(1)
 FreeMemory(file\buffer)
 
-Input()
-
+If Not silent
+  Input()
+EndIf 
 
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 139
-; FirstLine = 99
+; CursorPosition = 207
+; FirstLine = 180
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe
+; CommandLine = test/oui

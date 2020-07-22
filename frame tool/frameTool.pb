@@ -1,22 +1,20 @@
 ﻿#DEBUG = 1
 
 ;TODO
-;menu option to make the data file
-;menu option to save + make + load
 ;change hitbox damage
 ;play animation
 
 CompilerIf #DEBUG
-  #DEFAULT_DATAFILE_PATH = "../src/res/data.twl"
+  #DEFAULT_DATAFILE_PATH = "..\src\res\data.twl"
 CompilerElse
-  #DEFAULT_DATAFILE_PATH = "../data.twl"
+  #DEFAULT_DATAFILE_PATH = "..\data.twl"
 CompilerEndIf
 
 Enumeration
   #MENUITEM_SAVE
   #MENUITEM_SAVEALL
+  #MENUITEM_REBUILD ;save all + rebuild + reload
   #MENUITEM_SETDESCRIPTOR
-  #MENUITEM_LOADDATAFILE
   #MENUITEM_LOADPROJECTDB
   #MENUITEM_RELOAD
   #MENUITEM_ADDHITBOX
@@ -48,7 +46,7 @@ Structure AnimationDescriptorPair
   descriptor.s
 EndStructure
 
-Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, dataFilePath.s, popUpMenuPosition.Point
+Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, originalPath.s, dataFilePath.s, popUpMenuPosition.Point
 NewMap characters.Champion()
 
 Procedure drawFrame(*animation.AnimationModel, facing)
@@ -237,31 +235,18 @@ Procedure gadgetCallback()
         drawFrame(*selectedAnim, 1)
       EndIf
     Case 4
-      If *selectedCollisionBox
-        If event = #PB_EventType_Up
-          *selectedCollisionBox\y - 1
-        ElseIf event = #PB_EventType_Down
-          *selectedCollisionBox\y + 1
-        EndIf
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\y = Val(GetGadgetText(4))
         drawFrame(*selectedAnim, 1)
-        
       EndIf
     Case 6
-      If *selectedCollisionBox
-        If event = #PB_EventType_Up
-          *selectedCollisionBox\x2 + 1
-        ElseIf event = #PB_EventType_Down
-          *selectedCollisionBox\x2 - 1
-        EndIf 
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\x2 = Val(GetGadgetText(6))
         drawFrame(*selectedAnim, 1)
       EndIf
     Case 8
-      If *selectedCollisionBox
-        If event = #PB_EventType_Up
-          *selectedCollisionBox\y2 + 1
-        ElseIf event = #PB_EventType_Down
-          *selectedCollisionBox\y2 - 1
-        EndIf 
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\y2 = Val(GetGadgetText(8))
         drawFrame(*selectedAnim, 1)
       EndIf
     Case 9
@@ -418,12 +403,13 @@ Procedure makeMenu()
   CloseSubMenu()
   
   MenuItem(#MENUITEM_SAVE, "Save")
-  MenuItem(#MENUITEM_SAVEALL, "Save All")
   MenuItem(#MENUITEM_SETDESCRIPTOR, "Set descriptor file")
   
   MenuTitle("Project")
+  MenuItem(#MENUITEM_SAVEALL, "Save All")
   MenuItem(#MENUITEM_LOADPROJECTDB, "Load project_db")
-  MenuItem(#MENUITEM_LOADDATAFILE, "Load Data File (data.twl)")
+  MenuItem(#MENUITEM_REBUILD, "Save and rebuild")
+  MenuItem(#MENUITEM_RELOAD, "Reload Data File")
   
   MenuTitle("Cboxes")
   MenuItem(#MENUITEM_ADDHITBOX, "Add hitbox")
@@ -435,11 +421,22 @@ Procedure makeMenu()
   MenuItem(#MENUITEM_PASTECBOX, "Paste collision box" + Chr(9) + "Ctrl+V")
 EndProcedure  
 
+Procedure resetData()
+  Shared characters(), animationDescriptorFiles()
+  ForEach kuribrawl\characters()
+    ClearMap(kuribrawl\characters()\animations())
+  Next
+  ClearMap(characters())
+  ClearList(animationDescriptorFiles())
+  *selectedAnim = 0
+EndProcedure
+
 Procedure onLoad()
   Shared characters(), totalAnims
   
   totalAnims = 0
   ForEach kuribrawl\characters()
+    
     ForEach kuribrawl\characters()\animations()
       CopyList(kuribrawl\characters()\animations()\frames(), characters(MapKey(kuribrawl\characters()))\animations(MapKey(kuribrawl\characters()\animations()))\frames())
       characters()\animations()\spriteSheet = kuribrawl\characters()\animations()\spriteSheet.l
@@ -453,7 +450,8 @@ Procedure onLoad()
 EndProcedure
 
 Procedure load(path.s)
-  Shared dataFilePath
+  Shared dataFilePath, originalPath.s
+  originalPath = GetCurrentDirectory()
   loadDatafile:
   If Not loadGameData(path)
     If MessageRequester("Kuribrawl Frame Tool", "Can't find data file (data.twl). Do you want to look for it maunally ?", #PB_MessageRequester_YesNo) = #PB_MessageRequester_Yes
@@ -464,20 +462,18 @@ Procedure load(path.s)
     EndIf
     ProcedureReturn 0 
   EndIf
-  dataFilePath = path
+  SetCurrentDirectory(GetPathPart(path))
+  dataFilePath = GetCurrentDirectory() + GetFilePart(path)
+  SetCurrentDirectory(originalPath)
   onLoad()
   ProcedureReturn 1
 EndProcedure
 
 Procedure reload()
-  Shared characters(), dataFilePath, animationDescriptorFiles()
-  ForEach kuribrawl\characters()
-    ClearMap(kuribrawl\characters()\animations())
-  Next
-  ClearMap(characters())
-  ClearList(animationDescriptorFiles())
-  *selectedAnim = 0
-  load(dataFilePath)
+  Shared dataFilePath
+  resetData()
+  loadGameData(dataFilePath)
+  onLoad()
   SetGadgetText(11, "")
   tryLoadProjectDB("project_db.txt")
 EndProcedure 
@@ -515,6 +511,39 @@ Procedure pasteCBox()
   EndSelect
 EndProcedure
 
+Procedure tryRunDFM(path.s)
+  If FileSize("datafilemaker.exe") > 0 
+    ProcedureReturn RunProgram("datafilemaker", "-s", path, #PB_Program_Open)
+  EndIf 
+  ProcedureReturn 0
+EndProcedure
+
+Procedure rebuildDataFile()
+  Shared dataFilePath, originalPath
+  Define currentPath.s, program.l
+  currentPath = GetCurrentDirectory()
+  saveAll()
+  program = tryRunDFM(currentPath)
+  If Not program
+    SetCurrentDirectory(originalPath)
+    program = tryRunDFM(currentPath)
+    If Not program
+      MessageRequester("Error", "Can't run DFM." + Chr(13) + "The data file was not rebuild")
+      ProcedureReturn 0
+    EndIf 
+  EndIf
+  Debug IsProgram(program)
+  
+  OpenWindow(1, 0, 0, 300, 100, "Kuribrawl Frame Tool", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
+  TextGadget(#PB_Any, 50, 5, 200, 60, "Waiting for DFM to finish execution (closing this window will cancel the data file rebuilding)", #PB_Text_Center)
+  
+  Repeat
+  Until Not ProgramRunning(program)
+  CloseWindow(1)
+  
+  reload()
+EndProcedure
+
 Procedure menuCallback()
   Shared *itemAnims(), firstAnimItem, *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType, popUpMenuPosition
   event.l = EventMenu()
@@ -541,15 +570,20 @@ Procedure menuCallback()
           generateDefaultHurtboxes(*selectedAnim)
         EndIf 
       Case #MENUITEM_LOADPROJECTDB
-        setProjectDBLoaded(Bool(loadProjectDB(OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0))))
-      Case #MENUITEM_LOADDATAFILE
-        reload()
+        path.s = OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0)
+        If Not path = ""
+          setProjectDBLoaded(Bool(loadProjectDB(path)))
+        EndIf 
       Case #MENUITEM_COPYCBOX
         copyCBox(*selectedCollisionBox, selectedCollisionBoxType)
       Case #MENUITEM_PASTECBOX
         pasteCBox()
       Case #MENUITEM_CUTCBOX
         cutCBox(*selectedCollisionBox, selectedCollisionBoxType)
+      Case #MENUITEM_RELOAD
+        reload()
+      Case #MENUITEM_REBUILD
+        rebuildDataFile()
     EndSelect
   Else
     setAnimation(*itemAnims(event - firstAnimItem))
@@ -605,7 +639,7 @@ If Not load(#DEFAULT_DATAFILE_PATH)
   End
 EndIf 
 
-setProjectDBLoaded(tryLoadProjectDB("../src/res/project_db.txt"))
+setProjectDBLoaded(tryLoadProjectDB("..\src\res\project_db.txt"))
 
 ;-Main Loop
 Define event.l
@@ -619,6 +653,6 @@ Repeat
 Until event = #PB_Event_CloseWindow
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 3
+; CursorPosition = 2
 ; Folding = ------
 ; EnableXP
