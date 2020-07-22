@@ -103,7 +103,6 @@ Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
   EndIf 
   *fighter\currentAnimation = *anim
   *fighter\currentAnimationName = name
-  ;Debug *anim
 
   setAnimationSpeed(*anim, speed)
   resetAnimation(*anim)
@@ -148,6 +147,9 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l)
       DrawingMode(#PB_2DDrawing_Outlined)
       ForEach *frame\hitboxes()
         Box(x + *frame\hitboxes()\x, y + *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+      Next
+      ForEach *frame\hurtboxes()
+        Box(x + *frame\hurtboxes()\x, y + *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, #Green)
       Next
       StopDrawing()
     CompilerEndIf
@@ -308,8 +310,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 148
-; FirstLine = 127
+; CursorPosition = 151
+; FirstLine = 107
 ; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL

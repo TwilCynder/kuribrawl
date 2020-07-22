@@ -6,6 +6,14 @@
   #DIRECTION_NONE
 EndEnumeration
 
+Macro getField(pointer, Structure, field, type)
+  peek#type(pointer + OffsetOf(Structure\field))
+EndMacro
+  
+Macro setField(pointer, Structure, field, type, value)
+  Poke#type(pointer + OffsetOf(Structure\field), value)
+EndMacro
+
 ;- Basic data structures
 
 Structure Vector
@@ -83,6 +91,6 @@ Procedure QIterate(*q.Queue, callback.QCallback)
 EndProcedure
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 10
+; CursorPosition = 13
 ; Folding = --
 ; EnableXP

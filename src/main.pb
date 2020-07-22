@@ -47,7 +47,7 @@ For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 5)
+setPort(0, 0)
 setPortFighter(0, *f1)
 ;setPort(1, 1)
 ;setPortFighter(1, *f2)
@@ -79,7 +79,7 @@ Repeat
   frameWait = nextFrame - currentTime
    If frameWait < 0
      nextFrame = currentTime
-     ;Debug "/!\Can't keep up !"
+     Debug "/!\Can't keep up !"
    Else 
      If frameWait < 14
        ;Debug "/!\Frame process lasted more than 2.6ms !"
@@ -94,8 +94,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 49
-; FirstLine = 9
+; CursorPosition = 57
+; FirstLine = 44
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

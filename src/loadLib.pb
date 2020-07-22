@@ -105,7 +105,7 @@ Procedure loadGameData(path.s)
               w.l = ReadWord(0)
               h.l = ReadWord(0)
               addHitbox(*frames(selectedElement), x, y, w, h)
-              *frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
+              *frames(selectedElement)\hitboxes()\damage = ReadDouble(0)
             Case #FILEMARKER_HURTBOXINFO
               selectedElement = ReadByte(0)
               x.l = ReadWord(0)
@@ -144,7 +144,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 42
-; FirstLine = 30
+; CursorPosition = 55
+; FirstLine = 36
 ; Folding = -
 ; EnableXP

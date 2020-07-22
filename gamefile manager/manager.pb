@@ -134,9 +134,10 @@ Procedure writeFileDescriptor(type.b, infos.s)
                 WriteWord(1, Val(value))
               Next 
               PrintN("- - - damages : " + StringField(line, 6, " "))
-              WriteFloat(1, Val(StringField(line, 6, " ")))
+              WriteDouble(1, ValD(StringField(line, 6, " ")))
           EndSelect
         Wend 
+        CloseFile(2)
       Else
         value = StringField(infos, 1, " ")
         PrintN("- frame number : " + value)
@@ -161,6 +162,7 @@ Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   writeType(type)
   writeFileTag(tag)
   WriteFileLength(*f\size)
+  PrintN("Pointer position : " + Str(Loc(1)))
   writeMemoryToFile(1, *f)
   writeFileDescriptor(type, info)
   writeInterfile()
@@ -217,8 +219,8 @@ Input()
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 112
-; FirstLine = 69
+; CursorPosition = 139
+; FirstLine = 99
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe

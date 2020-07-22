@@ -29,7 +29,7 @@ EndStructure
  
 Structure inputData
   element.b ; the element (stick/button) responsible for this input
-  stick.b ;wheter the said element was a stick or not
+  elementType.b ;wheter the said element was a button, stick or trigger
 EndStructure
 
 Structure AxisState
@@ -71,12 +71,10 @@ Procedure setPortFighter(port, *fighter.Fighter)
 EndProcedure
 
 Procedure readButton(button.b, *port.Port) ;examineJoystick not included !
-  Shared ports()
   ProcedureReturn JoystickButton(*port\joyID, button + 1)
 EndProcedure
 
 Procedure readAxis(*state.AxisState, axis.b, *port.Port)
-  Shared ports()
   *state\x = JoystickAxisX(*port\joyID, axis, #PB_Relative)
   *state\y = JoystickAxisY(*port\joyID, axis, #PB_Relative)
   *state\z = JoystickAxisZ(*port\joyID, axis, #PB_Relative)
@@ -104,23 +102,27 @@ Procedure controlStickDirection(*port.Port)
 EndProcedure
 
 Procedure readTrigger(axis.b, *port.Port) ;keep in mind that a trigger is just the Z axis of an axis oh wait apparently it depends on the jystick :^)
-  Shared ports()
   res.l = JoystickAxisZ(*port\joyID, axis, #PB_Relative)
   ProcedureReturn res
+EndProcedure  
+
+Procedure triggerPressed(axis.b, *port.Port)
+  Shared defaultControler
+  ProcedureReturn Bool(readTrigger(axis, *port) > triggerTreshold)
 EndProcedure
 
-Procedure makeInputValue(input.b, time.b, port.b, element.b, stick.b)
-  ProcedureReturn input + (time << 5) + (port << 9) + (stick << 12) + (element << 13)
+Procedure makeInputValue(input.b, time.b, port.b, element.b, elementType.b)
+  ProcedureReturn input + (time << 5) + (port << 9) + (elementType << 12) + (element << 14)
 EndProcedure
 
 CompilerIf #DEBUG
-  Declare logInput(port.b, input.b, element.b, stick.b)
+  Declare logInput(port.b, input.b, element.b, elementType.b)
 CompilerEndIf
-Procedure registerInput(port, input, element = #MAX_BUTTON_NB, stick = 0)
+Procedure registerInput(port, input, element = #MAX_BUTTON_NB, elementType = #ELEMENTTYPE_BUTTON)
   Shared inputQ(), defaultInputDurability()
-  AddElement(inputQ()) : inputQ() = makeInputValue(input, defaultInputDurability(input), port, element, stick)
+  AddElement(inputQ()) : inputQ() = makeInputValue(input, defaultInputDurability(input), port, element, elementType)
   CompilerIf #DEBUG
-   logInput(port, input, element, stick)
+   logInput(port, input, element, elementType)
   CompilerEndIf
 EndProcedure
 
@@ -212,18 +214,18 @@ Procedure readInputs()
       id = defaultControler\defaultBinding\axises()\ID
       readAxis(@axisState, defaultControler\defaultBinding\axises()\ID, *port)
       If axisState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, 1)
+        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_RIGHT)
       ElseIf axisState\x < -stickTreshold And *port\previousState\axis[id]\x > -stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, 1)
+        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_LEFT)
       EndIf 
         
       If axisState\y > stickTreshold And *port\previousState\axis[id]\y < stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, 1)
+        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_DOWN)
       ElseIf  axisState\y < -stickTreshold And *port\previousState\axis[id]\y > -stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, 1)
+        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_UP)
       EndIf 
       *port\previousState\axis[id]\x = axisState\x
@@ -233,15 +235,25 @@ Procedure readInputs()
     ;--- Triggers
     
     ForEach defaultControler\defaultBinding\triggers()
-      axisState\z = readTrigger(defaultControler\defaultBinding\triggers()\ID, *port)
+      id = defaultControler\defaultBinding\triggers()\ID
+      axisState\z = readTrigger(id, *port)
       If axisState\z > triggerTreshold And *port\previousState\axis[defaultControler\defaultBinding\triggers()\ID]\z < triggerTreshold
-        registerInput(i, defaultControler\defaultBinding\triggers()\input)
+        registerInput(i, defaultControler\defaultBinding\triggers()\input, id, #ELEMENTTYPE_TRIGGER)
       EndIf 
-      *port\previousState\axis[defaultControler\defaultBinding\triggers()\ID]\z = axisState\z
+      *port\previousState\axis[id]\z = axisState\z
     Next 
   
   Next 
   
+EndProcedure
+
+Procedure isElementPressed(element.b, elementType.b, *port.Port) ;button pressed, stick tilted or trigger pressed
+  Select elementType
+    Case #ELEMENTTYPE_BUTTON
+      ProcedureReturn readButton(element, *port)
+    Case #ELEMENTTYPE_TRIGGER
+      ProcedureReturn triggerPressed(element, *port)
+  EndSelect
 EndProcedure
 
 ;- STATE ACTIONS
@@ -258,7 +270,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
   Define direction.b
   Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
-  If *info\stick
+  If *info\elementType = #ELEMENTTYPE_STICK
     state.AxisState
     readAxis(@state, *info\element, *port)
     direction = stickDirection(@state)
@@ -357,7 +369,14 @@ EndProcedure
 
 Procedure inputManager_jump(*port.Port, *info.inputData)
   Shared defaultControler
-  Define jumpType.b
+  Define jumpType.b, jumpElement.b, jumpElementType.b
+  jumpElementType = (*port\figher\stateInfo & %1100) >> 2
+  jumpElement = (*port\figher\stateInfo & %111110000) >> 4
+  If *port\figher\state = #STATE_JUMPSQUAT And Not (*info\element = jumpElement And *info\elementType = jumpElementType)
+    *port\figher\stateInfo = *port\figher\stateInfo | %10
+    ProcedureReturn 1
+  EndIf 
+  
   If *port\figher\grounded
     If Not state_can_jump(*port\figher\state)
       ProcedureReturn 0
@@ -367,8 +386,7 @@ Procedure inputManager_jump(*port.Port, *info.inputData)
     Else 
       jumpType = #JUMP_NORMAL
     EndIf 
-    setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (*info\element << 2))
-    ProcedureReturn 1
+    setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (*info\elementType << 2) + (*info\element << 4))
   ElseIf *port\figher\jumps > 0
     If Abs(*port\currentControlStickState\x) > stickTreshold
       If  Sign(*port\currentControlStickState\x) = *port\figher\facing 
@@ -385,7 +403,7 @@ EndProcedure
 *inputManagers(#INPUT_Jump) = @inputManager_jump()
 
 Procedure inputManager_smashStickDown(*port.Port, *info.inputData)
-  If *port\figher\state = #STATE_IDLE And *port\figher\physics\v\y < 0
+  If Not *port\figher\grounded And *port\figher\physics\v\y < 0
     Debug "fast fall"
     *port\figher\physics\v\y = -*port\figher\character\fastFallSpeed
   EndIf 
@@ -430,8 +448,8 @@ Procedure updateInputs()
     input = inputQ() & %11111
     durability = (inputQ() & %111100000) >> 5
     port = (inputQ() & %111000000000) >> 9
-    info\stick = (inputQ() & %1000000000000) >> 12
-    info\element = (inputQ() & %11111 << 13) >> 13
+    info\elementType = (inputQ() & %11000000000000) >> 12
+    info\element = (inputQ() & %11111 << 14) >> 14
     
     If *inputManagers(input)
       *currentElement = @inputQ()
@@ -448,7 +466,7 @@ Procedure updateInputs()
     If durability < 1
       DeleteElement(inputQ())
     Else
-      inputQ() = makeInputValue(input, durability, port, element, stick)
+      inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
     EndIf 
   Next 
   For i = 0 To 3
@@ -464,7 +482,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 419
-; FirstLine = 382
-; Folding = ----
+; CursorPosition = 456
+; FirstLine = 432
+; Folding = -----
 ; EnableXP

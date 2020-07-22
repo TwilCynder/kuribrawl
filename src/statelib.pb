@@ -1,15 +1,20 @@
 ﻿Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
   Shared ports(), defaultControler
-  Define jumpType.b, button.b, axis.AxisState
+  Define jumpTypeX.b, jumpTypeY.b, element.b, elementType.b, axis.AxisState
   
-  jumpType = stateinfo & %11
-  button = (stateinfo & %1111100) >> 2
+  jumpTypeX = stateinfo & %1
+  jumpTypeY = (stateInfo & %10) >> 1
+  elementType = (stateinfo & %1100) >> 2
+  element = (stateinfo & %111110000) >> 4
   
   If Abs(ports(*fighter\port)\currentControlStickState\x) > stickTreshold And Sign(ports(*fighter\port)\currentControlStickState\x) <> *fighter\facing 
-    jumpType = #JUMP_BACKWARDS
+    jumpTypeX = #JUMP_BACKWARDS
   EndIf 
   
-  jump(*fighter, jumpType, 1 - readButton(button, ports(*fighter\port)))
+  If Not isElementPressed(element, elementType, ports(*fighter\port))
+    jumpTypeY = 1
+  EndIf
+  jump(*fighter, jumpTypeX,jumpTypeY)
 EndProcedure
 
 Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
@@ -66,7 +71,6 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 52
-; FirstLine = 15
+; CursorPosition = 5
 ; Folding = -
 ; EnableXP

@@ -20,7 +20,7 @@ Structure Hurtbox Extends CollisionBox
 EndStructure
 
 Structure Hitbox Extends CollisionBox
-  damage.l
+  damage.d
   hitstunModifier.l
   bkb.d ;base knockback
   skb.d ;scaling klockback
@@ -159,6 +159,7 @@ Procedure addHitbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_R
       *r\y2 = h
   EndSelect
   *r\shape = shape
+  ProcedureReturn *r
 EndProcedure
 
 Procedure addHurtbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
@@ -171,6 +172,7 @@ Procedure addHurtbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_
       *r\y2 = h
   EndSelect
   *r\shape = shape
+  ProcedureReturn *r
 EndProcedure
 
 Declare defaultJumpAnimCallback(*fighter, *data)
@@ -188,6 +190,6 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 174
-; FirstLine = 137
+; FirstLine = 126
 ; Folding = --
 ; EnableXP

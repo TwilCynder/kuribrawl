@@ -1,4 +1,10 @@
-﻿Enumeration ;inputs
+﻿Enumeration
+  #ELEMENTTYPE_BUTTON
+  #ELEMENTTYPE_STICK
+  #ELEMENTTYPE_TRIGGER
+EndEnumeration
+
+Enumeration ;inputs
   #INPUT_Attack
   #INPUT_Special
   #INPUT_Jump
@@ -34,5 +40,5 @@ Enumeration ;same
   #AXISES
 EndEnumeration
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 17
+; CursorPosition = 5
 ; EnableXP

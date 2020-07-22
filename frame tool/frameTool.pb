@@ -1,7 +1,10 @@
 ﻿#DEBUG = 1
 
-;todo : menu option to make the data file
+;TODO
+;menu option to make the data file
 ;menu option to save + make + load
+;change hitbox damage
+;play animation
 
 CompilerIf #DEBUG
   #DEFAULT_DATAFILE_PATH = "../src/res/data.twl"
@@ -20,15 +23,14 @@ Enumeration
   #MENUITEM_ADDHURTBOX
   #MENUITEM_DELETEBOX
   #MENUITEM_GENERATEHURTBOXES
+  #MENUITEM_COPYCBOX
+  #MENUITEM_PASTECBOX
+  #MENUITEM_CUTCBOX
   #MENUITEMS
 EndEnumeration
 
 #CANVAS_W = 200
 #CANVAS_H = 200
-
-Macro rmii
-  firstNonAnimItem +
-EndMacro
 
 XIncludeFile "../src/utilCore.pb"
 XIncludeFile "../src/filelib.pb"
@@ -46,12 +48,8 @@ Structure AnimationDescriptorPair
   descriptor.s
 EndStructure
 
-Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstNonAnimItem.l, projectDBLoaded.b, dataFilePath.s
+Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, dataFilePath.s, popUpMenuPosition.Point
 NewMap characters.Champion()
-
-ImportC "user32.lib" ;importing the msvcrt lib, granting access to the windows API
-  GetCursorPos_(*p.Point)
-EndImport
 
 Procedure drawFrame(*animation.AnimationModel, facing)
   Shared viewPosition, *selectedCollisionBox
@@ -95,16 +93,14 @@ Procedure drawFrame(*animation.AnimationModel, facing)
 EndProcedure
 
 Procedure onFrameChanged(*anim.AnimationModel)
-  Shared viewPosition, *selectedCollisionBox
-  *selectedCollisionBox = 0
+  Shared viewPosition
   viewPosition\x = (#CANVAS_W / 2) - (*anim\frames()\display\w / 2) 
   viewPosition\y = (#CANVAS_H / 2) - (*anim\frames()\display\h / 2) 
   drawFrame(*anim, 1)
 EndProcedure  
 
-
 Procedure selectCollisionBox(*b.CollisionBox, type.b)
-  Shared *selectedAnim, *selectedCollisionBox
+  Shared *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType
   SetGadgetState(2, *b\x)
   SetGadgetState(4, *b\y)
   SetGadgetState(6, *b\x2)
@@ -118,6 +114,7 @@ Declare.s findAnimationDescriptor(*animation)
 Procedure setAnimation(*animation.AnimationModel)
   Shared *selectedAnim
   *selectedAnim = *animation
+  *selectedCollisionBox = 0
   ResetList(*selectedAnim\frames())
   NextElement(*selectedAnim\frames())
   onFrameChanged(*selectedAnim)
@@ -125,22 +122,24 @@ Procedure setAnimation(*animation.AnimationModel)
   SetGadgetText(11, findAnimationDescriptor(*animation))
 EndProcedure
 
-Procedure newHitbox()
+Procedure newHitbox(x.l, y.l, w.l, h.l)
   Shared *selectedAnim
   If Not *selectedAnim
     ProcedureReturn 0
   EndIf 
-  addHitbox(*selectedAnim\frames(), -20, -60, 40, 40)
+  *r = addHitbox(*selectedAnim\frames(), x, y, w, h)
   drawFrame(*selectedAnim, 1)
+  ProcedureReturn *r
 EndProcedure
 
-Procedure newHurtbox()
+Procedure newHurtbox(x.l, y.l, w.l, h.l)
   Shared *selectedAnim
   If Not *selectedAnim
     ProcedureReturn 0
   EndIf 
-  addHurtbox(*selectedAnim\frames(), -20, -60, 40, 40)
+  *r = addHurtbox(*selectedAnim\frames(), x, y, w, h)
   drawFrame(*selectedAnim, 1)
+  ProcedureReturn *r
 EndProcedure
 
 Procedure deleteBox()
@@ -155,21 +154,22 @@ Procedure deleteBox()
     ChangeCurrentElement(*selectedAnim\frames()\hurtboxes(), *selectedCollisionBox)
     DeleteElement(*selectedAnim\frames()\hurtboxes())
   EndIf 
+  *selectedCollisionBox = 0
   drawFrame(*selectedAnim, 1)
 EndProcedure
 
-Procedure clickCallback()
+Procedure selectPointedCBox()
   Shared *selectedAnim, viewPosition
   Define x.l, y.l, hx.l, hy.l
   x = WindowMouseX(0) - 5
   y = WindowMouseY(0) - 5
-  
   If *selectedAnim
     ForEach *selectedAnim\frames()\hurtboxes()
       With *selectedAnim\frames()\hurtboxes()
         hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
         hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
         If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
+          
           selectCollisionBox(@*selectedAnim\frames()\hurtboxes(), #CBOX_TYPE_HURT)
         EndIf 
       EndWith
@@ -179,18 +179,22 @@ Procedure clickCallback()
         hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
         hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
         If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
-          selectCollisionBox(@*selectedAnim\frames()\hitboxes(),   #CBOX_TYPE_HIT)
+          selectCollisionBox(@*selectedAnim\frames()\hitboxes(), #CBOX_TYPE_HIT)
         EndIf 
       EndWith
     Next
-  EndIf 
+  EndIf   
 EndProcedure
 
-Procedure makeHitboxText(type.b)
-  Shared *selectedCollisionBox, *selectedAnim
+Procedure clickCallback()
+  selectPointedCBox()
+EndProcedure
+
+Procedure.s makeHitboxText(*cbox.CollisionBox, type.b)
+  Shared *selectedAnim
   Define text.s
-  If Not *selectedCollisionBox
-    ProcedureReturn 0
+  If Not *cbox
+    ProcedureReturn ""
   EndIf 
   If type = #CBOX_TYPE_HIT
     text + "h"
@@ -199,11 +203,14 @@ Procedure makeHitboxText(type.b)
   EndIf 
   text + Str(ListIndex(*selectedAnim\frames()))
   text + " "
-  text + Str(*selectedCollisionBox\x) + " "
-  text + Str(*selectedCollisionBox\y) + " "
-  text + Str(*selectedCollisionBox\x2) + " "
-  text + Str(*selectedCollisionBox\y2) + " "
-  SetGadgetText(10, text)
+  text + Str(*cbox\x) + " "
+  text + Str(*cbox\y) + " "
+  text + Str(*cbox\x2) + " "
+  text + Str(*cbox\y2) + " "
+  If type = #CBOX_TYPE_HIT
+    text + Str(getField(*cbox, Hitbox, damage, D)) + " "
+  EndIf 
+  ProcedureReturn text
 EndProcedure
 
 Procedure gadgetCallback()
@@ -225,12 +232,8 @@ Procedure gadgetCallback()
         EndIf 
       EndIf 
     Case 2
-      If *selectedCollisionBox
-        If event = #PB_EventType_Up
-          *selectedCollisionBox\x + 1
-        ElseIf event = #PB_EventType_Down
-          *selectedCollisionBox\x - 1
-        EndIf 
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\x = Val(GetGadgetText(2))
         drawFrame(*selectedAnim, 1)
       EndIf
     Case 4
@@ -262,7 +265,7 @@ Procedure gadgetCallback()
         drawFrame(*selectedAnim, 1)
       EndIf
     Case 9
-      makeHitboxText(selectedCollisionBoxType)
+      SetGadgetText(10, makeHitboxText(*selectedCollisionBox, selectedCollisionBoxType))
   EndSelect
 EndProcedure
 
@@ -293,7 +296,6 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
     ProcedureReturn 0
   EndIf 
   CreateFile(0, path)
-  Debug *animation
   WriteStringN(0, Str(ListSize(*animation\frames())))
   If Not *animation\baseSpeed = 1
     If *animation\baseSpeed < 1 And Not *animation\baseSpeed = -1
@@ -307,7 +309,7 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
       WriteStringN(0, "f" + Str(i) + " d" + Str(*animation\frames()\duration))
     EndIf 
     ForEach *animation\frames()\hitboxes()
-      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " + Str(*animation\frames()\hitboxes()\y2) + " " + Str(*animation\frames()\hitboxes()\damage))
+      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " + Str(*animation\frames()\hitboxes()\y2) + " " + StrD(*animation\frames()\hitboxes()\damage))
     Next 
     ForEach *animation\frames()\hurtboxes()
       WriteStringN(0, "c" + Str(i) + " " + Str(*animation\frames()\hurtboxes()\x) + " " + Str(*animation\frames()\hurtboxes()\y) + " " + Str(*animation\frames()\hurtboxes()\x2) + " " + Str(*animation\frames()\hurtboxes()\y2))
@@ -343,11 +345,11 @@ Procedure generateDefaultHurtboxes(*animation.AnimationModel)
 EndProcedure
 
 Procedure setProjectDBLoaded(state.b)
-  Shared projectDBLoaded, firstNonAnimItem
+  Shared projectDBLoaded
   projectDBLoaded = state
-  DisableMenuItem(0, rmii #MENUITEM_SAVE, 1 - state)
-  DisableMenuItem(0, rmii #MENUITEM_SAVEALL, 1 - state)
-  DisableMenuItem(0, rmii #MENUITEM_SETDESCRIPTOR, 1 - state)
+  DisableMenuItem(0, #MENUITEM_SAVE, 1 - state)
+  DisableMenuItem(0, #MENUITEM_SAVEALL, 1 - state)
+  DisableMenuItem(0, #MENUITEM_SETDESCRIPTOR, 1 - state)
 EndProcedure
 
 Procedure loadProjectDB(path.s)
@@ -395,39 +397,42 @@ Procedure tryLoadProjectDB(path.s)
 EndProcedure
 
 Procedure makeMenu()
-  Shared *itemAnims(), totalAnims, characters(), firstNonAnimItem
+  Shared *itemAnims(), totalAnims, characters(), firstAnimItem
   Dim *itemAnims.AnimationModel(totalAnims)
   CreateMenu(0, WindowID(0))
   MenuTitle("Animation")
   OpenSubMenu("Open")
   
-  Define i.l
+  firstAnimItem = #MENUITEMS
+  Define i.l = 0
+  
   ForEach characters()
     OpenSubMenu(characters()\name)
     ForEach characters()\animations()
-      MenuItem(i, MapKey(characters()\animations()))
+      MenuItem(i + firstAnimItem, MapKey(characters()\animations()))
       *itemAnims(i) = @characters()\animations()
       i + 1
     Next 
     CloseSubMenu()
   Next   
   CloseSubMenu()
-  firstNonAnimItem = i
   
-  MenuItem(rmii #MENUITEM_SAVE, "Save")
-  MenuItem(rmii #MENUITEM_SAVEALL, "Save All")
-  MenuItem(rmii #MENUITEM_SETDESCRIPTOR, "Set descriptor file")
+  MenuItem(#MENUITEM_SAVE, "Save")
+  MenuItem(#MENUITEM_SAVEALL, "Save All")
+  MenuItem(#MENUITEM_SETDESCRIPTOR, "Set descriptor file")
   
   MenuTitle("Project")
-  MenuItem(rmii #MENUITEM_LOADPROJECTDB, "Load project_db")
-  MenuItem(rmii #MENUITEM_LOADDATAFILE, "Load Data File (data.twl)")
-  MenuItem(rmii #MENUITEM_RELOAD, ""
+  MenuItem(#MENUITEM_LOADPROJECTDB, "Load project_db")
+  MenuItem(#MENUITEM_LOADDATAFILE, "Load Data File (data.twl)")
   
   MenuTitle("Cboxes")
-  MenuItem(rmii #MENUITEM_ADDHITBOX, "Add hitbox")
-  MenuItem(rmii #MENUITEM_ADDHURTBOX, "Add hurtbox")
-  MenuItem(rmii #MENUITEM_DELETEBOX, "Delete collision box")
-  MenuItem(rmii #MENUITEM_GENERATEHURTBOXES, "Generate default hurtboxes")
+  MenuItem(#MENUITEM_ADDHITBOX, "Add hitbox")
+  MenuItem(#MENUITEM_ADDHURTBOX, "Add hurtbox")
+  MenuItem(#MENUITEM_DELETEBOX, "Delete collision box" + Chr(9) + "Del")
+  MenuItem(#MENUITEM_GENERATEHURTBOXES, "Generate default hurtboxes")
+  MenuItem(#MENUITEM_COPYCBOX, "Copy collision box" + Chr(9) + "Ctrl+C")
+  MenuItem(#MENUITEM_CUTCBOX, "Cut collision box" + Chr(9) + "Ctrl+X")
+  MenuItem(#MENUITEM_PASTECBOX, "Paste collision box" + Chr(9) + "Ctrl+V")
 EndProcedure  
 
 Procedure onLoad()
@@ -477,78 +482,143 @@ Procedure reload()
   tryLoadProjectDB("project_db.txt")
 EndProcedure 
 
+Procedure copyCBox(*cbox, type)
+  SetClipboardText(makeHitboxText(*cbox, type))
+EndProcedure
+
+Procedure cutCBox(*cbox, type)
+  copyCBox(*cbox, type)
+  deleteBox()
+EndProcedure
+
+Procedure pasteCBox()
+  Define type.b, text.s, x.l, y.l, w.l, h.l, *cbox
+  text = GetClipboardText()
+  Select Mid(text, 1, 1)
+    Case "h"
+      type = #CBOX_TYPE_HIT
+    Case "c"
+      type = #CBOX_TYPE_HURT
+    Default 
+      ProcedureReturn 0
+  EndSelect
+  x = Val(StringField(text, 2, " "))
+  y = Val(StringField(text, 3, " "))
+  w = Val(StringField(text, 4, " "))
+  h = Val(StringField(text, 5, " "))
+  Select type
+    Case #CBOX_TYPE_HURT
+      *cbox = newHurtbox(x, y, w, h)
+    Case #CBOX_TYPE_HIT
+      *cbox = newHitbox(x, y, w, h)
+      setField(*cbox, Hitbox, damage, D, ValD(StringField(text, 6, " ")))
+  EndSelect
+EndProcedure
+
 Procedure menuCallback()
-  Shared *itemAnims(), firstNonAnimItem, *selectedAnim
+  Shared *itemAnims(), firstAnimItem, *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType, popUpMenuPosition
   event.l = EventMenu()
-  If event < firstNonAnimItem
-    setAnimation(*itemAnims(event))
-  Else
+  If event < firstAnimItem
     Select event
-      Case rmii #MENUITEM_ADDHITBOX
-        newHitbox()
-      Case rmii #MENUITEM_ADDHURTBOX
-        newHurtbox()
-      Case rmii #MENUITEM_DELETEBOX
+      Case #MENUITEM_ADDHITBOX
+        newHitbox(-20, -60, 40, 40)
+      Case #MENUITEM_ADDHURTBOX
+        newHurtbox(-20, -60, 40, 40)
+      Case #MENUITEM_DELETEBOX
         deleteBox() 
-      Case rmii #MENUITEM_SAVE
+      Case #MENUITEM_SAVE
         If *selectedAnim 
           saveAnimationDescriptor(*selectedAnim, findAnimationDescriptor(*selectedAnim))
         EndIf     
-      Case rmii #MENUITEM_SAVEALL
+      Case #MENUITEM_SAVEALL
         saveAll()
-      Case rmii #MENUITEM_SETDESCRIPTOR
+      Case #MENUITEM_SETDESCRIPTOR
         If *selectedAnim
           setDescriptorFile(*selectedAnim)
         EndIf 
-      Case rmii #MENUITEM_GENERATEHURTBOXES
+      Case #MENUITEM_GENERATEHURTBOXES
         If *selectedAnim
           generateDefaultHurtboxes(*selectedAnim)
         EndIf 
-      Case rmii #MENUITEM_LOADPROJECTDB
+      Case #MENUITEM_LOADPROJECTDB
         setProjectDBLoaded(Bool(loadProjectDB(OpenFileRequester("Find this project's project_db.txt", GetCurrentDirectory(), "Text Files (.txt)|*.txt", 0))))
-      Case rmii #MENUITEM_LOADDATAFILE
+      Case #MENUITEM_LOADDATAFILE
         reload()
-      Case rmii #MENUITEM_RELOAD
+      Case #MENUITEM_COPYCBOX
+        copyCBox(*selectedCollisionBox, selectedCollisionBoxType)
+      Case #MENUITEM_PASTECBOX
+        pasteCBox()
+      Case #MENUITEM_CUTCBOX
+        cutCBox(*selectedCollisionBox, selectedCollisionBoxType)
     EndSelect
+  Else
+    setAnimation(*itemAnims(event - firstAnimItem))
   EndIf 
 EndProcedure   
 
+Procedure defaultMenuItem(menu, id, text.s)
+  MyStyle.MenuItemInfo
+  MyStyle\cbSize=SizeOf(MyStyle)      ; The size of the structure, in bytes. The caller must set this member to sizeof(MENUITEMINFO).
+  MyStyle\fMask=#MIIM_STATE|#MIIM_STRING                     ; Retrieves or sets the fState member
+  MyStyle\fState=#MFS_DEFAULT              ; 0=Enabled/Normal, 3=Greyed, 8=Checked, 128=Highlighted, 4096=Bold/Default
+  MyStyle\dwTypeData = @text
+  InsertMenuItem_(MenuID(menu), id, #True, MyStyle)
+EndProcedure  
+
+Procedure rightClickCallback()
+  Shared popUpMenuPosition
+  selectPointedCBox()
+  DisplayPopupMenu(1, WindowID(0))
+EndProcedure  
+  
 BindEvent(#PB_Event_Menu, @menuCallback())
 BindEvent(#PB_Event_LeftClick, @clickCallback())
 BindEvent(#PB_Event_Gadget, @gadgetCallback())
+BindEvent(#PB_Event_RightClick, @rightClickCallback())
 
 SpinGadget(0, #CANVAS_W + 10, 5, 20, 50, 0, 1, #PB_Spin_ReadOnly)
 TextGadget(1, #CANVAS_W + 10, 60, 10, 20, "x")
-SpinGadget(2, #CANVAS_W + 25, 60, 45, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-TextGadget(3, #CANVAS_W + 80, 60, 10, 20, "y")
-SpinGadget(4, #CANVAS_W + 95, 60, 45, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
+SpinGadget(2, #CANVAS_W + 25, 60, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+TextGadget(3, #CANVAS_W + 85, 60, 10, 20, "y")
+SpinGadget(4, #CANVAS_W + 100, 60, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
 TextGadget(5, #CANVAS_W + 10, 90, 10, 20, "w")
-SpinGadget(6, #CANVAS_W + 25, 90, 45, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-TextGadget(7, #CANVAS_W + 80, 90, 10, 20, "h")
-SpinGadget(8, #CANVAS_W + 95, 90, 45, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
+SpinGadget(6, #CANVAS_W + 25, 90, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+TextGadget(7, #CANVAS_W + 85, 90, 10, 20, "h")
+SpinGadget(8, #CANVAS_W + 100, 90, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
 ButtonGadget(9, #CANVAS_W + 10, 120, 20, 20, "OK")
 StringGadget(10, #CANVAS_W + 35, 120, 150, 20, "")
 TextGadget(11, 5, #CANVAS_H + 10, #CANVAS_W, 20, "")
+
+CreatePopupMenu(1)
+
+;defaultMenuItem(1, #MENUITEM_CTX_SELECT, "Select")
+MenuItem(#MENUITEM_COPYCBOX, "Copy")
+MenuItem(#MENUITEM_CUTCBOX, "Cut")
+MenuItem(#MENUITEM_DELETEBOX, "Delete")
+
+AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_C, #MENUITEM_COPYCBOX)
+AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_X, #MENUITEM_CUTCBOX)
+AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_V, #MENUITEM_PASTECBOX)
+AddKeyboardShortcut(0, #PB_Shortcut_Delete, #MENUITEM_DELETEBOX)
 
 If Not load(#DEFAULT_DATAFILE_PATH)
   End
 EndIf 
 
-setProjectDBLoaded(tryLoadProjectDB("project_db.txt"))
+setProjectDBLoaded(tryLoadProjectDB("../src/res/project_db.txt"))
 
+;-Main Loop
 Define event.l
 Repeat
   event = WaitWindowEvent()
   Select event
   EndSelect
-  
   ClearScreen(#White)
   
   Delay(16)
 Until event = #PB_Event_CloseWindow
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 474
-; FirstLine = 437
-; Folding = -----
+; CursorPosition = 3
+; Folding = ------
 ; EnableXP
