@@ -138,18 +138,32 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   ProcedureReturn *r
 EndProcedure
 
-Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l)
+Procedure getRealCboxPos(*cbox.CollisionBox, facing)
+  If facing = 1
+    ProcedureReturn *cbox\x
+  Else
+    ProcedureReturn - *cbox\x - *cbox\x2
+  EndIf 
+EndProcedure
+
+Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing)
+  Define dx.l
   With *frame
+    If facing = 1
+      dx = x - \origin\x
+    Else
+      dx = x + \origin\x - \display\w
+    EndIf 
     ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
-    DisplayTransparentSprite(spriteSheet, x - \origin\x, y - \origin\y)
+    DisplayTransparentSprite(spriteSheet, dx, y - \origin\y)
     CompilerIf #DEBUG
       StartDrawing(ScreenOutput())
       DrawingMode(#PB_2DDrawing_Outlined)
       ForEach *frame\hitboxes()
-        Box(x + *frame\hitboxes()\x, y + *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+        Box(x + getRealCboxPos(*frame\hitboxes(), facing), y + *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
       Next
       ForEach *frame\hurtboxes()
-        Box(x + *frame\hurtboxes()\x, y + *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, #Green)
+        Box(x + getRealCboxPos(*frame\hurtboxes(), facing), y + *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, #Green)
       Next
       StopDrawing()
     CompilerEndIf
@@ -163,7 +177,7 @@ Procedure renderFighter(*fighter.Fighter)
   Else
     spriteSheet = *fighter\currentAnimation\model\spriteSheet
   EndIf 
-  drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y)
+  drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, *fighter\facing)
 EndProcedure
 
 Procedure renderFrame(*game.Game)
@@ -308,18 +322,14 @@ Procedure initFighters(*game.Game)
   updateAnimations(*game)
 EndProcedure
 
-Procedure getRealCboxPos(*cbox.CollisionBox, *fighter.Fighter
-  
-EndProcedure
-
 Procedure manageHitboxes()
   
 EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 311
-; FirstLine = 264
+; CursorPosition = 145
+; FirstLine = 126
 ; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL

@@ -1,8 +1,9 @@
 ﻿#DEBUG = 1
 
 ;TODO
-;change hitbox damage
 ;play animation
+;edit origin
+;edit duration
 
 CompilerIf #DEBUG
   #DEFAULT_DATAFILE_PATH = "..\src\res\data.twl"
@@ -24,6 +25,7 @@ Enumeration
   #MENUITEM_COPYCBOX
   #MENUITEM_PASTECBOX
   #MENUITEM_CUTCBOX
+  #MENUITEM_CBOXINFO
   #MENUITEMS
 EndEnumeration
 
@@ -46,7 +48,7 @@ Structure AnimationDescriptorPair
   descriptor.s
 EndStructure
 
-Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, originalPath.s, dataFilePath.s, popUpMenuPosition.Point
+Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, originalPath.s, dataFilePath.s, popUpMenuPosition.Point, draggin.b
 NewMap characters.Champion()
 
 Procedure drawFrame(*animation.AnimationModel, facing)
@@ -162,30 +164,28 @@ Procedure selectPointedCBox()
   x = WindowMouseX(0) - 5
   y = WindowMouseY(0) - 5
   If *selectedAnim
-    ForEach *selectedAnim\frames()\hurtboxes()
-      With *selectedAnim\frames()\hurtboxes()
-        hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
-        hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
-        If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
-          
-          selectCollisionBox(@*selectedAnim\frames()\hurtboxes(), #CBOX_TYPE_HURT)
-        EndIf 
-      EndWith
-    Next
     ForEach *selectedAnim\frames()\hitboxes()
       With *selectedAnim\frames()\hitboxes()
         hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
         hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
         If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
           selectCollisionBox(@*selectedAnim\frames()\hitboxes(), #CBOX_TYPE_HIT)
+          ProcedureReturn 1
+        EndIf 
+      EndWith
+    Next
+    ForEach *selectedAnim\frames()\hurtboxes()
+      With *selectedAnim\frames()\hurtboxes()
+        hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
+        hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
+        If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
+          selectCollisionBox(@*selectedAnim\frames()\hurtboxes(), #CBOX_TYPE_HURT)
+          ProcedureReturn 1
         EndIf 
       EndWith
     Next
   EndIf   
-EndProcedure
-
-Procedure clickCallback()
-  selectPointedCBox()
+  ProcedureReturn 0
 EndProcedure
 
 Procedure.s makeHitboxText(*cbox.CollisionBox, type.b)
@@ -209,49 +209,6 @@ Procedure.s makeHitboxText(*cbox.CollisionBox, type.b)
     text + Str(getField(*cbox, Hitbox, damage, D)) + " "
   EndIf 
   ProcedureReturn text
-EndProcedure
-
-Procedure gadgetCallback()
-  Shared *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType
-  gadget = EventGadget()
-  event.l = EventType()
-  Select gadget
-    Case 0
-      If Not *selectedAnim
-        ProcedureReturn
-      EndIf 
-      If event = #PB_EventType_Up
-        If NextElement(*selectedAnim\frames())
-          onFrameChanged(*selectedAnim)
-        EndIf 
-      Else
-        If PreviousElement(*selectedAnim\frames())
-          onFrameChanged(*selectedAnim)
-        EndIf 
-      EndIf 
-    Case 2
-      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
-        *selectedCollisionBox\x = Val(GetGadgetText(2))
-        drawFrame(*selectedAnim, 1)
-      EndIf
-    Case 4
-      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
-        *selectedCollisionBox\y = Val(GetGadgetText(4))
-        drawFrame(*selectedAnim, 1)
-      EndIf
-    Case 6
-      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
-        *selectedCollisionBox\x2 = Val(GetGadgetText(6))
-        drawFrame(*selectedAnim, 1)
-      EndIf
-    Case 8
-      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
-        *selectedCollisionBox\y2 = Val(GetGadgetText(8))
-        drawFrame(*selectedAnim, 1)
-      EndIf
-    Case 9
-      SetGadgetText(10, makeHitboxText(*selectedCollisionBox, selectedCollisionBoxType))
-  EndSelect
 EndProcedure
 
 InitSprite()
@@ -536,12 +493,31 @@ Procedure rebuildDataFile()
   
   OpenWindow(1, 0, 0, 300, 100, "Kuribrawl Frame Tool", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
   TextGadget(#PB_Any, 50, 5, 200, 60, "Waiting for DFM to finish execution (closing this window will cancel the data file rebuilding)", #PB_Text_Center)
+  EnableWindow_(WindowID(0), 0)
+
   
   Repeat
   Until Not ProgramRunning(program)
   CloseWindow(1)
+  EnableWindow_(WindowID(0), 1)
   
   reload()
+EndProcedure
+
+Procedure editCBoxInfo()
+  Shared *selectedCollisionBox, selectedCollisionBoxType
+  
+  OpenWindow(1, 0, 0, 150, 150, "Editing collision box info", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
+  
+  If selectedCollisionBoxType = #CBOX_TYPE_HIT
+    TextGadget(#PB_Any, 5, 5, 140, 20, "Damages")
+    SpinGadget(20, 80, 5, 60, 20, 0, 999)
+    SetGadgetText(20, StrD(getField(*selectedCollisionBox, Hitbox, damage, D)))
+  ElseIf selectedCollisionBoxType = #CBOX_TYPE_HURT
+  EndIf 
+  ButtonGadget(21, 5, 125, 140, 20, "Save")
+  
+  EnableWindow_(WindowID(0), 0)
 EndProcedure
 
 Procedure menuCallback()
@@ -584,25 +560,80 @@ Procedure menuCallback()
         reload()
       Case #MENUITEM_REBUILD
         rebuildDataFile()
+      Case #MENUITEM_CBOXINFO
+        editCBoxInfo()
     EndSelect
   Else
     setAnimation(*itemAnims(event - firstAnimItem))
   EndIf 
 EndProcedure   
 
-Procedure defaultMenuItem(menu, id, text.s)
-  MyStyle.MenuItemInfo
-  MyStyle\cbSize=SizeOf(MyStyle)      ; The size of the structure, in bytes. The caller must set this member to sizeof(MENUITEMINFO).
-  MyStyle\fMask=#MIIM_STATE|#MIIM_STRING                     ; Retrieves or sets the fState member
-  MyStyle\fState=#MFS_DEFAULT              ; 0=Enabled/Normal, 3=Greyed, 8=Checked, 128=Highlighted, 4096=Bold/Default
-  MyStyle\dwTypeData = @text
-  InsertMenuItem_(MenuID(menu), id, #True, MyStyle)
-EndProcedure  
+Procedure gadgetCallback()
+  Shared *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType
+  gadget = EventGadget()
+  event.l = EventType()
+  Select gadget
+    Case 0
+      If Not *selectedAnim
+        ProcedureReturn
+      EndIf 
+      If event = #PB_EventType_Up
+        If NextElement(*selectedAnim\frames())
+          onFrameChanged(*selectedAnim)
+        EndIf 
+      Else
+        If PreviousElement(*selectedAnim\frames())
+          onFrameChanged(*selectedAnim)
+        EndIf 
+      EndIf 
+    Case 2
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\x = Val(GetGadgetText(2))
+        drawFrame(*selectedAnim, 1)
+      EndIf
+    Case 4
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\y = Val(GetGadgetText(4))
+        drawFrame(*selectedAnim, 1)
+      EndIf
+    Case 6
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\x2 = Val(GetGadgetText(6))
+        drawFrame(*selectedAnim, 1)
+      EndIf
+    Case 8
+      If *selectedCollisionBox And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        *selectedCollisionBox\y2 = Val(GetGadgetText(8))
+        drawFrame(*selectedAnim, 1)
+      EndIf
+    Case 9
+      SetGadgetText(10, makeHitboxText(*selectedCollisionBox, selectedCollisionBoxType))
+    Case 20
+      Select EventType()
+        Case #PB_EventType_Up
+          SetGadgetText(20, StrD(ValD(GetGadgetText(20)) + 0.1))
+        Case #PB_EventType_Down
+          SetGadgetText(20, StrD(ValD(GetGadgetText(20)) - 0.1))
+      EndSelect
+    Case 21
+      Select selectedCollisionBoxType
+        Case #CBOX_TYPE_HIT
+          setField(*selectedCollisionBox, Hitbox, damage, D, ValD(GetGadgetText(20)))
+      EndSelect
+      CloseWindow(1)
+      EnableWindow_(WindowID(0), 1)
+  EndSelect
+EndProcedure
+
+Procedure clickCallback()
+  selectPointedCBox()
+EndProcedure
 
 Procedure rightClickCallback()
   Shared popUpMenuPosition
-  selectPointedCBox()
-  DisplayPopupMenu(1, WindowID(0))
+  If selectPointedCBox()
+    DisplayPopupMenu(1, WindowID(0))
+  EndIf 
 EndProcedure  
   
 BindEvent(#PB_Event_Menu, @menuCallback())
@@ -629,6 +660,7 @@ CreatePopupMenu(1)
 MenuItem(#MENUITEM_COPYCBOX, "Copy")
 MenuItem(#MENUITEM_CUTCBOX, "Cut")
 MenuItem(#MENUITEM_DELETEBOX, "Delete")
+MenuItem(#MENUITEM_CBOXINFO, "Edit CBox info")
 
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_C, #MENUITEM_COPYCBOX)
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_X, #MENUITEM_CUTCBOX)
@@ -646,13 +678,24 @@ Define event.l
 Repeat
   event = WaitWindowEvent()
   Select event
+    Case #PB_Event_CloseWindow
+      Select EventWindow()
+        Case 0
+          End
+        Case 1
+          CloseWindow(1)
+          EnableWindow_(WindowID(0), 1)
+      EndSelect
+    Case #PB_Event_LeftDoubleClick
+      If selectPointedCBox()
+        editCBoxInfo()
+      EndIf 
   EndSelect
-  ClearScreen(#White)
   
   Delay(16)
-Until event = #PB_Event_CloseWindow
+ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 2
+; CursorPosition = 5
 ; Folding = ------
 ; EnableXP
