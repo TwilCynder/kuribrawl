@@ -92,7 +92,7 @@ Procedure applyPhysics(*game.Game)
       If *fighter\grounded = 0
         landCallback(*fighter)
       EndIf 
-      *fighter\jumps = 1
+      *fighter\jumps = 5
       *fighter\grounded = 1
       *fighter\physics\v\y = 0
       ny = 0
@@ -107,6 +107,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 20
+; CursorPosition = 94
+; FirstLine = 57
 ; Folding = -
 ; EnableXP

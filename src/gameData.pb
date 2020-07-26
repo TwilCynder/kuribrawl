@@ -27,11 +27,12 @@ kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 *c1\displayName = "Acid Rainbows"
 ;IncludeFile "animations.pbi"
 
-*c1\moves(#COMMAND_NAir)\landLag = 20
-*c1\moves(#COMMAND_UAir)\landLag = 20
-*c1\moves(#COMMAND_DAir)\landLag = 20
-*c1\moves(#COMMAND_BAir)\landLag = 20
-*c1\moves(#COMMAND_FAir)\landLag = 20
+*c1\moves(#COMMAND_NAir)\landLag = 5
+*c1\moves(#COMMAND_UAir)\landLag = 5
+*c1\moves(#COMMAND_DAir)\landLag = 5
+*c1\moves(#COMMAND_BAir)\landLag = 5
+*c1\moves(#COMMAND_FAir)\landLag = 5
+*c1\moves(#COMMAND_FAir)\landLag = 5
 
 *c1\dashSpeed = 8.0
 *c1\initialDashSpeed = 10.0
@@ -53,5 +54,5 @@ kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 30
+; CursorPosition = 33
 ; EnableXP

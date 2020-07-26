@@ -79,5 +79,4 @@ addFrame(*testAnim, 468, 0, 78, 76, 39, 76, 3)
 addFrame(*testAnim, 546, 0, 78, 76, 39, 76, 4)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 55
-; FirstLine = 30
 ; EnableXP

@@ -1,5 +1,5 @@
 ﻿frame.l = 0
-
+Global bgc.l = #White
 
 Structure Frame
   *model.FrameModel
@@ -15,6 +15,11 @@ Structure Animation
   currentCarry.f
   endCallback.f_callback
 EndStructure  
+
+Structure fighterHitIdPair
+  *fighter
+  hitID.b
+EndStructure
 
 Structure Fighter
   x.l
@@ -33,6 +38,7 @@ Structure Fighter
   stateTimer.u
   stateUpdated.b ;wheter state has been changed since last animation change
   jumps.b
+  List fightersHit.fighterHitIdPair()
 EndStructure
 
 Structure Game
@@ -138,7 +144,7 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   ProcedureReturn *r
 EndProcedure
 
-Procedure getRealCboxPos(*cbox.CollisionBox, facing)
+Procedure getRealCboxX(*cbox.CollisionBox, facing)
   If facing = 1
     ProcedureReturn *cbox\x
   Else
@@ -159,11 +165,12 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing)
     CompilerIf #DEBUG
       StartDrawing(ScreenOutput())
       DrawingMode(#PB_2DDrawing_Outlined)
+      Line(0, y, #SCREEN_W, 1, #Blue)
       ForEach *frame\hitboxes()
-        Box(x + getRealCboxPos(*frame\hitboxes(), facing), y + *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+        Box(x + getRealCboxX(*frame\hitboxes(), facing), y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
       Next
       ForEach *frame\hurtboxes()
-        Box(x + getRealCboxPos(*frame\hurtboxes(), facing), y + *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, #Green)
+        Box(x + getRealCboxX(*frame\hurtboxes(), facing), y - *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, #Green)
       Next
       StopDrawing()
     CompilerEndIf
@@ -181,7 +188,7 @@ Procedure renderFighter(*fighter.Fighter)
 EndProcedure
 
 Procedure renderFrame(*game.Game)
-  ClearScreen(#White)
+  ClearScreen(bgc)
   ForEach *game\fighters()
     renderFighter(@*game\fighters())
   Next
@@ -265,7 +272,8 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
   setState(*fighter, #STATE_IDLE, 1)
 EndProcedure
 
-Procedure attack(*fighter, attack.b)
+Procedure attack(*fighter.Fighter, attack.b)
+  ClearList(*fighter\fightersHit())
   setState(*fighter, #STATE_ATTACK, attack)
 EndProcedure
 
@@ -322,14 +330,70 @@ Procedure initFighters(*game.Game)
   updateAnimations(*game)
 EndProcedure
 
-Procedure manageHitboxes()
-  
+Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
+  If x1 < x2 + w2 And
+     x1 + w1 > x2 And
+     y1 > y2 - h2 And
+     y1 - h1 < y2
+    ProcedureReturn 1
+  EndIf 
+EndProcedure 
+
+Procedure.d getKnockback(damage.d)
+  ProcedureReturn damage / 2
+EndProcedure
+
+Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
+  Define angle.d, knockback.d
+  ForEach *attacking\fightersHit()
+    If *attacking\fightersHit()\fighter = *defending And *attacking\fightersHit()\hitID = *hitbox\hit
+      ProcedureReturn 0
+    EndIf 
+  Next
+  AddElement(*attacking\fightersHit())
+  *attacking\fightersHit()\hitID = *hitbox\hit
+  *attacking\fightersHit()\fighter = *defending
+  If *attacking\facing = 1
+    angle = *hitbox\angle
+  Else
+    angle = 180 - *hitbox\angle
+  EndIf
+  angle = Radian(angle)
+  knockback = getKnockback(*hitbox\damage)
+  *defending\physics\v\x = Cos(angle) * knockback
+  *defending\physics\v\y = Sin(angle) * knockback
+EndProcedure
+
+Procedure manageHitboxes(*game.Game)
+  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox
+  bgc = #White
+  ForEach *game\fighters()
+    *attacking = @*game\fighters()
+    ForEach  *game\fighters()
+      *defending = @*game\fighters()
+      If *defending = *attacking
+        Continue
+      EndIf 
+      ForEach *attacking\currentAnimation\frames()\model\hitboxes()
+        ForEach *defending\currentAnimation\frames()\model\hurtboxes()
+          *hitbox = @*attacking\currentAnimation\frames()\model\hitboxes()
+          *hurtbox = @*defending\currentAnimation\frames()\model\hurtboxes()
+          If testRectCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y, *hitbox\x2, *hitbox\y2,
+                               getRealCboxX(*hurtbox, *defending\facing) + *defending\x, *defending\y + *hurtbox\y, *hurtbox\x2, *hurtbox\y2)
+            hit(*hitbox, *hurtbox, *attacking, *defending)
+            bgc = #Black
+          EndIf 
+        Next
+      Next 
+    Next
+    ChangeCurrentElement(*game\fighters(), *attacking)  
+  Next  
 EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 145
-; FirstLine = 126
+; CursorPosition = 161
+; FirstLine = 145
 ; Folding = -----
 ; EnableXP
 ; SubSystem = OpenGL

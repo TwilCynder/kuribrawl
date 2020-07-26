@@ -77,7 +77,7 @@ Procedure drawFrame(*animation.AnimationModel, facing)
       Else
         color.l = #Red
       EndIf 
-      Box(\hitboxes()\x + x + \origin\x, \hitboxes()\y + y + \origin\y, \hitboxes()\x2, \hitboxes()\y2, color)
+      Box(\hitboxes()\x + x + \origin\x, y + \origin\y - \hitboxes()\y, \hitboxes()\x2, \hitboxes()\y2, color)
     Next
     ForEach \hurtboxes()
       If *selectedCollisionBox = @\hurtboxes()
@@ -85,7 +85,7 @@ Procedure drawFrame(*animation.AnimationModel, facing)
       Else
         color.l = #Green
       EndIf 
-      Box(\hurtboxes()\x + x + \origin\x, \hurtboxes()\y + y + \origin\y, \hurtboxes()\x2, \hurtboxes()\y2, color)
+      Box(\hurtboxes()\x + x + \origin\x, y + \origin\y - \hurtboxes()\y, \hurtboxes()\x2, \hurtboxes()\y2, color)
     Next 
     StopDrawing()
   EndWith
@@ -96,6 +96,8 @@ Procedure onFrameChanged(*anim.AnimationModel)
   Shared viewPosition
   viewPosition\x = (#CANVAS_W / 2) - (*anim\frames()\display\w / 2) 
   viewPosition\y = (#CANVAS_H / 2) - (*anim\frames()\display\h / 2) 
+  SetGadgetText(12, Str(*anim\frames()\origin\x))
+  SetGadgetText(13, Str(*anim\frames()\origin\y))
   drawFrame(*anim, 1)
 EndProcedure  
 
@@ -167,7 +169,7 @@ Procedure selectPointedCBox()
     ForEach *selectedAnim\frames()\hitboxes()
       With *selectedAnim\frames()\hitboxes()
         hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
-        hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
+        hy = viewPosition\y + *selectedAnim\frames()\origin\y - \y
         If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
           selectCollisionBox(@*selectedAnim\frames()\hitboxes(), #CBOX_TYPE_HIT)
           ProcedureReturn 1
@@ -177,7 +179,7 @@ Procedure selectPointedCBox()
     ForEach *selectedAnim\frames()\hurtboxes()
       With *selectedAnim\frames()\hurtboxes()
         hx = \x + viewPosition\x + *selectedAnim\frames()\origin\x
-        hy = \y + viewPosition\y + *selectedAnim\frames()\origin\y
+        hy = viewPosition\y + *selectedAnim\frames()\origin\y - \y
         If x > hx And x < hx + \x2 And y > hy And y < hy + \y2
           selectCollisionBox(@*selectedAnim\frames()\hurtboxes(), #CBOX_TYPE_HURT)
           ProcedureReturn 1
@@ -233,7 +235,7 @@ Procedure.s findAnimationDescriptor(*animation)
 EndProcedure
 
 Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
-  Define i.b = 0
+  Define i.b = 0, text.s
   If path = ""
     ProcedureReturn 0
   EndIf 
@@ -247,11 +249,18 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
     EndIf 
   EndIf 
   ForEach *animation\frames()
+    text = ""
+    If Not (*animation\frames()\origin\x = (*animation\frames()\display\w / 2) And *animation\frames()\origin\y = *animation\frames()\display\h)
+      text + "o" + Str(*animation\frames()\origin\x) + " " + Str(*animation\frames()\origin\y) + " "
+    EndIf 
     If *animation\frames()\duration
-      WriteStringN(0, "f" + Str(i) + " d" + Str(*animation\frames()\duration))
+      text + "d" + Str(*animation\frames()\duration) + " "
+    EndIf 
+    If Not text = ""
+       WriteStringN(0, "f" + Str(i) + " " + text)
     EndIf 
     ForEach *animation\frames()\hitboxes()
-      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " + Str(*animation\frames()\hitboxes()\y2) + " " + StrD(*animation\frames()\hitboxes()\damage))
+      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " + Str(*animation\frames()\hitboxes()\y2) + " " + StrD(*animation\frames()\hitboxes()\damage) + " " + Str(*animation\frames()\hitboxes()\angle))
     Next 
     ForEach *animation\frames()\hurtboxes()
       WriteStringN(0, "c" + Str(i) + " " + Str(*animation\frames()\hurtboxes()\x) + " " + Str(*animation\frames()\hurtboxes()\y) + " " + Str(*animation\frames()\hurtboxes()\x2) + " " + Str(*animation\frames()\hurtboxes()\y2))
@@ -280,7 +289,7 @@ EndProcedure
 
 Procedure generateDefaultHurtboxes(*animation.AnimationModel)
   ForEach *animation\frames()
-    addHurtbox(*animation\frames(), -*animation\frames()\origin\x, -*animation\frames()\origin\y, *animation\frames()\display\w, *animation\frames()\display\h)
+    addHurtbox(*animation\frames(), -*animation\frames()\origin\x, *animation\frames()\origin\y, *animation\frames()\display\w, *animation\frames()\display\h)
   Next
   FirstElement(*animation\frames())
   drawFrame(*animation, 1)
@@ -511,11 +520,14 @@ Procedure editCBoxInfo()
   
   If selectedCollisionBoxType = #CBOX_TYPE_HIT
     TextGadget(#PB_Any, 5, 5, 140, 20, "Damages")
-    SpinGadget(20, 80, 5, 60, 20, 0, 999)
-    SetGadgetText(20, StrD(getField(*selectedCollisionBox, Hitbox, damage, D)))
+    SpinGadget(21, 80, 5, 60, 20, 0, 999)
+    SetGadgetText(21, StrD(getField(*selectedCollisionBox, Hitbox, damage, D)))
+    TextGadget(#PB_Any, 5, 30, 140, 20, "Angle")
+    SpinGadget(22, 80, 30, 60, 20, -180, 180, #PB_Spin_Numeric)
+    SetGadgetText(22, StrD(getField(*selectedCollisionBox, Hitbox, angle, W)))
   ElseIf selectedCollisionBoxType = #CBOX_TYPE_HURT
   EndIf 
-  ButtonGadget(21, 5, 125, 140, 20, "Save")
+  ButtonGadget(20, 5, 125, 140, 20, "Save")
   
   EnableWindow_(WindowID(0), 0)
 EndProcedure
@@ -569,7 +581,7 @@ Procedure menuCallback()
 EndProcedure   
 
 Procedure gadgetCallback()
-  Shared *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType
+  Shared *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType, diff.l
   gadget = EventGadget()
   event.l = EventType()
   Select gadget
@@ -608,17 +620,49 @@ Procedure gadgetCallback()
       EndIf
     Case 9
       SetGadgetText(10, makeHitboxText(*selectedCollisionBox, selectedCollisionBoxType))
-    Case 20
+    Case 12
+
+      If *selectedAnim And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        diff = *selectedAnim\frames()\origin\x
+        *selectedAnim\frames()\origin\x = Val(GetGadgetText(12))
+        diff = *selectedAnim\frames()\origin\x - diff
+        If diff
+          ForEach *selectedAnim\frames()\hurtboxes()
+            *selectedAnim\frames()\hurtboxes()\x - diff
+          Next 
+          ForEach *selectedAnim\frames()\hitboxes()
+            *selectedAnim\frames()\hitboxes()\x - diff
+          Next 
+        EndIf 
+        drawFrame(*selectedAnim, 1)
+      EndIf
+    Case 13
+      If *selectedAnim And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        diff = *selectedAnim\frames()\origin\y
+        *selectedAnim\frames()\origin\y = Val(GetGadgetText(13))
+        diff = *selectedAnim\frames()\origin\y - diff
+        If diff
+          ForEach *selectedAnim\frames()\hurtboxes()
+            *selectedAnim\frames()\hurtboxes()\y + diff
+          Next 
+          ForEach *selectedAnim\frames()\hitboxes()
+            *selectedAnim\frames()\hitboxes()\y + diff
+          Next 
+        EndIf 
+        drawFrame(*selectedAnim, 1)
+      EndIf
+    Case 21
       Select EventType()
         Case #PB_EventType_Up
-          SetGadgetText(20, StrD(ValD(GetGadgetText(20)) + 0.1))
+          SetGadgetText(21, StrD(ValD(GetGadgetText(20)) + 0.1))
         Case #PB_EventType_Down
-          SetGadgetText(20, StrD(ValD(GetGadgetText(20)) - 0.1))
+          SetGadgetText(21, StrD(ValD(GetGadgetText(20)) - 0.1))
       EndSelect
-    Case 21
+    Case 20
       Select selectedCollisionBoxType
         Case #CBOX_TYPE_HIT
-          setField(*selectedCollisionBox, Hitbox, damage, D, ValD(GetGadgetText(20)))
+          setField(*selectedCollisionBox, Hitbox, damage, D, ValD(GetGadgetText(21)))
+          setField(*selectedCollisionBox, Hitbox, angle, W, Val(GetGadgetText(22)))
       EndSelect
       CloseWindow(1)
       EnableWindow_(WindowID(0), 1)
@@ -642,16 +686,22 @@ BindEvent(#PB_Event_Gadget, @gadgetCallback())
 BindEvent(#PB_Event_RightClick, @rightClickCallback())
 
 SpinGadget(0, #CANVAS_W + 10, 5, 20, 50, 0, 1, #PB_Spin_ReadOnly)
-TextGadget(1, #CANVAS_W + 10, 60, 10, 20, "x")
-SpinGadget(2, #CANVAS_W + 25, 60, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-TextGadget(3, #CANVAS_W + 85, 60, 10, 20, "y")
-SpinGadget(4, #CANVAS_W + 100, 60, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
-TextGadget(5, #CANVAS_W + 10, 90, 10, 20, "w")
-SpinGadget(6, #CANVAS_W + 25, 90, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-TextGadget(7, #CANVAS_W + 85, 90, 10, 20, "h")
-SpinGadget(8, #CANVAS_W + 100, 90, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
-ButtonGadget(9, #CANVAS_W + 10, 120, 20, 20, "OK")
-StringGadget(10, #CANVAS_W + 35, 120, 150, 20, "")
+FrameGadget(#PB_Any, #CANVAS_W + 35, 5, 160, 50, "Frame Info")
+TextGadget(#PB_Any, #CANVAS_W + 40, 25, 20, 20, "ox")
+SpinGadget(12, #CANVAS_W + 60, 25, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+TextGadget(#PB_Any, #CANVAS_W + 120, 25, 20, 20, "oy")
+SpinGadget(13, #CANVAS_W + 140, 25, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+FrameGadget(#PB_Any, #CANVAS_W + 10, 60, 185, 80, "Collision Box Info")
+TextGadget(1, #CANVAS_W + 20, 80, 10, 20, "x")
+SpinGadget(2, #CANVAS_W + 35, 80, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+TextGadget(3, #CANVAS_W + 95, 80, 10, 20, "y")
+SpinGadget(4, #CANVAS_W + 110, 80, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
+TextGadget(5, #CANVAS_W + 20, 110, 10, 20, "w")
+SpinGadget(6, #CANVAS_W + 35, 110, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+TextGadget(7, #CANVAS_W + 95, 110, 10, 20, "h")
+SpinGadget(8, #CANVAS_W + 110, 110, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
+ButtonGadget(9, #CANVAS_W + 10, 145, 20, 20, "OK")
+StringGadget(10, #CANVAS_W + 35, 145, 150, 20, "")
 TextGadget(11, 5, #CANVAS_H + 10, #CANVAS_W, 20, "")
 
 CreatePopupMenu(1)
@@ -696,6 +746,7 @@ Repeat
 ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 5
+; CursorPosition = 252
+; FirstLine = 230
 ; Folding = ------
 ; EnableXP

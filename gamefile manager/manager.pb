@@ -97,11 +97,19 @@ Procedure writeFileDescriptor(type.b, infos.s)
               i = 2
               value = StringField(line, i, " ")
               While value
-                If Left(value, 1) = "d"
-                  WriteByte(1, $20)
-                  WriteUnicodeCharacter(1, Val(Mid(value, 2)))
-                  PrintN("- - - modified duration : " + Mid(value, 2))
-                EndIf 
+                Select Left(value, 1)
+                  Case "d"
+                    WriteByte(1, $20)
+                    WriteUnicodeCharacter(1, Val(Mid(value, 2)))
+                    PrintN("- - - modified duration : " + Mid(value, 2))
+                  Case "o"
+                    WriteByte(1, $21)
+                    WriteLong(1, Val(Mid(value, 2)))
+                    PrintN("- - - origin x : " + Mid(value, 2))
+                    i + 1
+                    WriteLong(1, Val(StringField(line, i, " ")))
+                    PrintN("- - - origin x : " + StringField(line, i, " "))
+                EndSelect
                 i + 1
                 value = StringField(line, i, " ")
               Wend 
@@ -135,6 +143,7 @@ Procedure writeFileDescriptor(type.b, infos.s)
               Next 
               PrintN("- - - damages : " + StringField(line, 6, " "))
               WriteDouble(1, ValD(StringField(line, 6, " ")))
+              WriteWord(1, Val(StringField(line, 7, " ")))
           EndSelect
         Wend 
         CloseFile(2)
@@ -246,8 +255,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 207
-; FirstLine = 180
+; CursorPosition = 111
+; FirstLine = 87
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe

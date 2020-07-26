@@ -40,8 +40,8 @@ initDefaultAnimationsConfig(*c1)
 
 *f1.Fighter = newFighter(*game, getCharacter("Acid"), 48, 500)
 *f1\name = "Test One"
-;*f2.Fighter = newFighter(*game, getCharacter("Acid Rainbows"), 48, 500)
-;*f2\name = "Test Two"
+*f2.Fighter = newFighter(*game, getCharacter("Acid"), 78, 500)
+*f2\name = "Test Two"
 
 For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
@@ -49,13 +49,11 @@ Next
 
 setPort(0, 5)
 setPortFighter(0, *f1)
-;setPort(1, 1)
-;setPortFighter(1, *f2)
 
 ;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 60
+frameDuration.f = 1000.0 / 15
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -65,7 +63,7 @@ Repeat
   startTime = endTime
   nextFrame = nextFrame + frameDuration
   startTime = ElapsedMilliseconds()
-  ;manageHitboxes
+  manageHitboxes(*game)
   updateInputs()
   manageStates(*game)
   applyPhysics(*game)
@@ -94,6 +92,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+; CursorPosition = 55
+; FirstLine = 27
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

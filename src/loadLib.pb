@@ -98,6 +98,9 @@ Procedure loadGameData(path.s)
               selectedElement = ReadByte(0)
             Case #FILEMARKER_FRAMEDURATION
               *frames(selectedElement)\duration = ReadUnicodeCharacter(0)
+            Case #FILEMARKER_FRAMEORIGIN
+              *frames(selectedElement)\origin\x = ReadLong(0)
+              *frames(selectedElement)\origin\y = ReadLong(0)
             Case #FILEMARKER_HITBOXINFO
               selectedElement = ReadByte(0)
               x.l = ReadWord(0)
@@ -106,6 +109,7 @@ Procedure loadGameData(path.s)
               h.l = ReadWord(0)
               addHitbox(*frames(selectedElement), x, y, w, h)
               *frames(selectedElement)\hitboxes()\damage = ReadDouble(0)
+              *frames(selectedElement)\hitboxes()\angle = ReadWord(0)
             Case #FILEMARKER_HURTBOXINFO
               selectedElement = ReadByte(0)
               x.l = ReadWord(0)
@@ -145,7 +149,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 41
-; FirstLine = 20
+; CursorPosition = 102
+; FirstLine = 81
 ; Folding = -
 ; EnableXP

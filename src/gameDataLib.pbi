@@ -24,7 +24,7 @@ Structure Hitbox Extends CollisionBox
   hitstunModifier.l
   bkb.d ;base knockback
   skb.d ;scaling klockback
-  angle.d
+  angle.w
   hit.b
 EndStructure  
 
@@ -189,7 +189,6 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 174
-; FirstLine = 126
+; CursorPosition = 26
 ; Folding = --
 ; EnableXP

@@ -5,7 +5,7 @@ Structure des fichiers de données de jeu (twl) :
 - 1 octet version mineure
 - 1 octet révision
 - Fichiers : 
-- - - 1 octet type (0 : image d'anim)
+- - - 1 octet type (0 : image d'anim, 1 : champion)
 - - - string : tag du fichier
 - - - 4 octets : longueur du fichier
 - - - Données
@@ -23,8 +23,8 @@ Structure des fichiers de données de jeu (twl) :
 - - - [0x20
 - - - 2 octets durée]
 - - - [0x21
-- - - 2 octets : x origine
-- - - 2 octets : y origine]
+- - - 4 octets : x origine
+- - - 4 octets : y origine]
 - - - 0x52
 - infos de hurtbox (facultatif) : 
 - - - 0x03
@@ -44,7 +44,17 @@ Structure des fichiers de données de jeu (twl) :
 - - - 2 octets w
 - - - 2 octets h
 - - - 2 octets damages
+- - - 2 octets angle
 - - - 0x52
+
+>Données de champion
+- Nom (UTF-8 String)
+- Variables gameplay (à la suite)
+- Infos de move (facultatif) :
+- - - 0x02
+- - - 1 octed ID du move
+- - - [0x20
+- - - 1 octet landing lag]
 
 ========================================================
 Descripteur de fichier d'animation (format texte, ligne par ligne)
@@ -52,12 +62,4 @@ Descripteur de fichier d'animation (format texte, ligne par ligne)
 - vitesse (facultatif) : s<speed>
 - info de frame (facultatif) : f<n° de frame> [d<durée>] [o<x origine> <y origine>]
 - info de hurtbox : c <x> <y> <w> <h> <invincible>
-- info d'hitbox : h <x> <y> <w> <h> <damages> 
-
-
-descripteur d'animation
-- 1 octet : nombre de
-- info de frame (facultatif) : f<n° de frame> [d<durée>] [o<x origine> <y origine>]
-- info de hurtbox : c<n° frame> <x> <y> <w> <h> <invincible>
-- info d'hitbox : h<n° frame> <x> <y> <w> <h> <damages> 
-
+- info d'hitbox : h <x> <y> <w> <h> <damages> <angle>
