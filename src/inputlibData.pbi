@@ -39,8 +39,6 @@ With defaultControler\defaultBinding
 EndWith
 
 
-
-
 gameCube.knownController
 gameCube\config\analogStickThreshold = 300
 gameCube\config\analogStickSmashThreshold = 750
@@ -61,5 +59,5 @@ EndWith
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 36
+; CursorPosition = 38
 ; EnableXP

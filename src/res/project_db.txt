@@ -46,3 +46,5 @@ uair_strip8.png
 A:Acid/uair uair.dat
 uair_strip8L.png
 AL:Acid/uair
+platform.png
+A:_FD/platform 1

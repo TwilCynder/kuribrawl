@@ -79,6 +79,18 @@ Structure Champion
   landingDuration.d
 EndStructure
 
+Structure PlatformModel
+  x.l
+  y.l
+  w.l
+  animationName.s
+EndStructure
+
+Structure StageModel
+  List platforms.platformModel()
+  Map animations.AnimationModel()
+EndStructure
+
 Structure ArtifactModel
   Map animations.AnimationModel()
   durability.b
@@ -92,12 +104,12 @@ EndStructure
 
 Structure GameData
   Map characters.Champion()
+  Map stages.StageModel()
   variables.GameVariables
 EndStructure  
 Global kuribrawl.GameData
 
 InitSprite()
-
 
 Procedure newCharacter(name.s)
   *r = AddMapElement(kuribrawl\characters(), name)
@@ -107,23 +119,34 @@ Procedure newCharacter(name.s)
 EndProcedure
 
 Procedure getCharacter(name.s)
-  ProcedureReturn @kuribrawl\characters(name)
+  ProcedureReturn FindMapElement(kuribrawl\characters(), name)
+EndProcedure
+
+Procedure getStage(name.s)
+  ProcedureReturn FindMapElement(kuribrawl\stages(), name)
+EndProcedure
+
+Procedure getStageAnimation(*stage.StageModel, name.s)
+  ProcedureReturn FindMapElement(*stage\animations(), name)
 EndProcedure
 
 Procedure getAnimation(*character.Champion, name.s)
   ProcedureReturn FindMapElement(*character\animations(), name)
 EndProcedure
 
-Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
+Procedure initAnimationModel(*animation.AnimationModel, spriteTag.s, speed.d = 1)
   Shared loadedSprites()
-
-  *animation.AnimationModel = AddMapElement(*character\animations(), name)
   If spriteTag
     *animation\spriteSheet = loadedSprites(spriteTag)
   EndIf 
   
   *animation\baseSpeed = speed
   
+EndProcedure
+
+Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
+  *animation.AnimationModel = AddMapElement(*character\animations(), name)
+  initAnimationModel(*animation, spriteTag, speed)
   ProcedureReturn *animation
 EndProcedure
 
@@ -135,7 +158,6 @@ EndProcedure
 Procedure setAnimationEndCallback(*animation.AnimationModel, f.f_callback)
   *animation\endCallback = f
 EndProcedure
-
 
 Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
   *f.FrameModel = AddElement(*animation\frames())
@@ -175,6 +197,26 @@ Procedure addHurtbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_
   ProcedureReturn *r
 EndProcedure
 
+Procedure newStage(name.s)
+  ProcedureReturn AddMapElement(kuribrawl\stages(), name)  
+EndProcedure
+
+Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
+  Define *r.PlatformModel
+  *r = AddElement(*stage\platforms())
+  *r\x = x
+  *r\y = y
+  *r\w = w
+  *r\animationName = animationName
+  ProcedureReturn *r
+EndProcedure
+
+Procedure newStageAnimation(*stage.StageModel, name.s, spriteTag.s, speed.d = 1)
+  *animation = AddMapElement(*stage\animations(), name)
+  initAnimationModel(*animation, spriteTag, speed)
+  ProcedureReturn *animation
+EndProcedure
+
 Declare defaultJumpAnimCallback(*fighter, *data)
 Declare defaultAttackAnimCallback(*fighter, *data)
 Procedure initDefaultAnimationsConfig(*char.Champion)
@@ -189,6 +231,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 26
-; Folding = --
+; CursorPosition = 112
+; FirstLine = 73
+; Folding = ---
 ; EnableXP

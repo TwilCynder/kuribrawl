@@ -25,52 +25,70 @@ Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
 EndProcedure  
   
 Procedure manageStates(*game.Game)
-  Define *fighter.Fighter, max.b
+  Define *fighter.Fighter, max.l
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    Select *fighter\state
-      Case #STATE_JUMPSQUAT
-        max = getStateMaxFrames(*fighter, *fighter\character\jumpsquatDuration)
-        If *fighter\stateTimer >= max
-          stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
-        EndIf
-      Case #STATE_DASH_STOP
-        max = getStateMaxFrames(*fighter, *fighter\character\dashStopDuration)
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_IDLE)
-        EndIf  
-      Case #STATE_DASH_START
-        max = getStateMaxFrames(*fighter, *fighter\character\dashStartDuration)
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_DASH)
-        EndIf 
-      Case #STATE_DASH_TURN
-        max = getStateMaxFrames(*fighter, *fighter\character\dashTurnDuration)
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_DASH)
-        EndIf 
-      Case #STATE_LANDING
-        max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
-
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_IDLE)
-        EndIf 
-      Case #STATE_LANDING_LAG
-        max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
-
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_IDLE)
-        EndIf 
-      Case #STATE_LANDING
-        max = getStateMaxFrames(*fighter, *fighter\stateInfo)
-        If *fighter\stateTimer >= max
-          setState(*fighter, #STATE_IDLE)
-        EndIf 
-    EndSelect
-    *fighter\stateTimer + 1
+    
+    If *fighter\paused > 0
+      *fighter\paused - 1
+    Else  
+    
+    
+      Select *fighter\state
+        Case #STATE_JUMPSQUAT
+          max = getStateMaxFrames(*fighter, *fighter\character\jumpsquatDuration)
+          If *fighter\stateTimer >= max
+            stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
+          EndIf
+        Case #STATE_DASH_STOP
+          max = getStateMaxFrames(*fighter, *fighter\character\dashStopDuration)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_IDLE)
+          EndIf  
+        Case #STATE_DASH_START
+          max = getStateMaxFrames(*fighter, *fighter\character\dashStartDuration)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_DASH)
+          EndIf 
+        Case #STATE_DASH_TURN
+          max = getStateMaxFrames(*fighter, *fighter\character\dashTurnDuration)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_DASH)
+          EndIf 
+        Case #STATE_LANDING
+          max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
+    
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_IDLE)
+          EndIf 
+        Case #STATE_LANDING_LAG
+          max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
+    
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_IDLE)
+          EndIf 
+        Case #STATE_LANDING
+          max = getStateMaxFrames(*fighter, *fighter\stateInfo)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_IDLE)
+          EndIf
+        Case #STATE_HITSTUN
+          max = *fighter\stateInfo >> 1
+          Debug max
+          If *fighter\stateTimer >= max
+            If *fighter\stateInfo & 1
+              setState(*fighter, #STATE_TUMBLE)
+            Else
+              setState(*fighter, #STATE_IDLE)
+            EndIf 
+          EndIf 
+      EndSelect
+      *fighter\stateTimer + 1
+    EndIf 
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 5
+; CursorPosition = 81
+; FirstLine = 37
 ; Folding = -
 ; EnableXP
