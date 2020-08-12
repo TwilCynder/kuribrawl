@@ -1,9 +1,15 @@
 ﻿#GRAVITY = 0.6
 
-Procedure groundCollision(x.l, y.l) ;ajouter le fighter au cas où les ECB pourraient être différentes selon le fighter
-  If y < 0
-    ProcedureReturn 1  ;TODO: return un pointeur vers l'élément de décor incriminé
-  EndIf 
+Procedure groundCollision(*game.Game, x.l, y.l, nx.l, ny.l) ;ajouter le fighter au cas où les ECB pourraient être différentes selon le fighter
+  Define *plat.Platform
+  ForEach *game\currentStage\platforms()
+    *plat = @*game\currentStage\platforms()
+    If x > *plat\model\x And x < *plat\model\x + *plat\model\w
+      If y >= *plat\model\y And ny < *plat\model\y
+        ProcedureReturn *plat
+      EndIf 
+    EndIf 
+  Next
   ProcedureReturn 0
 EndProcedure
 
@@ -48,6 +54,10 @@ Procedure applyPhysics(*game.Game)
   ForEach *game\fighters()
     *fighter = @*game\fighters()
     
+    If *fighter\paused > 0
+      Continue
+    EndIf 
+    
     If *fighter\facing = 0
       *fighter\facing = 1
     EndIf 
@@ -88,14 +98,16 @@ Procedure applyPhysics(*game.Game)
     ny = *fighter\y + *fighter\physics\v\y
         
     ;--- Calcul des collisions avec le terrain
-    If groundCollision(nx, ny)
+    Define *plat.Platform
+    *plat = groundCollision(*game, *fighter\x, *fighter\y, nx, ny)
+    If *plat
+      ny = *plat\model\y
       If *fighter\grounded = 0
         landCallback(*fighter)
       EndIf 
       *fighter\jumps = 5
       *fighter\grounded = 1
       *fighter\physics\v\y = 0
-      ny = 0
     Else 
       *fighter\grounded = 0
     EndIf 
@@ -107,7 +119,6 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 94
-; FirstLine = 57
+; CursorPosition = 5
 ; Folding = -
 ; EnableXP

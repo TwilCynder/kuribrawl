@@ -35,25 +35,30 @@ CompilerElse
 CompilerEndIf
 initDefaultAnimationsConfig(*c1)
 
+
+
 ;- Test game (game, fighters, ports)
 *game.Game = initGame(window)
 
-*f1.Fighter = newFighter(*game, getCharacter("Acid"), 48, 500)
+*f1.Fighter = newFighter(*game, getCharacter("Acid"), 150, 500)
 *f1\name = "Test One"
-*f2.Fighter = newFighter(*game, getCharacter("Acid"), 78, 500)
+*f2.Fighter = newFighter(*game, getCharacter("Acid"), 500, 500)
 *f2\name = "Test Two"
+setStage(*game, getStage("FD"))
 
 For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 5)
+setPort(0, 0)
 setPortFighter(0, *f1)
+setPort(1, 1)
+setPortFighter(1, *f2)
 
 ;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 15
+frameDuration.f = 1000.0 / 30
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -70,7 +75,6 @@ Repeat
   advanceAnimations(*game)
   updateAnimations(*game)
   renderFrame(*game)
-  
   SetWindowTitle(window, Str(lastFrameDuration))
   
   currentTime = ElapsedMilliseconds()
@@ -79,7 +83,7 @@ Repeat
      nextFrame = currentTime
      Debug "/!\Can't keep up !"
    Else 
-     If frameWait < 14
+     If frameWait < 10
        ;Debug "/!\Frame process lasted more than 2.6ms !"
      EndIf 
      Delay(frameWait)
@@ -93,7 +97,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 55
-; FirstLine = 27
+; FirstLine = 20
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

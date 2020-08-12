@@ -24,12 +24,14 @@ Structure toLoad
 EndStructure
 
 Procedure readFileToMemory(filename$, *file.loadedFile)
-  ReadFile(0, filename$)
+  If Not ReadFile(0, filename$)
+    ProcedureReturn 0
+  EndIf 
   *file\size = Lof(0)
   *file\buffer = ReAllocateMemory(*file\buffer, *file\size)
   ReadData(0, *file\buffer, *file\size)
   CloseFile(0)
-  ProcedureReturn *buffer
+  ProcedureReturn *file\buffer
 EndProcedure
 
 Procedure writeSignature()
@@ -167,7 +169,10 @@ EndProcedure
 Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   PrintN("file path : " + path)
   PrintN("tag : " + tag)
-  readFileToMemory(path, *f)
+  If Not readFileToMemory(path, *f)
+    MessageRequester("error", "can't find file " + path)
+    End
+  EndIf 
   writeType(type)
   writeFileTag(tag)
   WriteFileLength(*f\size)
@@ -255,8 +260,7 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 111
-; FirstLine = 87
+; CursorPosition = 33
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe

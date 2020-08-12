@@ -451,7 +451,7 @@ Procedure updateInputs()
     info\elementType = (inputQ() & %11000000000000) >> 12
     info\element = (inputQ() & %11111 << 14) >> 14
     
-    If *inputManagers(input)
+    If *inputManagers(input) And Not ports(port)\figher\paused
       *currentElement = @inputQ()
       inputManager.inputManager = *inputManagers(input)
       res = inputManager(@ports(port), @info)
@@ -482,7 +482,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 456
+; CursorPosition = 453
 ; FirstLine = 432
 ; Folding = -----
 ; EnableXP

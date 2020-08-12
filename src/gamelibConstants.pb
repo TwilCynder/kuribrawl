@@ -31,6 +31,7 @@ Enumeration
   #STATE_IDLE
   ;IDLE_AIR = IDLE && !grounded
   #STATE_CROUCH
+  #STATE_GUARD
   #STATE_WALK
   #STATE_WALK_TURN
   #STATE_DASH_START
@@ -41,8 +42,10 @@ Enumeration
   #STATE_LANDING
   #STATE_ATTACK
   ;ATTACK_AIR = ATTACK && !grounded
+  #STATE_HITSTUN
   #STATE_TUMBLE
   #STATE_LANDING_LAG
+  #STATE_CUSTOM
   #STATES
 EndEnumeration
 
@@ -56,6 +59,11 @@ Enumeration
   #YJUMP_NORMAL
   #YJUMP_SHORT
   #YJUMP_DOUBLE
+EndEnumeration
+
+Enumeration
+  #KB_NORMAL
+  #KB_TUMBLE
 EndEnumeration
 
 Enumeration ;commands
@@ -92,4 +100,6 @@ EndEnumeration
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+; CursorPosition = 66
+; FirstLine = 25
 ; EnableXP

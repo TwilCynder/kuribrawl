@@ -25,16 +25,26 @@ Procedure.s LoadSprite_(*buffer, tag.s)
   ProcedureReturn tag
 EndProcedure
 
-Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.FrameModel(1))
+Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.FrameModel(1), originType)
+  If Not *animation
+    ProcedureReturn 0
+  EndIf 
   Define x.l, y.l, w.l, h.l
   ReDim *frames(nb - 1)
   x = 0
   y = 0
   w = w / nb
-  For i = 0 To nb - 1
-    *frames(i) = addFrame(*animation, x, y, w, h, w / 2, h)
-    x + w
-  Next
+  If originType = 0
+    For i = 0 To nb - 1
+      *frames(i) = addFrame(*animation, x, y, w, h, w / 2, h)
+      x + w
+    Next
+  Else 
+    For i = 0 To nb - 1
+      *frames(i) = addFrame(*animation, x, y, w, h, 0, 0)
+      x + w
+    Next
+  EndIf 
 EndProcedure
 
 Procedure loadGameData(path.s)
@@ -45,7 +55,7 @@ Procedure loadGameData(path.s)
   EndIf 
   readVersion()
 
-  Define type.b, tag.s, size.l, *buffer, byte.a, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f
+  Define type.b, tag.s, size.l, *buffer, byte.a, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f, type2.b
   Dim *frames.FrameModel(0)
   
   *buffer = 0
@@ -61,16 +71,26 @@ Procedure loadGameData(path.s)
       Case #FILETYPE_ANIMATION
         
         character.s = StringField(tag, 1, "/")
+        
         animationName.s = StringField(tag, 2, "/")
         LoadSprite_(*buffer, tag)
         
-        *animation = getAnimation(getCharacter(character), animationName)
-        If Not *animation
-          *animation = newAnimation(getCharacter(character), animationName, tag)
+        *animation = 0
+        If (Left(character, 1) = "_")
+          type2 = 1
+          character = Mid(character, 2)
+          Debug animationName
+          *animation = newStageAnimation(getStage(character), animationName, tag)
         Else
-          *animation\spriteSheet = loadedSprites(tag)
+          type2 = 0
+          *animation = getAnimation(getCharacter(character), animationName)
+          If Not *animation
+            *animation = newAnimation(getCharacter(character), animationName, tag)
+          Else
+            *animation\spriteSheet = loadedSprites(tag)
+          EndIf 
         EndIf 
-        
+          
         w = SpriteWidth(loadedSprites(tag))
         h = SpriteHeight(loadedSprites(tag))
         
@@ -84,7 +104,7 @@ Procedure loadGameData(path.s)
         ;- reading descriptor
         
         byte = ReadByte(0)
-        makeFrames(*animation, w, h, byte, *frames())
+        makeFrames(*animation, w, h, byte, *frames(), type2)
         
         Repeat 
           byte = ReadByte(0)
@@ -126,6 +146,9 @@ Procedure loadGameData(path.s)
               addHurtbox(*frames(selectedElement), x, y, w, h)
           EndSelect
         ForEver
+        If *animation\baseSpeed = 0
+          *animation\baseSpeed = 1
+        EndIf 
       Case #FILETYPE_LEFTANIM
         character.s = StringField(tag, 1, "/")
         animationName.s = StringField(tag, 2, "/")
@@ -149,7 +172,6 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 102
-; FirstLine = 81
+; CursorPosition = 46
 ; Folding = -
 ; EnableXP

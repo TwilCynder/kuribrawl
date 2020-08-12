@@ -34,26 +34,46 @@ Structure Fighter
   grounded.b
   facing.b ;1 = right | -1 = left
   state.b
-  stateInfo.b ;attack, direction
+  stateInfo.l ;attack, direction
   stateTimer.u
   stateUpdated.b ;wheter state has been changed since last animation change
   jumps.b
+  paused.b
   List fightersHit.fighterHitIdPair()
+EndStructure
+
+Structure Platform
+  *animation.Animation
+  *model.PlatformModel
+EndStructure
+
+Structure Stage
+  List platforms.Platform()
 EndStructure
 
 Structure Game
   List fighters.Fighter()
+  *currentStage.Stage
   window.l
 EndStructure
+
+Procedure initAnimation(*anim.Animation, *model.AnimationModel)
+  *anim\endCallback = *model\endCallback
+  *anim\model = *model
+    
+  ForEach *model\frames()
+    AddElement(*anim\frames())
+    *anim\frames()\model = @*model\frames()
+  Next 
+EndProcedure
 
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
   *game\window = window
   ProcedureReturn *game
 EndProcedure
-
-Procedure resetAnimation(*animation.Animation)
-  
+ 
+Procedure resetAnimation(*animation.Animation)  
   ResetList(*animation\frames())
   NextElement(*animation\frames())
   If *animation\frameMultiplier > 1
@@ -95,6 +115,24 @@ Procedure setAnimationSpeed(*anim.Animation, speed.d = 0)
   *anim\carry = ratio - Int(ratio)
 EndProcedure
 
+Procedure setStage(*game.Game, *model.StageModel)
+  Define *model.StageModel
+  If Not *model
+    ProcedureReturn 0
+  EndIf 
+  *game\currentStage = AllocateStructure(Stage)
+  ;set the stage model if it's useful one day
+  ForEach *model\platforms()
+    AddElement(*game\currentStage\platforms())
+    *game\currentStage\platforms()\model = *model\platforms()
+    If *model\platforms()\animationName
+      *game\currentStage\platforms()\animation = AllocateStructure(Animation)
+      initAnimation(*game\currentStage\platforms()\animation, getStageAnimation(*model, *model\platforms()\animationName))
+      setAnimationSpeed(*game\currentStage\platforms()\animation)
+    EndIf 
+  Next 
+EndProcedure 
+
 Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
   Define *anim.Animation
   If *fighter\currentAnimationName = name
@@ -129,13 +167,7 @@ Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   ForEach *character\animations()
     *model = @*character\animations()
     *anim = AddMapElement(*r\animations(), MapKey(*character\animations()))
-    *anim\endCallback = *model\endCallback
-    *anim\model = *model
-    
-    ForEach *model\frames()
-      AddElement(*anim\frames())
-      *anim\frames()\model = @*model\frames()
-    Next 
+    initAnimation(*anim, *model)
     setAnimation(*r, MapKey(*character\animations()))
   Next 
   *r\state = #STATE_IDLE
@@ -159,7 +191,7 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing)
       dx = x - \origin\x
     Else
       dx = x + \origin\x - \display\w
-    EndIf 
+    EndIf
     ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
     DisplayTransparentSprite(spriteSheet, dx, y - \origin\y)
     CompilerIf #DEBUG
@@ -187,15 +219,25 @@ Procedure renderFighter(*fighter.Fighter)
   drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, *fighter\facing)
 EndProcedure
 
+Procedure renderPlatform(*platform.Platform)
+  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x, #SCREEN_H - *platform\model\y, 1)
+EndProcedure
+
 Procedure renderFrame(*game.Game)
   ClearScreen(bgc)
   ForEach *game\fighters()
     renderFighter(@*game\fighters())
   Next
+  ForEach *game\currentStage\platforms()
+    renderPlatform(@*game\currentStage\platforms())
+  Next
   FlipBuffers()
 EndProcedure
 
 Procedure nextFrame(*animation.Animation, *fighter.Fighter)
+  If *fighter\paused > 0
+    ProcedureReturn 0
+  EndIf 
   If NextElement(*animation\frames()) = 0
     If *animation\endCallback
       ProcedureReturn *animation\endCallback(*fighter, 0)
@@ -343,16 +385,16 @@ Procedure.d getKnockback(damage.d)
   ProcedureReturn damage / 2
 EndProcedure
 
-Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
-  Define angle.d, knockback.d
-  ForEach *attacking\fightersHit()
-    If *attacking\fightersHit()\fighter = *defending And *attacking\fightersHit()\hitID = *hitbox\hit
-      ProcedureReturn 0
-    EndIf 
-  Next
-  AddElement(*attacking\fightersHit())
-  *attacking\fightersHit()\hitID = *hitbox\hit
-  *attacking\fightersHit()\fighter = *defending
+Procedure getHitlag(damage.d)
+  ProcedureReturn (damage * 0.65) + 6
+EndProcedure
+
+Procedure getHitstun(knockback.b)
+  ProcedureReturn knockback * 5
+EndProcedure 
+
+Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
+  Define hitlag.b, type.b, hitstun.l
   If *attacking\facing = 1
     angle = *hitbox\angle
   Else
@@ -362,6 +404,43 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
   knockback = getKnockback(*hitbox\damage)
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
+  If *defending\physics\v\y < 2 And *defending\grounded
+    *defending\physics\v\y = 0
+  EndIf
+  hitlag = getHitlag(*hitbox\damage)
+  *defending\paused = hitlag
+  *attacking\paused = hitlag
+  If knockback > 100
+    type = #KB_TUMBLE
+  EndIf 
+  hitstun = getHitstun(knockback)
+  Debug hitstun
+  setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
+EndProcedure
+
+Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
+  Define angle.d, knockback.d
+  
+  ForEach *attacking\fightersHit()
+    If *attacking\fightersHit()\fighter = *defending And *attacking\fightersHit()\hitID = *hitbox\hit
+      ProcedureReturn 0
+    EndIf 
+  Next
+  
+  Select *defending\state
+    Case #STATE_GUARD  
+      ;shieldstun
+      AddElement(*attacking\fightersHit())
+      *attacking\fightersHit()\hitID = *hitbox\hit
+      *attacking\fightersHit()\fighter = *defending
+    Case #STATE_CUSTOM
+      ;custom state handling
+    Default
+      AddElement(*attacking\fightersHit())  
+      *attacking\fightersHit()\hitID = *hitbox\hit
+      *attacking\fightersHit()\fighter = *defending
+      startKnockback(*hitbox, *hurtbox, *attacking, *defending)
+    EndSelect
 EndProcedure
 
 Procedure manageHitboxes(*game.Game)
@@ -392,9 +471,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 161
-; FirstLine = 145
-; Folding = -----
+; CursorPosition = 193
+; FirstLine = 167
+; Folding = ------
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode
