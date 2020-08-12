@@ -7,15 +7,11 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-07-25 01:29" user="twilc" host="TWIL-DESKTOP"/>
+    <lastopen date="2020-07-26 09:13" user="twilc" host="TWIL-DESKTOP"/>
   </section>
   <section name="files">
-    <file name="src\animations.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="cbd022d9093fafa1822ba6e8628f9a54"/>
-    </file>
     <file name="src\debug.pb">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5="167df50a2a3f0491238f99cb501fe744"/>
     </file>
     <file name="src\debugData.pbi">
@@ -27,16 +23,16 @@
       <fingerprint md5="2e3cc4467baf80a22f97daa1fdfa827d"/>
     </file>
     <file name="src\gameData.pb">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5="f55b31deca9628a3c5414d8165bc550b"/>
     </file>
     <file name="src\gameDataLib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="50974f17728a28d080b3017c43b9699a"/>
+      <fingerprint md5="f4408f4c72f78fefa5715b563dd66193"/>
     </file>
     <file name="src\gamelib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="1d5f034910ad44a30b117e3352c93e56"/>
+      <fingerprint md5="dd7f1ea1f4599d66b18af29d5141b556"/>
     </file>
     <file name="src\gamelibConstants.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -56,11 +52,11 @@
     </file>
     <file name="src\loadLib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="ac689c26af34570d5e046a9c80926be9"/>
+      <fingerprint md5="4e3af914d8e1ac553069f7141b0ad057"/>
     </file>
     <file name="src\main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="2d6a0de624abd22ea00f08de9761d3ed"/>
+      <fingerprint md5="b90d0e73108a2eb0077a6cf15f8641c4"/>
     </file>
     <file name="src\physicslib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>

@@ -498,7 +498,6 @@ Procedure rebuildDataFile()
       ProcedureReturn 0
     EndIf 
   EndIf
-  Debug IsProgram(program)
   
   OpenWindow(1, 0, 0, 300, 100, "Kuribrawl Frame Tool", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
   TextGadget(#PB_Any, 50, 5, 200, 60, "Waiting for DFM to finish execution (closing this window will cancel the data file rebuilding)", #PB_Text_Center)
@@ -746,7 +745,7 @@ Repeat
 ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 252
-; FirstLine = 230
+; CursorPosition = 499
+; FirstLine = 497
 ; Folding = ------
 ; EnableXP
