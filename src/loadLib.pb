@@ -55,7 +55,7 @@ Procedure loadGameData(path.s)
   EndIf 
   readVersion()
 
-  Define type.b, tag.s, size.l, *buffer, byte.a, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f, type2.b
+  Define type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f, type2.b
   Dim *frames.FrameModel(0)
   
   *buffer = 0
@@ -79,7 +79,6 @@ Procedure loadGameData(path.s)
         If (Left(character, 1) = "_")
           type2 = 1
           character = Mid(character, 2)
-          Debug animationName
           *animation = newStageAnimation(getStage(character), animationName, tag)
         Else
           type2 = 0
@@ -104,7 +103,10 @@ Procedure loadGameData(path.s)
         ;- reading descriptor
         
         byte = ReadByte(0)
-        makeFrames(*animation, w, h, byte, *frames(), type2)
+        
+        If byte > 0
+          makeFrames(*animation, w, h, byte, *frames(), type2)
+        EndIf 
         
         Repeat 
           byte = ReadByte(0)
@@ -172,6 +174,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 46
+; CursorPosition = 108
+; FirstLine = 77
 ; Folding = -
 ; EnableXP

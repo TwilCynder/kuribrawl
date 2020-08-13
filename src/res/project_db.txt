@@ -46,5 +46,17 @@ uair_strip8.png
 A:Acid/uair uair.dat
 uair_strip8L.png
 AL:Acid/uair
+hurt.png
+A:Acid/hurt hurt.dat
+hurtL.png
+AL:Acid/hurt
+bighurt.png
+A:Acid/hurtheavy hurtheavy.dat
+bighurtL.png
+AL:Acid/hurtheavy
+hurtground.png
+A:Acid/hurtground hurtground.dat
+hurtgroundL.png
+AL:Acid/hurtground
 platform.png
 A:_FD/platform 1

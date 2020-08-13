@@ -404,6 +404,17 @@ Procedure onLoad()
   ForEach kuribrawl\characters()
     
     ForEach kuribrawl\characters()\animations()
+      If ListSize(kuribrawl\characters()\animations()\frames()) = 0
+        res.s = InputRequester("Kuribrawl Frame Tool", "Animation " + MapKey(kuribrawl\characters()\animations()) + " of character " + MapKey(kuribrawl\characters()) + Chr(10) + " doesn't have any info. Please enter a frame number.", "0")
+        nb.b = Val(res)
+        If nb < 0 
+          nb = 1
+        EndIf 
+        Dim *frames.FrameModel(0)
+        *anim.AnimationModel = kuribrawl\characters()\animations()
+        makeFrames(*anim, SpriteWidth(*anim\spritesheet), SpriteHeight(*anim\spritesheet), nb, *frames(), 0)
+      EndIf 
+      
       CopyList(kuribrawl\characters()\animations()\frames(), characters(MapKey(kuribrawl\characters()))\animations(MapKey(kuribrawl\characters()\animations()))\frames())
       characters()\animations()\spriteSheet = kuribrawl\characters()\animations()\spriteSheet.l
       characters()\animations()\spriteSheetL = kuribrawl\characters()\animations()\spriteSheetL.l
@@ -745,7 +756,7 @@ Repeat
 ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 499
-; FirstLine = 497
+; CursorPosition = 416
+; FirstLine = 392
 ; Folding = ------
 ; EnableXP

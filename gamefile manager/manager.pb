@@ -79,7 +79,10 @@ Procedure writeFileDescriptor(type.b, infos.s)
       If Right(infos, 4) = ".dat"
 
         PrintN("- descriptor file : " + infos)
-        ReadFile(2, infos)
+        If Not ReadFile(2, infos)
+          WriteByte(1, -1)
+          ProcedureReturn 1
+        EndIf 
         line = ReadString(2)
         WriteByte(1, Val(line))
         PrintN("- - frame number : " + line)
@@ -260,7 +263,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 33
+; CursorPosition = 81
+; FirstLine = 51
 ; Folding = --
 ; EnableXP
 ; Executable = ..\src\res\datafileMaker.exe

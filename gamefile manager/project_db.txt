@@ -3,4 +3,4 @@ A:Acid/Jumpsquat 1
 jumpstartL.png
 A:Acid/JumpsquatL 2
 nair_strip6.png
-A:Acid/nair nair_acid.dat
+A:Acid/nair nair_hhhacid.dat

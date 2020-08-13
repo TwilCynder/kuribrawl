@@ -35,8 +35,6 @@ CompilerElse
 CompilerEndIf
 initDefaultAnimationsConfig(*c1)
 
-
-
 ;- Test game (game, fighters, ports)
 *game.Game = initGame(window)
 
@@ -50,7 +48,7 @@ For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 0)
+setPort(0, 2)
 setPortFighter(0, *f1)
 setPort(1, 1)
 setPortFighter(1, *f2)
@@ -96,8 +94,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 55
-; FirstLine = 20
+; CursorPosition = 50
+; FirstLine = 12
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

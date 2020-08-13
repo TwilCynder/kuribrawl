@@ -60,5 +60,5 @@ addPlatform(*s1, 100, 200, 500, "platform")
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 25
+; CursorPosition = 8
 ; EnableXP

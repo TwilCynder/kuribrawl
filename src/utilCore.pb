@@ -7,7 +7,7 @@
 EndEnumeration
 
 Macro getField(pointer, Structure, field, type)
-  peek#type(pointer + OffsetOf(Structure\field))
+  Peek#type(pointer + OffsetOf(Structure\field))
 EndMacro
   
 Macro setField(pointer, Structure, field, type, value)
@@ -91,6 +91,6 @@ Procedure QIterate(*q.Queue, callback.QCallback)
 EndProcedure
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 13
+; CursorPosition = 9
 ; Folding = --
 ; EnableXP

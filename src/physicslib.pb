@@ -48,6 +48,12 @@ Procedure substractValue(*v1.Double, v2.d)
   ProcedureReturn v1
 EndProcedure
 
+Procedure groundToAir(*fighter.Fighter)
+  If Not *fighter\state = #STATE_HITSTUN
+    setState(*fighter, #STATE_IDLE)
+  EndIf 
+EndProcedure
+
 Procedure applyPhysics(*game.Game)
   Define nx.l, ny.l, *fighter.Fighter
 
@@ -109,6 +115,9 @@ Procedure applyPhysics(*game.Game)
       *fighter\grounded = 1
       *fighter\physics\v\y = 0
     Else 
+      If *fighter\grounded = 1
+        groundToAir(*fighter)
+      EndIf 
       *fighter\grounded = 0
     EndIf 
     
@@ -119,6 +128,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 5
-; Folding = -
+; CursorPosition = 53
+; FirstLine = 16
+; Folding = --
 ; EnableXP

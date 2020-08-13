@@ -13,6 +13,7 @@ Structure Animation
   frameMultiplier.b
   carry.f ;for animations with speed
   currentCarry.f
+  facing.b
   endCallback.f_callback
 EndStructure  
 
@@ -36,7 +37,7 @@ Structure Fighter
   state.b
   stateInfo.l ;attack, direction
   stateTimer.u
-  stateUpdated.b ;wheter state has been changed since last animation change
+  updateAnim.b ;wheter state has been changed since last animation change
   jumps.b
   paused.b
   List fightersHit.fighterHitIdPair()
@@ -127,13 +128,14 @@ Procedure setStage(*game.Game, *model.StageModel)
     *game\currentStage\platforms()\model = *model\platforms()
     If *model\platforms()\animationName
       *game\currentStage\platforms()\animation = AllocateStructure(Animation)
+      Debug MapSize(*model\animations())
       initAnimation(*game\currentStage\platforms()\animation, getStageAnimation(*model, *model\platforms()\animationName))
       setAnimationSpeed(*game\currentStage\platforms()\animation)
     EndIf 
   Next 
 EndProcedure 
 
-Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
+Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0)
   Define *anim.Animation
   If *fighter\currentAnimationName = name
     ProcedureReturn 0
@@ -147,7 +149,9 @@ Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0)
   EndIf 
   *fighter\currentAnimation = *anim
   *fighter\currentAnimationName = name
-
+  
+  *fighter\currentAnimation\facing = facing
+  
   setAnimationSpeed(*anim, speed)
   resetAnimation(*anim)
 EndProcedure
@@ -210,13 +214,18 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing)
 EndProcedure
 
 Procedure renderFighter(*fighter.Fighter)
-  Define spriteSheet.l
-  If *fighter\facing = -1 And *fighter\currentAnimation\model\spriteSheetL
+  Define spriteSheet.l, facing.b
+  If *fighter\currentAnimation\facing = 0
+    facing = *fighter\facing
+  Else
+    facing = *fighter\currentAnimation\facing
+  EndIf 
+  If facing = -1 And *fighter\currentAnimation\model\spriteSheetL
     spriteSheet = *fighter\currentAnimation\model\spriteSheetL
   Else
     spriteSheet = *fighter\currentAnimation\model\spriteSheet
   EndIf 
-  drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, *fighter\facing)
+  drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, facing)
 EndProcedure
 
 Procedure renderPlatform(*platform.Platform)
@@ -287,7 +296,7 @@ Procedure setState(*fighter.Fighter, state.b, info.l = 0)
     logState(state, *fighter\facing, *fighter\stateTimer)
   CompilerEndIf
   *fighter\stateTimer = 0
-  *fighter\stateUpdated = 1
+  *fighter\updateAnim = 1
   
 EndProcedure
 
@@ -326,7 +335,7 @@ Procedure updateAnimations(*game.Game)
   Define animation.s, *fighter.Fighter
   ForEach *game\fighters()
     *fighter = @*game\fighters()
-    If *fighter\stateUpdated
+    If *fighter\updateAnim
       ;case by case
       Select *fighter\state
         Case #STATE_IDLE
@@ -352,12 +361,12 @@ Procedure updateAnimations(*game.Game)
         setAnimationSpeed(*fighter\currentAnimation, *fighter\stateInfo)
       EndIf
     EndIf
-    *fighter\stateUpdated = 0
+    *fighter\updateAnim = 0
   Next 
 EndProcedure
 
 Procedure defaultJumpAnimCallback(*fighter.Fighter, *data)
-  setAnimation(*fighter, "airIdle")
+  *fighter\updateAnim = 1
 EndProcedure
 
 Procedure defaultAttackAnimCallback(*fighter.Fighter, *data)
@@ -393,8 +402,13 @@ Procedure getHitstun(knockback.b)
   ProcedureReturn knockback * 5
 EndProcedure 
 
+;fonctionnement de la hitstun/tumble
+; - à la fin de la durée de la hitstun, les persos passent soient en IDLE, soient en TUMBLE
+; - ses changement de state sont indépendants de l'animation (un perso peut rester en anim de hitstun même s'il est en IDLE indéfiniment, jusqu'à changer son anim lui-même)
+; - un perso en heavy hitsutn passe en anim de tumble quand la hitstun est finie ET qu'il descend
+
 Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
-  Define hitlag.b, type.b, hitstun.l
+  Define hitlag.b, type.b, hitstun.l, anim.s, facing.b
   If *attacking\facing = 1
     angle = *hitbox\angle
   Else
@@ -404,17 +418,24 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   knockback = getKnockback(*hitbox\damage)
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
+  If knockback > 100
+    type = #KB_TUMBLE
+    anim = "hurtheavy"
+  Else
+    anim = "hurt"
+  EndIf 
   If *defending\physics\v\y < 2 And *defending\grounded
     *defending\physics\v\y = 0
+    anim = "hurtground"
   EndIf
+  facing = -Sign(*defending\physics\v\x)
+  
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
   *attacking\paused = hitlag
-  If knockback > 100
-    type = #KB_TUMBLE
-  EndIf 
   hitstun = getHitstun(knockback)
   Debug hitstun
+  setAnimation(*defending, anim, 0, facing)
   setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
 EndProcedure
 
@@ -471,8 +492,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 193
-; FirstLine = 167
+; CursorPosition = 407
+; FirstLine = 389
 ; Folding = ------
 ; EnableXP
 ; SubSystem = OpenGL
