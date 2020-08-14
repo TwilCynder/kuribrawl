@@ -9,7 +9,7 @@ stateDefaultAnimation(#STATE_LANDING) = "land"
 stateDefaultAnimation(#STATE_LANDING_LAG) = "land"
 
 commandDefaultAnimation(#COMMAND_NAir) = "nair"
-commandDefaultAnimation(#COMMAND_FAir) = "nair"
+commandDefaultAnimation(#COMMAND_FAir) = "fair"
 commandDefaultAnimation(#COMMAND_UAir) = "uair"
 commandDefaultAnimation(#COMMAND_BAir) = "nair"
 commandDefaultAnimation(#COMMAND_DAir) = "nair"
@@ -21,9 +21,10 @@ kuribrawl\variables\backwardJumpBoost = 3.0
 kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 
 ;- ========STAGE SPECIFIC================
-*s1.StageModel = newStage("FD")
-addPlatform(*s1, -200, 400, 500, "platform")
-addPlatform(*s1, 100, 200, 500, "platform")
+*s1.StageModel = newStage("Snowdin")
+;addPlatform(*s1, -200, 400, 500, "platform")
+;addPlatform(*s1, 100, 200, 500, "platform")
+addPlatform(*s1, 50, 200, 800, "platform")
 
 ;- ========CHARACTER SPECIFIC============
 
@@ -60,5 +61,5 @@ addPlatform(*s1, 100, 200, 500, "platform")
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 8
+; CursorPosition = 26
 ; EnableXP

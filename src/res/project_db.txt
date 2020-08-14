@@ -58,5 +58,19 @@ hurtground.png
 A:Acid/hurtground hurtground.dat
 hurtgroundL.png
 AL:Acid/hurtground
-platform.png
-A:_FD/platform 1
+fair_strip10.png
+A:Acid/fair fair.dat
+uphurt.png
+A:Acid/hurtup hurtup.dat
+spinhurt_strip4.png
+A:Acid/tumble tumble.dat
+spinhurt_strip4L.png
+AL:Acid/tumble
+downhurt.png
+A:Acid/hurtdown hurtdown.dat
+downhurtL.png
+AL:Acid/hurtdown
+stage_plat_main.png
+A:_Snowdin/platform platform.dat
+stage_bg.png
+A:_Snowdin/background 1

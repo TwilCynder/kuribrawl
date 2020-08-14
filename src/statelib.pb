@@ -77,9 +77,10 @@ Procedure manageStates(*game.Game)
           Debug max
           If *fighter\stateTimer >= max
             If *fighter\stateInfo & 1
-              setState(*fighter, #STATE_TUMBLE)
+              setState(*fighter, #STATE_TUMBLE, 0, 0)
             Else
-              setState(*fighter, #STATE_IDLE)
+              Debug "oui"
+              setState(*fighter, #STATE_IDLE, 0, 0)
             EndIf 
           EndIf 
       EndSelect
@@ -88,7 +89,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 81
-; FirstLine = 37
+; CursorPosition = 79
+; FirstLine = 33
 ; Folding = -
 ; EnableXP

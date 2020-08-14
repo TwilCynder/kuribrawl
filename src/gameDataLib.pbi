@@ -40,6 +40,7 @@ EndStructure
 Prototype.i f_callback(*fighter, *data)
 
 Structure AnimationModel
+  noCollisions.b ;indicates that this animation doesn't not interact with fighters (no hit/hurtboxes)
   List frames.FrameModel()
   spriteSheet.l ;handle de l'image servant de spritesheet
   spriteSheetL.l;image pour les sprite retournés
@@ -89,6 +90,7 @@ EndStructure
 Structure StageModel
   List platforms.platformModel()
   Map animations.AnimationModel()
+  *backgroundAnim.AnimationModel
 EndStructure
 
 Structure ArtifactModel
@@ -231,7 +233,6 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 112
-; FirstLine = 73
+; CursorPosition = 37
 ; Folding = ---
 ; EnableXP

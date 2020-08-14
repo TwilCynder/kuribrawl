@@ -1,6 +1,6 @@
-﻿#DEBUG = 1
+﻿;TODO : régler finalement la question du : substructure directement en field ou pointer vers heap
 
-;améliorer l'interaction entre durée de state et vitesse d'animation
+#DEBUG = 1
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
@@ -15,13 +15,44 @@ CompilerIf #DEBUG
   XIncludeFile "debug.pb"
 CompilerEndIf
 
+Define *game.Game, window.l
+
+Procedure startTestGame()
+  Shared *game, window
+  
+  If *game
+    Debug *game
+    endGame(*game)
+  EndIf 
+  
+  *game = initGame(window)
+
+  *f1.Fighter = newFighter(*game, getCharacter("Acid"), 150, 500)
+  *f1\name = "Test One"
+  *f2.Fighter = newFighter(*game, getCharacter("Acid"), 500, 500)
+  *f2\name = "Test Two"
+  setStage(*game, getStage("Snowdin"))
+  
+  DisplayTransparentSprite(*game\currentStage\backgroundAnim\model\spriteSheet, 0, 0)
+  FlipBuffers()
+  
+  
+  setPort(0, 3)
+  setPortFighter(0, *f1)
+  setPort(1, 0)
+  setPortFighter(1, *f2)
+EndProcedure  
+
 ;- Game window
-window.l = OpenWindow(-1, 0, 0, #SCREEN_W + 170, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
+window = OpenWindow(-1, 0, 0, #SCREEN_W + 170, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
 OpenWindowedScreen(WindowID(window), 0, 0, #SCREEN_W, #SCREEN_H, 0, 0, 0, #PB_Screen_NoSynchronization)
 SetWindowColor(window, $aaaaaa)
 CompilerIf #DEBUG
   InputLogGadget(#SCREEN_W + 5, 5, 160, #SCREEN_H - 120)
   StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
+  CreateMenu(0, WindowID(window))
+  AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
+  BindMenuEvent(0, 0, @startTestGame())
 CompilerEndIf 
 
 ;- Game data
@@ -34,29 +65,17 @@ CompilerElse
   loadGameData("data.twl")
 CompilerEndIf
 initDefaultAnimationsConfig(*c1)
-
-;- Test game (game, fighters, ports)
-*game.Game = initGame(window)
-
-*f1.Fighter = newFighter(*game, getCharacter("Acid"), 150, 500)
-*f1\name = "Test One"
-*f2.Fighter = newFighter(*game, getCharacter("Acid"), 500, 500)
-*f2\name = "Test Two"
-setStage(*game, getStage("FD"))
-
+  
 For i = 1 To availableJosticks
   Debug Str(i - 1) + JoystickName(i - 1)
 Next
 
-setPort(0, 2)
-setPortFighter(0, *f1)
-setPort(1, 1)
-setPortFighter(1, *f2)
+startTestGame()
 
 ;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 30
+frameDuration.f = 1000.0 / 15
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -81,9 +100,12 @@ Repeat
      nextFrame = currentTime
      Debug "/!\Can't keep up !"
    Else 
-     If frameWait < 10
-       ;Debug "/!\Frame process lasted more than 2.6ms !"
-     EndIf 
+     CompilerIf Not #DEBUG
+       If frameWait < 10
+         bgc = #Red 
+         Debug "/!\Frame process lasted more than 2.6ms !"
+       EndIf 
+     CompilerEndIf
      Delay(frameWait)
    EndIf 
   frame + 1
@@ -94,8 +116,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 50
-; FirstLine = 12
+; CursorPosition = 77
+; FirstLine = 37
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

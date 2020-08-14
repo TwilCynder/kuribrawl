@@ -258,7 +258,7 @@ EndProcedure
 
 ;- STATE ACTIONS
 Procedure state_can_jump(state.b)
-  If state = #STATE_LANDING Or state = #STATE_LANDING_LAG
+  If state = #STATE_LANDING Or state = #STATE_LANDING_LAG Or state = #STATE_HITSTUN Or state = #STATE_TUMBLE
     ProcedureReturn 0
   EndIf 
   ProcedureReturn 1
@@ -267,6 +267,9 @@ EndProcedure
 ;- INPUT MANAGERS
 
 Procedure inputManager_Attack(*port.Port, *info.inputData)
+  If *port\figher\state = #STATE_HITSTUN
+    ProcedureReturn 0
+  EndIf 
   Define direction.b
   Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
@@ -377,10 +380,10 @@ Procedure inputManager_jump(*port.Port, *info.inputData)
     ProcedureReturn 1
   EndIf 
   
+  If Not state_can_jump(*port\figher\state)
+    ProcedureReturn 0
+  EndIf 
   If *port\figher\grounded
-    If Not state_can_jump(*port\figher\state)
-      ProcedureReturn 0
-    EndIf 
     If *port\figher\state = #STATE_WALK Or *port\figher\state = #STATE_DASH
       jumpType = #JUMP_WALKING
     Else 
@@ -413,7 +416,7 @@ EndProcedure
 Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
   Shared defaultControler
   Select *port\figher\state
-    Case #STATE_IDLE
+    Case #STATE_IDLE, #STATE_TUMBLE
       If Abs(*port\currentControlStickState\x) > stickTreshold
         If *port\figher\grounded
           *port\figher\facing = Sign(*port\currentControlStickState\x)
@@ -482,7 +485,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 453
-; FirstLine = 432
+; CursorPosition = 418
+; FirstLine = 415
 ; Folding = -----
 ; EnableXP

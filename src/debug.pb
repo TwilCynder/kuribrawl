@@ -25,6 +25,7 @@ Procedure StatesGadgets(x.l, y.l, w.l)
 EndProcedure
 
 Procedure logState(state.b, facing.b = 0, previousTime.b = 0)
+  Shared ports()
   Shared stateGadget, previousStateGadget, previousStateTimeGadget, StateNames()
   SetGadgetText(previousStateGadget, GetGadgetText(stateGadget))
   SetGadgetText(previousStateTimeGadget, Str(previousTime))

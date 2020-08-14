@@ -49,6 +49,8 @@ Structure Platform
 EndStructure
 
 Structure Stage
+  *model.StageModel
+  *backgroundAnim.Animation
   List platforms.Platform()
 EndStructure
 
@@ -122,18 +124,25 @@ Procedure setStage(*game.Game, *model.StageModel)
     ProcedureReturn 0
   EndIf 
   *game\currentStage = AllocateStructure(Stage)
-  ;set the stage model if it's useful one day
+  *game\currentStage\model = *model
+  If *game\currentStage\model\backgroundAnim
+    *game\currentStage\backgroundAnim = AllocateStructure(Animation)
+    initAnimation(*game\currentStage\backgroundAnim, *game\currentStage\model\backgroundAnim)
+  EndIf 
   ForEach *model\platforms()
     AddElement(*game\currentStage\platforms())
     *game\currentStage\platforms()\model = *model\platforms()
     If *model\platforms()\animationName
       *game\currentStage\platforms()\animation = AllocateStructure(Animation)
-      Debug MapSize(*model\animations())
       initAnimation(*game\currentStage\platforms()\animation, getStageAnimation(*model, *model\platforms()\animationName))
       setAnimationSpeed(*game\currentStage\platforms()\animation)
     EndIf 
   Next 
 EndProcedure 
+
+Procedure freeStage(*stage.Stage)
+  FreeList(*stage\platforms())
+EndProcedure
 
 Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0)
   Define *anim.Animation
@@ -232,17 +241,29 @@ Procedure renderPlatform(*platform.Platform)
   drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x, #SCREEN_H - *platform\model\y, 1)
 EndProcedure
 
+Procedure renderStage(*stage.Stage)
+  If *stage\backgroundAnim
+    DisplayTransparentSprite(*stage\backgroundAnim\model\spriteSheet, 0, 0)
+  EndIf 
+EndProcedure
+
 Procedure renderFrame(*game.Game)
   ClearScreen(bgc)
-  ForEach *game\fighters()
-    renderFighter(@*game\fighters())
-  Next
+  
+  If *game\currentStage
+    renderStage(*game\currentStage)
+  EndIf 
   ForEach *game\currentStage\platforms()
     renderPlatform(@*game\currentStage\platforms())
   Next
+  ForEach *game\fighters()
+    renderFighter(@*game\fighters())
+  Next
   FlipBuffers()
+  bgc = #White
 EndProcedure
 
+;avancer les anims des stages (bg/plat)
 Procedure nextFrame(*animation.Animation, *fighter.Fighter)
   If *fighter\paused > 0
     ProcedureReturn 0
@@ -261,6 +282,7 @@ Procedure nextFrame(*animation.Animation, *fighter.Fighter)
       *animation\frames()\timeLeft - 1
     EndIf 
   EndIf
+  
 EndProcedure
 
 Procedure advanceAnimations(*game.Game)
@@ -289,15 +311,14 @@ EndProcedure
 CompilerIf #DEBUG
   Declare logState(state.b, facing.b = 0, previousTime.b = 0)
 CompilerEndIf
-Procedure setState(*fighter.Fighter, state.b, info.l = 0)
+Procedure setState(*fighter.Fighter, state.b, info.l = 0, updateAnim.b = 1)
   *fighter\state = state
   *fighter\stateInfo = info
   CompilerIf #DEBUG
     logState(state, *fighter\facing, *fighter\stateTimer)
   CompilerEndIf
   *fighter\stateTimer = 0
-  *fighter\updateAnim = 1
-  
+  *fighter\updateAnim = updateAnim
 EndProcedure
 
 Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
@@ -335,6 +356,11 @@ Procedure updateAnimations(*game.Game)
   Define animation.s, *fighter.Fighter
   ForEach *game\fighters()
     *fighter = @*game\fighters()
+    
+    If *fighter\state = #STATE_TUMBLE And *fighter\physics\v\y < 0
+      setAnimation(*fighter, "tumble")
+    EndIf 
+    
     If *fighter\updateAnim
       ;case by case
       Select *fighter\state
@@ -391,7 +417,7 @@ Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
 EndProcedure 
 
 Procedure.d getKnockback(damage.d)
-  ProcedureReturn damage / 2
+  ProcedureReturn damage
 EndProcedure
 
 Procedure getHitlag(damage.d)
@@ -399,7 +425,7 @@ Procedure getHitlag(damage.d)
 EndProcedure
 
 Procedure getHitstun(knockback.b)
-  ProcedureReturn knockback * 5
+  ProcedureReturn knockback * 2
 EndProcedure 
 
 ;fonctionnement de la hitstun/tumble
@@ -408,19 +434,28 @@ EndProcedure
 ; - un perso en heavy hitsutn passe en anim de tumble quand la hitstun est finie ET qu'il descend
 
 Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
-  Define hitlag.b, type.b, hitstun.l, anim.s, facing.b
+  Define hitlag.b, type.b, hitstun.l, anim.s, facing.b, angle.d
   If *attacking\facing = 1
-    angle = *hitbox\angle
+    degAngle.l = *hitbox\angle
   Else
-    angle = 180 - *hitbox\angle
+    degAngle.l = 180 - *hitbox\angle
   EndIf
-  angle = Radian(angle)
+  angle = Radian(degAngle)
+    
   knockback = getKnockback(*hitbox\damage)
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
-  If knockback > 100
+  
+  facing = -Sign(*defending\physics\v\x)
+  
+  If knockback > 10
     type = #KB_TUMBLE
-    anim = "hurtheavy"
+    If degAngle > 45 And degAngle < 135 And *attacking\y < *defending\y
+      anim = "hurtup"
+      facing = 0
+    Else
+      anim = "hurtheavy"
+    EndIf   
   Else
     anim = "hurt"
   EndIf 
@@ -428,13 +463,12 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
     *defending\physics\v\y = 0
     anim = "hurtground"
   EndIf
-  facing = -Sign(*defending\physics\v\x)
+
   
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
   *attacking\paused = hitlag
   hitstun = getHitstun(knockback)
-  Debug hitstun
   setAnimation(*defending, anim, 0, facing)
   setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
 EndProcedure
@@ -466,7 +500,6 @@ EndProcedure
 
 Procedure manageHitboxes(*game.Game)
   Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox
-  bgc = #White
   ForEach *game\fighters()
     *attacking = @*game\fighters()
     ForEach  *game\fighters()
@@ -490,11 +523,16 @@ Procedure manageHitboxes(*game.Game)
   Next  
 EndProcedure
 
+Procedure endGame(*game.Game)
+  freeStage(*game\currentStage)
+  FreeStructure(*game)
+EndProcedure
+
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 407
-; FirstLine = 389
-; Folding = ------
+; CursorPosition = 454
+; FirstLine = 431
+; Folding = ---X---
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

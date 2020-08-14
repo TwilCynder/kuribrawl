@@ -26,6 +26,7 @@ Enumeration
   #MENUITEM_PASTECBOX
   #MENUITEM_CUTCBOX
   #MENUITEM_CBOXINFO
+  #MENUITEM_ANIMINFO
   #MENUITEMS
 EndEnumeration
 
@@ -36,6 +37,8 @@ XIncludeFile "../src/utilCore.pb"
 XIncludeFile "../src/filelib.pb"
 XIncludeFile "../src/gameDatalib.pbi"
 XIncludeFile "../src/loadlib.pb"
+
+XIncludeFile "AngleViewerGadget.pbi"
 
 Procedure defaultJumpAnimCallback(*fighter, *data)
 EndProcedure
@@ -98,6 +101,7 @@ Procedure onFrameChanged(*anim.AnimationModel)
   viewPosition\y = (#CANVAS_H / 2) - (*anim\frames()\display\h / 2) 
   SetGadgetText(12, Str(*anim\frames()\origin\x))
   SetGadgetText(13, Str(*anim\frames()\origin\y))
+  SetGadgetText(14, Str(*anim\frames()\duration))
   drawFrame(*anim, 1)
 EndProcedure  
 
@@ -370,6 +374,7 @@ Procedure makeMenu()
   
   MenuItem(#MENUITEM_SAVE, "Save")
   MenuItem(#MENUITEM_SETDESCRIPTOR, "Set descriptor file")
+  MenuItem(#MENUITEM_ANIMINFO, "Edit Anim Info")
   
   MenuTitle("Project")
   MenuItem(#MENUITEM_SAVEALL, "Save All")
@@ -485,6 +490,7 @@ Procedure pasteCBox()
     Case #CBOX_TYPE_HIT
       *cbox = newHitbox(x, y, w, h)
       setField(*cbox, Hitbox, damage, D, ValD(StringField(text, 6, " ")))
+      setField(*cbox, Hitbox, angle, W, Val(StringField(text, 7, " ")))
   EndSelect
 EndProcedure
 
@@ -533,7 +539,8 @@ Procedure editCBoxInfo()
     SpinGadget(21, 80, 5, 60, 20, 0, 999)
     SetGadgetText(21, StrD(getField(*selectedCollisionBox, Hitbox, damage, D)))
     TextGadget(#PB_Any, 5, 30, 140, 20, "Angle")
-    SpinGadget(22, 80, 30, 60, 20, -180, 180, #PB_Spin_Numeric)
+    ButtonGadget(23, 40, 30, 20, 20, "")
+    SpinGadget(22, 80, 30, 60, 20, 0, 360, #PB_Spin_Numeric)
     SetGadgetText(22, StrD(getField(*selectedCollisionBox, Hitbox, angle, W)))
   ElseIf selectedCollisionBoxType = #CBOX_TYPE_HURT
   EndIf 
@@ -542,15 +549,34 @@ Procedure editCBoxInfo()
   EnableWindow_(WindowID(0), 0)
 EndProcedure
 
+Procedure editAnimInfo()
+  Shared *selectedAnim
+  
+  If Not *selectedAnim
+    ProcedureReturn 0
+  EndIf
+  
+  OpenWindow(1, 0, 0, 150, 150, "Editing animation info", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
+  
+  TextGadget(#PB_Any, 5, 5, 140, 20, "Speed")
+  SpinGadget(24, 80, 5, 60, 20, 0, 999)
+  SetGadgetText(24, StrD(*selectedAnim\baseSpeed))
+  
+  ButtonGadget(25, 5, 125, 140, 20, "Save")
+  
+  EnableWindow_(WindowID(0), 0)
+  
+EndProcedure
+
 Procedure menuCallback()
   Shared *itemAnims(), firstAnimItem, *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType, popUpMenuPosition
   event.l = EventMenu()
   If event < firstAnimItem
     Select event
       Case #MENUITEM_ADDHITBOX
-        newHitbox(-20, -60, 40, 40)
+        newHitbox(-20, 60, 40, 40)
       Case #MENUITEM_ADDHURTBOX
-        newHurtbox(-20, -60, 40, 40)
+        newHurtbox(-20, 60, 40, 40)
       Case #MENUITEM_DELETEBOX
         deleteBox() 
       Case #MENUITEM_SAVE
@@ -584,11 +610,24 @@ Procedure menuCallback()
         rebuildDataFile()
       Case #MENUITEM_CBOXINFO
         editCBoxInfo()
+      Case #MENUITEM_ANIMINFO
+        editAnimInfo()
     EndSelect
   Else
     setAnimation(*itemAnims(event - firstAnimItem))
   EndIf 
 EndProcedure   
+
+Procedure angleViewerCallback(angle.d)
+  CloseWindow(2)
+  SetGadgetText(22, Str(Degree(angle)))
+EndProcedure
+
+Procedure promptAngle()
+  OpenWindow(2, 0, 0, 300, 300, "Select an angle", #PB_Window_SystemMenu | #PB_Window_WindowCentered, WindowID(1))
+  GMB_AngleViewer::AngleViewerGadget(-1, 5, 5, 290, Radian(Val(GetGadgetText(22))), @angleViewerCallback())
+  
+EndProcedure
 
 Procedure gadgetCallback()
   Shared *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType, diff.l
@@ -631,7 +670,6 @@ Procedure gadgetCallback()
     Case 9
       SetGadgetText(10, makeHitboxText(*selectedCollisionBox, selectedCollisionBoxType))
     Case 12
-
       If *selectedAnim And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
         diff = *selectedAnim\frames()\origin\x
         *selectedAnim\frames()\origin\x = Val(GetGadgetText(12))
@@ -661,6 +699,12 @@ Procedure gadgetCallback()
         EndIf 
         drawFrame(*selectedAnim, 1)
       EndIf
+    Case 14
+      If *selectedAnim And (event = #PB_EventType_Change Or event = #PB_EventType_Up Or event = #PB_EventType_Down)
+        If GetGadgetText(14)
+          *selectedAnim\frames()\duration = Val(GetGadgetText(14))
+        EndIf 
+      EndIf 
     Case 21
       Select EventType()
         Case #PB_EventType_Up
@@ -668,12 +712,25 @@ Procedure gadgetCallback()
         Case #PB_EventType_Down
           SetGadgetText(21, StrD(ValD(GetGadgetText(20)) - 0.1))
       EndSelect
+    Case 23
+      promptAngle()
     Case 20
       Select selectedCollisionBoxType
         Case #CBOX_TYPE_HIT
           setField(*selectedCollisionBox, Hitbox, damage, D, ValD(GetGadgetText(21)))
           setField(*selectedCollisionBox, Hitbox, angle, W, Val(GetGadgetText(22)))
       EndSelect
+      CloseWindow(1)
+      EnableWindow_(WindowID(0), 1)
+    Case 24
+      Select EventType()
+        Case #PB_EventType_Up
+          SetGadgetText(21, StrD(ValD(GetGadgetText(20)) + 0.1))
+        Case #PB_EventType_Down
+          SetGadgetText(21, StrD(ValD(GetGadgetText(20)) - 0.1))
+      EndSelect
+    Case 25
+      *selectedAnim\baseSpeed = ValD(GetGadgetText(24))    
       CloseWindow(1)
       EnableWindow_(WindowID(0), 1)
   EndSelect
@@ -696,22 +753,24 @@ BindEvent(#PB_Event_Gadget, @gadgetCallback())
 BindEvent(#PB_Event_RightClick, @rightClickCallback())
 
 SpinGadget(0, #CANVAS_W + 10, 5, 20, 50, 0, 1, #PB_Spin_ReadOnly)
-FrameGadget(#PB_Any, #CANVAS_W + 35, 5, 160, 50, "Frame Info")
+FrameGadget(#PB_Any, #CANVAS_W + 35, 5, 160, 80, "Frame Info")
 TextGadget(#PB_Any, #CANVAS_W + 40, 25, 20, 20, "ox")
-SpinGadget(12, #CANVAS_W + 60, 25, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
+SpinGadget(12, #CANVAS_W + 60, 25, 50, 20, -999, 999, #PB_Spin_Numeric)
 TextGadget(#PB_Any, #CANVAS_W + 120, 25, 20, 20, "oy")
-SpinGadget(13, #CANVAS_W + 140, 25, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-FrameGadget(#PB_Any, #CANVAS_W + 10, 60, 185, 80, "Collision Box Info")
-TextGadget(1, #CANVAS_W + 20, 80, 10, 20, "x")
-SpinGadget(2, #CANVAS_W + 35, 80, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-TextGadget(3, #CANVAS_W + 95, 80, 10, 20, "y")
-SpinGadget(4, #CANVAS_W + 110, 80, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
-TextGadget(5, #CANVAS_W + 20, 110, 10, 20, "w")
-SpinGadget(6, #CANVAS_W + 35, 110, 50, 20, -#CANVAS_W / 2, #CANVAS_W / 2, #PB_Spin_Numeric)
-TextGadget(7, #CANVAS_W + 95, 110, 10, 20, "h")
-SpinGadget(8, #CANVAS_W + 110, 110, 50, 20, -#CANVAS_H / 2, #CANVAS_H / 2, #PB_Spin_Numeric)
-ButtonGadget(9, #CANVAS_W + 10, 145, 20, 20, "OK")
-StringGadget(10, #CANVAS_W + 35, 145, 150, 20, "")
+SpinGadget(13, #CANVAS_W + 140, 25, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(#PB_Any, #CANVAS_W + 40, 55, 100, 20, "Duration")
+SpinGadget(14, #CANVAS_W + 95, 55, 50, 20, 0, 99, #PB_Spin_Numeric)
+FrameGadget(#PB_Any, #CANVAS_W + 10, 90, 185, 80, "Collision Box Info")
+TextGadget(1, #CANVAS_W + 20, 110, 10, 20, "x")
+SpinGadget(2, #CANVAS_W + 35, 110, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(3, #CANVAS_W + 95, 110, 10, 20, "y")
+SpinGadget(4, #CANVAS_W + 110, 110, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(5, #CANVAS_W + 20, 140, 10, 20, "w")
+SpinGadget(6, #CANVAS_W + 35, 140, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(7, #CANVAS_W + 95, 140, 10, 20, "h")
+SpinGadget(8, #CANVAS_W + 110, 140, 50, 20, -999, 999, #PB_Spin_Numeric)
+ButtonGadget(9, #CANVAS_W + 10, 175, 20, 20, "OK")
+StringGadget(10, #CANVAS_W + 35, 175, 150, 20, "")
 TextGadget(11, 5, #CANVAS_H + 10, #CANVAS_W, 20, "")
 
 CreatePopupMenu(1)
@@ -745,6 +804,11 @@ Repeat
         Case 1
           CloseWindow(1)
           EnableWindow_(WindowID(0), 1)
+          If IsWindow(2)
+            CloseWindow(2)
+          EndIf 
+        Case 2
+          CloseWindow(2)
       EndSelect
     Case #PB_Event_LeftDoubleClick
       If selectPointedCBox()
@@ -756,7 +820,7 @@ Repeat
 ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 416
-; FirstLine = 392
-; Folding = ------
+; CursorPosition = 731
+; FirstLine = 696
+; Folding = -------
 ; EnableXP

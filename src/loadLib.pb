@@ -76,10 +76,16 @@ Procedure loadGameData(path.s)
         LoadSprite_(*buffer, tag)
         
         *animation = 0
+        
         If (Left(character, 1) = "_")
           type2 = 1
           character = Mid(character, 2)
-          *animation = newStageAnimation(getStage(character), animationName, tag)
+          *stage.StageModel = getStage(character)
+          *animation = newStageAnimation(*stage, animationName, tag)
+          *animation\noCollisions = 1
+          If animationName = "background"
+            *stage\backgroundAnim = *animation
+          EndIf 
         Else
           type2 = 0
           *animation = getAnimation(getCharacter(character), animationName)
@@ -174,7 +180,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 108
-; FirstLine = 77
+; CursorPosition = 84
+; FirstLine = 59
 ; Folding = -
 ; EnableXP
