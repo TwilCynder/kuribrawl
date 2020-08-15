@@ -197,7 +197,7 @@ Procedure getRealCboxX(*cbox.CollisionBox, facing)
   EndIf 
 EndProcedure
 
-Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing)
+Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing = 1)
   Define dx.l
   With *frame
     If facing = 1
@@ -238,7 +238,7 @@ Procedure renderFighter(*fighter.Fighter)
 EndProcedure
 
 Procedure renderPlatform(*platform.Platform)
-  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x, #SCREEN_H - *platform\model\y, 1)
+  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x, #SCREEN_H - *platform\model\y)
 EndProcedure
 
 Procedure renderStage(*stage.Stage)
@@ -264,10 +264,7 @@ Procedure renderFrame(*game.Game)
 EndProcedure
 
 ;avancer les anims des stages (bg/plat)
-Procedure nextFrame(*animation.Animation, *fighter.Fighter)
-  If *fighter\paused > 0
-    ProcedureReturn 0
-  EndIf 
+Procedure nextFrame(*animation.Animation, *fighter.Fighter) 
   If NextElement(*animation\frames()) = 0
     If *animation\endCallback
       ProcedureReturn *animation\endCallback(*fighter, 0)
@@ -282,15 +279,24 @@ Procedure nextFrame(*animation.Animation, *fighter.Fighter)
       *animation\frames()\timeLeft - 1
     EndIf 
   EndIf
-  
+  If *animation\frames()\model\speedMode & 1
+    Debug Bin(*animation\frames()\model\speedMode)
+    If Not *animation\frames()\model\speedMode & 1000
+      *fighter\physics\v\x = *animation\frames()\model\speed\x
+    EndIf 
+    If Not *animation\frames()\model\speedMode & 10000
+      *fighter\physics\v\y = *animation\frames()\model\speed\y
+    EndIf 
+  EndIf 
 EndProcedure
 
 Procedure advanceAnimations(*game.Game)
   Define *fighter.Fighter
   ForEach *game\fighters()
     *fighter = *game\fighters()
-    If *fighter\currentAnimationName = "land"
-    EndIf 
+    If *fighter\paused > 0
+      ProcedureReturn 0
+    EndIf
     If *fighter\currentAnimation\frames()\timeLeft >= 1
       *fighter\currentAnimation\frames()\timeLeft - 1
     ElseIf Not *fighter\currentAnimation\speed = -1
@@ -447,11 +453,15 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   *defending\physics\v\y = Sin(angle) * knockback
   
   facing = -Sign(*defending\physics\v\x)
-  
+  Debug degAngle
+  Debug knockback
   If knockback > 10
     type = #KB_TUMBLE
     If degAngle > 45 And degAngle < 135 And *attacking\y < *defending\y
       anim = "hurtup"
+      facing = 0
+    ElseIf degAngle > 225 And degAngle < 270
+      anim = "hurtdown"
       facing = 0
     Else
       anim = "hurtheavy"
@@ -467,7 +477,7 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
-  *attacking\paused = hitlag
+  *attacking\paused = hitlag / 2
   hitstun = getHitstun(knockback)
   setAnimation(*defending, anim, 0, facing)
   setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
@@ -530,8 +540,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 454
-; FirstLine = 431
+; CursorPosition = 282
+; FirstLine = 251
 ; Folding = ---X---
 ; EnableXP
 ; SubSystem = OpenGL

@@ -31,7 +31,8 @@ EndStructure
 Structure FrameModel
   display.Rect_
   origin.Vector
-  actionnable.b
+  speed.VectorDouble
+  speedMode.b ;bit 0 : {0 : disabled | 1 : enabled} ; bit 1 : {0 : speed is added | 1 : speed is set} ; bit 2 : {0 : when this frame comes out | 1 : during the whole frame}
   duration.b
   List hurtboxes.Hurtbox()
   List hitboxes.Hitbox()
@@ -233,6 +234,6 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 37
+; CursorPosition = 34
 ; Folding = ---
 ; EnableXP

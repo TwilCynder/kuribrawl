@@ -54,6 +54,11 @@ Procedure groundToAir(*fighter.Fighter)
   EndIf 
 EndProcedure
 
+Procedure knockbackBounce(*fighter.Fighter)
+  *fighter\physics\v\y = (-*fighter\physics\v\y) * 0.7
+  setAnimation(*fighter, "hurtbounce", 0, -Sign(*fighter\physics\v\x))
+EndProcedure
+
 Procedure applyPhysics(*game.Game)
   Define nx.l, ny.l, *fighter.Fighter
 
@@ -102,18 +107,23 @@ Procedure applyPhysics(*game.Game)
     
     nx = *fighter\x + *fighter\physics\v\x
     ny = *fighter\y + *fighter\physics\v\y
-        
+    
+    
     ;--- Calcul des collisions avec le terrain
     Define *plat.Platform
     *plat = groundCollision(*game, *fighter\x, *fighter\y, nx, ny)
     If *plat
       ny = *plat\model\y
-      If *fighter\grounded = 0
-        landCallback(*fighter)
+      If *fighter\physics\v\y < -15 And (*fighter\state = #STATE_TUMBLE Or *fighter\state = #STATE_HITSTUN)
+        knockbackBounce(*fighter)
+      Else  
+        If *fighter\grounded = 0
+          landCallback(*fighter)
+        EndIf 
+        *fighter\jumps = 5
+        *fighter\grounded = 1
+        *fighter\physics\v\y = 0
       EndIf 
-      *fighter\jumps = 5
-      *fighter\grounded = 1
-      *fighter\physics\v\y = 0
     Else 
       If *fighter\grounded = 1
         groundToAir(*fighter)
@@ -128,7 +138,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 53
-; FirstLine = 16
+; CursorPosition = 58
+; FirstLine = 24
 ; Folding = --
 ; EnableXP

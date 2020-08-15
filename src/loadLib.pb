@@ -4,6 +4,7 @@
 #FILEMARKER_FRAMEINFO = 2
 #FILEMARKER_FRAMEDURATION = $20
 #FILEMARKER_FRAMEORIGIN = $21
+#FILEMARKER_FRAMEMOVEMENT = $22
 #FILEMARKER_HURTBOXINFO = 3
 #FILEMARKER_HITBOXINFO = 4
 #FILEMARKER_INTERFILE = $54
@@ -129,6 +130,10 @@ Procedure loadGameData(path.s)
             Case #FILEMARKER_FRAMEORIGIN
               *frames(selectedElement)\origin\x = ReadLong(0)
               *frames(selectedElement)\origin\y = ReadLong(0)
+            Case #FILEMARKER_FRAMEMOVEMENT
+              *frames(selectedElement)\speedMode = ReadByte(0)
+              *frames(selectedElement)\speed\x = ReadDouble(0)
+              *frames(selectedElement)\speed\y = ReadDouble(0)
             Case #FILEMARKER_HITBOXINFO
               selectedElement = ReadByte(0)
               x.l = ReadWord(0)
@@ -180,7 +185,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 84
-; FirstLine = 59
+; CursorPosition = 131
+; FirstLine = 87
 ; Folding = -
 ; EnableXP

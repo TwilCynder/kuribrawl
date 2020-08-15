@@ -3,6 +3,7 @@
 #FILEMARKER_FRAMEINFO = 2
 #FILEMARKER_FRAMEDURATION = $20
 #FILEMARKER_FRAMEORIGIN = $21
+#FILEMARKER_FRAMEMOVEMENT = $22
 #FILEMARKER_HURTBOXINFO = 3
 #FILEMARKER_HITBOXINFO = 4
 #FILEMARKER_INTERFILE = $54
@@ -104,16 +105,26 @@ Procedure writeFileDescriptor(type.b, infos.s)
               While value
                 Select Left(value, 1)
                   Case "d"
-                    WriteByte(1, $20)
+                    WriteByte(1, #FILEMARKER_FRAMEDURATION)
                     WriteUnicodeCharacter(1, Val(Mid(value, 2)))
                     PrintN("- - - modified duration : " + Mid(value, 2))
                   Case "o"
-                    WriteByte(1, $21)
+                    WriteByte(1, #FILEMARKER_FRAMEORIGIN)
                     WriteLong(1, Val(Mid(value, 2)))
                     PrintN("- - - origin x : " + Mid(value, 2))
                     i + 1
                     WriteLong(1, Val(StringField(line, i, " ")))
                     PrintN("- - - origin x : " + StringField(line, i, " "))
+                  Case "m"
+                    WriteByte(1, #FILEMARKER_FRAMEMOVEMENT)
+                    WriteByte(1, Val(Mid(value, 2)))
+                    PrintN("- - - speed mode : " + Bin(Val(Mid(value, 2))))
+                    i + 1
+                    WriteDouble(1, ValD(StringField(line, i, " ")))
+                    PrintN("- - - speed x : " + StringField(line, i, " "))
+                    i + 1
+                    WriteDouble(1, ValD(StringField(line, i, " ")))
+                    PrintN("- - - speed y : " + StringField(line, i, " "))
                 EndSelect
                 i + 1
                 value = StringField(line, i, " ")
@@ -263,9 +274,10 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 81
-; FirstLine = 51
+; CursorPosition = 118
+; FirstLine = 81
 ; Folding = --
 ; EnableXP
+; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico
 ; Executable = ..\src\res\datafileMaker.exe
 ; CommandLine = test/oui

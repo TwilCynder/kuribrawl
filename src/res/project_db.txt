@@ -70,6 +70,12 @@ downhurt.png
 A:Acid/hurtdown hurtdown.dat
 downhurtL.png
 AL:Acid/hurtdown
+bouncehurt.png
+A:Acid/hurtbounce hurtbounce.dat
+bouncehurtL.png
+AL:Acid/hurtbounce
+dair_strip14.png
+A:Acid/dair dair.dat
 stage_plat_main.png
 A:_Snowdin/platform platform.dat
 stage_bg.png

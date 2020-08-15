@@ -59,5 +59,5 @@ EndWith
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 38
+; CursorPosition = 36
 ; EnableXP

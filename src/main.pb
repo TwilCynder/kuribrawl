@@ -75,7 +75,7 @@ startTestGame()
 ;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 15
+frameDuration.f = 1000.0 / 30
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -117,7 +117,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 77
-; FirstLine = 37
+; FirstLine = 52
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

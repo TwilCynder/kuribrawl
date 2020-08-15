@@ -27,6 +27,7 @@ Enumeration
   #MENUITEM_CUTCBOX
   #MENUITEM_CBOXINFO
   #MENUITEM_ANIMINFO
+  #MENUITEM_FRAMEINFO
   #MENUITEMS
 EndEnumeration
 
@@ -101,7 +102,6 @@ Procedure onFrameChanged(*anim.AnimationModel)
   viewPosition\y = (#CANVAS_H / 2) - (*anim\frames()\display\h / 2) 
   SetGadgetText(12, Str(*anim\frames()\origin\x))
   SetGadgetText(13, Str(*anim\frames()\origin\y))
-  SetGadgetText(14, Str(*anim\frames()\duration))
   drawFrame(*anim, 1)
 EndProcedure  
 
@@ -260,6 +260,9 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
     If *animation\frames()\duration
       text + "d" + Str(*animation\frames()\duration) + " "
     EndIf 
+    If *animation\frames()\speedmode & 1
+      text + "m" + Str(*animation\frames()\speedmode) + " " + Str(*animation\frames()\speed\x) + " " + Str(*animation\frames()\speed\y) + " "
+    EndIf
     If Not text = ""
        WriteStringN(0, "f" + Str(i) + " " + text)
     EndIf 
@@ -323,6 +326,9 @@ Procedure loadProjectDB(path.s)
       Continue
     EndIf 
     tag = StringField(tag, 2, ":")
+    If Left(tag, 1) = "_"
+      Continue
+    EndIf 
     If Right(infos, 4) = ".dat"
       *animation = characters(StringField(tag, 1, "/"))\animations(StringField(tag, 2, "/"))
       AddElement(animationDescriptorFiles())
@@ -375,6 +381,7 @@ Procedure makeMenu()
   MenuItem(#MENUITEM_SAVE, "Save")
   MenuItem(#MENUITEM_SETDESCRIPTOR, "Set descriptor file")
   MenuItem(#MENUITEM_ANIMINFO, "Edit Anim Info")
+  MenuItem(#MENUITEM_FRAMEINFO, "Edit Frame Info")
   
   MenuTitle("Project")
   MenuItem(#MENUITEM_SAVEALL, "Save All")
@@ -539,12 +546,12 @@ Procedure editCBoxInfo()
     SpinGadget(21, 80, 5, 60, 20, 0, 999)
     SetGadgetText(21, StrD(getField(*selectedCollisionBox, Hitbox, damage, D)))
     TextGadget(#PB_Any, 5, 30, 140, 20, "Angle")
-    ButtonGadget(23, 40, 30, 20, 20, "")
-    SpinGadget(22, 80, 30, 60, 20, 0, 360, #PB_Spin_Numeric)
-    SetGadgetText(22, StrD(getField(*selectedCollisionBox, Hitbox, angle, W)))
+    ButtonGadget(22, 40, 30, 20, 20, "")
+    SpinGadget(20, 80, 30, 60, 20, 0, 360, #PB_Spin_Numeric)
+    SetGadgetText(20, StrD(getField(*selectedCollisionBox, Hitbox, angle, W)))
   ElseIf selectedCollisionBoxType = #CBOX_TYPE_HURT
   EndIf 
-  ButtonGadget(20, 5, 125, 140, 20, "Save")
+  ButtonGadget(23, 5, 125, 140, 20, "Save")
   
   EnableWindow_(WindowID(0), 0)
 EndProcedure
@@ -559,10 +566,44 @@ Procedure editAnimInfo()
   OpenWindow(1, 0, 0, 150, 150, "Editing animation info", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
   
   TextGadget(#PB_Any, 5, 5, 140, 20, "Speed")
-  SpinGadget(24, 80, 5, 60, 20, 0, 999)
-  SetGadgetText(24, StrD(*selectedAnim\baseSpeed))
+  SpinGadget(21, 80, 5, 60, 20, 0, 999)
+  SetGadgetText(21, StrD(*selectedAnim\baseSpeed))
   
-  ButtonGadget(25, 5, 125, 140, 20, "Save")
+  ButtonGadget(24, 5, 125, 140, 20, "Save")
+  
+  EnableWindow_(WindowID(0), 0)
+  
+EndProcedure
+
+Procedure editFrameInfo()
+  Shared *selectedAnim
+  
+  If Not *selectedAnim
+    ProcedureReturn 0
+  EndIf
+  
+  OpenWindow(1, 0, 0, 170, 180, "Editing frame info", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
+  
+  TextGadget(#PB_Any, 5, 5, 140, 20, "Duration")
+  SpinGadget(20, 100, 5, 60, 20, 0, 999)
+  SetGadgetText(20, StrD(*selectedAnim\frames()\duration))
+  CheckBoxGadget(30, 5, 35, 80, 20, "X speed")
+  SetGadgetState(30, 1 - (*selectedAnim\frames()\speedMode & 1000) >> 3)
+  SpinGadget(21, 100, 35, 60, 20, 0, 999)
+  SetGadgetText(21, StrD(*selectedAnim\frames()\speed\x))
+  CheckBoxGadget(31, 5, 65, 80, 20, "Y speed")
+  SetGadgetState(31, 1 - (*selectedAnim\frames()\speedMode & 10000) >> 4)
+  SpinGadget(26, 100, 65, 60, 20, 0, 999)
+  SetGadgetText(26, StrD(*selectedAnim\frames()\speed\y))
+  CheckBoxGadget(27, 5, 90, 160, 20, "Enable speed changing")
+  SetGadgetState(27, *selectedAnim\frames()\speedMode & 1)
+  GadgetToolTip(27, "If this is enabled, the fighter's speed will be modified while displaying this frame.")
+  CheckBoxGadget(28, 5, 110, 160, 20, "□Add Speed ✓Set speed")
+  SetGadgetState(28, (*selectedAnim\frames()\speedMode & %10) >> 1)
+  CheckBoxGadget(29, 5, 130, 160, 20, "□Once ✓Whole Frame")
+  SetGadgetState(29, (*selectedAnim\frames()\speedMode & %100) >> 2)
+  
+  ButtonGadget(25, 5, 155, 160, 20, "Save")
   
   EnableWindow_(WindowID(0), 0)
   
@@ -612,6 +653,8 @@ Procedure menuCallback()
         editCBoxInfo()
       Case #MENUITEM_ANIMINFO
         editAnimInfo()
+      Case #MENUITEM_FRAMEINFO
+        editFrameInfo()
     EndSelect
   Else
     setAnimation(*itemAnims(event - firstAnimItem))
@@ -705,32 +748,60 @@ Procedure gadgetCallback()
           *selectedAnim\frames()\duration = Val(GetGadgetText(14))
         EndIf 
       EndIf 
-    Case 21
+    Case 21, 26
       Select EventType()
         Case #PB_EventType_Up
           SetGadgetText(21, StrD(ValD(GetGadgetText(20)) + 0.1))
         Case #PB_EventType_Down
           SetGadgetText(21, StrD(ValD(GetGadgetText(20)) - 0.1))
       EndSelect
-    Case 23
+    Case 22
       promptAngle()
-    Case 20
+    Case 23
       Select selectedCollisionBoxType
         Case #CBOX_TYPE_HIT
           setField(*selectedCollisionBox, Hitbox, damage, D, ValD(GetGadgetText(21)))
-          setField(*selectedCollisionBox, Hitbox, angle, W, Val(GetGadgetText(22)))
+          setField(*selectedCollisionBox, Hitbox, angle, W, Val(GetGadgetText(20)))
       EndSelect
       CloseWindow(1)
       EnableWindow_(WindowID(0), 1)
     Case 24
-      Select EventType()
-        Case #PB_EventType_Up
-          SetGadgetText(21, StrD(ValD(GetGadgetText(20)) + 0.1))
-        Case #PB_EventType_Down
-          SetGadgetText(21, StrD(ValD(GetGadgetText(20)) - 0.1))
-      EndSelect
+      *selectedAnim\baseSpeed = ValD(GetGadgetText(21))    
+      CloseWindow(1)
+      EnableWindow_(WindowID(0), 1)
     Case 25
-      *selectedAnim\baseSpeed = ValD(GetGadgetText(24))    
+      *selectedAnim\frames()\duration = Val(GetGadgetText(20))
+      
+      If GetGadgetState(27)
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode | %1
+      Else
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode & 00
+      EndIf 
+      If GetGadgetState(28)
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode | %10
+      Else
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode & %01
+      EndIf 
+      If GetGadgetState(29)
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode | %100
+      Else
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode & %011
+      EndIf 
+      If Not GetGadgetState(30)
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode | %1000
+      Else
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode & %0111
+      EndIf
+      If Not GetGadgetState(31)
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode | %10000
+      Else
+        *selectedAnim\frames()\speedMode = *selectedAnim\frames()\speedMode & %01111
+      EndIf
+      If *selectedAnim\frames()\speedmode & 1
+        *selectedAnim\frames()\speed\x = ValD(GetGadgetText(21))
+        *selectedAnim\frames()\speed\y = ValD(GetGadgetText(26))
+      EndIf 
+        
       CloseWindow(1)
       EnableWindow_(WindowID(0), 1)
   EndSelect
@@ -744,6 +815,8 @@ Procedure rightClickCallback()
   Shared popUpMenuPosition
   If selectPointedCBox()
     DisplayPopupMenu(1, WindowID(0))
+  ElseIf WindowMouseX(0) > 5 And WindowMouseY(0) > 5 And WindowMouseX(0) < 5 + #CANVAS_W And WindowMouseY(0) < 5 + #CANVAS_H
+    DisplayPopupMenu(2, WindowID(0))
   EndIf 
 EndProcedure  
   
@@ -753,24 +826,22 @@ BindEvent(#PB_Event_Gadget, @gadgetCallback())
 BindEvent(#PB_Event_RightClick, @rightClickCallback())
 
 SpinGadget(0, #CANVAS_W + 10, 5, 20, 50, 0, 1, #PB_Spin_ReadOnly)
-FrameGadget(#PB_Any, #CANVAS_W + 35, 5, 160, 80, "Frame Info")
+FrameGadget(#PB_Any, #CANVAS_W + 35, 5, 160, 50, "Frame Info")
 TextGadget(#PB_Any, #CANVAS_W + 40, 25, 20, 20, "ox")
 SpinGadget(12, #CANVAS_W + 60, 25, 50, 20, -999, 999, #PB_Spin_Numeric)
 TextGadget(#PB_Any, #CANVAS_W + 120, 25, 20, 20, "oy")
 SpinGadget(13, #CANVAS_W + 140, 25, 50, 20, -999, 999, #PB_Spin_Numeric)
-TextGadget(#PB_Any, #CANVAS_W + 40, 55, 100, 20, "Duration")
-SpinGadget(14, #CANVAS_W + 95, 55, 50, 20, 0, 99, #PB_Spin_Numeric)
-FrameGadget(#PB_Any, #CANVAS_W + 10, 90, 185, 80, "Collision Box Info")
-TextGadget(1, #CANVAS_W + 20, 110, 10, 20, "x")
-SpinGadget(2, #CANVAS_W + 35, 110, 50, 20, -999, 999, #PB_Spin_Numeric)
-TextGadget(3, #CANVAS_W + 95, 110, 10, 20, "y")
-SpinGadget(4, #CANVAS_W + 110, 110, 50, 20, -999, 999, #PB_Spin_Numeric)
-TextGadget(5, #CANVAS_W + 20, 140, 10, 20, "w")
-SpinGadget(6, #CANVAS_W + 35, 140, 50, 20, -999, 999, #PB_Spin_Numeric)
-TextGadget(7, #CANVAS_W + 95, 140, 10, 20, "h")
-SpinGadget(8, #CANVAS_W + 110, 140, 50, 20, -999, 999, #PB_Spin_Numeric)
-ButtonGadget(9, #CANVAS_W + 10, 175, 20, 20, "OK")
-StringGadget(10, #CANVAS_W + 35, 175, 150, 20, "")
+FrameGadget(#PB_Any, #CANVAS_W + 10, 60, 185, 80, "Collision Box Info")
+TextGadget(1, #CANVAS_W + 20, 80, 10, 20, "x")
+SpinGadget(2, #CANVAS_W + 35, 80, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(3, #CANVAS_W + 95, 80, 10, 20, "y")
+SpinGadget(4, #CANVAS_W + 110, 80, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(5, #CANVAS_W + 20, 110, 10, 20, "w")
+SpinGadget(6, #CANVAS_W + 35, 110, 50, 20, -999, 999, #PB_Spin_Numeric)
+TextGadget(7, #CANVAS_W + 95, 110, 10, 20, "h")
+SpinGadget(8, #CANVAS_W + 110, 110, 50, 20, -999, 999, #PB_Spin_Numeric)
+ButtonGadget(9, #CANVAS_W + 10, 145, 20, 20, "OK")
+StringGadget(10, #CANVAS_W + 35, 145, 150, 20, "")
 TextGadget(11, 5, #CANVAS_H + 10, #CANVAS_W, 20, "")
 
 CreatePopupMenu(1)
@@ -780,6 +851,9 @@ MenuItem(#MENUITEM_COPYCBOX, "Copy")
 MenuItem(#MENUITEM_CUTCBOX, "Cut")
 MenuItem(#MENUITEM_DELETEBOX, "Delete")
 MenuItem(#MENUITEM_CBOXINFO, "Edit CBox info")
+
+CreatePopupMenu(2)
+MenuItem(#MENUITEM_FRAMEINFO, "Edit Frame Info")
 
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_C, #MENUITEM_COPYCBOX)
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_X, #MENUITEM_CUTCBOX)
@@ -820,7 +894,7 @@ Repeat
 ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 731
-; FirstLine = 696
+; CursorPosition = 589
+; FirstLine = 577
 ; Folding = -------
 ; EnableXP

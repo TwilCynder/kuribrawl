@@ -12,7 +12,7 @@ commandDefaultAnimation(#COMMAND_NAir) = "nair"
 commandDefaultAnimation(#COMMAND_FAir) = "fair"
 commandDefaultAnimation(#COMMAND_UAir) = "uair"
 commandDefaultAnimation(#COMMAND_BAir) = "nair"
-commandDefaultAnimation(#COMMAND_DAir) = "nair"
+commandDefaultAnimation(#COMMAND_DAir) = "dair"
 
 ;- ========VARIABLES=====================
 
@@ -61,5 +61,5 @@ addPlatform(*s1, 50, 200, 800, "platform")
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 26
+; CursorPosition = 14
 ; EnableXP
