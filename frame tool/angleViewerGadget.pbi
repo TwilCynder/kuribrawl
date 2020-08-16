@@ -1,8 +1,8 @@
 ﻿DeclareModule GMB_AngleViewer
   Declare AngleViewerGadget(id.q, x.l, y.l, size.l, angle.d, *callback = 0)
   Declare SetCallback(id.q, *callback)
-  ;Declare SetAngle(id.q, angle.d)
-  ;Declare.d GetAngle(id.q)
+  Declare SetAngleP(*angleViewer, angle.d)
+  Declare SetAngle(id.q, angle.d)
 EndDeclareModule
 
 Module GMB_AngleViewer
@@ -73,7 +73,7 @@ Module GMB_AngleViewer
     
     Render(@AngleViewers())
     
-    ProcedureReturn id
+    ProcedureReturn @AngleViewers()
   EndProcedure
   
   Procedure SetCallback(id.q, *callback)
@@ -81,9 +81,20 @@ Module GMB_AngleViewer
     *angleViewer\callback = *callback
   EndProcedure
   
+  Procedure SetAngleP(*angleViewer.AngleViewer, angle.d)
+    *angleViewer\angle = angle
+    Debug *angleViewer\angle
+    Render(*angleViewer)
+  EndProcedure
+  
+  Procedure SetAngle(id.q, angle.d)
+    SetAngleP(GetGadgetData(id), angle)
+  EndProcedure
+  
 EndModule
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 1
-; Folding = -
+; CursorPosition = 85
+; FirstLine = 42
+; Folding = --
 ; EnableXP

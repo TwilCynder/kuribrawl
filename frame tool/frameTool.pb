@@ -267,10 +267,15 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
        WriteStringN(0, "f" + Str(i) + " " + text)
     EndIf 
     ForEach *animation\frames()\hitboxes()
-      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " + Str(*animation\frames()\hitboxes()\y2) + " " + StrD(*animation\frames()\hitboxes()\damage) + " " + Str(*animation\frames()\hitboxes()\angle))
+      WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + 
+                      Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " +
+                      Str(*animation\frames()\hitboxes()\y2) + " " + StrD(*animation\frames()\hitboxes()\damage) + " " +
+                      Str(*animation\frames()\hitboxes()\angle) + " " + Str(*animation\frames()\hitboxes()\priority) + " " +
+                      Str(*animation\frames()\hitboxes()\hit))
     Next 
     ForEach *animation\frames()\hurtboxes()
-      WriteStringN(0, "c" + Str(i) + " " + Str(*animation\frames()\hurtboxes()\x) + " " + Str(*animation\frames()\hurtboxes()\y) + " " + Str(*animation\frames()\hurtboxes()\x2) + " " + Str(*animation\frames()\hurtboxes()\y2))
+      WriteStringN(0, "c" + Str(i) + " " + Str(*animation\frames()\hurtboxes()\x) + " " + Str(*animation\frames()\hurtboxes()\y) +
+                      " " + Str(*animation\frames()\hurtboxes()\x2) + " " + Str(*animation\frames()\hurtboxes()\y2))
     Next 
     i + 1
   Next 
@@ -465,6 +470,7 @@ Procedure reload()
   onLoad()
   SetGadgetText(11, "")
   tryLoadProjectDB("project_db.txt")
+  *selectedAnim = 0
 EndProcedure 
 
 Procedure copyCBox(*cbox, type)
@@ -549,6 +555,13 @@ Procedure editCBoxInfo()
     ButtonGadget(22, 40, 30, 20, 20, "")
     SpinGadget(20, 80, 30, 60, 20, 0, 360, #PB_Spin_Numeric)
     SetGadgetText(20, StrD(getField(*selectedCollisionBox, Hitbox, angle, W)))
+    TextGadget(#PB_Any, 5, 55, 140, 20, "Priority")
+    SpinGadget(26, 80, 55, 60, 20, 0, 99, #PB_Spin_Numeric)
+    SetGadgetText(26, StrD(getField(*selectedCollisionBox, Hitbox, priority, B)))
+    TextGadget(#PB_Any, 5, 80, 140, 20, "HitID")
+    SpinGadget(27, 80, 80, 60, 20, 0, 99, #PB_Spin_Numeric)
+    GadgetToolTip(27, "An hitbox can hit a fighter that has already been struck by another hitbox in the same move If they have different hitIDs. Useful For multihits.")    
+    SetGadgetText(27, StrD(getField(*selectedCollisionBox, Hitbox, hit, B)))
   ElseIf selectedCollisionBoxType = #CBOX_TYPE_HURT
   EndIf 
   ButtonGadget(23, 5, 125, 140, 20, "Save")
@@ -667,9 +680,10 @@ Procedure angleViewerCallback(angle.d)
 EndProcedure
 
 Procedure promptAngle()
+  Shared *selectedCollisionBox
   OpenWindow(2, 0, 0, 300, 300, "Select an angle", #PB_Window_SystemMenu | #PB_Window_WindowCentered, WindowID(1))
-  GMB_AngleViewer::AngleViewerGadget(-1, 5, 5, 290, Radian(Val(GetGadgetText(22))), @angleViewerCallback())
-  
+  *av = GMB_AngleViewer::AngleViewerGadget(-1, 5, 5, 290, Radian(Val(GetGadgetText(22))), @angleViewerCallback())
+  GMB_AngleViewer::SetAngleP(*av, Radian(getField(*selectedCollisionBox, Hitbox, angle, W)))
 EndProcedure
 
 Procedure gadgetCallback()
@@ -762,6 +776,8 @@ Procedure gadgetCallback()
         Case #CBOX_TYPE_HIT
           setField(*selectedCollisionBox, Hitbox, damage, D, ValD(GetGadgetText(21)))
           setField(*selectedCollisionBox, Hitbox, angle, W, Val(GetGadgetText(20)))
+          setField(*selectedCollisionBox, Hitbox, priority, B, Val(GetGadgetText(26)))
+          setField(*selectedCollisionBox, Hitbox, hit, B, Val(GetGadgetText(27)))
       EndSelect
       CloseWindow(1)
       EnableWindow_(WindowID(0), 1)
@@ -894,7 +910,8 @@ Repeat
 ForEver 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 589
-; FirstLine = 577
+; CursorPosition = 779
+; FirstLine = 760
 ; Folding = -------
 ; EnableXP
+; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico

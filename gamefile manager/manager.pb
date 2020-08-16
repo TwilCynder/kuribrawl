@@ -160,6 +160,8 @@ Procedure writeFileDescriptor(type.b, infos.s)
               PrintN("- - - damages : " + StringField(line, 6, " "))
               WriteDouble(1, ValD(StringField(line, 6, " ")))
               WriteWord(1, Val(StringField(line, 7, " ")))
+              WriteByte(1, Val(StringField(line, 8, " ")))
+              WriteByte(1, Val(StringField(line, 9, " ")))
           EndSelect
         Wend 
         CloseFile(2)
@@ -274,8 +276,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 118
-; FirstLine = 81
+; CursorPosition = 163
+; FirstLine = 138
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

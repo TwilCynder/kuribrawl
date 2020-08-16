@@ -76,6 +76,10 @@ bouncehurtL.png
 AL:Acid/hurtbounce
 dair_strip14.png
 A:Acid/dair dair.dat
+utilt_3_strip8.png
+A:Acid/utilt utilt.dat
+utilt_3_strip8L.png
+AL:Acid/utilt
 stage_plat_main.png
 A:_Snowdin/platform platform.dat
 stage_bg.png

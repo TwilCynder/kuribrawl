@@ -267,7 +267,7 @@ EndProcedure
 ;- INPUT MANAGERS
 
 Procedure inputManager_Attack(*port.Port, *info.inputData)
-  If *port\figher\state = #STATE_HITSTUN
+  If *port\figher\state = #STATE_HITSTUN Or *port\figher\state = #STATE_JUMPSQUAT
     ProcedureReturn 0
   EndIf 
   Define direction.b
@@ -308,6 +308,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
         Debug "Ftilt (" + *port\figher\name + ")"  ;ou reverse ftilt ? à voir si je fais un truc restrictif sur les reverse à la brawl
         ProcedureReturn 1
       Case #DIRECTION_UP
+        attack(*port\figher, #COMMAND_UTilt)
         Debug "Utilt (" + *port\figher\name + ")"
         ProcedureReturn 1
       Case #DIRECTION_DOWN
@@ -485,7 +486,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 418
-; FirstLine = 415
+; CursorPosition = 269
+; FirstLine = 268
 ; Folding = -----
 ; EnableXP

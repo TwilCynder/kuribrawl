@@ -26,6 +26,7 @@ Structure Hitbox Extends CollisionBox
   skb.d ;scaling klockback
   angle.w
   hit.b
+  priority.b  
 EndStructure  
 
 Structure FrameModel
@@ -215,6 +216,7 @@ Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
 EndProcedure
 
 Procedure newStageAnimation(*stage.StageModel, name.s, spriteTag.s, speed.d = 1)
+  Debug *stage
   *animation = AddMapElement(*stage\animations(), name)
   initAnimationModel(*animation, spriteTag, speed)
   ProcedureReturn *animation
@@ -234,6 +236,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 34
+; CursorPosition = 218
+; FirstLine = 176
 ; Folding = ---
 ; EnableXP

@@ -7,7 +7,7 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-08-15 05:43" user="twilc" host="TWIL-DESKTOP"/>
+    <lastopen date="2020-08-15 18:52" user="twilc" host="TWIL-DESKTOP"/>
   </section>
   <section name="files">
     <file name="src\animations.pbi">
@@ -28,7 +28,7 @@
     </file>
     <file name="src\gameData.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="62a1d0657a8e94b657a808fa46e4a703"/>
+      <fingerprint md5="55210533dc1ebba1adb65557e7d6498b"/>
     </file>
     <file name="src\gameDataLib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -36,7 +36,7 @@
     </file>
     <file name="src\gamelib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="1e05c2eca9827854d636511984e42165"/>
+      <fingerprint md5="231294363663f1135189e9d86cbcf4b3"/>
     </file>
     <file name="src\gamelibConstants.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -52,23 +52,23 @@
     </file>
     <file name="src\inputlibData.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
-      <fingerprint md5="915ed3956311a4686faddbcb783bc2eb"/>
+      <fingerprint md5="7b39469da9c30f79eff08c9c6e798df6"/>
     </file>
     <file name="src\loadLib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="34ee448ac755e8aa064f399053202e69"/>
+      <fingerprint md5="121489cf860f9710fbd9c46a176f1c2b"/>
     </file>
     <file name="src\main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="54e32768ffa71e5499dcdc2929a9a745"/>
+      <fingerprint md5="5ea9cd646d37f5613f315d32a51d69dd"/>
     </file>
     <file name="src\physicslib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="15065d95a9aad1d941fee5cd03ebe96a"/>
+      <fingerprint md5="a80c1478db6c8d3b06faed0fa1c261ae"/>
     </file>
     <file name="src\statelib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="a28cf739e58c935ff23e28c57fb43d88"/>
+      <fingerprint md5="9fe19ae1e9937f00e531a01c3923f270"/>
     </file>
     <file name="src\utilCore.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -81,7 +81,7 @@
       <outputfile value="bin\KuriBrawl.exe"/>
       <executable value="build\KuriBrawl.exe"/>
       <options xpskin="1" debug="1"/>
-      <icon enable="1">icon.ico</icon>
+      <icon enable="1">GraphicDesignIsMyPassion\icon.ico</icon>
     </target>
   </section>
 </project>

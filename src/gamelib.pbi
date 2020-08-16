@@ -447,14 +447,16 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
     degAngle.l = 180 - *hitbox\angle
   EndIf
   angle = Radian(degAngle)
-    
+  
+  If *defending\state = #STATE_HITSTUN
+    Debug "TRUE"
+  EndIf 
+  
   knockback = getKnockback(*hitbox\damage)
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
   
   facing = -Sign(*defending\physics\v\x)
-  Debug degAngle
-  Debug knockback
   If knockback > 10
     type = #KB_TUMBLE
     If degAngle > 45 And degAngle < 135 And *attacking\y < *defending\y
@@ -469,7 +471,7 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   Else
     anim = "hurt"
   EndIf 
-  If *defending\physics\v\y < 2 And *defending\grounded
+  If *defending\physics\v\y < 2 And *defending\grounded And Not type = #KB_TUMBLE
     *defending\physics\v\y = 0
     anim = "hurtground"
   EndIf
@@ -477,7 +479,7 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
-  *attacking\paused = hitlag / 2
+  *attacking\paused = hitlag
   hitstun = getHitstun(knockback)
   setAnimation(*defending, anim, 0, facing)
   setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
@@ -509,7 +511,7 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
 EndProcedure
 
 Procedure manageHitboxes(*game.Game)
-  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox
+  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox
   ForEach *game\fighters()
     *attacking = @*game\fighters()
     ForEach  *game\fighters()
@@ -517,17 +519,23 @@ Procedure manageHitboxes(*game.Game)
       If *defending = *attacking
         Continue
       EndIf 
+      *successfulHitbox = 0
       ForEach *attacking\currentAnimation\frames()\model\hitboxes()
         ForEach *defending\currentAnimation\frames()\model\hurtboxes()
           *hitbox = @*attacking\currentAnimation\frames()\model\hitboxes()
           *hurtbox = @*defending\currentAnimation\frames()\model\hurtboxes()
           If testRectCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y, *hitbox\x2, *hitbox\y2,
                                getRealCboxX(*hurtbox, *defending\facing) + *defending\x, *defending\y + *hurtbox\y, *hurtbox\x2, *hurtbox\y2)
-            hit(*hitbox, *hurtbox, *attacking, *defending)
             bgc = #Black
+            If Not *successfulHitbox Or *hitbox\priority > *successfulHitbox\priority
+              *successfulHitbox = *hitbox
+            EndIf 
           EndIf 
         Next
-      Next 
+      Next
+      If *successfulHitbox 
+        hit(*successfulHitbox, *hurtbox, *attacking, *defending)
+      EndIf 
     Next
     ChangeCurrentElement(*game\fighters(), *attacking)  
   Next  
@@ -540,8 +548,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 282
-; FirstLine = 251
+; CursorPosition = 429
+; FirstLine = 408
 ; Folding = ---X---
 ; EnableXP
 ; SubSystem = OpenGL

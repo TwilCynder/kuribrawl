@@ -32,8 +32,6 @@ Procedure manageStates(*game.Game)
     If *fighter\paused > 0
       *fighter\paused - 1
     Else  
-    
-    
       Select *fighter\state
         Case #STATE_JUMPSQUAT
           max = getStateMaxFrames(*fighter, *fighter\character\jumpsquatDuration)
@@ -74,7 +72,6 @@ Procedure manageStates(*game.Game)
           EndIf
         Case #STATE_HITSTUN
           max = *fighter\stateInfo >> 1
-          Debug max
           If *fighter\stateTimer >= max
             If *fighter\stateInfo & 1 And Not *fighter\grounded
               setState(*fighter, #STATE_TUMBLE, 0)
@@ -88,7 +85,6 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 79
-; FirstLine = 37
+; CursorPosition = 33
 ; Folding = -
 ; EnableXP

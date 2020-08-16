@@ -1,6 +1,6 @@
 ﻿;TODO : régler finalement la question du : substructure directement en field ou pointer vers heap
 
-#DEBUG = 1
+#DEBUG = 0
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
@@ -50,10 +50,10 @@ SetWindowColor(window, $aaaaaa)
 CompilerIf #DEBUG
   InputLogGadget(#SCREEN_W + 5, 5, 160, #SCREEN_H - 120)
   StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
+CompilerEndIf 
   CreateMenu(0, WindowID(window))
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
   BindMenuEvent(0, 0, @startTestGame())
-CompilerEndIf 
 
 ;- Game data
 
@@ -75,7 +75,7 @@ startTestGame()
 ;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 30
+frameDuration.f = 1000.0 / 60
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -117,7 +117,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; CursorPosition = 77
-; FirstLine = 52
+; FirstLine = 51
 ; Folding = -
 ; EnableXP
 ; EnableUnicode
