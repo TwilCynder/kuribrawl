@@ -263,6 +263,18 @@ Procedure renderFrame(*game.Game)
   bgc = #White
 EndProcedure
 
+Procedure applyFrameMovement(*fighter.Fighter, *frame.FrameModel)
+  Define add.b = 1 - ((*frame\speedMode & %10) >> 1)
+  Debug add
+  If Not *frame\speedMode & %1000
+    *fighter\physics\v\x = *frame\speed\x + (add * *fighter\physics\v\x)
+  EndIf 
+  If Not *frame\speedMode & %10000
+    *fighter\physics\v\y = *frame\speed\y + (add * *fighter\physics\v\y)
+    Debug *frame\speed\y
+  EndIf 
+EndProcedure
+
 ;avancer les anims des stages (bg/plat)
 Procedure nextFrame(*animation.Animation, *fighter.Fighter) 
   If NextElement(*animation\frames()) = 0
@@ -279,14 +291,8 @@ Procedure nextFrame(*animation.Animation, *fighter.Fighter)
       *animation\frames()\timeLeft - 1
     EndIf 
   EndIf
-  If *animation\frames()\model\speedMode & 1
-    Debug Bin(*animation\frames()\model\speedMode)
-    If Not *animation\frames()\model\speedMode & 1000
-      *fighter\physics\v\x = *animation\frames()\model\speed\x
-    EndIf 
-    If Not *animation\frames()\model\speedMode & 10000
-      *fighter\physics\v\y = *animation\frames()\model\speed\y
-    EndIf 
+  If *animation\frames()\model\speedMode & 1 And Not (*fighter\currentAnimation\frames() & %100 )
+    applyFrameMovement(*fighter, *animation\frames()\model)
   EndIf 
 EndProcedure
 
@@ -302,6 +308,11 @@ Procedure advanceAnimations(*game.Game)
     ElseIf Not *fighter\currentAnimation\speed = -1
       *fighter\currentAnimation\currentCarry + *fighter\currentAnimation\carry
       nextFrame(*fighter\currentAnimation, *fighter)
+      ProcedureReturn 1
+    EndIf 
+    If *fighter\currentAnimation\frames()\model\speedMode & %101
+      Debug "oui"
+      applyFrameMovement(*fighter, *fighter\currentAnimation\frames()\model)
     EndIf 
   Next
 EndProcedure
@@ -548,9 +559,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 429
-; FirstLine = 408
-; Folding = ---X---
+; CursorPosition = 311
+; FirstLine = 308
+; Folding = ---v+--
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

@@ -1,6 +1,6 @@
 ﻿;TODO : régler finalement la question du : substructure directement en field ou pointer vers heap
 
-#DEBUG = 0
+#DEBUG = 1
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
@@ -116,8 +116,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 77
-; FirstLine = 51
+; CursorPosition = 2
 ; Folding = -
 ; EnableXP
 ; EnableUnicode
