@@ -55,13 +55,11 @@ Procedure manageStates(*game.Game)
           EndIf 
         Case #STATE_LANDING
           max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
-    
           If *fighter\stateTimer >= max
             setState(*fighter, #STATE_IDLE)
           EndIf 
         Case #STATE_LANDING_LAG
           max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
-    
           If *fighter\stateTimer >= max
             setState(*fighter, #STATE_IDLE)
           EndIf 
@@ -85,6 +83,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 33
+; CursorPosition = 56
+; FirstLine = 32
 ; Folding = -
 ; EnableXP
