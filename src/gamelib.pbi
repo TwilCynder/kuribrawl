@@ -1,5 +1,8 @@
 ﻿frame.l = 0
 Global bgc.l = #White
+Global testVal.b = 0
+
+;- Structure
 
 Structure Frame
   *model.FrameModel
@@ -9,11 +12,13 @@ EndStructure
 Structure Animation
   *model.AnimationModel
   List frames.Frame()
+  frame.b
   speed.d
   frameMultiplier.b
   carry.f ;for animations with speed
   currentCarry.f
   facing.b
+  onFrameChanged.f_callback
   endCallback.f_callback
 EndStructure  
 
@@ -30,6 +35,7 @@ Structure Fighter
   Map animations.Animation()
   *currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
   currentAnimationName.s
+  currentMove.MoveInfo
   port.b
   name.s
   grounded.b
@@ -77,11 +83,14 @@ Procedure initGame(window.l)
 EndProcedure
  
 Procedure resetAnimation(*animation.Animation)  
+  *animation\frame = 0
   ResetList(*animation\frames())
   NextElement(*animation\frames())
   If *animation\frameMultiplier > 1
     *animation\currentCarry = 0
     *animation\frames()\timeLeft = *animation\frameMultiplier
+  ElseIf *animation\frames()\model\duration
+    *animation\frames()\timeLeft = *animation\frames()\model\duration
   EndIf 
 EndProcedure
 
@@ -163,6 +172,7 @@ Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0)
   
   setAnimationSpeed(*anim, speed)
   resetAnimation(*anim)
+  *fighter\currentAnimation\frame = 0
 EndProcedure
 
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
@@ -207,18 +217,6 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing 
     EndIf
     ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
     DisplayTransparentSprite(spriteSheet, dx, y - \origin\y)
-    CompilerIf #DEBUG
-      StartDrawing(ScreenOutput())
-      DrawingMode(#PB_2DDrawing_Outlined)
-      Line(0, y, #SCREEN_W, 1, #Blue)
-      ForEach *frame\hitboxes()
-        Box(x + getRealCboxX(*frame\hitboxes(), facing), y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
-      Next
-      ForEach *frame\hurtboxes()
-        Box(x + getRealCboxX(*frame\hurtboxes(), facing), y - *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, #Green)
-      Next
-      StopDrawing()
-    CompilerEndIf
   EndWith
 EndProcedure
 
@@ -234,7 +232,26 @@ Procedure renderFighter(*fighter.Fighter)
   Else
     spriteSheet = *fighter\currentAnimation\model\spriteSheet
   EndIf 
-  drawAnimationFrame(*fighter\currentAnimation\frames()\model, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, facing)
+  *frame.FrameModel = *fighter\currentAnimation\frames()\model
+  drawAnimationFrame(*frame, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, facing)
+  CompilerIf #DEBUG
+    Define hurtColor.l
+    If *fighter\state = #STATE_HITSTUN
+      hurtColor = #Yellow
+    Else
+      hurtColor = #Green
+    EndIf 
+    StartDrawing(ScreenOutput())
+    DrawingMode(#PB_2DDrawing_Outlined)
+    Line(0, y, #SCREEN_W, 1, #Blue)
+    ForEach *frame\hitboxes()
+      Box(*fighter\x + getRealCboxX(*frame\hitboxes(), facing), #SCREEN_H - *fighter\y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+    Next
+    ForEach *frame\hurtboxes()
+      Box(*fighter\x + getRealCboxX(*frame\hurtboxes(), facing), #SCREEN_H - *fighter\y - *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, hurtColor)
+    Next
+    StopDrawing()
+  CompilerEndIf
 EndProcedure
 
 Procedure renderPlatform(*platform.Platform)
@@ -265,18 +282,17 @@ EndProcedure
 
 Procedure applyFrameMovement(*fighter.Fighter, *frame.FrameModel)
   Define add.b = 1 - ((*frame\speedMode & %10) >> 1)
-  Debug add
   If Not *frame\speedMode & %1000
     *fighter\physics\v\x = *frame\speed\x + (add * *fighter\physics\v\x)
   EndIf 
   If Not *frame\speedMode & %10000
     *fighter\physics\v\y = *frame\speed\y + (add * *fighter\physics\v\y)
-    Debug *frame\speed\y
   EndIf 
 EndProcedure
 
 ;avancer les anims des stages (bg/plat)
 Procedure nextFrame(*animation.Animation, *fighter.Fighter) 
+  *animation\frame + 1
   If NextElement(*animation\frames()) = 0
     If *animation\endCallback
       ProcedureReturn *animation\endCallback(*fighter, 0)
@@ -291,9 +307,19 @@ Procedure nextFrame(*animation.Animation, *fighter.Fighter)
       *animation\frames()\timeLeft - 1
     EndIf 
   EndIf
-  If *animation\frames()\model\speedMode & 1 And Not (*fighter\currentAnimation\frames() & %100 )
+  If *animation\onFrameChanged
+    *animation\onFrameChanged(*fighter, *animation\frames())
+  EndIf 
+  If *animation\frames()\model\speedMode & 1 And Not (*animation\frames() & %100 )
     applyFrameMovement(*fighter, *animation\frames()\model)
   EndIf 
+EndProcedure
+
+Procedure skipToFrame(*animation.Animation, *fighter.Fighter, frame.b) ; not compatible with animations with anim modifiers. or maybe it is. idk
+  While *animation\frame < frame
+    *animation\currentCarry + *animation\carry
+    nextFrame(*animation, *fighter)
+  Wend
 EndProcedure
 
 Procedure advanceAnimations(*game.Game)
@@ -311,9 +337,8 @@ Procedure advanceAnimations(*game.Game)
       ProcedureReturn 1
     EndIf 
     If *fighter\currentAnimation\frames()\model\speedMode & %101
-      Debug "oui"
       applyFrameMovement(*fighter, *fighter\currentAnimation\frames()\model)
-    EndIf 
+    EndIf  
   Next
 EndProcedure
 
@@ -323,6 +348,14 @@ EndProcedure
 
 Procedure figherDirection(*fighter.Fighter)
   ProcedureReturn *fighter\facing
+EndProcedure
+
+Procedure getCurrentAttack(*fighter.Fighter)
+  ProcedureReturn *fighter\stateInfo & %11111
+EndProcedure
+
+Procedure getCurrentAttackInfo(*fighter.Fighter)
+  ProcedureReturn *fighter\character\moves(getCurrentAttack(*fighter))
 EndProcedure
 
 CompilerIf #DEBUG
@@ -361,15 +394,44 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
   setState(*fighter, #STATE_IDLE, 1)
 EndProcedure
 
+Declare multiMoveFrameCallback(*fighter.Fighter, *frame.FrameModel)
 Procedure attack(*fighter.Fighter, attack.b)
+  Shared commandDefaultAnimation()
   ClearList(*fighter\fightersHit())
   setState(*fighter, #STATE_ATTACK, attack)
+  setAnimation(*fighter, commandDefaultAnimation(attack))
+  *fighter\currentMove = *fighter\character\moves(attack)
+  If *fighter\currentMove\multiMove
+    *fighter\currentAnimation\onFrameChanged = @multiMoveFrameCallback()
+  EndIf
+  testVal = 1
+EndProcedure
+
+Procedure endAttack(*fighter)
+  Define attack.b = getCurrentAttack(*fighter)
+  setState(*fighter, #STATE_IDLE)
+EndProcedure
+
+Procedure defaultJumpAnimCallback(*fighter.Fighter, *data)
+  *fighter\updateAnim = 1
+EndProcedure
+
+Procedure defaultAttackAnimCallback(*fighter.Fighter, *data)
+  endAttack(*fighter)
+EndProcedure
+
+Procedure multiMoveFrameCallback(*fighter.Fighter, *frame.FrameModel)
+  Define part.b = (*fighter\stateInfo & %11100000) >> 5
+  If part > 0 And *fighter\currentAnimation\frame = *fighter\currentMove\multiMove\partEndFrames(part - 1)
+    skipToFrame(*fighter\currentAnimation, *fighter, *fighter\currentMove\multiMove\partStartFrames(part - 1))
+  ElseIf part <= ArraySize(*fighter\currentMove\multiMove\partStartFrames()) And *fighter\currentAnimation\frame = *fighter\currentMove\multiMove\partStartFrames(part)
+    endAttack(*fighter)
+  EndIf 
 EndProcedure
 
 ;système d'acceptable animations
-
 Procedure updateAnimations(*game.Game)
-  Shared stateDefaultAnimation(), commandDefaultAnimation()
+  Shared stateDefaultAnimation()
   Define animation.s, *fighter.Fighter
   ForEach *game\fighters()
     *fighter = @*game\fighters()
@@ -391,8 +453,6 @@ Procedure updateAnimations(*game.Game)
           ElseIf *fighter\grounded = 1
             setAnimation(*fighter, "idle")
           EndIf 
-        Case #STATE_ATTACK
-          setAnimation(*fighter, commandDefaultAnimation(*fighter\stateInfo))
         Default 
           animation = stateDefaultAnimation(*fighter\state)
           If animation And Not animation = *fighter\currentAnimationName
@@ -406,14 +466,6 @@ Procedure updateAnimations(*game.Game)
     EndIf
     *fighter\updateAnim = 0
   Next 
-EndProcedure
-
-Procedure defaultJumpAnimCallback(*fighter.Fighter, *data)
-  *fighter\updateAnim = 1
-EndProcedure
-
-Procedure defaultAttackAnimCallback(*fighter.Fighter, *data)
-  setState(*fighter, #STATE_IDLE)
 EndProcedure
 
 Procedure initFighters(*game.Game)
@@ -559,9 +611,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 311
-; FirstLine = 308
-; Folding = ---v+--
+; CursorPosition = 93
+; FirstLine = 75
+; Folding = ----2---
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

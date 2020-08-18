@@ -14,6 +14,10 @@ Macro setField(pointer, Structure, field, type, value)
   Poke#type(pointer + OffsetOf(Structure\field), value)
 EndMacro
 
+Macro addElementVal(l, value)
+  AddElement(l) : l = value
+EndMacro
+
 ;- Basic data structures
 
 Structure Vector
@@ -89,8 +93,7 @@ Procedure QIterate(*q.Queue, callback.QCallback)
     callback(*elem\value)
   Wend
 EndProcedure
-
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 9
+; CursorPosition = 18
 ; Folding = --
 ; EnableXP

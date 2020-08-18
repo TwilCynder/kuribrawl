@@ -28,6 +28,8 @@ Enumeration
   #MENUITEM_CBOXINFO
   #MENUITEM_ANIMINFO
   #MENUITEM_FRAMEINFO
+  #MENUITEM_RECTSELECT_CREATEHITBOX
+  #MENUITEM_RECTSELECT_CREATEHURTBOX
   #MENUITEMS
 EndEnumeration
 
@@ -52,7 +54,15 @@ Structure AnimationDescriptorPair
   descriptor.s
 EndStructure
 
-Define *selectedAnim.AnimationModel, *selectedCollisionBox.CollisionBox, viewPosition.Vector, selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, originalPath.s, dataFilePath.s, popUpMenuPosition.Point, draggin.b
+Structure RectSelection
+  coord.RECT
+  active.b
+EndStructure
+
+Global *selectedAnim.AnimationModel
+Define *selectedCollisionBox.CollisionBox, viewPosition.Vector,
+       selectedCollisionBoxType.b, firstAnimItem.l, projectDBLoaded.b, originalPath.s, dataFilePath.s,
+       popUpMenuPosition.Point, rectSelection.RectSelection
 NewMap characters.Champion()
 
 Procedure drawFrame(*animation.AnimationModel, facing)
@@ -166,6 +176,7 @@ EndProcedure
 
 Procedure selectPointedCBox()
   Shared *selectedAnim, viewPosition
+ 
   Define x.l, y.l, hx.l, hy.l
   x = WindowMouseX(0) - 5
   y = WindowMouseY(0) - 5
@@ -622,6 +633,35 @@ Procedure editFrameInfo()
   
 EndProcedure
 
+Procedure rectSelectionCreateCBox(type.b)
+  Shared rectSelection, viewPosition
+  x = rectSelection\coord\left
+  y = rectSelection\coord\top
+  w = rectSelection\coord\right - rectSelection\coord\left
+  h = rectSelection\coord\bottom - rectSelection\coord\top
+  
+  If w < 0
+    x + w
+    w = -w
+  EndIf
+  If h < 0
+    y + h
+    h = -h
+  EndIf 
+  
+  x = -(*selectedAnim\frames()\origin\x - (x - viewPosition\x))
+  y = viewPosition\y + *selectedAnim\frames()\origin\y - y
+  
+  Debug x
+  Debug y
+  
+  If type = #CBOX_TYPE_HURT
+    newHurtbox(x, y, w, h)
+  Else 
+    newHitbox(x, y, w, h)
+  EndIf 
+EndProcedure
+
 Procedure menuCallback()
   Shared *itemAnims(), firstAnimItem, *selectedAnim, *selectedCollisionBox, selectedCollisionBoxType, popUpMenuPosition
   event.l = EventMenu()
@@ -668,6 +708,10 @@ Procedure menuCallback()
         editAnimInfo()
       Case #MENUITEM_FRAMEINFO
         editFrameInfo()
+      Case #MENUITEM_RECTSELECT_CREATEHITBOX
+        rectSelectionCreateCBox(#CBOX_TYPE_HIT)
+      Case #MENUITEM_RECTSELECT_CREATEHURTBOX
+        rectSelectionCreateCBox(#CBOX_TYPE_HURT)
     EndSelect
   Else
     setAnimation(*itemAnims(event - firstAnimItem))
@@ -823,6 +867,44 @@ Procedure gadgetCallback()
   EndSelect
 EndProcedure
 
+Procedure startRectSelection()
+  Shared rectSelection, *selectedAnim
+  If Not *selectedAnim
+    ProcedureReturn
+  EndIf 
+  rectSelection\coord\left = WindowMouseX(0) - 5
+  rectSelection\coord\top = WindowMouseY(0) - 5
+  rectSelection\active = 1
+EndProcedure
+
+Procedure updateRectSelection()
+  Shared rectSelection
+  rectSelection\coord\right = WindowMouseX(0) - 5
+  rectSelection\coord\bottom = WindowMouseY(0) - 5
+EndProcedure
+
+Procedure displaySelectionRectangle()
+  Shared rectSelection, *selectedAnim
+  drawFrame(*selectedAnim, 1)
+  With rectSelection
+    StartDrawing(ScreenOutput())
+    DrawingMode(#PB_2DDrawing_Outlined)
+    Box(\coord\left, \coord\top, \coord\right - \coord\left, \coord\bottom - \coord\top, #White)
+    StopDrawing()
+  EndWith
+  FlipBuffers()
+EndProcedure
+
+Procedure endRectSelection()
+  Shared rectSelection
+  rectSelection\active = 0
+  If Abs(rectSelection\coord\left - rectSelection\coord\right) > 10 Or Abs (rectSelection\coord\top - rectSelection\coord\bottom) > 10
+    DisplayPopupMenu(3, WindowID(0))
+  Else
+    drawFrame(*selectedAnim, 1)
+  EndIf 
+EndProcedure
+
 Procedure clickCallback()
   selectPointedCBox()
 EndProcedure
@@ -871,6 +953,10 @@ MenuItem(#MENUITEM_CBOXINFO, "Edit CBox info")
 CreatePopupMenu(2)
 MenuItem(#MENUITEM_FRAMEINFO, "Edit Frame Info")
 
+CreatePopupMenu(3)
+MenuItem(#MENUITEM_RECTSELECT_CREATEHITBOX, "Create hitbox")
+MenuItem(#MENUITEM_RECTSELECT_CREATEHURTBOX, "Create hurtbox")
+
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_C, #MENUITEM_COPYCBOX)
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_X, #MENUITEM_CUTCBOX)
 AddKeyboardShortcut(0, #PB_Shortcut_Control | #PB_Shortcut_V, #MENUITEM_PASTECBOX)
@@ -904,14 +990,22 @@ Repeat
       If selectPointedCBox()
         editCBoxInfo()
       EndIf 
+    Case #WM_LBUTTONUP
+      endRectSelection()
+    Case #WM_LBUTTONDOWN
+      startRectSelection()
   EndSelect
+  
+  If rectSelection\active
+    updateRectSelection()
+    displaySelectionRectangle()
+  EndIf 
   
   Delay(16)
 ForEver 
-
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 779
-; FirstLine = 760
-; Folding = -------
+; CursorPosition = 651
+; FirstLine = 635
+; Folding = --------
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico

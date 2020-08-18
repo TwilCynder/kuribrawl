@@ -268,6 +268,8 @@ Next
 CloseFile(1)
 FreeMemory(file\buffer)
 
+PrintN("Finished.")
+
 If Not silent
   Input()
 EndIf 
@@ -276,8 +278,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 163
-; FirstLine = 138
+; CursorPosition = 270
+; FirstLine = 224
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

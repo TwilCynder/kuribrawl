@@ -1,4 +1,9 @@
 ﻿;TODO : régler finalement la question du : substructure directement en field ou pointer vers heap
+;trucs pas finis
+;animations des stages/plateformes
+;double jump
+;créations des champions stages (dans gameData.pb -> dans data.twl)
+
 
 #DEBUG = 1
 
@@ -29,18 +34,15 @@ Procedure startTestGame()
 
   *f1.Fighter = newFighter(*game, getCharacter("Acid"), 150, 500)
   *f1\name = "Test One"
-  *f2.Fighter = newFighter(*game, getCharacter("Acid"), 500, 500)
-  *f2\name = "Test Two"
+  ;*f2.Fighter = newFighter(*game, getCharacter("Acid"), 500, 500)
+  ;*f2\name = "Test Two"
   setStage(*game, getStage("Snowdin"))
-  
-  DisplayTransparentSprite(*game\currentStage\backgroundAnim\model\spriteSheet, 0, 0)
-  FlipBuffers()
   
   
   setPort(0, 3)
   setPortFighter(0, *f1)
-  setPort(1, 0)
-  setPortFighter(1, *f2)
+  ;setPort(1, 0)
+  ;setPortFighter(1, *f2)
 EndProcedure  
 
 ;- Game window
@@ -116,7 +118,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 2
+; CursorPosition = 79
+; FirstLine = 67
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

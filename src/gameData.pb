@@ -14,6 +14,7 @@ commandDefaultAnimation(#COMMAND_UAir) = "uair"
 commandDefaultAnimation(#COMMAND_BAir) = "nair"
 commandDefaultAnimation(#COMMAND_DAir) = "dair"
 commandDefaultAnimation(#COMMAND_UTilt) = "utilt"
+commandDefaultAnimation(#COMMAND_Jab) = "jab"
 
 ;- ========VARIABLES=====================
 
@@ -29,18 +30,21 @@ addPlatform(*s1, 50, 200, 800, "platform")
 
 ;- ========CHARACTER SPECIFIC============
 
-
 *c1.Champion = newCharacter("Acid")
 *c1\displayName = "Acid Rainbows"
-
-
 
 *c1\moves(#COMMAND_NAir)\landLag = 5
 *c1\moves(#COMMAND_UAir)\landLag = 5
 *c1\moves(#COMMAND_DAir)\landLag = 5
 *c1\moves(#COMMAND_BAir)\landLag = 5
 *c1\moves(#COMMAND_FAir)\landLag = 5
-*c1\moves(#COMMAND_FAir)\landLag = 5
+
+makeMultiMove(*c1\moves(#COMMAND_Jab), 3)
+*c1\moves(#COMMAND_Jab)\multiMove\partEndFrames(0) = 3
+*c1\moves(#COMMAND_Jab)\multiMove\partStartFrames(0) = 5
+*c1\moves(#COMMAND_Jab)\multiMove\partEndFrames(1) = 9
+*c1\moves(#COMMAND_Jab)\multiMove\partStartFrames(1) = 12
+
 
 *c1\dashSpeed = 8.0
 *c1\initialDashSpeed = 10.0
@@ -62,5 +66,6 @@ addPlatform(*s1, 50, 200, 800, "platform")
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 15
+; CursorPosition = 44
+; FirstLine = 15
 ; EnableXP

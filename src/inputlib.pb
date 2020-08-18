@@ -266,7 +266,31 @@ EndProcedure
 
 ;- INPUT MANAGERS
 
+;jab et autres multimoves : 
+; - ajouter un moyen de stop une anim en plein milieu (propriété frameStop / callback onFrameChanged)
+; - dans les infos du move (partie dédiée aux multimoves ( p* -> malloc)) liste des frames de fin de partie
+; - début du move : l'anim est set pour se terminer à la première valeur
+; - dans l'input manager attack, si attack input pendant multimove, l'anim est set pour s'arrêter à la fin de la partie suivante
+; - etc
+
+;ensuite pour ce qui est de les faire se cancel dans la partie suivante
+; - dans les infos du multimove, aussi lister les frames de fin de partie
+; - si on passe à la partie suivante, set l'anim pour skip les frames entre la frame de fin de partie et la frame de début de partie suivante
+
 Procedure inputManager_Attack(*port.Port, *info.inputData)
+  If *port\figher\state = #STATE_ATTACK And *port\figher\currentMove\multiMove
+    part.b = (*port\figher\stateInfo % %11100000) >> 5
+    ;Debug part
+    ;Debug *port\figher\currentAnimation\frame
+    If (part = 0) Or (part <= ArraySize(*port\figher\currentMove\multiMove\partStartFrames())) And *port\figher\currentAnimation\frame >= *port\figher\currentMove\multiMove\partStartFrames(part - 1)
+      part + 1
+    Else
+      ProcedureReturn 0
+    EndIf 
+    *port\figher\stateInfo = (*port\figher\stateInfo & (~%11100000)) + (part << 5)
+    ProcedureReturn 1
+  EndIf 
+  
   If *port\figher\state = #STATE_HITSTUN Or *port\figher\state = #STATE_JUMPSQUAT
     ProcedureReturn 0
   EndIf 
@@ -303,6 +327,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     Select direction
       Case #DIRECTION_NONE
         Debug "Jab (" + *port\figher\name + ")"
+        attack(*port\figher, #COMMAND_Jab)
         ProcedureReturn 1
       Case #DIRECTION_RIGHT, #DIRECTION_LEFT
         Debug "Ftilt (" + *port\figher\name + ")"  ;ou reverse ftilt ? à voir si je fais un truc restrictif sur les reverse à la brawl
@@ -486,7 +511,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 269
-; FirstLine = 268
+; CursorPosition = 283
+; FirstLine = 263
 ; Folding = -----
 ; EnableXP

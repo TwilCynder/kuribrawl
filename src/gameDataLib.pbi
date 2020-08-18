@@ -1,5 +1,7 @@
 ﻿XIncludeFile "gamelibConstants.pb"
 
+;- Structures
+
 Structure Physics
   v.VectorDouble
   a.VectorDouble
@@ -53,8 +55,14 @@ EndStructure
 Dim stateDefaultAnimation.s(#STATES)
 Dim commandDefaultAnimation.s(#COMMANDS)
 
-Structure moveInfo
+Structure MultiMoveInfo
+  Array partEndFrames.b(0)
+  Array partStartFrames.b(0)
+EndStructure
+
+Structure MoveInfo
   landLag.b
+  *multiMove.MultiMoveInfo
 EndStructure
 
 Structure Champion
@@ -201,8 +209,17 @@ Procedure addHurtbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_
   ProcedureReturn *r
 EndProcedure
 
+Procedure makeMultiMove(*attack.MoveInfo, nbMoves)
+  If nbMoves < 2
+    nbMoves = 2
+  EndIf 
+  *attack\multiMove = AllocateStructure(MultiMoveInfo)
+  ReDim *attack\multiMove\partEndFrames(nbMoves - 2)
+  ReDim *attack\multiMove\partStartFrames(nbMoves - 2)
+EndProcedure
+
 Procedure newStage(name.s)
-  ProcedureReturn AddMapElement(kuribrawl\stages(), name)  
+  ProcedureReturn AddMapElement(kuribrawl\stages(), name)
 EndProcedure
 
 Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
@@ -216,7 +233,6 @@ Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
 EndProcedure
 
 Procedure newStageAnimation(*stage.StageModel, name.s, spriteTag.s, speed.d = 1)
-  Debug *stage
   *animation = AddMapElement(*stage\animations(), name)
   initAnimationModel(*animation, spriteTag, speed)
   ProcedureReturn *animation
@@ -236,7 +252,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 218
-; FirstLine = 176
+; CursorPosition = 234
+; FirstLine = 201
 ; Folding = ---
 ; EnableXP
