@@ -651,10 +651,7 @@ Procedure rectSelectionCreateCBox(type.b)
   
   x = -(*selectedAnim\frames()\origin\x - (x - viewPosition\x))
   y = viewPosition\y + *selectedAnim\frames()\origin\y - y
-  
-  Debug x
-  Debug y
-  
+ 
   If type = #CBOX_TYPE_HURT
     newHurtbox(x, y, w, h)
   Else 
@@ -897,6 +894,9 @@ EndProcedure
 
 Procedure endRectSelection()
   Shared rectSelection
+  If Not rectSelection\active
+    ProcedureReturn
+  EndIf 
   rectSelection\active = 0
   If Abs(rectSelection\coord\left - rectSelection\coord\right) > 10 Or Abs (rectSelection\coord\top - rectSelection\coord\bottom) > 10
     DisplayPopupMenu(3, WindowID(0))
@@ -993,7 +993,11 @@ Repeat
     Case #WM_LBUTTONUP
       endRectSelection()
     Case #WM_LBUTTONDOWN
-      startRectSelection()
+      If IsWindowEnabled_(WindowID(0))
+        
+        startRectSelection()
+      EndIf
+      
   EndSelect
   
   If rectSelection\active
@@ -1004,8 +1008,8 @@ Repeat
   Delay(16)
 ForEver 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 651
-; FirstLine = 635
+; CursorPosition = 999
+; FirstLine = 954
 ; Folding = --------
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico

@@ -8,6 +8,7 @@ Enumeration ;inputs
   #INPUT_Attack
   #INPUT_Special
   #INPUT_Jump
+  #INPUT_Shorthop
   #INPUT_Grab
   #INPUT_Guard
   #INPUT_Smash
@@ -40,5 +41,5 @@ Enumeration ;same
   #AXISES
 EndEnumeration
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 5
+; CursorPosition = 10
 ; EnableXP

@@ -100,6 +100,9 @@ EndStructure
 Structure StageModel
   List platforms.platformModel()
   Map animations.AnimationModel()
+  w.l
+  h.l
+  cameraZone.RECT
   *backgroundAnim.AnimationModel
 EndStructure
 
@@ -112,6 +115,7 @@ Structure GameVariables
   backwardJumpBoost.d
   walkingJumpBoost.d
   doubleJumpBackwardSpeed.d
+  cameraMaxSpeed.d
 EndStructure
 
 Structure GameData
@@ -218,10 +222,29 @@ Procedure makeMultiMove(*attack.MoveInfo, nbMoves)
   ReDim *attack\multiMove\partStartFrames(nbMoves - 2)
 EndProcedure
 
-Procedure newStage(name.s)
-  ProcedureReturn AddMapElement(kuribrawl\stages(), name)
+Procedure newStage(name.s, w.l, h.l)
+  Define *stage.StageModel
+  *stage = AddMapElement(kuribrawl\stages(), name)
+  *stage\w = w
+  *stage\h = h
+  *stage\cameraZone\left = 0
+  *stage\cameraZone\top = 0
+  *stage\cameraZone\bottom = #SCREEN_H
+  *stage\cameraZone\right = #SCREEN_W
+  ProcedureReturn *stage
 EndProcedure
 
+Procedure setStageCameraZone(*stage.StageModel, w.l, h.l)
+  *stage\cameraZone\left = (*stage\w - w) / 2
+  *stage\cameraZone\right = *stage\cameraZone\left + w
+  *stage\cameraZone\top = (*stage\h - h) / 2
+  *stage\cameraZone\bottom = *stage\cameraZone\left + h
+  Debug *stage\w
+  Debug w
+  Debug *stage\cameraZone\left
+  Debug *stage\cameraZone\right
+EndProcedure  
+  
 Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
   Define *r.PlatformModel
   *r = AddElement(*stage\platforms())
@@ -231,6 +254,10 @@ Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
   *r\animationName = animationName
   ProcedureReturn *r
 EndProcedure
+
+Procedure addCenteredPlatform(*stage.StageModel, y.l, w.l, animationName.s = "")
+  addPlatform(*stage, (*stage\w / 2) - (w / 2), y, w, animationName)
+EndProcedure 
 
 Procedure newStageAnimation(*stage.StageModel, name.s, spriteTag.s, speed.d = 1)
   *animation = AddMapElement(*stage\animations(), name)
@@ -252,7 +279,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 234
-; FirstLine = 201
-; Folding = ---
+; CursorPosition = 117
+; FirstLine = 81
+; Folding = ----
 ; EnableXP

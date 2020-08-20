@@ -21,23 +21,25 @@ commandDefaultAnimation(#COMMAND_Jab) = "jab"
 kuribrawl\variables\walkingJumpBoost = 3.0
 kuribrawl\variables\backwardJumpBoost = 3.0
 kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
+kuribrawl\variables\cameraMaxSpeed = 10
 
 ;- ========STAGE SPECIFIC================
-*s1.StageModel = newStage("Snowdin")
+*s1.StageModel = newStage("Snowdin", #SCREEN_W * 1.5, #SCREEN_H)
+setStageCameraZone(*s1, #SCREEN_W * 1.2, #SCREEN_H)
 ;addPlatform(*s1, -200, 400, 500, "platform")
 ;addPlatform(*s1, 100, 200, 500, "platform")
-addPlatform(*s1, 50, 200, 800, "platform")
+addCenteredPlatform(*s1, 200, 850, "platform")
 
 ;- ========CHARACTER SPECIFIC============
 
 *c1.Champion = newCharacter("Acid")
 *c1\displayName = "Acid Rainbows"
 
-*c1\moves(#COMMAND_NAir)\landLag = 5
-*c1\moves(#COMMAND_UAir)\landLag = 5
-*c1\moves(#COMMAND_DAir)\landLag = 5
+*c1\moves(#COMMAND_NAir)\landLag = 4
+*c1\moves(#COMMAND_UAir)\landLag = 6
+*c1\moves(#COMMAND_DAir)\landLag = 8
 *c1\moves(#COMMAND_BAir)\landLag = 5
-*c1\moves(#COMMAND_FAir)\landLag = 5
+*c1\moves(#COMMAND_FAir)\landLag = 8
 
 makeMultiMove(*c1\moves(#COMMAND_Jab), 3)
 *c1\moves(#COMMAND_Jab)\multiMove\partEndFrames(0) = 3
@@ -66,6 +68,5 @@ makeMultiMove(*c1\moves(#COMMAND_Jab), 3)
 *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 44
-; FirstLine = 15
+; CursorPosition = 23
 ; EnableXP

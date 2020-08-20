@@ -60,6 +60,8 @@ hurtgroundL.png
 AL:Acid/hurtground
 fair_strip10.png
 A:Acid/fair fair.dat
+fair_strip10L.png
+AL:Acid/fair
 uphurt.png
 A:Acid/hurtup hurtup.dat
 spinhurt_strip4.png
@@ -82,6 +84,8 @@ utilt_3_strip8L.png
 AL:Acid/utilt
 jab_strip19.png
 A:Acid/jab jab.dat
+jab_strip19L.png
+AL:Acid/jab
 stage_plat_main.png
 A:_Snowdin/platform platform.dat
 stage_bg.png

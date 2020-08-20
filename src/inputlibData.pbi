@@ -30,7 +30,7 @@ With defaultControler\defaultBinding
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_A : \buttons()\input = #INPUT_Attack
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_B : \buttons()\input = #INPUT_Special
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_X : \buttons()\input = #INPUT_Jump
-  AddElement(\buttons()) : \buttons()\ID = #BUTTON_Y : \buttons()\input = #INPUT_Jump
+  AddElement(\buttons()) : \buttons()\ID = #BUTTON_Y : \buttons()\input = #INPUT_Shorthop
   AddElement(\buttons()) : \buttons()\ID = #BUTTON_Z : \buttons()\input = #INPUT_Grab
   AddElement(\axises()) : \axises()\ID = #AXIS_RIGHT : \axises()\input = #INPUT_Attack
   AddElement(\triggers()) : \triggers()\ID = #AXIS_LEFT : \triggers()\input = #INPUT_Guard
@@ -59,5 +59,6 @@ EndWith
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 36
+; CursorPosition = 32
+; FirstLine = 3
 ; EnableXP

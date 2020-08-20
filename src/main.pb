@@ -31,18 +31,17 @@ Procedure startTestGame()
   EndIf 
   
   *game = initGame(window)
-
-  *f1.Fighter = newFighter(*game, getCharacter("Acid"), 150, 500)
-  *f1\name = "Test One"
-  ;*f2.Fighter = newFighter(*game, getCharacter("Acid"), 500, 500)
-  ;*f2\name = "Test Two"
-  setStage(*game, getStage("Snowdin"))
   
+  setStage(*game, getStage("Snowdin"))
+  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 500)
+  *f1\name = "Test One"
+  *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 500)
+  *f2\name = "Test Two"
   
   setPort(0, 3)
   setPortFighter(0, *f1)
-  ;setPort(1, 0)
-  ;setPortFighter(1, *f2)
+  setPort(1, 0)
+  setPortFighter(1, *f2)
 EndProcedure  
 
 ;- Game window
@@ -63,14 +62,13 @@ XIncludeFile "gameData.pb"
 
 CompilerIf #DEBUG
   loadGameData("res/data.twl")
+  For i = 1 To availableJosticks
+    Debug Str(i - 1) + JoystickName(i - 1)
+  Next
 CompilerElse 
   loadGameData("data.twl")
 CompilerEndIf
 initDefaultAnimationsConfig(*c1)
-  
-For i = 1 To availableJosticks
-  Debug Str(i - 1) + JoystickName(i - 1)
-Next
 
 startTestGame()
 
@@ -118,8 +116,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 79
-; FirstLine = 67
+; CursorPosition = 39
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

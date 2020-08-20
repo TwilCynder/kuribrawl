@@ -81,7 +81,7 @@ Procedure applyPhysics(*game.Game)
       substractValue(@*fighter\physics\v\x, *fighter\character\airFriction)
     EndIf 
     
-    ;--- Application des vitesses dues aux états (walk/dashà
+    ;--- Application des vitesses dues aux états (walk/dash)
     
     Select *fighter\state
       Case #STATE_WALK  
@@ -131,6 +131,17 @@ Procedure applyPhysics(*game.Game)
       *fighter\grounded = 0
     EndIf 
     
+    ;--- Vérification de sortie de blastzone
+      ;TODO: calculer l'angle de sortie
+    If ny < 0 Or nx < 0 Or nx > *game\currentStage\model\w
+      Debug "DEATH"
+      nx = *game\currentStage\model\w / 2
+      ny = 500
+      *fighter\physics\v\x = 0
+      *fighter\physics\v\y = 0
+      setState(*fighter, #STATE_IDLE)
+    EndIf 
+    
     ;--- Application des vitesses
     
     *fighter\x = nx
@@ -138,7 +149,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 58
-; FirstLine = 24
+; CursorPosition = 140
+; FirstLine = 95
 ; Folding = --
 ; EnableXP

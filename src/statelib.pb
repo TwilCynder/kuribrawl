@@ -83,7 +83,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 56
-; FirstLine = 32
+; CursorPosition = 27
+; FirstLine = 14
 ; Folding = -
 ; EnableXP

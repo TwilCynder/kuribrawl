@@ -396,14 +396,16 @@ Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
 EndProcedure
 *inputManagers(#INPUT_ControlStick_LEFT) = @inputManager_smashStickLeft()
 
-Procedure inputManager_jump(*port.Port, *info.inputData)
-  Shared defaultControler
+Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
+    Shared defaultControler
   Define jumpType.b, jumpElement.b, jumpElementType.b
-  jumpElementType = (*port\figher\stateInfo & %1100) >> 2
-  jumpElement = (*port\figher\stateInfo & %111110000) >> 4
-  If *port\figher\state = #STATE_JUMPSQUAT And Not (*info\element = jumpElement And *info\elementType = jumpElementType)
-    *port\figher\stateInfo = *port\figher\stateInfo | %10
-    ProcedureReturn 1
+  If *port\figher\state = #STATE_JUMPSQUAT
+    jumpElementType = (*port\figher\stateInfo & %1100) >> 2
+    jumpElement = (*port\figher\stateInfo & %111110000) >> 4
+    If Not (*info\element = jumpElement And *info\elementType = jumpElementType)
+      *port\figher\stateInfo = *port\figher\stateInfo | %10
+      ProcedureReturn 1  
+    EndIf 
   EndIf 
   
   If Not state_can_jump(*port\figher\state)
@@ -415,7 +417,7 @@ Procedure inputManager_jump(*port.Port, *info.inputData)
     Else 
       jumpType = #JUMP_NORMAL
     EndIf 
-    setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (*info\elementType << 2) + (*info\element << 4))
+    setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (typeY << 1) + (*info\elementType << 2) + (*info\element << 4))
   ElseIf *port\figher\jumps > 0
     If Abs(*port\currentControlStickState\x) > stickTreshold
       If  Sign(*port\currentControlStickState\x) = *port\figher\facing 
@@ -428,8 +430,17 @@ Procedure inputManager_jump(*port.Port, *info.inputData)
     EndIf
     *port\figher\jumps - 1  
   EndIf 
+EndProcedure  
+  
+Procedure inputManager_jump(*port.Port, *info.inputData)
+  jumpManager(*port, *info, 0)
 EndProcedure
 *inputManagers(#INPUT_Jump) = @inputManager_jump()
+
+Procedure inputManager_shorthop(*port.Port, *info.inputData)
+  jumpManager(*port, *info, #YJUMP_SHORT)
+EndProcedure
+*inputManagers(#INPUT_Shorthop) = @inputManager_shorthop()
 
 Procedure inputManager_smashStickDown(*port.Port, *info.inputData)
   If Not *port\figher\grounded And *port\figher\physics\v\y < 0
@@ -511,7 +522,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 283
-; FirstLine = 263
+; CursorPosition = 440
+; FirstLine = 397
 ; Folding = -----
 ; EnableXP

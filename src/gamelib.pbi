@@ -2,7 +2,7 @@
 Global bgc.l = #White
 Global testVal.b = 0
 
-;- Structure
+;- Structures
 
 Structure Frame
   *model.FrameModel
@@ -58,12 +58,16 @@ Structure Stage
   *model.StageModel
   *backgroundAnim.Animation
   List platforms.Platform()
+EndStructure 
+
+Structure Camera Extends Vector
 EndStructure
 
 Structure Game
   List fighters.Fighter()
   *currentStage.Stage
   window.l
+  camera.Camera
 EndStructure
 
 Procedure initAnimation(*anim.Animation, *model.AnimationModel)
@@ -79,6 +83,8 @@ EndProcedure
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
   *game\window = window
+  *game\camera\x = 0
+  *game\camera\y = 0
   ProcedureReturn *game
 EndProcedure
  
@@ -147,6 +153,7 @@ Procedure setStage(*game.Game, *model.StageModel)
       setAnimationSpeed(*game\currentStage\platforms()\animation)
     EndIf 
   Next 
+  *game\camera\x = (*game\currentStage\model\w - #SCREEN_W) / 2
 EndProcedure 
 
 Procedure freeStage(*stage.Stage)
@@ -220,8 +227,8 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing 
   EndWith
 EndProcedure
 
-Procedure renderFighter(*fighter.Fighter)
-  Define spriteSheet.l, facing.b
+Procedure renderFighter(*fighter.Fighter, *camera.Camera)
+  Define spriteSheet.l, facing.b, x.l, y.l
   If *fighter\currentAnimation\facing = 0
     facing = *fighter\facing
   Else
@@ -233,7 +240,10 @@ Procedure renderFighter(*fighter.Fighter)
     spriteSheet = *fighter\currentAnimation\model\spriteSheet
   EndIf 
   *frame.FrameModel = *fighter\currentAnimation\frames()\model
-  drawAnimationFrame(*frame, spriteSheet, *fighter\x, #SCREEN_H - *fighter\y, facing)
+  x = *fighter\x - *camera\x
+  y = #SCREEN_H - *fighter\y - *camera\y
+  drawAnimationFrame(*frame, spriteSheet, x, y, facing)
+  ;*camera\x + x
   CompilerIf #DEBUG
     Define hurtColor.l
     If *fighter\state = #STATE_HITSTUN
@@ -245,17 +255,17 @@ Procedure renderFighter(*fighter.Fighter)
     DrawingMode(#PB_2DDrawing_Outlined)
     Line(0, y, #SCREEN_W, 1, #Blue)
     ForEach *frame\hitboxes()
-      Box(*fighter\x + getRealCboxX(*frame\hitboxes(), facing), #SCREEN_H - *fighter\y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+      Box(x + getRealCboxX(*frame\hitboxes(), facing), y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
     Next
     ForEach *frame\hurtboxes()
-      Box(*fighter\x + getRealCboxX(*frame\hurtboxes(), facing), #SCREEN_H - *fighter\y - *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, hurtColor)
+      Box(x + getRealCboxX(*frame\hurtboxes(), facing), y - *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, hurtColor)
     Next
     StopDrawing()
   CompilerEndIf
 EndProcedure
 
-Procedure renderPlatform(*platform.Platform)
-  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x, #SCREEN_H - *platform\model\y)
+Procedure renderPlatform(*platform.Platform, *camera.Camera)
+  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x - *camera\x, #SCREEN_H - *platform\model\y - *camera\y)
 EndProcedure
 
 Procedure renderStage(*stage.Stage)
@@ -265,16 +275,35 @@ Procedure renderStage(*stage.Stage)
 EndProcedure
 
 Procedure renderFrame(*game.Game)
+  Define medPos.Vector
   ClearScreen(bgc)
   
   If *game\currentStage
     renderStage(*game\currentStage)
   EndIf 
   ForEach *game\currentStage\platforms()
-    renderPlatform(@*game\currentStage\platforms())
+    renderPlatform(@*game\currentStage\platforms(), *game\camera)
   Next
   ForEach *game\fighters()
-    renderFighter(@*game\fighters())
+    medPos\x + *game\fighters()\x    
+  Next 
+  medPos\x / ListSize(*game\fighters())
+  medPos\x - (#SCREEN_W / 2)
+  
+  If Abs (*game\camera\x - medPos\x) < kuribrawl\variables\cameraMaxSpeed
+    *game\camera\x = medPos\x
+  Else
+    *game\camera\x + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\x - medPos\x))
+  EndIf 
+  
+  If *game\camera\x < *game\currentStage\model\cameraZone\left
+    *game\camera\x = *game\currentStage\model\cameraZone\left
+  ElseIf *game\camera\x + #SCREEN_W > *game\currentStage\model\cameraZone\right
+    *game\camera\x =  *game\currentStage\model\cameraZone\right - #SCREEN_W
+  EndIf 
+  
+  ForEach *game\fighters()
+    renderFighter(@*game\fighters(), *game\camera)
   Next
   FlipBuffers()
   bgc = #White
@@ -611,9 +640,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 93
-; FirstLine = 75
-; Folding = ----2---
+; CursorPosition = 155
+; FirstLine = 135
+; Folding = --0-2---
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode
