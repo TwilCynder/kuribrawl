@@ -1,3 +1,5 @@
+acid_rainbows.dat
+C:Acid
 dash_strip4.png
 A:Acid/dash dash.dat
 dash_strip4L.png

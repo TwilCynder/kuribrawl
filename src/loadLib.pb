@@ -8,12 +8,43 @@
 #FILEMARKER_HURTBOXINFO = 3
 #FILEMARKER_HITBOXINFO = 4
 #FILEMARKER_INTERFILE = $54
+#FILEMARKER_MOVEINFO = 2
+#FILEMARKER_LANDINGLAG = $20
+#FILEMARKER_MULTIMOVE = 3
+#FILEMARKER_MULTIMOVEEND = $30
 
 Enumeration 
   #FILETYPE_ANIMATION
   #FILETYPE_LEFTANIM
+  #FILETYPE_CHAMPION
 EndEnumeration
 
+Enumeration 
+  #ANIMATIONTYPE_CHAMPION
+  #ANIMATIONTYPE_STAGE
+EndEnumeration
+
+Procedure readChampionValues(*champion.Champion)
+ *champion\walkSpeed = ReadDouble(0)
+ *champion\dashSpeed = ReadDouble(0)
+ *champion\initialDashSpeed = ReadDouble(0)
+ *champion\dashTurnAccel = ReadDouble(0)
+ *champion\maxAirSpeed = ReadDouble(0)
+ *champion\airAcceleration = ReadDouble(0)
+ *champion\traction = ReadDouble(0)
+ *champion\jumpSpeed = ReadDouble(0) 
+ *champion\jumpsquatDuration = ReadByte(0)
+ *champion\dashStopDuration = ReadByte(0)
+ *champion\dashStartDuration = ReadByte(0)
+ *champion\dashTurnDuration = ReadByte(0)
+ *champion\shortHopSpeed = ReadDouble(0)
+ *champion\doubleJumpSpeed = ReadDouble(0)
+ *champion\maxFallSpeed = ReadDouble(0)
+ *champion\fastFallSpeed = ReadDouble(0)
+ *champion\airFriction = ReadDouble(0)
+ *champion\landingDuration = ReadByte(0)
+EndProcedure  
+  
 Procedure.s LoadSprite_(*buffer, tag.s)
   Shared loadedSprites()
   Define sprite.l
@@ -35,7 +66,7 @@ Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.Fr
   x = 0
   y = 0
   w = w / nb
-  If originType = 0
+  If originType = #ANIMATIONTYPE_CHAMPION
     For i = 0 To nb - 1
       *frames(i) = addFrame(*animation, x, y, w, h, w / 2, h)
       x + w
@@ -48,6 +79,14 @@ Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.Fr
   EndIf 
 EndProcedure
 
+Procedure tryChampion(name.s)
+  *r = getCharacter(name)
+  If Not *r
+    *r = newCharacter(name)
+  EndIf
+  ProcedureReturn *r
+EndProcedure  
+  
 Procedure loadGameData(path.s)
   Shared loadedSprites()
   ;- opening file
@@ -56,7 +95,7 @@ Procedure loadGameData(path.s)
   EndIf 
   readVersion()
 
-  Define type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, selectedElement.b, value.l, w.l, h.l, valueF.f, type2.b
+  Define type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, w.l, h.l, valueF.f, subType.b
   Dim *frames.FrameModel(0)
   
   *buffer = 0
@@ -69,17 +108,58 @@ Procedure loadGameData(path.s)
     
     ;-reading file data
     Select type
+      Case #FILETYPE_CHAMPION
+        If Not ReadByte(0) = #FILEMARKER_DESCRIPTORSTART
+          Debug "Error : unexpected byte (no descriptorstartat the beginning of a champion data)"
+        EndIf 
+        *character = tryChampion(tag)
+        *character\displayName = ReadString(0, #PB_UTF8)
+        readChampionValues(*character)  
+        Repeat 
+          byte = ReadByte(0)
+          Select byte
+            Case #FILEMARKER_MOVEINFO
+              selectedElement = ReadByte(0)
+            Case #FILEMARKER_LANDINGLAG
+              *character\moves(selectedElement)\landLag = ReadByte(0)
+            Case #FILEMARKER_MULTIMOVE
+              NewList multiMove.b()
+              byte = ReadByte(0)
+              value = 0
+              While Not byte = #FILEMARKER_MULTIMOVEEND
+                addElementVal(multiMove(), byte)
+                byte = ReadByte(0)
+                addElementVal(multiMove(), byte)
+                value + 1
+              Wend 
+              makeMultiMove(*character\moves(selectedElement), value)
+              value = 0
+              ForEach multiMove()
+                *character\moves(selectedElement)\multiMove\partEndFrames(value) = multiMove()
+                NextElement(multiMove())
+                *character\moves(selectedElement)\multiMove\partStartFrames(value) = multiMove()
+                value + 1
+              Next 
+            Case #FILEMARKER_FRAMEDURATION
+              *frames(selectedElement)\duration = ReadUnicodeCharacter(0)
+            Case #FILEMARKER_INTERFILE
+              Break 
+          EndSelect
+        ForEver
       Case #FILETYPE_ANIMATION
-        
+        ;- - File type : Animation
+        ;- - - Parsing animation tag
         character.s = StringField(tag, 1, "/")
-        
         animationName.s = StringField(tag, 2, "/")
+        
+        ;- - - Loading spritesheet
         LoadSprite_(*buffer, tag)
         
         *animation = 0
         
+        ;- - - Obtaining animation object
         If (Left(character, 1) = "_")
-          type2 = 1
+          subType = #ANIMATIONTYPE_STAGE
           character = Mid(character, 2)
           *stage.StageModel = getStage(character)
           *animation = newStageAnimation(*stage, animationName, tag)
@@ -88,10 +168,10 @@ Procedure loadGameData(path.s)
             *stage\backgroundAnim = *animation
           EndIf 
         Else
-          type2 = 0
-          *animation = getAnimation(getCharacter(character), animationName)
+          subType = #ANIMATIONTYPE_CHAMPION
+          *animation = getAnimation(tryChampion(character), animationName)
           If Not *animation
-            *animation = newAnimation(getCharacter(character), animationName, tag)
+            *animation = newAnimation(tryChampion(character), animationName, tag)
           Else
             *animation\spriteSheet = loadedSprites(tag)
           EndIf 
@@ -107,12 +187,12 @@ Procedure loadGameData(path.s)
           Debug "Error : unexpected byte (neither interfile or descriptorstart) after file " + tag
           End
         EndIf 
-        ;- reading descriptor
+        ;- - - reading descriptor
         
         byte = ReadByte(0)
         
         If byte > 0
-          makeFrames(*animation, w, h, byte, *frames(), type2)
+          makeFrames(*animation, w, h, byte, *frames(), subType)
         EndIf 
         
         Repeat 
@@ -171,9 +251,9 @@ Procedure loadGameData(path.s)
         
         LoadSprite_(*buffer, tag)
         
-        *animation = getAnimation(getCharacter(character), animationName)
+        *animation = getAnimation(tryChampion(character), animationName)
         If Not *animation
-          *animation = newAnimation(getCharacter(character), animationName, "")
+          *animation = newAnimation(tryChampion(character), animationName, "")
         EndIf
         
         addLeftSpritesheet(getAnimation(getCharacter(character), animationName), tag)
@@ -187,7 +267,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 160
-; FirstLine = 117
+; CursorPosition = 141
+; FirstLine = 93
 ; Folding = -
 ; EnableXP

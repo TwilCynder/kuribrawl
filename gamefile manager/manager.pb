@@ -7,10 +7,22 @@
 #FILEMARKER_HURTBOXINFO = 3
 #FILEMARKER_HITBOXINFO = 4
 #FILEMARKER_INTERFILE = $54
+#FILEMARKER_MOVEINFO = 2
+#FILEMARKER_LANDINGLAG = $20
+#FILEMARKER_MULTIMOVE = 3
+#FILEMARKER_MULTIMOVEEND = $30
 
 Enumeration 
   #FILETYPE_ANIMATION
   #FILETYPE_LEFTANIM
+  #FILETYPE_CHAMPION
+EndEnumeration
+
+#CHAMPION_VALUES_NB = 18
+
+Enumeration 
+  #TYPE_BYTE
+  #TYPE_DOUBLE
 EndEnumeration
 
 Structure loadedFile
@@ -23,6 +35,26 @@ Structure toLoad
   type.b
   infos.s
 EndStructure
+
+Dim championValues.b(#CHAMPION_VALUES_NB)
+championValues(1) = #TYPE_DOUBLE 
+championValues(2) = #TYPE_DOUBLE 
+championValues(3) = #TYPE_DOUBLE 
+championValues(4) = #TYPE_DOUBLE 
+championValues(5) = #TYPE_DOUBLE 
+championValues(6) = #TYPE_DOUBLE 
+championValues(7) = #TYPE_DOUBLE 
+championValues(8) = #TYPE_DOUBLE
+championValues(9) = #TYPE_BYTE
+championValues(10) = #TYPE_BYTE
+championValues(11) = #TYPE_BYTE
+championValues(12) = #TYPE_BYTE
+championValues(13) = #TYPE_DOUBLE
+championValues(14) = #TYPE_DOUBLE
+championValues(15) = #TYPE_DOUBLE
+championValues(16) = #TYPE_DOUBLE
+championValues(17) = #TYPE_DOUBLE
+championValues(18) = #TYPE_BYTE
 
 Procedure readFileToMemory(filename$, *file.loadedFile)
   If Not ReadFile(0, filename$)
@@ -67,12 +99,75 @@ Procedure writeInterfile()
 EndProcedure
 
 Procedure writeFileDescriptor(type.b, infos.s)
+  Shared championValues()
   Define line.s, value.s, i.b
   
   If infos = ""
     ProcedureReturn 0
   EndIf   
   Select type
+    Case #FILETYPE_CHAMPION
+      PrintN("- Champion descriptor")
+      WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
+      If Not ReadFile(2, infos)
+        WriteByte(1, -1)
+        PrintN("- - Can't find descriptor " + infos)
+        ProcedureReturn 1
+      EndIf 
+      line = ReadString(2)
+      PrintN("- - Display name : " + line)
+      WriteString(1, line, #PB_UTF8)
+      WriteByte(1, 0)
+      
+      line = ReadString(2)
+      PrintN("- - Values : " + line)
+      For i = 1 To #CHAMPION_VALUES_NB
+        If championValues(i) = #TYPE_DOUBLE
+          WriteDouble(1, ValD(StringField(line, i, " ")))
+        Else 
+          WriteByte(1, Val(StringField(line, i, " ")))
+        EndIf 
+      Next 
+      While Not Eof(2)
+        line = ReadString(2)
+        Select Left(line, 1)
+          Case "m"
+            value = Mid(StringField(line, 1, " "), 2)
+            WriteByte(1, #FILEMARKER_MOVEINFO)
+            WriteByte(1, Val(value))
+            PrintN("- - move modified : " + value)
+            i = 2
+            value = StringField(line, i, " ")
+            While value
+              Select Left(value, 1)
+                Case "l"
+                  WriteByte(1, #FILEMARKER_LANDINGLAG)
+                  WriteByte(1, Val(Mid(value, 2)))
+                  PrintN("- - - landing lag : " + Mid(value, 2))
+              EndSelect
+              i + 1
+              value = StringField(line, i, " ")
+            Wend 
+          Case "u"
+            value = Mid(StringField(line, 1, " "), 2)
+            WriteByte(1, #FILEMARKER_MULTIMOVE)
+            WriteByte(1, Val(value))
+            PrintN("- - multimove : " + value)
+            i = 2
+            value = StringField(line, i, " ")
+            While value
+              WriteByte(1, Val(value))
+              PrintN("- - - end frame : " + value)
+              i + 1
+              value = StringField(line, i, " ")
+              WriteByte(1, Val(value))
+              PrintN("- - - start frame : " + value)
+              i + 1
+              value = StringField(line, i, " ")
+            Wend 
+            WriteByte(1, #FILEMARKER_MULTIMOVEEND)
+        EndSelect
+      Wend 
     Case #FILETYPE_ANIMATION
       PrintN("- starting descriptor")
       WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
@@ -181,7 +276,6 @@ Procedure writeFileDescriptor(type.b, infos.s)
   EndSelect
 EndProcedure
 
-
 Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   PrintN("file path : " + path)
   PrintN("tag : " + tag)
@@ -191,10 +285,15 @@ Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   EndIf 
   writeType(type)
   writeFileTag(tag)
-  WriteFileLength(*f\size)
-  PrintN("Pointer position : " + Str(Loc(1)))
-  writeMemoryToFile(1, *f)
-  writeFileDescriptor(type, info)
+  If type = #FILETYPE_CHAMPION
+    WriteFileLength(0)
+    writeFileDescriptor(type, path)
+  Else
+    WriteFileLength(*f\size)
+    PrintN("Pointer position : " + Str(Loc(1)))
+    writeMemoryToFile(1, *f)
+    writeFileDescriptor(type, info)
+  EndIf 
   writeInterfile()
 EndProcedure
 
@@ -214,12 +313,11 @@ For i = 1 To CountProgramParameters()
     If param = "-s"
       silent = 1
     EndIf
-  ElseIf CheckFilename(param)
+  Else
     SetCurrentDirectory(param)
     PrintN(GetCurrentDirectory())
   EndIf 
 Next 
-
 
 Define tag.s, path.s, type.b, infos.s
 If Not ReadFile(2, "project_db.txt")
@@ -235,7 +333,7 @@ If buildPath = "" Or Not CreateFile(1, buildPath)
   CreateFile(1, "data.twl")
 EndIf 
 writeSignature()
-writeVersion(0, 0, 1)
+writeVersion(0, 2, 0)
 
 While Not Eof(2)
   path = ReadString(2)
@@ -249,6 +347,8 @@ While Not Eof(2)
       type = #FILETYPE_ANIMATION
     Case "AL"
       type = #FILETYPE_LEFTANIM
+    Case "C" 
+      type = #FILETYPE_CHAMPION
     Default:Continue
   EndSelect
   tag = StringField(tag, 2, ":")
@@ -278,8 +378,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 270
-; FirstLine = 224
+; CursorPosition = 315
+; FirstLine = 290
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

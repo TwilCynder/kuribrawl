@@ -5,7 +5,7 @@
 ;créations des champions stages (dans gameData.pb -> dans data.twl)
 
 
-#DEBUG = 1
+#DEBUG = 0
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
@@ -15,6 +15,7 @@ XIncludeFile "gamelib.pbi"
 XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
+XIncludeFile "gameData.pb"
 
 CompilerIf #DEBUG
   XIncludeFile "debug.pb"
@@ -33,9 +34,9 @@ Procedure startTestGame()
   *game = initGame(window)
   
   setStage(*game, getStage("Snowdin"))
-  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 500)
+  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 200)
   *f1\name = "Test One"
-  *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 500)
+  *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 200)
   *f2\name = "Test Two"
   
   setPort(0, 3)
@@ -56,9 +57,12 @@ CompilerEndIf
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
   BindMenuEvent(0, 0, @startTestGame())
 
-;- Game data
 
-XIncludeFile "gameData.pb"
+*s1.StageModel = newStage("Snowdin", #SCREEN_W * 1.5, #SCREEN_H)
+setStageCameraZone(*s1, #SCREEN_W * 1.2, #SCREEN_H)
+;addPlatform(*s1, -200, 400, 500, "platform")
+;addPlatform(*s1, 100, 200, 500, "platform")
+addCenteredPlatform(*s1, 200, 850, "platform")
 
 CompilerIf #DEBUG
   loadGameData("res/data.twl")
@@ -68,7 +72,11 @@ CompilerIf #DEBUG
 CompilerElse 
   loadGameData("data.twl")
 CompilerEndIf
-initDefaultAnimationsConfig(*c1)
+
+ForEach kuribrawl\characters()
+  initDefaultAnimationsConfig(kuribrawl\characters())
+Next 
+
 
 startTestGame()
 
@@ -116,7 +124,7 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 39
+; CursorPosition = 7
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

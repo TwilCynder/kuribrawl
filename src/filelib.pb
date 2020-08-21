@@ -28,6 +28,9 @@ Procedure readFileLength()
 EndProcedure
 
 Procedure readFileData(size.l, *buffer)
+  If size = 0
+    ProcedureReturn 0
+  EndIf 
   *buffer = ReAllocateMemory(*buffer, size)
   ReadData(0, *buffer, size)
   ProcedureReturn *buffer
@@ -37,6 +40,6 @@ Procedure checkInterfile()
  ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 7
+; CursorPosition = 32
 ; Folding = --
 ; EnableXP

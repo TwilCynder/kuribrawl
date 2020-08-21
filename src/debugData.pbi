@@ -30,6 +30,7 @@ StateNames(#STATE_ATTACK) = "Attack"
 ;ATTACK_AIR = ATTACK && !grounded
 StateNames(#STATE_LANDING_LAG) = "Landing Lag"
 StateNames(#STATE_HITSTUN) = "Hitstun"
+StateNames(#STATE_TUMBLE) = "Tumble"
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 31
+; CursorPosition = 32
 ; EnableXP

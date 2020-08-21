@@ -87,7 +87,7 @@ Structure Champion
   maxFallSpeed.d
   fastFallSpeed.d
   airFriction.d
-  landingDuration.d
+  landingDuration.b
 EndStructure
 
 Structure PlatformModel
@@ -155,9 +155,7 @@ Procedure initAnimationModel(*animation.AnimationModel, spriteTag.s, speed.d = 1
   If spriteTag
     *animation\spriteSheet = loadedSprites(spriteTag)
   EndIf 
-  
   *animation\baseSpeed = speed
-  
 EndProcedure
 
 Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
@@ -239,10 +237,6 @@ Procedure setStageCameraZone(*stage.StageModel, w.l, h.l)
   *stage\cameraZone\right = *stage\cameraZone\left + w
   *stage\cameraZone\top = (*stage\h - h) / 2
   *stage\cameraZone\bottom = *stage\cameraZone\left + h
-  Debug *stage\w
-  Debug w
-  Debug *stage\cameraZone\left
-  Debug *stage\cameraZone\right
 EndProcedure  
   
 Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
@@ -279,7 +273,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 117
-; FirstLine = 81
+; CursorPosition = 89
+; FirstLine = 69
 ; Folding = ----
 ; EnableXP
