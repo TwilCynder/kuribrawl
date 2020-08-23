@@ -1,4 +1,7 @@
-﻿#FILEMARKER_DESCRIPTORSTART = $53
+﻿;TODO
+;more informative error messages (line number etc)
+
+#FILEMARKER_DESCRIPTORSTART = $53
 #FILEMARKER_ANIMSPEED = 1
 #FILEMARKER_FRAMEINFO = 2
 #FILEMARKER_FRAMEDURATION = $20
@@ -36,25 +39,7 @@ Structure toLoad
   infos.s
 EndStructure
 
-Dim championValues.b(#CHAMPION_VALUES_NB)
-championValues(1) = #TYPE_DOUBLE 
-championValues(2) = #TYPE_DOUBLE 
-championValues(3) = #TYPE_DOUBLE 
-championValues(4) = #TYPE_DOUBLE 
-championValues(5) = #TYPE_DOUBLE 
-championValues(6) = #TYPE_DOUBLE 
-championValues(7) = #TYPE_DOUBLE 
-championValues(8) = #TYPE_DOUBLE
-championValues(9) = #TYPE_BYTE
-championValues(10) = #TYPE_BYTE
-championValues(11) = #TYPE_BYTE
-championValues(12) = #TYPE_BYTE
-championValues(13) = #TYPE_DOUBLE
-championValues(14) = #TYPE_DOUBLE
-championValues(15) = #TYPE_DOUBLE
-championValues(16) = #TYPE_DOUBLE
-championValues(17) = #TYPE_DOUBLE
-championValues(18) = #TYPE_BYTE
+IncludeFile "managerData.pbi"
 
 Procedure readFileToMemory(filename$, *file.loadedFile)
   If Not ReadFile(0, filename$)
@@ -98,6 +83,18 @@ Procedure writeInterfile()
   WriteAsciiCharacter(1, #FILEMARKER_INTERFILE)
 EndProcedure
 
+Procedure getMove(string.s)
+  Shared moveNames()
+  If Left(string, 1) = ":"
+    If Not FindMapElement(moveNames(), Mid(string, 2))
+      PrintN("Can't find move " + value)
+      ProcedureReturn -1
+    EndIf 
+    ProcedureReturn moveNames()
+  EndIf
+  ProcedureReturn Val(string)
+EndProcedure
+
 Procedure writeFileDescriptor(type.b, infos.s)
   Shared championValues()
   Define line.s, value.s, i.b
@@ -132,9 +129,9 @@ Procedure writeFileDescriptor(type.b, infos.s)
         line = ReadString(2)
         Select Left(line, 1)
           Case "m"
-            value = Mid(StringField(line, 1, " "), 2)
             WriteByte(1, #FILEMARKER_MOVEINFO)
-            WriteByte(1, Val(value))
+            value = Mid(StringField(line, 1, " "), 2)
+            WriteByte(1, getMove(value))
             PrintN("- - move modified : " + value)
             i = 2
             value = StringField(line, i, " ")
@@ -151,7 +148,7 @@ Procedure writeFileDescriptor(type.b, infos.s)
           Case "u"
             value = Mid(StringField(line, 1, " "), 2)
             WriteByte(1, #FILEMARKER_MULTIMOVE)
-            WriteByte(1, Val(value))
+            WriteByte(1, getMove(value))
             PrintN("- - multimove : " + value)
             i = 2
             value = StringField(line, i, " ")
@@ -285,12 +282,12 @@ Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   EndIf 
   writeType(type)
   writeFileTag(tag)
+  PrintN("Pointer position : " + Str(Loc(1)))
   If type = #FILETYPE_CHAMPION
     WriteFileLength(0)
     writeFileDescriptor(type, path)
   Else
     WriteFileLength(*f\size)
-    PrintN("Pointer position : " + Str(Loc(1)))
     writeMemoryToFile(1, *f)
     writeFileDescriptor(type, info)
   EndIf 
@@ -378,10 +375,10 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 315
-; FirstLine = 290
+; CursorPosition = 284
+; FirstLine = 274
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico
-; Executable = ..\src\res\datafileMaker.exe
+; Executable = ..\src\res\dataFileMaker.exe
 ; CommandLine = test/oui

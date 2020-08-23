@@ -110,7 +110,7 @@ Procedure loadGameData(path.s)
     Select type
       Case #FILETYPE_CHAMPION
         If Not ReadByte(0) = #FILEMARKER_DESCRIPTORSTART
-          Debug "Error : unexpected byte (no descriptorstartat the beginning of a champion data)"
+          Debug "Error : unexpected byte (no descriptorstart at the beginning of a champion data)"
         EndIf 
         *character = tryChampion(tag)
         *character\displayName = ReadString(0, #PB_UTF8)
@@ -123,6 +123,7 @@ Procedure loadGameData(path.s)
             Case #FILEMARKER_LANDINGLAG
               *character\moves(selectedElement)\landLag = ReadByte(0)
             Case #FILEMARKER_MULTIMOVE
+              selectedElement = ReadByte(0)
               NewList multiMove.b()
               byte = ReadByte(0)
               value = 0
@@ -130,6 +131,7 @@ Procedure loadGameData(path.s)
                 addElementVal(multiMove(), byte)
                 byte = ReadByte(0)
                 addElementVal(multiMove(), byte)
+                byte = ReadByte(0)
                 value + 1
               Wend 
               makeMultiMove(*character\moves(selectedElement), value)
@@ -267,7 +269,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 141
-; FirstLine = 93
+; CursorPosition = 135
+; FirstLine = 88
 ; Folding = -
 ; EnableXP

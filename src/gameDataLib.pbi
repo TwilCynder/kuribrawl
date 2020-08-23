@@ -216,8 +216,8 @@ Procedure makeMultiMove(*attack.MoveInfo, nbMoves)
     nbMoves = 2
   EndIf 
   *attack\multiMove = AllocateStructure(MultiMoveInfo)
-  ReDim *attack\multiMove\partEndFrames(nbMoves - 2)
-  ReDim *attack\multiMove\partStartFrames(nbMoves - 2)
+  ReDim *attack\multiMove\partEndFrames(nbMoves - 1)
+  ReDim *attack\multiMove\partStartFrames(nbMoves - 1)
 EndProcedure
 
 Procedure newStage(name.s, w.l, h.l)
@@ -273,7 +273,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 89
-; FirstLine = 69
+; CursorPosition = 219
+; FirstLine = 213
 ; Folding = ----
 ; EnableXP

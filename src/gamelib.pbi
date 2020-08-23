@@ -640,8 +640,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 155
-; FirstLine = 135
+; CursorPosition = 2
 ; Folding = --0-2---
 ; EnableXP
 ; SubSystem = OpenGL

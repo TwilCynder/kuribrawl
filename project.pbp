@@ -7,7 +7,7 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-08-20 21:25" user="twilc" host="TWIL-DESKTOP"/>
+    <lastopen date="2020-08-22 22:18" user="twilc" host="TWIL-DESKTOP"/>
   </section>
   <section name="files">
     <file name="src\animations.pbi">
@@ -64,7 +64,7 @@
     </file>
     <file name="src\main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="1960f0a98a935415d754a77ee8220bc0"/>
+      <fingerprint md5="273e3b0c1e7f48b42c42506bdbca78d5"/>
     </file>
     <file name="src\physicslib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>

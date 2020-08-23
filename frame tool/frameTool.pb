@@ -2,10 +2,8 @@
 
 ;TODO
 ;play animation
-;edit origin
-;edit duration
 
-CompilerIf #DEBUG
+CompilerIf #DEBUG And Not #Build
   #DEFAULT_DATAFILE_PATH = "..\src\res\data.twl"
 CompilerElse
   #DEFAULT_DATAFILE_PATH = "..\data.twl"
@@ -1008,8 +1006,7 @@ Repeat
   Delay(16)
 ForEver 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 999
-; FirstLine = 954
+; CursorPosition = 3
 ; Folding = --------
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico

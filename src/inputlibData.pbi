@@ -1,9 +1,9 @@
 ﻿Dim defaultInputDurability(#INPUTS)
-defaultInputDurability(#INPUT_Special) = 0
-defaultInputDurability(#INPUT_Attack) = 0
-defaultInputDurability(#INPUT_Jump) = 0
-defaultInputDurability(#INPUT_Grab) = 0
-defaultInputDurability(#INPUT_Guard) = 0
+defaultInputDurability(#INPUT_Special) = 3
+defaultInputDurability(#INPUT_Attack) = 3
+defaultInputDurability(#INPUT_Jump) = 3
+defaultInputDurability(#INPUT_Grab) = 3
+defaultInputDurability(#INPUT_Guard) = 3
 defaultInputDurability(#INPUT_ControlStick_SRIGHT) = 5
 defaultInputDurability(#INPUT_ControlStick_SDOWN) = 5
 defaultInputDurability(#INPUT_ControlStick_SLEFT) = 5
@@ -59,6 +59,5 @@ EndWith
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 32
-; FirstLine = 3
+; CursorPosition = 1
 ; EnableXP

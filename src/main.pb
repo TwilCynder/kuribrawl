@@ -2,10 +2,10 @@
 ;trucs pas finis
 ;animations des stages/plateformes
 ;double jump
-;créations des champions stages (dans gameData.pb -> dans data.twl)
+;créations des stages (dans main.pb -> dans data.twl)
 
 
-#DEBUG = 0
+#DEBUG = 1
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
@@ -22,6 +22,8 @@ CompilerIf #DEBUG
 CompilerEndIf
 
 Define *game.Game, window.l
+
+Define fbf.b
 
 Procedure startTestGame()
   Shared *game, window
@@ -56,14 +58,15 @@ CompilerEndIf
   CreateMenu(0, WindowID(window))
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
   BindMenuEvent(0, 0, @startTestGame())
-
-
+  
+;- stage (temporaire)  
 *s1.StageModel = newStage("Snowdin", #SCREEN_W * 1.5, #SCREEN_H)
 setStageCameraZone(*s1, #SCREEN_W * 1.2, #SCREEN_H)
 ;addPlatform(*s1, -200, 400, 500, "platform")
 ;addPlatform(*s1, 100, 200, 500, "platform")
 addCenteredPlatform(*s1, 200, 850, "platform")
 
+;- game data
 CompilerIf #DEBUG
   loadGameData("res/data.twl")
   For i = 1 To availableJosticks
@@ -111,7 +114,7 @@ Repeat
      CompilerIf Not #DEBUG
        If frameWait < 10
          bgc = #Red 
-         Debug "/!\Frame process lasted more than 2.6ms !"
+         ;Debug "/!\Frame process lasted more than 2.6ms !"
        EndIf 
      CompilerEndIf
      Delay(frameWait)
@@ -124,7 +127,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 7
+; CursorPosition = 88
+; FirstLine = 59
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

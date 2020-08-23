@@ -44,6 +44,7 @@ Structure ControllerState
 EndStructure
 
 Structure Port
+  id.b
   joyID.l
   *joyType.knownController
   previousState.ControllerState
@@ -62,6 +63,7 @@ Procedure setPort(port, joyID, active = 1)
   Shared ports()
   ports(port)\joyID = joyID
   ports(port)\active = active
+  ports(port)\id = port
 EndProcedure
 
 Procedure setPortFighter(port, *fighter.Fighter)
@@ -278,22 +280,28 @@ EndProcedure
 ; - si on passe à la partie suivante, set l'anim pour skip les frames entre la frame de fin de partie et la frame de début de partie suivante
 
 Procedure inputManager_Attack(*port.Port, *info.inputData)
-  If *port\figher\state = #STATE_ATTACK And *port\figher\currentMove\multiMove
-    part.b = (*port\figher\stateInfo % %11100000) >> 5
-    ;Debug part
-    ;Debug *port\figher\currentAnimation\frame
-    If (part = 0) Or (part <= ArraySize(*port\figher\currentMove\multiMove\partStartFrames())) And *port\figher\currentAnimation\frame >= *port\figher\currentMove\multiMove\partStartFrames(part - 1)
-      part + 1
-    Else
+  Select *port\figher\state
+    Case #STATE_ATTACK 
+      If  *port\figher\currentMove\multiMove
+        part.b = (*port\figher\stateInfo % %11100000) >> 5
+        ;Debug part
+        ;Debug *port\figher\currentAnimation\frame
+        If (part = 0) Or (part <= ArraySize(*port\figher\currentMove\multiMove\partStartFrames())) And *port\figher\currentAnimation\frame >= *port\figher\currentMove\multiMove\partStartFrames(part - 1)
+          part + 1
+        Else
+          ProcedureReturn 0
+        EndIf 
+        *port\figher\stateInfo = (*port\figher\stateInfo & (~%11100000)) + (part << 5)
+        ProcedureReturn 1
+      Else
+        ProcedureReturn 0
+      EndIf 
+    Case  #STATE_HITSTUN, #STATE_LANDING_LAG
       ProcedureReturn 0
-    EndIf 
-    *port\figher\stateInfo = (*port\figher\stateInfo & (~%11100000)) + (part << 5)
-    ProcedureReturn 1
-  EndIf 
+    Case #STATE_JUMPSQUAT
+      ProcedureReturn 2
+  EndSelect
   
-  If *port\figher\state = #STATE_HITSTUN Or *port\figher\state = #STATE_JUMPSQUAT
-    ProcedureReturn 0
-  EndIf 
   Define direction.b
   Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
@@ -322,6 +330,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     Next 
     If *port\figher\state = #STATE_DASH
       Debug "Dash Attack (" + *port\figher\name + ")"
+      attack(*port\figher, #COMMAND_Jab)
       ProcedureReturn 1
     EndIf
     Select direction
@@ -397,7 +406,7 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_LEFT) = @inputManager_smashStickLeft()
 
 Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
-    Shared defaultControler
+  Shared defaultControler
   Define jumpType.b, jumpElement.b, jumpElementType.b
   If *port\figher\state = #STATE_JUMPSQUAT
     jumpElementType = (*port\figher\stateInfo & %1100) >> 2
@@ -411,6 +420,15 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
   If Not state_can_jump(*port\figher\state)
     ProcedureReturn 0
   EndIf 
+  
+  If *port\figher\state = #STATE_ATTACK
+    If *port\figher\stateTimer > 3
+      ProcedureReturn 0
+    Else
+      registerInput(*port\id, #INPUT_Attack)
+    EndIf 
+  EndIf 
+  
   If *port\figher\grounded
     If *port\figher\state = #STATE_WALK Or *port\figher\state = #STATE_DASH
       jumpType = #JUMP_WALKING
@@ -496,17 +514,20 @@ Procedure updateInputs()
       inputManager.inputManager = *inputManagers(input)
       res = inputManager(@ports(port), @info)
       ChangeCurrentElement(inputQ(), *currentElement)
-      If res
-        DeleteElement(inputQ())
-        Continue 
-      EndIf 
-    EndIf 
-
-    durability - 1
-    If durability < 1
-      DeleteElement(inputQ())
+      Select res
+        Case 1
+          DeleteElement(inputQ())
+          Continue 
+        Case 0
+          durability - 1
+          If durability < 1
+            DeleteElement(inputQ())
+          Else
+            inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
+          EndIf 
+      EndSelect 
     Else
-      inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
+      DeleteElement(inputQ())
     EndIf 
   Next 
   For i = 0 To 3
@@ -522,7 +543,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 440
-; FirstLine = 397
+; CursorPosition = 428
+; FirstLine = 391
 ; Folding = -----
 ; EnableXP
