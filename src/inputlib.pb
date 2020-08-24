@@ -280,6 +280,9 @@ EndProcedure
 ; - si on passe à la partie suivante, set l'anim pour skip les frames entre la frame de fin de partie et la frame de début de partie suivante
 
 Procedure inputManager_Attack(*port.Port, *info.inputData)
+  If *port\figher\paused
+    ProcedureReturn 2
+  EndIf 
   Select *port\figher\state
     Case #STATE_ATTACK 
       If  *port\figher\currentMove\multiMove
@@ -340,6 +343,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
         ProcedureReturn 1
       Case #DIRECTION_RIGHT, #DIRECTION_LEFT
         Debug "Ftilt (" + *port\figher\name + ")"  ;ou reverse ftilt ? à voir si je fais un truc restrictif sur les reverse à la brawl
+        attack(*port\figher, #COMMAND_Jab)
         ProcedureReturn 1
       Case #DIRECTION_UP
         attack(*port\figher, #COMMAND_UTilt)
@@ -376,6 +380,9 @@ EndProcedure
 *inputManagers(#INPUT_Attack) = @inputManager_Attack()
 
 Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
+  If *port\figher\paused
+    ProcedureReturn 0
+  EndIf 
   Define state.b
   state = *port\figher\state
   If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
@@ -391,6 +398,9 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_RIGHT) = @inputManager_smashStickRight()
 
 Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
+  If *port\figher\paused
+    ProcedureReturn 0
+  EndIf 
   Define state.b
   state = *port\figher\state
   If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
@@ -406,6 +416,10 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_LEFT) = @inputManager_smashStickLeft()
 
 Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
+  If *port\figher\paused
+    ProcedureReturn 2
+  EndIf 
+  
   Shared defaultControler
   Define jumpType.b, jumpElement.b, jumpElementType.b
   If *port\figher\state = #STATE_JUMPSQUAT
@@ -422,9 +436,12 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
   EndIf 
   
   If *port\figher\state = #STATE_ATTACK
-    If *port\figher\stateTimer > 3
+    If *port\figher\stateTimer > 3 Or Not *port\figher\grounded
       ProcedureReturn 0
     Else
+      ;attack cancel
+      typeY = #YJUMP_SHORT
+      *port\figher\facing = Sign(*port\currentControlStickState\x)
       registerInput(*port\id, #INPUT_Attack)
     EndIf 
   EndIf 
@@ -435,6 +452,7 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
     Else 
       jumpType = #JUMP_NORMAL
     EndIf 
+    Debug typeY
     setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (typeY << 1) + (*info\elementType << 2) + (*info\element << 4))
   ElseIf *port\figher\jumps > 0
     If Abs(*port\currentControlStickState\x) > stickTreshold
@@ -448,15 +466,16 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
     EndIf
     *port\figher\jumps - 1  
   EndIf 
+  ProcedureReturn 1
 EndProcedure  
   
 Procedure inputManager_jump(*port.Port, *info.inputData)
-  jumpManager(*port, *info, 0)
+  ProcedureReturn jumpManager(*port, *info, 0)
 EndProcedure
 *inputManagers(#INPUT_Jump) = @inputManager_jump()
 
 Procedure inputManager_shorthop(*port.Port, *info.inputData)
-  jumpManager(*port, *info, #YJUMP_SHORT)
+  ProcedureReturn jumpManager(*port, *info, #YJUMP_SHORT)
 EndProcedure
 *inputManagers(#INPUT_Shorthop) = @inputManager_shorthop()
 
@@ -502,6 +521,7 @@ Procedure updateInputs()
   Shared inputQ(), ports(), *inputManagers(), *port.Port
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
   readInputs()
+  
   ForEach inputQ()
     input = inputQ() & %11111
     durability = (inputQ() & %111100000) >> 5
@@ -509,7 +529,7 @@ Procedure updateInputs()
     info\elementType = (inputQ() & %11000000000000) >> 12
     info\element = (inputQ() & %11111 << 14) >> 14
     
-    If *inputManagers(input) And Not ports(port)\figher\paused
+    If *inputManagers(input)
       *currentElement = @inputQ()
       inputManager.inputManager = *inputManagers(input)
       res = inputManager(@ports(port), @info)
@@ -543,7 +563,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 428
-; FirstLine = 391
+; CursorPosition = 443
+; FirstLine = 417
 ; Folding = -----
 ; EnableXP

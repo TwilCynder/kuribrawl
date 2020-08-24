@@ -68,7 +68,27 @@ After the first 2 lines, all lines indicate facultative info, and can be include
 Please note that the presence of a Champion Descriptor is not required to create the described champion : in fact, a champion is created as soon as anything related to it as added (animation or descriptor), the descriptor only configures it. In clear, it means that you do not need to include the Champion Descriptor before animations of this champion.
 
 ### Stage Descriptor
-not yet lol
+A champion descriptor is a text file containing all the informations of a champions that isn't already part of the info of one of its animations.  
+Its description in the Project DB must follow this syntax : 
+```
+S:Tag
+```
+`Tag` is the name of the Stage. (note : the *name* is only the internal identifier, the name that will be displayed is the *display name*).
+
+- The first line of a Stage Descriptor must contain its *display name*. If you want it to be the same as it's internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).
+- The second line must contain all the *values* of this stage, separated by spaces. These values are (in this order): 
+    - Width
+    - Height
+    - Camera Zone Width
+    - Camera Zone Height : the camera zone is the area where the camera can move. Any object outside of this area will always be offstreen, but can still be in the stage. 
+
+After the first 2 lines, all lines indicate facultative info, and can be included in any order.
+
+- `p <x> <y> <width> [<animation>]` : adds a platform.
+    - `x` and `y` will be the position of the upper left corner of the platform, relative to the lower left corner of the stage.
+    - `width` the width of the platform.
+    - `animationName`  must be the name of an animation of the stage.
+
 
 ### Animation
 An animation file is, in fact, a combination of two files : 

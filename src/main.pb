@@ -2,8 +2,12 @@
 ;trucs pas finis
 ;animations des stages/plateformes
 ;double jump
-;créations des stages (dans main.pb -> dans data.twl)
 
+
+;TODO list
+;finir attack cancel
+;créations des stages (dans main.pb -> dans data.twl)
+;mouvements verticaux de la caméra
 
 #DEBUG = 1
 
@@ -58,13 +62,6 @@ CompilerEndIf
   CreateMenu(0, WindowID(window))
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
   BindMenuEvent(0, 0, @startTestGame())
-  
-;- stage (temporaire)  
-*s1.StageModel = newStage("Snowdin", #SCREEN_W * 1.5, #SCREEN_H)
-setStageCameraZone(*s1, #SCREEN_W * 1.2, #SCREEN_H)
-;addPlatform(*s1, -200, 400, 500, "platform")
-;addPlatform(*s1, 100, 200, 500, "platform")
-addCenteredPlatform(*s1, 200, 850, "platform")
 
 ;- game data
 CompilerIf #DEBUG
@@ -86,7 +83,7 @@ startTestGame()
 ;- Main loop (game)
 
 Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 60
+frameDuration.f = 1000.0 / 10
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -127,8 +124,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 88
-; FirstLine = 59
+; CursorPosition = 85
+; FirstLine = 36
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

@@ -25,6 +25,14 @@ kuribrawl\variables\cameraMaxSpeed = 10
 
 ;- ========STAGE SPECIFIC================
 
+  
+;- stage (temporaire)  
+*s1.StageModel = newStage("Snowdin", #SCREEN_W * 1.5, #SCREEN_H)
+setStageCameraZone(*s1, #SCREEN_W * 1.2, #SCREEN_H)
+;addPlatform(*s1, -200, 400, 500, "platform")
+;addPlatform(*s1, 100, 200, 500, "platform")
+addCenteredPlatform(*s1, 200, 850, "platform")
+
 ;- ========CHARACTER SPECIFIC============
 
 ;*c1.Champion = newCharacter("Acid")
@@ -63,6 +71,6 @@ kuribrawl\variables\cameraMaxSpeed = 10
 ; *c1\landingDuration = 0
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 62
+; CursorPosition = 33
 ; FirstLine = 12
 ; EnableXP
