@@ -98,6 +98,8 @@ Structure PlatformModel
 EndStructure
 
 Structure StageModel
+  name.s
+  displayName.s
   List platforms.platformModel()
   Map animations.AnimationModel()
   w.l
@@ -173,6 +175,10 @@ Procedure setAnimationEndCallback(*animation.AnimationModel, f.f_callback)
   *animation\endCallback = f
 EndProcedure
 
+Procedure AnimBaseLength(*animation.AnimationModel)
+  
+EndProcedure
+
 Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
   *f.FrameModel = AddElement(*animation\frames())
   *f\display\x = x
@@ -220,7 +226,7 @@ Procedure makeMultiMove(*attack.MoveInfo, nbMoves)
   ReDim *attack\multiMove\partStartFrames(nbMoves - 1)
 EndProcedure
 
-Procedure newStage(name.s, w.l, h.l)
+Procedure newStage(name.s, w.l = #SCREEN_W, h.l = #SCREEN_H)
   Define *stage.StageModel
   *stage = AddMapElement(kuribrawl\stages(), name)
   *stage\w = w
@@ -229,14 +235,24 @@ Procedure newStage(name.s, w.l, h.l)
   *stage\cameraZone\top = 0
   *stage\cameraZone\bottom = #SCREEN_H
   *stage\cameraZone\right = #SCREEN_W
+  *stage\name = name
+  *stage\displayName = name
   ProcedureReturn *stage
 EndProcedure
 
-Procedure setStageCameraZone(*stage.StageModel, w.l, h.l)
-  *stage\cameraZone\left = (*stage\w - w) / 2
+Procedure setStageCameraZone(*stage.StageModel, x.l, y.l, w.l, h.l)
+  If x = -1
+    *stage\cameraZone\left = (*stage\w - w) / 2
+  Else
+    *stage\cameraZone\left = x
+  EndIf 
   *stage\cameraZone\right = *stage\cameraZone\left + w
-  *stage\cameraZone\top = (*stage\h - h) / 2
-  *stage\cameraZone\bottom = *stage\cameraZone\left + h
+  If y = -1
+    *stage\cameraZone\bottom = (*stage\h - h) / 2
+  Else
+    *stage\cameraZone\bottom = y
+  EndIf 
+  *stage\cameraZone\top = *stage\cameraZone\bottom + h
 EndProcedure  
   
 Procedure addPlatform(*stage.StageModel, x.l, y.l, w.l, animationName.s = "")
@@ -262,9 +278,11 @@ EndProcedure
 Declare defaultJumpAnimCallback(*fighter, *data)
 Declare defaultAttackAnimCallback(*fighter, *data)
 Procedure initDefaultAnimationsConfig(*char.Champion)
+  Define *anim.AnimationModel
   Shared commandDefaultAnimation()
   If *char\animations("jump")
     setAnimationEndCallback(@*char\animations("jump"), @defaultJumpAnimCallback())
+    setAnimationEndCallback(@*char\animations("doublejump"), @defaultJumpAnimCallback())
   EndIf 
   For i = 0 To #COMMANDS - 1
     If *char\animations(commandDefaultAnimation(i))
@@ -273,7 +291,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 219
-; FirstLine = 213
+; CursorPosition = 290
+; FirstLine = 240
 ; Folding = ----
 ; EnableXP

@@ -79,8 +79,10 @@ S:Tag
 - The second line must contain all the *values* of this stage, separated by spaces. These values are (in this order): 
     - Width
     - Height
+    - Camera Zone X : x position of the camera zone. The camera zone is the area where the camera can move. Any object outside of this area will always be offstreen, but can still be in the stage. 
+    - Camera Zone Y : y position of the camera zone (relative to the lower side of the stage. This means a y position of 200 will place the camera zone 200 pixels *above* the bottom of the stage.)
     - Camera Zone Width
-    - Camera Zone Height : the camera zone is the area where the camera can move. Any object outside of this area will always be offstreen, but can still be in the stage. 
+    - Camera Zone Height
 
 After the first 2 lines, all lines indicate facultative info, and can be included in any order.
 

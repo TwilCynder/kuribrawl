@@ -15,7 +15,7 @@ EndProcedure
 
 Procedure landCallback(*fighter.Fighter)
   If *fighter\state = #STATE_ATTACK
-    lag = *fighter\character\moves(*fighter\stateInfo)\landLag
+    lag = *fighter\character\moves(*fighter\stateInfo & %11111)\landLag
     If lag
       setState(*fighter, #STATE_LANDING_LAG, lag)
     EndIf 
@@ -49,7 +49,7 @@ Procedure substractValue(*v1.Double, v2.d)
 EndProcedure
 
 Procedure groundToAir(*fighter.Fighter)
-  If Not *fighter\state = #STATE_HITSTUN
+  If Not (*fighter\state = #STATE_HITSTUN Or (*fighter\state = #STATE_IDLE And *fighter\stateInfo & 1))
     setState(*fighter, #STATE_IDLE)
   EndIf 
 EndProcedure
@@ -149,7 +149,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 140
-; FirstLine = 95
+; CursorPosition = 51
+; FirstLine = 27
 ; Folding = --
 ; EnableXP

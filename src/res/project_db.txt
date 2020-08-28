@@ -1,5 +1,13 @@
+snowdin.dat
+S:Snowdin
 acid_rainbows.dat
 C:Acid
+crouch.png
+A:Acid/crouch crouch.dat
+crouch_start.png
+A:Acid/crouchstart crouchstart.dat
+crouch_end.png 
+A:Acid/crouchend crouchend.dat
 dash_strip4.png
 A:Acid/dash dash.dat
 dash_strip4L.png
@@ -88,6 +96,10 @@ jab_strip19.png
 A:Acid/jab jab.dat
 jab_strip19L.png
 AL:Acid/jab
+doublejump_strip8.png
+A:Acid/doublejump doublejump.dat
+doublejump_strip8L.png
+AL:Acid/doublejump
 stage_plat_main.png
 A:_Snowdin/platform platform.dat
 stage_bg.png

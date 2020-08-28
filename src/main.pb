@@ -1,13 +1,16 @@
-﻿;TODO : régler finalement la question du : substructure directement en field ou pointer vers heap
-;trucs pas finis
+﻿;trucs pas finis
 ;animations des stages/plateformes
 ;double jump
 
 
 ;TODO list
-;finir attack cancel
 ;créations des stages (dans main.pb -> dans data.twl)
-;mouvements verticaux de la caméra
+;crouch
+;shield
+
+;TODO (non urgent)
+; régler finalement la question du : substructure directement en field ou pointer vers heap
+; transformer les données sous forme de nombre fragmenté (input) en structures
 
 #DEBUG = 1
 
@@ -16,6 +19,7 @@ XIncludeFile "filelib.pb"
 XIncludeFile "gameDataLib.pbi"
 XIncludeFile "loadlib.pb"
 XIncludeFile "gamelib.pbi"
+XIncludeFile "cleanseLib.pbi"
 XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
@@ -26,8 +30,6 @@ CompilerIf #DEBUG
 CompilerEndIf
 
 Define *game.Game, window.l
-
-Define fbf.b
 
 Procedure startTestGame()
   Shared *game, window
@@ -40,14 +42,14 @@ Procedure startTestGame()
   *game = initGame(window)
   
   setStage(*game, getStage("Snowdin"))
-  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 200)
+  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
   *f1\name = "Test One"
-  *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 200)
+  *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
   
-  setPort(0, 3)
+  setPort(0, 0)
   setPortFighter(0, *f1)
-  setPort(1, 0)
+  setPort(1, 3)
   setPortFighter(1, *f2)
 EndProcedure  
 
@@ -62,6 +64,10 @@ CompilerEndIf
   CreateMenu(0, WindowID(window))
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
   BindMenuEvent(0, 0, @startTestGame())
+  AddKeyboardShortcut(window, #PB_Shortcut_F6, 1)
+  BindMenuEvent(0, 1, @lowerFrameRate())
+  AddKeyboardShortcut(window, #PB_Shortcut_F7, 2)
+  BindMenuEvent(0, 2, @increaseFrameRate())
 
 ;- game data
 CompilerIf #DEBUG
@@ -82,8 +88,8 @@ startTestGame()
 
 ;- Main loop (game)
 
-Define nextFrame.f, frameDuration.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
-frameDuration.f = 1000.0 / 10
+Define nextFrame.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
+updateFrameRate()
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
 launchTime = nextFrame
@@ -97,9 +103,9 @@ Repeat
   updateInputs()
   manageStates(*game)
   applyPhysics(*game)
-  advanceAnimations(*game)
   updateAnimations(*game)
   renderFrame(*game)
+  advanceAnimations(*game)
   SetWindowTitle(window, Str(lastFrameDuration))
   
   currentTime = ElapsedMilliseconds()
@@ -124,8 +130,8 @@ Until WindowEvent() = #PB_Event_CloseWindow
   
   
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 85
-; FirstLine = 36
+; CursorPosition = 91
+; FirstLine = 69
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

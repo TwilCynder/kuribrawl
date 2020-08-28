@@ -1,5 +1,4 @@
-﻿;memo : penser à garder un array des frames (p*) crées pour pouvoir y accéder via leur n° (non-opti avec une simple liste)
-#FILEMARKER_DESCRIPTORSTART = $53
+﻿#FILEMARKER_DESCRIPTORSTART = $53
 #FILEMARKER_ANIMSPEED = 1
 #FILEMARKER_FRAMEINFO = 2
 #FILEMARKER_FRAMEDURATION = $20
@@ -12,11 +11,13 @@
 #FILEMARKER_LANDINGLAG = $20
 #FILEMARKER_MULTIMOVE = 3
 #FILEMARKER_MULTIMOVEEND = $30
+#FILEMARKER_PLATFORMINFO = 1
 
 Enumeration 
   #FILETYPE_ANIMATION
   #FILETYPE_LEFTANIM
   #FILETYPE_CHAMPION
+  #FILETYPE_STAGE
 EndEnumeration
 
 Enumeration 
@@ -44,7 +45,18 @@ Procedure readChampionValues(*champion.Champion)
  *champion\airFriction = ReadDouble(0)
  *champion\landingDuration = ReadByte(0)
 EndProcedure  
-  
+
+Procedure readStageValues(*stage.StageModel)
+  *stage\w = ReadWord(0)
+  *stage\h = ReadWord(0)
+  camera.Rect_
+  camera\x = ReadWord(0)
+  camera\y = ReadWord(0)
+  camera\w = ReadWord(0)
+  camera\h = ReadWord(0)
+  setStageCameraZone(*stage, camera\x, camera\y, camera\w, camera\h)
+EndProcedure
+
 Procedure.s LoadSprite_(*buffer, tag.s)
   Shared loadedSprites()
   Define sprite.l
@@ -86,6 +98,14 @@ Procedure tryChampion(name.s)
   EndIf
   ProcedureReturn *r
 EndProcedure  
+
+Procedure tryStage(name.s)
+  *r = getStage(name)
+  If Not *r
+    *r = newStage(name)
+  EndIf 
+  ProcedureReturn *r
+EndProcedure
   
 Procedure loadGameData(path.s)
   Shared loadedSprites()
@@ -95,7 +115,7 @@ Procedure loadGameData(path.s)
   EndIf 
   readVersion()
 
-  Define type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, w.l, h.l, valueF.f, subType.b
+  Define type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, x.l, y.l, w.l, h.l, valueF.f, subType.b, value$
   Dim *frames.FrameModel(0)
   
   *buffer = 0
@@ -142,8 +162,30 @@ Procedure loadGameData(path.s)
                 *character\moves(selectedElement)\multiMove\partStartFrames(value) = multiMove()
                 value + 1
               Next 
-            Case #FILEMARKER_FRAMEDURATION
-              *frames(selectedElement)\duration = ReadUnicodeCharacter(0)
+            Case #FILEMARKER_INTERFILE
+              Break 
+          EndSelect
+        ForEver
+      Case #FILETYPE_STAGE
+        If Not ReadByte(0) = #FILEMARKER_DESCRIPTORSTART
+          Debug "Error : unexpected byte (no descriptorstart at the beginning of a stage data)"
+        EndIf 
+        *stage.StageModel = tryStage(tag)
+        *stage\displayName = ReadString(0, #PB_UTF8)
+        readStageValues(*stage)  
+        Repeat 
+          byte = ReadByte(0)
+          Select byte
+            Case #FILEMARKER_PLATFORMINFO
+              x.l = ReadWord(0)
+              y.l = ReadWord(0)
+              w.l = ReadWord(0)
+              value$ = ReadString(0, #PB_Ascii)
+              If x = -1
+                addCenteredPlatform(*stage, y, w, value$)
+              Else
+                addPlatform(*stage, x, y, w, value$)
+              EndIf   
             Case #FILEMARKER_INTERFILE
               Break 
           EndSelect
@@ -163,7 +205,7 @@ Procedure loadGameData(path.s)
         If (Left(character, 1) = "_")
           subType = #ANIMATIONTYPE_STAGE
           character = Mid(character, 2)
-          *stage.StageModel = getStage(character)
+          *stage.StageModel = tryStage(character)
           *animation = newStageAnimation(*stage, animationName, tag)
           *animation\noCollisions = 1
           If animationName = "background"
@@ -269,7 +311,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 135
-; FirstLine = 88
-; Folding = -
+; CursorPosition = 184
+; FirstLine = 139
+; Folding = --
 ; EnableXP

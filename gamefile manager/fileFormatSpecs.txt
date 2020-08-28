@@ -61,6 +61,16 @@ Structure des fichiers de données de jeu (twl) :
 - - - 1 octet frame de début de part}
 - - - 0x31
 
+>Données de stage
+- Nom (UTF-8 String)
+- Variables de gameplay (à la suite)
+- Infos de plateforme (facultatif) : 
+- - - 0x01
+- - - 2 octets x (-1 si centré)
+- - - 2 octets y
+- - - 2 octets w
+
+
 ========================================================
 Descripteur de fichier d'animation (format texte, ligne par ligne)
 - nombre de frames
@@ -74,4 +84,10 @@ Descripteur de champion
 - variables sur la même lignes (séparées par espaces)
 - infos de move (facultatif) : m<id du move> [l<landing lag>]
 - info de multimove (facultatif) : u<id du move> {<frame de fin de part> <frame de début de part>}
+
+Descripteur de stage
+- Nom
+- variables 
+- infos de plateforme
+- info de plateforme (facultatif) : p <x> <y> <width> [<animation>]
 

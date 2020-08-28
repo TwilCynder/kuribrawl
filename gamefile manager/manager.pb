@@ -1,4 +1,7 @@
-﻿;TODO
+﻿#SCREEN_W = 960
+#SCREEN_H = 540
+
+;TODO
 ;more informative error messages (line number etc)
 
 #FILEMARKER_DESCRIPTORSTART = $53
@@ -14,11 +17,13 @@
 #FILEMARKER_LANDINGLAG = $20
 #FILEMARKER_MULTIMOVE = 3
 #FILEMARKER_MULTIMOVEEND = $30
+#FILEMARKER_PLATFORMINFO = 1
 
 Enumeration 
   #FILETYPE_ANIMATION
   #FILETYPE_LEFTANIM
   #FILETYPE_CHAMPION
+  #FILETYPE_STAGE
 EndEnumeration
 
 #CHAMPION_VALUES_NB = 18
@@ -103,6 +108,39 @@ Procedure writeFileDescriptor(type.b, infos.s)
     ProcedureReturn 0
   EndIf   
   Select type
+    Case #FILETYPE_STAGE
+      PrintN("- Stage descriptor")
+      WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
+      If Not ReadFile(2, infos)
+        WriteByte(1, -1)
+        PrintN("- - Can't find descriptor " + infos)
+        ProcedureReturn 1
+      EndIf 
+      line = ReadString(2)
+      PrintN("- - Display name : " + line)
+      WriteString(1, line, #PB_UTF8)
+      WriteByte(1, 0)
+      
+      line = ReadString(2)
+      PrintN("- - Values : " + line)
+      For i = 1 To 6
+        WriteWord(1, Val(StringField(line, i, " ")))
+      Next 
+      
+      While Not Eof(2)
+        line = ReadString(2)
+        Select Left(line, 1)
+          Case "p"
+            WriteByte(1, #FILEMARKER_PLATFORMINFO)
+            PrintN("- - adding platform")
+            For i = 2 To 4
+              WriteWord(1, Val(StringField(line, i, " ")))
+            Next 
+            WriteString(1, StringField(line, 5, " "))
+            WriteByte(1, 0)
+        EndSelect
+      Wend 
+        
     Case #FILETYPE_CHAMPION
       PrintN("- Champion descriptor")
       WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
@@ -283,7 +321,7 @@ Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   writeType(type)
   writeFileTag(tag)
   PrintN("Pointer position : " + Str(Loc(1)))
-  If type = #FILETYPE_CHAMPION
+  If type = #FILETYPE_CHAMPION Or type = #FILETYPE_STAGE
     WriteFileLength(0)
     writeFileDescriptor(type, path)
   Else
@@ -346,6 +384,8 @@ While Not Eof(2)
       type = #FILETYPE_LEFTANIM
     Case "C" 
       type = #FILETYPE_CHAMPION
+    Case "S"
+      type = #FILETYPE_STAGE
     Default:Continue
   EndSelect
   tag = StringField(tag, 2, ":")
@@ -375,8 +415,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 284
-; FirstLine = 274
+; CursorPosition = 134
+; FirstLine = 115
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

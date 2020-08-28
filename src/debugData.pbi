@@ -31,6 +31,9 @@ StateNames(#STATE_ATTACK) = "Attack"
 StateNames(#STATE_LANDING_LAG) = "Landing Lag"
 StateNames(#STATE_HITSTUN) = "Hitstun"
 StateNames(#STATE_TUMBLE) = "Tumble"
+StateNames(#STATE_CROUCH) = "Crouch"
+StateNames(#STATE_CROUCH_START) = "Crouch Start"
+StateNames(#STATE_CROUCH_STOP) = "Crouch Stop"
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 32
+; CursorPosition = 35
 ; EnableXP

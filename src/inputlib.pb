@@ -266,18 +266,18 @@ Procedure state_can_jump(state.b)
   ProcedureReturn 1
 EndProcedure 
 
+Procedure startAttack(*fighter.Fighter, attack.b, *info.inputData = 0)
+  attack(*fighter.Fighter, attack)
+  If *info
+    *fighter\stateInfo = *fighter\stateInfo + (*info\elementType << 8) + (*info\element << 10)
+  EndIf 
+EndProcedure
+
+Macro Atk(attack)
+  startAttack(*port\figher, attack, *info)
+EndMacro
+
 ;- INPUT MANAGERS
-
-;jab et autres multimoves : 
-; - ajouter un moyen de stop une anim en plein milieu (propriété frameStop / callback onFrameChanged)
-; - dans les infos du move (partie dédiée aux multimoves ( p* -> malloc)) liste des frames de fin de partie
-; - début du move : l'anim est set pour se terminer à la première valeur
-; - dans l'input manager attack, si attack input pendant multimove, l'anim est set pour s'arrêter à la fin de la partie suivante
-; - etc
-
-;ensuite pour ce qui est de les faire se cancel dans la partie suivante
-; - dans les infos du multimove, aussi lister les frames de fin de partie
-; - si on passe à la partie suivante, set l'anim pour skip les frames entre la frame de fin de partie et la frame de début de partie suivante
 
 Procedure inputManager_Attack(*port.Port, *info.inputData)
   If *port\figher\paused
@@ -327,26 +327,27 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
             Debug "Dsmash (" + *port\figher\name + ")"
           Case #INPUT_ControlStick_SLEFT, #INPUT_ControlStick_SRIGHT  ;ou reverse fsmash ? à voir si je fais un truc restrictif sur les reverse à la brawl
             Debug "FSmash (" + *port\figher\name + ")"
+            Atk(#COMMAND_Jab)
         EndSelect
         ProcedureReturn 1
       EndIf 
     Next 
     If *port\figher\state = #STATE_DASH
       Debug "Dash Attack (" + *port\figher\name + ")"
-      attack(*port\figher, #COMMAND_Jab)
+      Atk(#COMMAND_Jab)
       ProcedureReturn 1
     EndIf
     Select direction
       Case #DIRECTION_NONE
         Debug "Jab (" + *port\figher\name + ")"
-        attack(*port\figher, #COMMAND_Jab)
+        Atk(#COMMAND_Jab)
         ProcedureReturn 1
       Case #DIRECTION_RIGHT, #DIRECTION_LEFT
         Debug "Ftilt (" + *port\figher\name + ")"  ;ou reverse ftilt ? à voir si je fais un truc restrictif sur les reverse à la brawl
-        attack(*port\figher, #COMMAND_Jab)
+        Atk(#COMMAND_Jab)
         ProcedureReturn 1
       Case #DIRECTION_UP
-        attack(*port\figher, #COMMAND_UTilt)
+        Atk(#COMMAND_UTilt)
         Debug "Utilt (" + *port\figher\name + ")"
         ProcedureReturn 1
       Case #DIRECTION_DOWN
@@ -386,6 +387,7 @@ Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
   Define state.b
   state = *port\figher\state
   If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
+    Debug "oui"
     *port\figher\facing = 1
     setState(*port\figher, #STATE_DASH_START)
   EndIf 
@@ -439,20 +441,23 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
     If *port\figher\stateTimer > 3 Or Not *port\figher\grounded
       ProcedureReturn 0
     Else
-      ;attack cancel
+      Debug "attack cancel"
+      *port\figher\physics\v\x = 0
+      jumpType = #JUMP_NORMAL
       typeY = #YJUMP_SHORT
       *port\figher\facing = Sign(*port\currentControlStickState\x)
-      registerInput(*port\id, #INPUT_Attack)
+      elementType.b = (*port\figher\stateInfo & %1100000000) >> 8
+      element.b = (*port\figher\stateInfo & %111110000000000) >> 10
+      registerInput(*port\id, #INPUT_Attack, elementType, element)
     EndIf 
   EndIf 
   
   If *port\figher\grounded
-    If *port\figher\state = #STATE_WALK Or *port\figher\state = #STATE_DASH
+    If (*port\figher\state = #STATE_WALK Or *port\figher\state = #STATE_DASH) And Not jumpType
       jumpType = #JUMP_WALKING
     Else 
       jumpType = #JUMP_NORMAL
     EndIf 
-    Debug typeY
     setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (typeY << 1) + (*info\elementType << 2) + (*info\element << 4))
   ElseIf *port\figher\jumps > 0
     If Abs(*port\currentControlStickState\x) > stickTreshold
@@ -487,25 +492,49 @@ Procedure inputManager_smashStickDown(*port.Port, *info.inputData)
 EndProcedure    
 *inputManagers(#INPUT_ControlStick_DOWN) = @inputManager_smashStickDown()
 
+Procedure applyAirDrift(*fighter.Fighter, direction)
+    If *fighter\grounded
+      *fighter\facing = direction
+      setState(*fighter, #STATE_WALK)
+    Else 
+      applyAirAccel(*fighter, direction)
+    EndIf 
+EndProcedure
+
 Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
   Shared defaultControler
   Select *port\figher\state
-    Case #STATE_IDLE, #STATE_TUMBLE
+    Case #STATE_CROUCH_STOP
+      If *port\currentControlStickState\y > stickTreshold
+        setState(*port\figher, #STATE_CROUCH_START)
+      EndIf 
+    Case #STATE_CROUCH
+      If *port\currentControlStickState\y < stickTreshold
+        setState(*port\figher, #STATE_CROUCH_STOP)
+      EndIf       
+    Case #STATE_IDLE
+      If *port\currentControlStickState\y > stickTreshold
+        crouch(*port\figher)
+      EndIf   
       If Abs(*port\currentControlStickState\x) > stickTreshold
-        If *port\figher\grounded
-          *port\figher\facing = Sign(*port\currentControlStickState\x)
-          setState(*port\figher, #STATE_WALK)
-        Else 
-          applyAirAccel(*port\figher, Sign(*port\currentControlStickState\x))
-        EndIf 
-      EndIf     
+        applyAirDrift(*port\figher, Sign(*port\currentControlStickState\x))
+      EndIf 
+    Case #STATE_TUMBLE
+      If Abs(*port\currentControlStickState\x) > stickTreshold
+        applyAirDrift(*port\figher, Sign(*port\currentControlStickState\x))
+      EndIf
     Case #STATE_WALK
       If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
         setState(*port\figher, #STATE_IDLE)
       EndIf
     Case #STATE_DASH
-      If *port\currentControlStickState\x < stickTreshold And *port\currentControlStickState\x > -stickTreshold
+      If Abs(*port\currentControlStickState\x) < stickTreshold
         setState(*port\figher, #STATE_DASH_STOP)
+      Else
+        If Sign(*port\currentControlStickState\x) <> *port\figher\facing
+          *port\figher\facing = Sign(*port\currentControlStickState\x)
+          setstate(*port\figher, #STATE_IDLE)
+        EndIf 
       EndIf
     Case #STATE_ATTACK
       If *port\figher\grounded
@@ -516,6 +545,13 @@ Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
       EndIf 
   EndSelect 
 EndProcedure
+
+;input structure : 
+; - 5 bits : input
+; - 4 bits : durability
+; - 3 bits : port
+; - 2 bits : elementType
+; - 5 bits : element
 
 Procedure updateInputs()
   Shared inputQ(), ports(), *inputManagers(), *port.Port
@@ -550,6 +586,7 @@ Procedure updateInputs()
       DeleteElement(inputQ())
     EndIf 
   Next 
+    
   For i = 0 To 3
     If Not ports(i)\active
       Continue  
@@ -563,7 +600,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 443
-; FirstLine = 417
-; Folding = -----
+; CursorPosition = 507
+; FirstLine = 503
+; Folding = ------
 ; EnableXP

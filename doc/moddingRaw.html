@@ -75,7 +75,28 @@ Type:tag info
 </ul>
 <p>Please note that the presence of a Champion Descriptor is not required to create the described champion : in fact, a champion is created as soon as anything related to it as added (animation or descriptor), the descriptor only configures it. In clear, it means that you do not need to include the Champion Descriptor before animations of this champion.</p>
 <h3 id="stage-descriptor">Stage Descriptor</h3>
-<p>not yet lol</p>
+<p>A champion descriptor is a text file containing all the informations of a champions that isn&#39;t already part of the info of one of its animations.<br>Its description in the Project DB must follow this syntax : </p>
+<pre><code>S:Tag
+</code></pre><p><code>Tag</code> is the name of the Stage. (note : the <em>name</em> is only the internal identifier, the name that will be displayed is the <em>display name</em>).</p>
+<ul>
+<li>The first line of a Stage Descriptor must contain its <em>display name</em>. If you want it to be the same as it&#39;s internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).</li>
+<li>The second line must contain all the <em>values</em> of this stage, separated by spaces. These values are (in this order): <ul>
+<li>Width</li>
+<li>Height</li>
+<li>Camera Zone Width</li>
+<li>Camera Zone Height : the camera zone is the area where the camera can move. Any object outside of this area will always be offstreen, but can still be in the stage. </li>
+</ul>
+</li>
+</ul>
+<p>After the first 2 lines, all lines indicate facultative info, and can be included in any order.</p>
+<ul>
+<li><code>p &lt;x&gt; &lt;y&gt; &lt;width&gt; [&lt;animation&gt;]</code> : adds a platform.<ul>
+<li><code>x</code> and <code>y</code> will be the position of the upper left corner of the platform, relative to the lower left corner of the stage.</li>
+<li><code>width</code> the width of the platform.</li>
+<li><code>animationName</code>  must be the name of an animation of the stage.</li>
+</ul>
+</li>
+</ul>
 <h3 id="animation">Animation</h3>
 <p>An animation file is, in fact, a combination of two files : </p>
 <ul>
@@ -146,7 +167,14 @@ Type:tag info
 <li><code>frame id</code> is the frame numer (the number of the first frame is 0)</li>
 <li><code>duration</code> will be the durationof the frame, which means the time (in real frames) during which the frame will be displayed. Setting this value overrides the animation speed system (in fact, i advise never using frames with set durations in an animation with a set speed)</li>
 <li><code>origin x</code> and <code>origin y</code> is the position of the frame&#39;s <em>origin</em>. The origin of a frame is the point that matches the fighter&#39;s position : when displaying the frame, it will be placed so that the origin point is placed exactly on the fighter position.<br>By default, the origin of a frame is placed at {width/2 ; height} (center bottom) for a champion, and {0;0} for a stage.</li>
-<li><code>speed mode</code> is a number indicating how <em>frame movement</em> works with this frame. Frame movement causes a frame to change the speed of a fighter when it is displayed.</li>
+<li><code>speed mode</code> is a number indicating how <em>frame movement</em> works with this frame. <code>vx</code> and <code>vy</code> are the speed that will be applied. Frame movement causes a frame to change the speed of a fighter when it is displayed. This number must be written in decimal in the descriptor, but is interpreted as a binary number, bit-by-bit : every bit indicates a specific property of this frame&#39;s movement :<ul>
+<li>bit 1 (lsb) : indicates that frame movement is enabled. If it is 0, there will be no frame movement at all regardless of all other bits.</li>
+<li>bit 2 : 0 means that the speed is added to the fighter&#39;s current speed, 1 means the speed replaces the fighter&#39;s current speed.</li>
+<li>bit 3 : (for frames that last more than one real frame) 0 indicates that the speed is applied (added or set, depending on bit 2) only once, when the frame starts being displayed, 1 indicates that the speed is applied every frame until the animation goes on another frame.</li>
+<li>bit 4 : disables x speed. If this bit is 1, only vertical speed will be applied.</li>
+<li>bit 5 (msb) : disables y speed. If this bit is 1, only horizontal speed will be applied. (if both bits 4 and 5 are 1, frame movement has no effect)</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><p><code>c&lt;frame id&gt; &lt;x&gt; &lt;y&gt; &lt;w&gt; &lt;h&gt;</code> : creates a hurtbox on the specified frame, at the specified coordinates (relative to the origin)</p>

@@ -7,8 +7,12 @@
   elementType = (stateinfo & %1100) >> 2
   element = (stateinfo & %111110000) >> 4
   
-  If Abs(ports(*fighter\port)\currentControlStickState\x) > stickTreshold And Sign(ports(*fighter\port)\currentControlStickState\x) <> *fighter\facing 
-    jumpTypeX = #JUMP_BACKWARDS
+  If Abs(ports(*fighter\port)\currentControlStickState\x) > stickTreshold And Not jumpTypeX = #JUMP_NEUTRAL
+    If Sign(ports(*fighter\port)\currentControlStickState\x) <> *fighter\facing 
+      jumpTypeX = #JUMP_BACKWARDS  
+    Else
+      jumpTypeX = #JUMP_WALKING
+    EndIf 
   EndIf 
   
   If Not isElementPressed(element, elementType, ports(*fighter\port))
@@ -16,13 +20,6 @@
   EndIf
   jump(*fighter, jumpTypeX,jumpTypeY)
 EndProcedure
-
-Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
-  If characterProperty < 1
-    ProcedureReturn animLength(*fighter\currentAnimation)
-  EndIf 
-  ProcedureReturn characterProperty
-EndProcedure  
   
 Procedure manageStates(*game.Game)
   Define *fighter.Fighter, max.l
@@ -76,14 +73,24 @@ Procedure manageStates(*game.Game)
             Else
               setState(*fighter, #STATE_IDLE, 0, *fighter\grounded)
             EndIf 
+          EndIf
+        Case #STATE_CROUCH_START
+          max = animLength(*fighter\currentAnimation)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_CROUCH)
           EndIf 
+        Case #STATE_CROUCH_STOP
+          max = animLength(*fighter\currentAnimation)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_IDLE)
+          EndIf    
       EndSelect
       *fighter\stateTimer + 1
     EndIf 
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 27
-; FirstLine = 14
+; CursorPosition = 84
+; FirstLine = 38
 ; Folding = -
 ; EnableXP

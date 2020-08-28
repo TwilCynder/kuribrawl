@@ -70,6 +70,8 @@ Structure Game
   camera.Camera
 EndStructure
 
+Define frameRate.b = 60, frameDuration.f
+
 Procedure initAnimation(*anim.Animation, *model.AnimationModel)
   *anim\endCallback = *model\endCallback
   *anim\model = *model
@@ -156,13 +158,9 @@ Procedure setStage(*game.Game, *model.StageModel)
   *game\camera\x = (*game\currentStage\model\w - #SCREEN_W) / 2
 EndProcedure 
 
-Procedure freeStage(*stage.Stage)
-  FreeList(*stage\platforms())
-EndProcedure
-
-Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0)
+Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0, reset.b = 0)
   Define *anim.Animation
-  If *fighter\currentAnimationName = name
+  If *fighter\currentAnimationName = name And Not reset
     ProcedureReturn 0
   EndIf
   
@@ -241,7 +239,7 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   EndIf 
   *frame.FrameModel = *fighter\currentAnimation\frames()\model
   x = *fighter\x - *camera\x
-  y = #SCREEN_H - *fighter\y - *camera\y
+  y = #SCREEN_H - (*fighter\y - *camera\y)
   drawAnimationFrame(*frame, spriteSheet, x, y, facing)
   ;*camera\x + x
   CompilerIf #DEBUG
@@ -265,7 +263,7 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
 EndProcedure
 
 Procedure renderPlatform(*platform.Platform, *camera.Camera)
-  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x - *camera\x, #SCREEN_H - *platform\model\y - *camera\y)
+  drawAnimationFrame(*platform\animation\frames()\model, *platform\animation\model\spriteSheet, *platform\model\x - *camera\x, #SCREEN_H - (*platform\model\y - *camera\y))
 EndProcedure
 
 Procedure renderStage(*stage.Stage)
@@ -278,17 +276,15 @@ Procedure renderFrame(*game.Game)
   Define medPos.Vector
   ClearScreen(bgc)
   
-  If *game\currentStage
-    renderStage(*game\currentStage)
-  EndIf 
-  ForEach *game\currentStage\platforms()
-    renderPlatform(@*game\currentStage\platforms(), *game\camera)
-  Next
   ForEach *game\fighters()
-    medPos\x + *game\fighters()\x    
+    medPos\x + *game\fighters()\x 
+    medPos\y + *game\fighters()\y
   Next 
   medPos\x / ListSize(*game\fighters())
   medPos\x - (#SCREEN_W / 2)
+  
+  medPos\y / ListSize(*game\fighters())
+  medPos\y - (#SCREEN_H / 2)
   
   If Abs (*game\camera\x - medPos\x) < kuribrawl\variables\cameraMaxSpeed
     *game\camera\x = medPos\x
@@ -301,6 +297,25 @@ Procedure renderFrame(*game.Game)
   ElseIf *game\camera\x + #SCREEN_W > *game\currentStage\model\cameraZone\right
     *game\camera\x =  *game\currentStage\model\cameraZone\right - #SCREEN_W
   EndIf 
+  
+  If Abs (*game\camera\y - medPos\y) < kuribrawl\variables\cameraMaxSpeed
+    *game\camera\y = medPos\y
+  Else
+    *game\camera\y + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\y - medPos\y))
+  EndIf 
+  
+  If *game\camera\y < *game\currentStage\model\cameraZone\bottom
+    *game\camera\y = *game\currentStage\model\cameraZone\bottom
+  ElseIf *game\camera\y + #SCREEN_H > *game\currentStage\model\cameraZone\top 
+    *game\camera\y =  *game\currentStage\model\cameraZone\top - #SCREEN_H
+  EndIf 
+  
+  If *game\currentStage
+    renderStage(*game\currentStage)
+  EndIf 
+  ForEach *game\currentStage\platforms()
+    renderPlatform(@*game\currentStage\platforms(), *game\camera)
+  Next
   
   ForEach *game\fighters()
     renderFighter(@*game\fighters(), *game\camera)
@@ -324,6 +339,9 @@ Procedure nextFrame(*animation.Animation, *fighter.Fighter)
   *animation\frame + 1
   If NextElement(*animation\frames()) = 0
     If *animation\endCallback
+      If *animation\endCallback = 1
+        ProcedureReturn
+      EndIf 
       ProcedureReturn *animation\endCallback(*fighter, 0)
     EndIf 
     resetAnimation(*animation)
@@ -415,19 +433,26 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
   Select jumpTypeY
     Case #YJUMP_SHORT
       *fighter\physics\v\y = *fighter\character\shorthopSpeed
+      setAnimation(*fighter, "jump")
     Case #YJUMP_NORMAL
       *fighter\physics\v\y = *fighter\character\jumpSpeed
+      setAnimation(*fighter, "jump")
     Case #YJUMP_DOUBLE
       *fighter\physics\v\y = *fighter\character\doubleJumpSpeed
+      setAnimation(*fighter, "doublejump", 0, 0, 1)
   EndSelect
-  setState(*fighter, #STATE_IDLE, 1)
+  setState(*fighter, #STATE_IDLE, 1, 0)
+EndProcedure
+
+Procedure crouch(*fighter.Fighter)
+  setState(*fighter, #STATE_CROUCH_START)
 EndProcedure
 
 Declare multiMoveFrameCallback(*fighter.Fighter, *frame.FrameModel)
 Procedure attack(*fighter.Fighter, attack.b)
   Shared commandDefaultAnimation()
   ClearList(*fighter\fightersHit())
-  setState(*fighter, #STATE_ATTACK, attack)
+  setState(*fighter, #STATE_ATTACK, attack + (elementType << 8) + (element << 10))
   setAnimation(*fighter, commandDefaultAnimation(attack))
   *fighter\currentMove = *fighter\character\moves(attack)
   If *fighter\currentMove\multiMove
@@ -474,11 +499,7 @@ Procedure updateAnimations(*game.Game)
       Select *fighter\state
         Case #STATE_IDLE
           If *fighter\grounded = 0
-            If *fighter\stateInfo & 1
-              setAnimation(*fighter, "jump")
-            Else
               setAnimation(*fighter, "airIdle")
-            EndIf 
           ElseIf *fighter\grounded = 1
             setAnimation(*fighter, "idle")
           EndIf 
@@ -488,7 +509,6 @@ Procedure updateAnimations(*game.Game)
             setAnimation(*fighter, animation)
           EndIf 
       EndSelect
-      
       If *fighter\state = #STATE_LANDING_LAG
         setAnimationSpeed(*fighter\currentAnimation, *fighter\stateInfo)
       EndIf
@@ -551,10 +571,10 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   facing = -Sign(*defending\physics\v\x)
   If knockback > 10
     type = #KB_TUMBLE
-    If degAngle > 45 And degAngle < 135 And *attacking\y < *defending\y
+    If degAngle > 60 And degAngle < 120 And *attacking\y < *defending\y
       anim = "hurtup"
       facing = 0
-    ElseIf degAngle > 225 And degAngle < 270
+    ElseIf degAngle > 240 And degAngle < 300
       anim = "hurtdown"
       facing = 0
     Else
@@ -633,15 +653,40 @@ Procedure manageHitboxes(*game.Game)
   Next  
 EndProcedure
 
+Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
+  If characterProperty < 1
+    ProcedureReturn animLength(*fighter\currentAnimation)
+  EndIf 
+  ProcedureReturn characterProperty
+EndProcedure  
+
+Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
-  freeStage(*game\currentStage)
-  FreeStructure(*game)
+  freeGame(*game)
 EndProcedure
 
+Procedure updateFrameRate()
+  Shared frameRate, frameDuration
+  frameDuration.f = 1000 / frameRate
+EndProcedure  
+  
+Procedure lowerFrameRate()
+  Shared frameRate
+  frameRate - 5
+  updateFrameRate()
+EndProcedure
+  
+Procedure increaseFrameRate()
+  Shared frameRate
+  frameRate + 5
+  updateFrameRate()
+EndProcedure
+  
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 2
-; Folding = --0-2---
+; CursorPosition = 681
+; FirstLine = 611
+; Folding = --+-7----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode
