@@ -11,7 +11,6 @@ stateDefaultAnimation(#STATE_CROUCH_START) = "crouchstart"
 stateDefaultAnimation(#STATE_CROUCH) = "crouch"
 stateDefaultAnimation(#STATE_CROUCH_STOP) = "crouchend"
 
-
 commandDefaultAnimation(#COMMAND_NAir) = "nair"
 commandDefaultAnimation(#COMMAND_FAir) = "fair"
 commandDefaultAnimation(#COMMAND_UAir) = "uair"
@@ -26,6 +25,6 @@ kuribrawl\variables\walkingJumpBoost = 3.0
 kuribrawl\variables\backwardJumpBoost = 3.0
 kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 kuribrawl\variables\cameraMaxSpeed = 10
-; IDE Options = PureBasic 5.72 (Windows - x64)
+; IDE Options = PureBasic 5.31 (Windows - x64)
 ; CursorPosition = 11
 ; EnableXP

@@ -36,7 +36,7 @@ Procedure logState(state.b, facing.b = 0, previousTime.b = 0)
     SetGadgetColor(stateGadget, #PB_Gadget_BackColor,  #Red)
   EndIf 
 EndProcedure
-; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 27
+; IDE Options = PureBasic 5.31 (Windows - x64)
+; CursorPosition = 37
 ; Folding = -
 ; EnableXP

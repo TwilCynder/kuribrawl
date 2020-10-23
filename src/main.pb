@@ -24,6 +24,7 @@ XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
 XIncludeFile "gameData.pb"
+XIncludeFile "window.pb"
 
 CompilerIf #DEBUG
   XIncludeFile "debug.pb"
@@ -47,27 +48,13 @@ Procedure startTestGame()
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
   
-  setPort(0, 0)
-  setPortFighter(0, *f1)
-  setPort(1, 3)
-  setPortFighter(1, *f2)
+  ;setPort(0, 0)
+  ;setPortFighter(0, *f1)
+  ;setPort(1, 3)
+  ;setPortFighter(1, *f2)
 EndProcedure  
 
-;- Game window
-window = OpenWindow(-1, 0, 0, #SCREEN_W + 170, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
-OpenWindowedScreen(WindowID(window), 0, 0, #SCREEN_W, #SCREEN_H, 0, 0, 0, #PB_Screen_NoSynchronization)
-SetWindowColor(window, $aaaaaa)
-CompilerIf #DEBUG
-  InputLogGadget(#SCREEN_W + 5, 5, 160, #SCREEN_H - 120)
-  StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
-CompilerEndIf 
-  CreateMenu(0, WindowID(window))
-  AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
-  BindMenuEvent(0, 0, @startTestGame())
-  AddKeyboardShortcut(window, #PB_Shortcut_F6, 1)
-  BindMenuEvent(0, 1, @lowerFrameRate())
-  AddKeyboardShortcut(window, #PB_Shortcut_F7, 2)
-  BindMenuEvent(0, 2, @increaseFrameRate())
+initWindow()
 
 ;- game data
 CompilerIf #DEBUG
@@ -112,7 +99,7 @@ Repeat
   frameWait = nextFrame - currentTime
    If frameWait < 0
      nextFrame = currentTime
-     Debug "/!\Can't keep up !"
+     Debug "/!\Can't keep up ! Frame lasted " + Str(frameDuration - frameWait)
    Else 
      CompilerIf Not #DEBUG
        If frameWait < 10
@@ -129,9 +116,9 @@ Repeat
 Until WindowEvent() = #PB_Event_CloseWindow
   
   
-; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 91
-; FirstLine = 69
+; IDE Options = PureBasic 5.31 (Windows - x64)
+; CursorPosition = 101
+; FirstLine = 43
 ; Folding = -
-; EnableXP
 ; EnableUnicode
+; EnableXP

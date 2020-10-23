@@ -46,6 +46,7 @@ Structure Fighter
   updateAnim.b ;wheter state has been changed since last animation change
   jumps.b
   paused.b
+  damages.d
   List fightersHit.fighterHitIdPair()
 EndStructure
 
@@ -534,8 +535,8 @@ Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
   EndIf 
 EndProcedure 
 
-Procedure.d getKnockback(damage.d)
-  ProcedureReturn damage
+Procedure.d getKnockback(defendingDamage.l, damage.d)
+  ProcedureReturn defendingDamage + damage
 EndProcedure
 
 Procedure getHitlag(damage.d)
@@ -552,7 +553,11 @@ EndProcedure
 ; - un perso en heavy hitsutn passe en anim de tumble quand la hitstun est finie ET qu'il descend
 
 Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
+EndProcedure
+
+Procedure hurt(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
   Define hitlag.b, type.b, hitstun.l, anim.s, facing.b, angle.d
+  
   If *attacking\facing = 1
     degAngle.l = *hitbox\angle
   Else
@@ -561,10 +566,10 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   angle = Radian(degAngle)
   
   If *defending\state = #STATE_HITSTUN
-    Debug "TRUE"
+    Debug "TRUE COMBO"
   EndIf 
   
-  knockback = getKnockback(*hitbox\damage)
+  knockback = getKnockback(*defending\damages, *hitbox\damage)
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
   
@@ -587,7 +592,8 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
     *defending\physics\v\y = 0
     anim = "hurtground"
   EndIf
-
+  
+  *defending\damages + *hitbox\damage
   
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
@@ -618,7 +624,7 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
       AddElement(*attacking\fightersHit())  
       *attacking\fightersHit()\hitID = *hitbox\hit
       *attacking\fightersHit()\fighter = *defending
-      startKnockback(*hitbox, *hurtbox, *attacking, *defending)
+      hurt(*hitbox, *hurtbox, *attacking, *defending)
     EndSelect
 EndProcedure
 
@@ -683,10 +689,10 @@ Procedure increaseFrameRate()
 EndProcedure
   
 
-; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 681
-; FirstLine = 611
+; IDE Options = PureBasic 5.31 (Windows - x64)
+; CursorPosition = 571
+; FirstLine = 533
 ; Folding = --+-7----
+; EnableUnicode
 ; EnableXP
 ; SubSystem = OpenGL
-; EnableUnicode
