@@ -1,4 +1,11 @@
-﻿Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
+﻿Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
+  If characterProperty < 1
+    ProcedureReturn animLength(*fighter\currentAnimation)
+  EndIf 
+  ProcedureReturn characterProperty
+EndProcedure  
+
+Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
   Shared ports(), defaultControler
   Define jumpTypeX.b, jumpTypeY.b, element.b, elementType.b, axis.AxisState
   
@@ -29,6 +36,7 @@ Procedure manageStates(*game.Game)
     If *fighter\paused > 0
       *fighter\paused - 1
     Else  
+      *fighter\stateTimer + 1
       Select *fighter\state
         Case #STATE_JUMPSQUAT
           max = getStateMaxFrames(*fighter, *fighter\character\jumpsquatDuration)
@@ -83,14 +91,35 @@ Procedure manageStates(*game.Game)
           max = animLength(*fighter\currentAnimation)
           If *fighter\stateTimer >= max
             setState(*fighter, #STATE_IDLE)
-          EndIf    
+          EndIf 
+        Case #STATE_GUARD_START
+          max = getStateMaxFrames(*fighter, *fighter\stateInfo & ~%1111111)
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_GUARD, *fighter\stateInfo)
+          EndIf 
+        Case #STATE_GUARD_STOP
+          max = getStateMaxFrames(*fighter, *fighter\character\shieldEndlag)
+          If Not max 
+            max = kuribrawl\variables\shieldEndlag
+          EndIf
+          If *fighter\stateTimer >= max
+            setState(*fighter, #STATE_IDLE)
+          EndIf
       EndSelect
-      *fighter\stateTimer + 1
+      If *fighter\state = #STATE_GUARD
+        *fighter\shieldSize - kuribrawl\variables\shieldDecay
+      Else
+        *fighter\shieldSize + kuribrawl\variables\shieldRegen
+        If *fighter\shieldSize > 1
+          *fighter\shieldSize = 1.0
+        EndIf 
+      EndIf 
     EndIf 
+   
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 84
-; FirstLine = 38
+; CursorPosition = 114
+; FirstLine = 67
 ; Folding = -
 ; EnableXP

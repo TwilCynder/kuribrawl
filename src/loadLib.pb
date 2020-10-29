@@ -44,6 +44,11 @@ Procedure readChampionValues(*champion.Champion)
  *champion\fastFallSpeed = ReadDouble(0)
  *champion\airFriction = ReadDouble(0)
  *champion\landingDuration = ReadByte(0)
+ *champion\shieldStartup = ReadByte(0)
+ *champion\shieldEndlag = ReadByte(0)
+ *champion\shieldInfo\x = ReadByte(0)
+ *champion\shieldInfo\y = ReadByte(0)
+ *champion\shieldInfo\size = ReadByte(0)
 EndProcedure  
 
 Procedure readStageValues(*stage.StageModel)
@@ -311,7 +316,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 184
-; FirstLine = 139
+; CursorPosition = 50
+; FirstLine = 9
 ; Folding = --
 ; EnableXP

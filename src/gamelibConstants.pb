@@ -31,6 +31,8 @@ Enumeration
   #STATE_IDLE
   ;IDLE_AIR = IDLE && !grounded
   #STATE_GUARD
+  #STATE_GUARD_START
+  #STATE_GUARD_STOP
   #STATE_WALK
   #STATE_WALK_TURN
   #STATE_DASH_START
@@ -103,6 +105,6 @@ EndEnumeration
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 31
-; FirstLine = 29
+; CursorPosition = 105
+; FirstLine = 54
 ; EnableXP

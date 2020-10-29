@@ -65,6 +65,11 @@ Structure MoveInfo
   *multiMove.MultiMoveInfo
 EndStructure
 
+Structure ShieldInfo Extends Vector
+  size.b
+EndStructure
+
+;si ajout de variable, penser à update : loadLib, DFM, doc
 Structure Champion
   Map animations.AnimationModel()
   Array moves.moveInfo(#Commands)
@@ -88,6 +93,9 @@ Structure Champion
   fastFallSpeed.d
   airFriction.d
   landingDuration.b
+  shieldStartup.b
+  shieldEndlag.b
+  shieldInfo.ShieldInfo
 EndStructure
 
 Structure PlatformModel
@@ -117,6 +125,11 @@ Structure GameVariables
   backwardJumpBoost.d
   walkingJumpBoost.d
   doubleJumpBackwardSpeed.d
+  shieldStartup.b
+  shieldEndlag.b
+  minimumShieldDuration.b
+  shieldDecay.d
+  shieldRegen.d
   cameraMaxSpeed.d
 EndStructure
 
@@ -291,7 +304,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 290
-; FirstLine = 240
+; CursorPosition = 130
+; FirstLine = 98
 ; Folding = ----
 ; EnableXP

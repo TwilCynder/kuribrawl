@@ -10,6 +10,9 @@ stateDefaultAnimation(#STATE_LANDING_LAG) = "land"
 stateDefaultAnimation(#STATE_CROUCH_START) = "crouchstart"
 stateDefaultAnimation(#STATE_CROUCH) = "crouch"
 stateDefaultAnimation(#STATE_CROUCH_STOP) = "crouchend"
+stateDefaultAnimation(#STATE_GUARD) = "shield"
+stateDefaultAnimation(#STATE_GUARD_START) = "shieldstart"
+stateDefaultAnimation(#STATE_GUARD_STOP) = "shieldend"
 
 
 commandDefaultAnimation(#COMMAND_NAir) = "nair"
@@ -26,6 +29,11 @@ kuribrawl\variables\walkingJumpBoost = 3.0
 kuribrawl\variables\backwardJumpBoost = 3.0
 kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
 kuribrawl\variables\cameraMaxSpeed = 10
+kuribrawl\variables\shieldStartup = 2
+kuribrawl\variables\shieldEndlag = 6
+kuribrawl\variables\minimumShieldDuration = 2
+kuribrawl\variables\shieldDecay = 0.01
+kuribrawl\variables\shieldRegen = 0.002
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 11
+; CursorPosition = 34
 ; EnableXP

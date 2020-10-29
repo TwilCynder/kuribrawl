@@ -54,7 +54,8 @@ C:Tag
     - Fast Fall Speed
     - Air Friction (deceleration/backwards acceleration applied when airborne)
     - Landing duration (duration of the landing state. Leave to 0 to set it to the duration of the lading animation)  
-
+    - Shield Startup : number of frames between the frame you press Guard and the frame your shield appears.
+    - Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.
 After the first 2 lines, all lines indicate facultative info, and can be included in any order.
 
 - `〔m<id> | m:<move name>〕[l<land lag>]`

@@ -118,13 +118,13 @@ Procedure makeInputValue(input.b, time.b, port.b, element.b, elementType.b)
 EndProcedure
 
 CompilerIf #DEBUG
-  Declare logInput(port.b, input.b, element.b, elementType.b)
+  Declare logInput(port.b, input.b, element.b, elementType.b, frame.l = -1)
 CompilerEndIf
 Procedure registerInput(port, input, element = #MAX_BUTTON_NB, elementType = #ELEMENTTYPE_BUTTON)
-  Shared inputQ(), defaultInputDurability()
+  Shared inputQ(), defaultInputDurability(), frame
   AddElement(inputQ()) : inputQ() = makeInputValue(input, defaultInputDurability(input), port, element, elementType)
   CompilerIf #DEBUG
-   logInput(port, input, element, elementType)
+   logInput(port, input, element, elementType, frame)
   CompilerEndIf
 EndProcedure
 
@@ -277,6 +277,17 @@ Macro Atk(attack)
   startAttack(*port\figher, attack, *info)
 EndMacro
 
+Procedure findDirectionalInput()
+  Shared InputQ()
+  ForEach inputQ()
+    input.b = inputQ() & %11111
+    If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
+      DeleteElement(inputQ())
+      ProcedureReturn input
+    EndIf 
+  Next 
+EndProcedure
+
 ;- INPUT MANAGERS
 
 Procedure inputManager_Attack(*port.Port, *info.inputData)
@@ -306,7 +317,6 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
   EndSelect
   
   Define direction.b
-  Shared inputQ()
   ;todo : return 0 si le fighter est incapacitate
   If *info\elementType = #ELEMENTTYPE_STICK
     state.AxisState
@@ -316,22 +326,20 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     direction = controlStickDirection(*port)
   EndIf 
   If isFighterGrounded(*port\figher)
-    ForEach inputQ()
-      input.b = inputQ() & %11111
-      If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
-        DeleteElement(inputQ())
-        Select input
-          Case #INPUT_ControlStick_SUP
-            Debug "Upsmash (" + *port\figher\name + ")"
-          Case #INPUT_ControlStick_SDOWN
-            Debug "Dsmash (" + *port\figher\name + ")"
-          Case #INPUT_ControlStick_SLEFT, #INPUT_ControlStick_SRIGHT  ;ou reverse fsmash ? à voir si je fais un truc restrictif sur les reverse à la brawl
-            Debug "FSmash (" + *port\figher\name + ")"
-            Atk(#COMMAND_Jab)
-        EndSelect
+    input.b = findDirectionalInput()
+    Select input
+      Case #INPUT_ControlStick_SUP
+        Debug "Upsmash (" + *port\figher\name + ")"
         ProcedureReturn 1
-      EndIf 
-    Next 
+      Case #INPUT_ControlStick_SDOWN
+        Debug "Dsmash (" + *port\figher\name + ")"
+        ProcedureReturn 1
+      Case #INPUT_ControlStick_SLEFT, #INPUT_ControlStick_SRIGHT  ;ou reverse fsmash ? à voir si je fais un truc restrictif sur les reverse à la brawl
+        Debug "FSmash (" + *port\figher\name + ")"
+        Atk(#COMMAND_Jab)
+        ProcedureReturn 1
+      Default 
+    EndSelect
     If *port\figher\state = #STATE_DASH
       Debug "Dash Attack (" + *port\figher\name + ")"
       Atk(#COMMAND_Jab)
@@ -492,16 +500,24 @@ Procedure inputManager_smashStickDown(*port.Port, *info.inputData)
 EndProcedure    
 *inputManagers(#INPUT_ControlStick_DOWN) = @inputManager_smashStickDown()
 
-Procedure applyAirDrift(*fighter.Fighter, direction)
-    If *fighter\grounded
-      *fighter\facing = direction
-      setState(*fighter, #STATE_WALK)
-    Else 
-      applyAirAccel(*fighter, direction)
-    EndIf 
+Procedure inputManager_guard(*port.Port, *info.inputData)
+  If Not *port\figher\grounded Or *port\figher\state = #STATE_ATTACK
+    ProcedureReturn 0
+  EndIf 
+  Select findDirectionalInput()
+    Case #INPUT_ControlStick_SDOWN
+    Default 
+      shieldStartup.b = *port\figher\character\shieldStartup
+      If Not shieldStartup
+        shieldStartup = kuribrawl\variables\shieldStartup
+      EndIf 
+      setState(*port\figher, #STATE_GUARD_START, *info\elementType + (*info\element << 2) + (shieldStartup << 7))
+  EndSelect
+  ProcedureReturn 1
 EndProcedure
+*inputManagers(#INPUT_Guard) = @inputManager_guard()
 
-Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
+Procedure checkControlStickState(*port.Port) ;not a real input manager
   Shared defaultControler
   Select *port\figher\state
     Case #STATE_CROUCH_STOP
@@ -513,7 +529,7 @@ Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
         setState(*port\figher, #STATE_CROUCH_STOP)
       EndIf       
     Case #STATE_IDLE
-      If *port\currentControlStickState\y > stickTreshold
+      If *port\currentControlStickState\y > stickTreshold And *port\figher\grounded
         crouch(*port\figher)
       EndIf   
       If Abs(*port\currentControlStickState\x) > stickTreshold
@@ -546,6 +562,19 @@ Procedure inputManager_controlStickState(*port.Port) ;not a real input manager
   EndSelect 
 EndProcedure
 
+Procedure checkInputReleases(*port.Port)
+  Select *port\figher\state
+    Case #STATE_GUARD
+      If *port\figher\stateTimer >= kuribrawl\variables\minimumShieldDuration And Not isElementPressed((*port\figher\stateInfo & %1111100) >> 2, *port\figher\stateInfo & %11, *port)
+        shieldEndlag.b = *port\figher\character\shieldEndlag
+        If Not shieldEndlag
+          shieldEndlag = kuribrawl\variables\shieldEndlag
+        EndIf 
+        setState(*port\figher, #STATE_GUARD_STOP, shieldEndlag)
+      EndIf 
+  EndSelect 
+EndProcedure
+
 ;input structure : 
 ; - 5 bits : input
 ; - 4 bits : durability
@@ -570,21 +599,21 @@ Procedure updateInputs()
       inputManager.inputManager = *inputManagers(input)
       res = inputManager(@ports(port), @info)
       ChangeCurrentElement(inputQ(), *currentElement)
-      Select res
-        Case 1
-          DeleteElement(inputQ())
-          Continue 
-        Case 0
-          durability - 1
-          If durability < 1
-            DeleteElement(inputQ())
-          Else
-            inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
-          EndIf 
-      EndSelect 
     Else
-      DeleteElement(inputQ())
-    EndIf 
+      res = 0
+    EndIf
+    Select res
+      Case 1
+        DeleteElement(inputQ())
+        Continue 
+      Case 0
+        durability - 1
+        If durability < 1
+          DeleteElement(inputQ())
+        Else
+          inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
+        EndIf 
+    EndSelect  
   Next 
     
   For i = 0 To 3
@@ -592,7 +621,8 @@ Procedure updateInputs()
       Continue  
     EndIf 
     *port = ports(i)
-    inputManager_controlStickState(*port)
+    checkControlStickState(*port)
+    checkInputReleases(*port)
   Next
 EndProcedure
   
@@ -600,7 +630,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 507
-; FirstLine = 503
+; CursorPosition = 509
+; FirstLine = 490
 ; Folding = ------
 ; EnableXP

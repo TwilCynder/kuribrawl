@@ -2,6 +2,12 @@ snowdin.dat
 S:Snowdin
 acid_rainbows.dat
 C:Acid
+shieldstart.png
+A:Acid/shieldstart shieldstart.dat
+shield.png
+A:Acid/shield shield.dat
+shieldend.png
+A:Acid/shieldend shieldend.dat
 crouch.png
 A:Acid/crouch crouch.dat
 crouch_start.png

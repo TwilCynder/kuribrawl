@@ -2,6 +2,7 @@
 InputNames(#INPUT_Attack) = "Attack"
 InputNames(#INPUT_Special) = "Special"
 InputNames(#INPUT_Jump) = "Jump"
+InputNames(#INPUT_Shorthop) = "Shorthop"
 InputNames(#INPUT_Grab) = "Grab"
 InputNames(#INPUT_Guard) = "Guard"
 InputNames(#INPUT_ControlStick_RIGHT) = "Stick Right"
@@ -17,7 +18,6 @@ Dim StateNames.s(#STATES)
 
 StateNames(#STATE_IDLE) = "Idle"
 ;IDLE_AIR = IDLE && !grounded
-StateNames(#STATE_CROUCH) = "Crouch"
 StateNames(#STATE_WALK) = "Walk"
 StateNames(#STATE_WALK_TURN) = "Walk Turn"
 StateNames(#STATE_DASH_START) = "Initial Dash"
@@ -34,6 +34,9 @@ StateNames(#STATE_TUMBLE) = "Tumble"
 StateNames(#STATE_CROUCH) = "Crouch"
 StateNames(#STATE_CROUCH_START) = "Crouch Start"
 StateNames(#STATE_CROUCH_STOP) = "Crouch Stop"
+StateNames(#STATE_GUARD) = "Guard"
+StateNames(#STATE_GUARD_START) = "Guard Start"
+StateNames(#STATE_GUARD_STOP) = "Guard Stop"
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 35
+; CursorPosition = 38
 ; EnableXP

@@ -26,7 +26,7 @@ Enumeration
   #FILETYPE_STAGE
 EndEnumeration
 
-#CHAMPION_VALUES_NB = 18
+#CHAMPION_VALUES_NB = 23
 
 Enumeration 
   #TYPE_BYTE
@@ -415,8 +415,7 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 134
-; FirstLine = 115
+; CursorPosition = 28
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

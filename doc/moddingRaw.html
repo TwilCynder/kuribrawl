@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>Kuribrawl Modding Guide</title>
-  <link rel="stylesheet" href="modding.css">
 </head>
 <body>
 <h1 id="kuribrawl-modding-tutorial">Kuribrawl Modding Tutorial</h1>
@@ -38,7 +37,8 @@ Type:tag info
 </li>
 <li><p>The first line of a Champion Descriptor must contain its <em>display name</em>. If you want it to be the same as it&#39;s internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).</p>
 </li>
-<li>The second line must contain all the <em>values</em> of this champions, separated by spaces. These values are (in this order): <ul>
+<li><p>The second line must contain all the <em>values</em> of this champions, separated by spaces. These values are (in this order): </p>
+<ul>
 <li>Walk Speed</li>
 <li>Dash Speed</li>
 <li>Initial Dash Speed</li>
@@ -57,12 +57,12 @@ Type:tag info
 <li>Fast Fall Speed</li>
 <li>Air Friction (deceleration/backwards acceleration applied when airborne)</li>
 <li>Landing duration (duration of the landing state. Leave to 0 to set it to the duration of the lading animation)  </li>
+<li>Shield Startup : number of frames between the frame you press Guard and the frame your shield appears.</li>
+<li>Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.<br>After the first 2 lines, all lines indicate facultative info, and can be included in any order.</li>
 </ul>
 </li>
-</ul>
-<p>After the first 2 lines, all lines indicate facultative info, and can be included in any order.</p>
+<li><p><code>〔m&lt;id&gt; | m:&lt;move name&gt;〕[l&lt;land lag&gt;]</code></p>
 <ul>
-<li><code>〔m&lt;id&gt; | m:&lt;move name&gt;〕[l&lt;land lag&gt;]</code><ul>
 <li><code>id</code> is the numerical identifier of a move, <code>move name</code> is the text identifier of a move.</li>
 <li>You can only specify the landing lag of an aerial move (aerials including ZAir, and specials if they are configured a certain way).</li>
 </ul>
@@ -83,8 +83,10 @@ Type:tag info
 <li>The second line must contain all the <em>values</em> of this stage, separated by spaces. These values are (in this order): <ul>
 <li>Width</li>
 <li>Height</li>
+<li>Camera Zone X : x position of the camera zone. The camera zone is the area where the camera can move. Any object outside of this area will always be offstreen, but can still be in the stage. </li>
+<li>Camera Zone Y : y position of the camera zone (relative to the lower side of the stage. This means a y position of 200 will place the camera zone 200 pixels <em>above</em> the bottom of the stage.)</li>
 <li>Camera Zone Width</li>
-<li>Camera Zone Height : the camera zone is the area where the camera can move. Any object outside of this area will always be offstreen, but can still be in the stage. </li>
+<li>Camera Zone Height</li>
 </ul>
 </li>
 </ul>
@@ -188,3 +190,4 @@ Type:tag info
 </ul>
 </body>
 </html>
+"==============FINISHED=============="

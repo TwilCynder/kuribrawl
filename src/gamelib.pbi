@@ -46,6 +46,7 @@ Structure Fighter
   updateAnim.b ;wheter state has been changed since last animation change
   jumps.b
   paused.b
+  shieldSize.d
   List fightersHit.fighterHitIdPair()
 EndStructure
 
@@ -71,6 +72,9 @@ Structure Game
 EndStructure
 
 Define frameRate.b = 60, frameDuration.f
+
+;- Rendering objects
+CreateImage(0, #SCREEN_W, #SCREEN_H, 32, #PB_Image_Transparent)
 
 Procedure initAnimation(*anim.Animation, *model.AnimationModel)
   *anim\endCallback = *model\endCallback
@@ -111,6 +115,8 @@ Procedure animLength(*anim.Animation)
   Define multiplier.b
   If *anim\speed > 1
     ProcedureReturn *anim\speed
+  ElseIf *anim\speed = -1
+    ProcedureReturn 0
   Else
     ProcedureReturn ListSize(*anim\frames()) * Abs(Int(1 / *anim\speed))
   EndIf 
@@ -225,6 +231,12 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing 
   EndWith
 EndProcedure
 
+Procedure renderShield(*fighter.Fighter, *camera, x.l, y.l)
+  *info.ShieldInfo = *fighter\character\shieldInfo
+  DrawingMode(#PB_2DDrawing_AlphaBlend)
+  Circle( x + *info\x,  y - *info\y, *info\size * *fighter\shieldSize, RGBA(255,   0,   0, 96))
+EndProcedure
+
 Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   Define spriteSheet.l, facing.b, x.l, y.l
   If *fighter\currentAnimation\facing = 0
@@ -241,25 +253,29 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   x = *fighter\x - *camera\x
   y = #SCREEN_H - (*fighter\y - *camera\y)
   drawAnimationFrame(*frame, spriteSheet, x, y, facing)
-  ;*camera\x + x
-  CompilerIf #DEBUG
+  
+  ;direct drawing
+  StartDrawing(ImageOutput(0)) 
+  If *fighter\state = #STATE_GUARD
+    renderShield(*fighter, *camera, x, y)
+  EndIf 
+  CompilerIf #DEBUG 
     Define hurtColor.l
     If *fighter\state = #STATE_HITSTUN
-      hurtColor = #Yellow
+      hurtColor = #YellowAlpha
     Else
-      hurtColor = #Green
+      hurtColor = #GreenAlpha
     EndIf 
-    StartDrawing(ScreenOutput())
-    DrawingMode(#PB_2DDrawing_Outlined)
-    Line(0, y, #SCREEN_W, 1, #Blue)
+    DrawingMode(#PB_2DDrawing_AllChannels | #PB_2DDrawing_Outlined)
+    Line(0, y, #SCREEN_W, 1, #BlueAlpha)
     ForEach *frame\hitboxes()
-      Box(x + getRealCboxX(*frame\hitboxes(), facing), y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #Red)
+      Box(x + getRealCboxX(*frame\hitboxes(), facing), y - *frame\hitboxes()\y, *frame\hitboxes()\x2, *frame\hitboxes()\y2, #RedAlpha)
     Next
     ForEach *frame\hurtboxes()
       Box(x + getRealCboxX(*frame\hurtboxes(), facing), y - *frame\hurtboxes()\y, *frame\hurtboxes()\x2, *frame\hurtboxes()\y2, hurtColor)
     Next
-    StopDrawing()
   CompilerEndIf
+  StopDrawing()
 EndProcedure
 
 Procedure renderPlatform(*platform.Platform, *camera.Camera)
@@ -320,6 +336,15 @@ Procedure renderFrame(*game.Game)
   ForEach *game\fighters()
     renderFighter(@*game\fighters(), *game\camera)
   Next
+  
+  StartDrawing(ScreenOutput())
+  DrawAlphaImage(ImageID(0), 0, 0)
+  StopDrawing()
+  StartDrawing(ImageOutput(0))
+  DrawingMode(#PB_2DDrawing_AlphaChannel)
+  Box(0, 0, #SCREEN_W, #SCREEN_H, $00000000)
+  StopDrawing()
+  
   FlipBuffers()
   bgc = #White
 EndProcedure
@@ -406,7 +431,7 @@ Procedure getCurrentAttackInfo(*fighter.Fighter)
 EndProcedure
 
 CompilerIf #DEBUG
-  Declare logState(state.b, facing.b = 0, previousTime.b = 0)
+  Declare logState(state.b, facing.b = 0, previousTime.u = 0)
 CompilerEndIf
 Procedure setState(*fighter.Fighter, state.b, info.l = 0, updateAnim.b = 1)
   *fighter\state = state
@@ -519,10 +544,18 @@ EndProcedure
 
 Procedure initFighters(*game.Game)
   ForEach *game\fighters()
+    *game\fighters()\shieldSize = 1.0
     *game\fighters()\grounded = 0
     setState(*game\fighters(), #STATE_IDLE, 0)
   Next 
   updateAnimations(*game)
+EndProcedure
+
+Procedure.d getShieldDecrement(currentShield.d)
+  Debug "oui"
+  Debug currentShield
+  Debug Exp((-Pow(currentShield - 0.7, 2)) * 15) / 20
+  ProcedureReturn Exp(-(Sqr(currentShield) - 0.7) * 15) / 20
 EndProcedure
 
 Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
@@ -622,6 +655,14 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
     EndSelect
 EndProcedure
 
+Procedure death(*fighter.Fighter, *game.Game)
+  *fighter\x = *game\currentStage\model\w / 2
+  *fighter\y = 500
+  *fighter\physics\v\x = 0
+  *fighter\physics\v\y = 0
+  setState(*fighter, #STATE_IDLE)
+EndProcedure
+
 Procedure manageHitboxes(*game.Game)
   Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox
   ForEach *game\fighters()
@@ -653,13 +694,6 @@ Procedure manageHitboxes(*game.Game)
   Next  
 EndProcedure
 
-Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
-  If characterProperty < 1
-    ProcedureReturn animLength(*fighter\currentAnimation)
-  EndIf 
-  ProcedureReturn characterProperty
-EndProcedure  
-
 Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
   freeGame(*game)
@@ -668,6 +702,7 @@ EndProcedure
 Procedure updateFrameRate()
   Shared frameRate, frameDuration
   frameDuration.f = 1000 / frameRate
+  Debug "New framerate " + Str(frameRate)
 EndProcedure  
   
 Procedure lowerFrameRate()
@@ -684,9 +719,9 @@ EndProcedure
   
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 681
-; FirstLine = 611
-; Folding = --+-7----
+; CursorPosition = 554
+; FirstLine = 519
+; Folding = --0-4----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

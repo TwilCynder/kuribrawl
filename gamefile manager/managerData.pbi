@@ -29,7 +29,7 @@
   #COMMANDS
 EndEnumeration
 
-newMap moveNames.b()
+NewMap moveNames.b()
 moveNames("jab") = #COMMAND_Jab
 moveNames("ftilt") = #COMMAND_FTilt
 moveNames("utilt") = #COMMAND_UTilt
@@ -67,8 +67,13 @@ championValues(15) = #TYPE_DOUBLE
 championValues(16) = #TYPE_DOUBLE
 championValues(17) = #TYPE_DOUBLE
 championValues(18) = #TYPE_BYTE
+championValues(19) = #TYPE_BYTE
+championValues(20) = #TYPE_BYTE
+championValues(21) = #TYPE_BYTE
+championValues(22) = #TYPE_BYTE
+championValues(23) = #TYPE_BYTE
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 31
-; FirstLine = 9
+; CursorPosition = 73
+; FirstLine = 23
 ; EnableXP

@@ -5,14 +5,15 @@ XIncludeFile "debugData.pbi"
 Procedure InputLogGadget(x.l, y.l, w.l, h.l)
   Shared inputConsole
   inputConsole = ListIconGadget(-1, x, y, w, h, "Port", 20)
-  AddGadgetColumn(inputConsole, 1, "Input", w - 60)
+  AddGadgetColumn(inputConsole, 1, "Input", w - 100)
   AddGadgetColumn(inputConsole, 2, "Element", 30)
+  AddGadgetColumn(inputConsole, 3, "Frame", 40)
   ProcedureReturn inputConsole
 EndProcedure
 
-Procedure logInput(port.b, input.b, element.b, stick.b)
+Procedure logInput(port.b, input.b, element.b, stick.b, frame.l = -1)
   Shared inputConsole, InputNames()
-  AddGadgetItem(inputConsole, 0, Str(port) + Chr(10) + InputNames(input) + Chr(10) + Str(element * -((stick * 2) -1 )))
+  AddGadgetItem(inputConsole, 0, Str(port) + Chr(10) + InputNames(input) + Chr(10) + Str(element * -((stick * 2) -1 )) + Chr(10) + Str(frame))
 EndProcedure
 
 Procedure StatesGadgets(x.l, y.l, w.l)
@@ -24,7 +25,7 @@ Procedure StatesGadgets(x.l, y.l, w.l)
   stateGadget = StringGadget(-1, x, y + 75, w, 20, "")
 EndProcedure
 
-Procedure logState(state.b, facing.b = 0, previousTime.b = 0)
+Procedure logState(state.b, facing.b = 0, previousTime.u = 0)
   Shared ports()
   Shared stateGadget, previousStateGadget, previousStateTimeGadget, StateNames()
   SetGadgetText(previousStateGadget, GetGadgetText(stateGadget))
@@ -37,6 +38,5 @@ Procedure logState(state.b, facing.b = 0, previousTime.b = 0)
   EndIf 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 27
 ; Folding = -
 ; EnableXP

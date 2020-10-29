@@ -35,6 +35,15 @@ Procedure applyAirAccel(*fighter.Fighter, direction.b)
   EndIf 
 EndProcedure
 
+Procedure applyAirDrift(*fighter.Fighter, direction)
+    If *fighter\grounded
+      *fighter\facing = direction
+      setState(*fighter, #STATE_WALK)
+    Else 
+      applyAirAccel(*fighter, direction)
+    EndIf 
+EndProcedure
+
 Procedure substractValue(*v1.Double, v2.d)
   Define sign.b
   sign = Sign(*v1\d)
@@ -129,27 +138,24 @@ Procedure applyPhysics(*game.Game)
         groundToAir(*fighter)
       EndIf 
       *fighter\grounded = 0
-    EndIf 
-    
-    ;--- Vérification de sortie de blastzone
-      ;TODO: calculer l'angle de sortie
-    If ny < 0 Or nx < 0 Or nx > *game\currentStage\model\w
-      Debug "DEATH"
-      nx = *game\currentStage\model\w / 2
-      ny = 500
-      *fighter\physics\v\x = 0
-      *fighter\physics\v\y = 0
-      setState(*fighter, #STATE_IDLE)
-    EndIf 
+    EndIf  
     
     ;--- Application des vitesses
     
     *fighter\x = nx
     *fighter\y = ny
+    
+   ;--- Vérification de sortie de blastzone
+      ;TODO: calculer l'angle de sortie
+    If ny < 0 Or nx < 0 Or nx > *game\currentStage\model\w Or (ny > *game\currentStage\model\h And *fighter\state = #STATE_HITSTUN)
+      Debug "DEATH"
+      death(*fighter, *game)
+    EndIf
+    
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 51
-; FirstLine = 27
+; CursorPosition = 44
+; FirstLine = 11
 ; Folding = --
 ; EnableXP

@@ -54,12 +54,12 @@ Procedure startTestGame()
 EndProcedure  
 
 ;- Game window
-window = OpenWindow(-1, 0, 0, #SCREEN_W + 170, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
+window = OpenWindow(-1, 0, 0, #SCREEN_W + 210, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
 OpenWindowedScreen(WindowID(window), 0, 0, #SCREEN_W, #SCREEN_H, 0, 0, 0, #PB_Screen_NoSynchronization)
 SetWindowColor(window, $aaaaaa)
 CompilerIf #DEBUG
-  InputLogGadget(#SCREEN_W + 5, 5, 160, #SCREEN_H - 120)
-  StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 140)
+  InputLogGadget(#SCREEN_W + 5, 5, 200, #SCREEN_H - 120)
+  StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 180)
 CompilerEndIf 
   CreateMenu(0, WindowID(window))
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
@@ -68,7 +68,8 @@ CompilerEndIf
   BindMenuEvent(0, 1, @lowerFrameRate())
   AddKeyboardShortcut(window, #PB_Shortcut_F7, 2)
   BindMenuEvent(0, 2, @increaseFrameRate())
-
+  
+  
 ;- game data
 CompilerIf #DEBUG
   loadGameData("res/data.twl")
@@ -83,12 +84,12 @@ ForEach kuribrawl\characters()
   initDefaultAnimationsConfig(kuribrawl\characters())
 Next 
 
-
 startTestGame()
 
 ;- Main loop (game)
 
 Define nextFrame.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
+Define totalFrameWait.q
 updateFrameRate()
 nextFrame.f = ElapsedMilliseconds()
 endTime = ElapsedMilliseconds()
@@ -110,6 +111,7 @@ Repeat
   
   currentTime = ElapsedMilliseconds()
   frameWait = nextFrame - currentTime
+  totalFrameWait + frameWait
    If frameWait < 0
      nextFrame = currentTime
      Debug "/!\Can't keep up !"
@@ -117,7 +119,7 @@ Repeat
      CompilerIf Not #DEBUG
        If frameWait < 10
          bgc = #Red 
-         ;Debug "/!\Frame process lasted more than 2.6ms !"
+         Debug "/!\Frame process lasted more than 6.6ms !"
        EndIf 
      CompilerEndIf
      Delay(frameWait)
@@ -128,10 +130,13 @@ Repeat
   lastFrameDuration = endTime - startTime
 Until WindowEvent() = #PB_Event_CloseWindow
   
-  
+CreateFile(0, "kuribrawl log.txt")
+totalTime = ElapsedMilliseconds() - launchTime
+WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
+CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 91
-; FirstLine = 69
+; CursorPosition = 86
+; FirstLine = 67
 ; Folding = -
 ; EnableXP
 ; EnableUnicode
