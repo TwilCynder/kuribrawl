@@ -5,7 +5,7 @@ Procedure groundCollision(*game.Game, x.l, y.l, nx.l, ny.l) ;ajouter le fighter 
   ForEach *game\currentStage\platforms()
     *plat = @*game\currentStage\platforms()
     If x > *plat\model\x And x < *plat\model\x + *plat\model\w
-      If y >= *plat\model\y And ny < *plat\model\y
+      If y >= *plat\model\y And ny <= *plat\model\y
         ProcedureReturn *plat
       EndIf 
     EndIf 
@@ -155,7 +155,5 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 44
-; FirstLine = 11
 ; Folding = --
 ; EnableXP

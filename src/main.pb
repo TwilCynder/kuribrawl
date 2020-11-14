@@ -14,6 +14,8 @@
 
 #DEBUG = 1
 
+Global shieldColor = RGBA(255, 0, 0, 96)
+
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
 XIncludeFile "gameDataLib.pbi"
@@ -100,9 +102,10 @@ Repeat
   startTime = endTime
   nextFrame = nextFrame + frameDuration
   startTime = ElapsedMilliseconds()
-  manageHitboxes(*game)
-  updateInputs()
+  readInputs()
   manageStates(*game)
+  updateInputs()  
+  manageHitboxes(*game)
   applyPhysics(*game)
   updateAnimations(*game)
   renderFrame(*game)
@@ -135,8 +138,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 86
-; FirstLine = 67
+; CursorPosition = 105
+; FirstLine = 75
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

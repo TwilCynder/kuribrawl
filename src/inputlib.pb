@@ -69,7 +69,7 @@ EndProcedure
 Procedure setPortFighter(port, *fighter.Fighter)
   Shared ports()
   ports(port)\figher = *fighter
-  *fighter\port = port
+  *fighter\port = ports(port)
 EndProcedure
 
 Procedure readButton(button.b, *port.Port) ;examineJoystick not included !
@@ -298,8 +298,6 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     Case #STATE_ATTACK 
       If  *port\figher\currentMove\multiMove
         part.b = (*port\figher\stateInfo % %11100000) >> 5
-        ;Debug part
-        ;Debug *port\figher\currentAnimation\frame
         If (part = 0) Or (part <= ArraySize(*port\figher\currentMove\multiMove\partStartFrames())) And *port\figher\currentAnimation\frame >= *port\figher\currentMove\multiMove\partStartFrames(part - 1)
           part + 1
         Else
@@ -310,9 +308,10 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
       Else
         ProcedureReturn 0
       EndIf 
-    Case  #STATE_HITSTUN, #STATE_LANDING_LAG
+    Case  #STATE_HITSTUN, #STATE_LANDING_LAG, #STATE_GUARD, #STATE_GUARDSTUN
       ProcedureReturn 0
     Case #STATE_JUMPSQUAT
+      Debug "oui"
       ProcedureReturn 2
   EndSelect
   
@@ -408,11 +407,11 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_RIGHT) = @inputManager_smashStickRight()
 
 Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
-  If *port\figher\paused
-    ProcedureReturn 0
-  EndIf 
   Define state.b
   state = *port\figher\state
+  If *port\figher\paused Or state = #STATE_DASH_TURN
+    ProcedureReturn 0
+  EndIf 
   If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
     *port\figher\facing = -1
     setState(*port\figher, #STATE_DASH_START)
@@ -546,11 +545,6 @@ Procedure checkControlStickState(*port.Port) ;not a real input manager
     Case #STATE_DASH
       If Abs(*port\currentControlStickState\x) < stickTreshold
         setState(*port\figher, #STATE_DASH_STOP)
-      Else
-        If Sign(*port\currentControlStickState\x) <> *port\figher\facing
-          *port\figher\facing = Sign(*port\currentControlStickState\x)
-          setstate(*port\figher, #STATE_IDLE)
-        EndIf 
       EndIf
     Case #STATE_ATTACK
       If *port\figher\grounded
@@ -585,7 +579,14 @@ EndProcedure
 Procedure updateInputs()
   Shared inputQ(), ports(), *inputManagers(), *port.Port
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
-  readInputs()
+  For i = 0 To 3
+    If Not ports(i)\active
+      Continue  
+    EndIf 
+    *port = ports(i)
+    checkControlStickState(*port)
+    checkInputReleases(*port)
+  Next
   
   ForEach inputQ()
     input = inputQ() & %11111
@@ -615,22 +616,14 @@ Procedure updateInputs()
         EndIf 
     EndSelect  
   Next 
-    
-  For i = 0 To 3
-    If Not ports(i)\active
-      Continue  
-    EndIf 
-    *port = ports(i)
-    checkControlStickState(*port)
-    checkInputReleases(*port)
-  Next
+
 EndProcedure
-  
+
 availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 509
-; FirstLine = 490
+; CursorPosition = 313
+; FirstLine = 268
 ; Folding = ------
 ; EnableXP

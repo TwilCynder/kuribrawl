@@ -36,7 +36,7 @@ Structure Fighter
   *currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
   currentAnimationName.s
   currentMove.MoveInfo
-  port.b
+  *port
   name.s
   grounded.b
   facing.b ;1 = right | -1 = left
@@ -234,7 +234,7 @@ EndProcedure
 Procedure renderShield(*fighter.Fighter, *camera, x.l, y.l)
   *info.ShieldInfo = *fighter\character\shieldInfo
   DrawingMode(#PB_2DDrawing_AlphaBlend)
-  Circle( x + *info\x,  y - *info\y, *info\size * *fighter\shieldSize, RGBA(255,   0,   0, 96))
+  Circle( x + *info\x,  y - *info\y, *info\size * *fighter\shieldSize, shieldColor)
 EndProcedure
 
 Procedure renderFighter(*fighter.Fighter, *camera.Camera)
@@ -256,7 +256,7 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   
   ;direct drawing
   StartDrawing(ImageOutput(0)) 
-  If *fighter\state = #STATE_GUARD
+  If *fighter\state = #STATE_GUARD Or *fighter\state = #STATE_GUARDSTUN
     renderShield(*fighter, *camera, x, y)
   EndIf 
   CompilerIf #DEBUG 
@@ -466,6 +466,7 @@ Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
       *fighter\physics\v\y = *fighter\character\doubleJumpSpeed
       setAnimation(*fighter, "doublejump", 0, 0, 1)
   EndSelect
+  *fighter\grounded = 0
   setState(*fighter, #STATE_IDLE, 1, 0)
 EndProcedure
 
@@ -552,10 +553,7 @@ Procedure initFighters(*game.Game)
 EndProcedure
 
 Procedure.d getShieldDecrement(currentShield.d)
-  Debug "oui"
-  Debug currentShield
-  Debug Exp((-Pow(currentShield - 0.7, 2)) * 15) / 20
-  ProcedureReturn Exp(-(Sqr(currentShield) - 0.7) * 15) / 20
+  ProcedureReturn kuribrawl\variables\shieldDecay
 EndProcedure
 
 Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
@@ -566,6 +564,35 @@ Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
     ProcedureReturn 1
   EndIf 
 EndProcedure 
+
+Procedure testRectCircleCollision(rx.l, ry.l, rw.l, rh.l, cx.l, cy.l, cr.l)
+  Define testPos.Vector
+  Define testDist.Vector
+  Define distance.l
+  testPos\x = cx
+  testPos\y = cy
+  If cx < rx 
+    testPos\x = rx ;left
+  ElseIf cx > rx + rw
+    testPos\x = rx + rw ;right
+  EndIf 
+  
+  If cy < ry 
+    testPos\y = ry ;above
+  ElseIf cy > ry + rh
+    testPos\y = ry + rh ;below
+  EndIf 
+  
+  testDist\x = cx - testPos\x
+  testDist\y = cy - testPos\y
+  distance = Int(Sqr((testDist\x * testDist\x) + (testDist\y * testDist\y)))
+  
+  If distance <= cr
+    ProcedureReturn 1
+  EndIf
+  
+  ProcedureReturn 0
+EndProcedure
 
 Procedure.d getKnockback(damage.d)
   ProcedureReturn damage
@@ -578,6 +605,10 @@ EndProcedure
 Procedure getHitstun(knockback.b)
   ProcedureReturn knockback * 2
 EndProcedure 
+
+Procedure getShieldKnockback(damage)
+  ProcedureReturn damage / 2
+EndProcedure
 
 ;fonctionnement de la hitstun/tumble
 ; - à la fin de la durée de la hitstun, les persos passent soient en IDLE, soient en TUMBLE
@@ -630,7 +661,53 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
 EndProcedure
 
-Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
+Procedure shieldHit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
+    Define hitlag.b, type.b, hitstun.l, anim.s, facing.b, angle.d
+  If *attacking\facing = 1
+    degAngle.l = *hitbox\angle
+  Else
+    degAngle.l = 180 - *hitbox\angle
+  EndIf
+  angle = Radian(degAngle)
+  
+  If *defending\state = #STATE_HITSTUN
+    Debug "TRUE"
+  EndIf 
+  
+  knockback = getKnockback(*hitbox\damage)
+  *defending\physics\v\x = Cos(angle) * knockback
+  *defending\physics\v\y = Sin(angle) * knockback
+  
+  facing = -Sign(*defending\physics\v\x)
+  If knockback > 10
+    type = #KB_TUMBLE
+    If degAngle > 60 And degAngle < 120 And *attacking\y < *defending\y
+      anim = "hurtup"
+      facing = 0
+    ElseIf degAngle > 240 And degAngle < 300
+      anim = "hurtdown"
+      facing = 0
+    Else
+      anim = "hurtheavy"
+    EndIf   
+  Else
+    anim = "hurt"
+  EndIf 
+  If *defending\physics\v\y < 2 And *defending\grounded And Not type = #KB_TUMBLE
+    *defending\physics\v\y = 0
+    anim = "hurtground"
+  EndIf
+
+  
+  hitlag = getHitlag(*hitbox\damage)
+  *defending\paused = hitlag
+  *attacking\paused = hitlag
+  hitstun = getHitstun(knockback)
+  setAnimation(*defending, anim, 0, facing)
+  setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
+EndProcedure
+
+Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter, type.b)
   Define angle.d, knockback.d
   
   ForEach *attacking\fightersHit()
@@ -639,18 +716,16 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
     EndIf 
   Next
   
-  Select *defending\state
-    Case #STATE_GUARD  
-      ;shieldstun
-      AddElement(*attacking\fightersHit())
-      *attacking\fightersHit()\hitID = *hitbox\hit
-      *attacking\fightersHit()\fighter = *defending
-    Case #STATE_CUSTOM
+  AddElement(*attacking\fightersHit())  
+  *attacking\fightersHit()\hitID = *hitbox\hit
+  *attacking\fightersHit()\fighter = *defending
+  
+  Select type
+    Case #HIT_CUSTOM
       ;custom state handling
+    Case #HIT_SHIELD
+      shieldHit(*hitbox, *hurtbox, *attacking, *defending)
     Default
-      AddElement(*attacking\fightersHit())  
-      *attacking\fightersHit()\hitID = *hitbox\hit
-      *attacking\fightersHit()\fighter = *defending
       startKnockback(*hitbox, *hurtbox, *attacking, *defending)
     EndSelect
 EndProcedure
@@ -664,7 +739,7 @@ Procedure death(*fighter.Fighter, *game.Game)
 EndProcedure
 
 Procedure manageHitboxes(*game.Game)
-  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox
+  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox, shieldHit.b
   ForEach *game\fighters()
     *attacking = @*game\fighters()
     ForEach  *game\fighters()
@@ -673,21 +748,37 @@ Procedure manageHitboxes(*game.Game)
         Continue
       EndIf 
       *successfulHitbox = 0
+      shieldHit = 0
       ForEach *attacking\currentAnimation\frames()\model\hitboxes()
-        ForEach *defending\currentAnimation\frames()\model\hurtboxes()
-          *hitbox = @*attacking\currentAnimation\frames()\model\hitboxes()
-          *hurtbox = @*defending\currentAnimation\frames()\model\hurtboxes()
-          If testRectCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y, *hitbox\x2, *hitbox\y2,
-                               getRealCboxX(*hurtbox, *defending\facing) + *defending\x, *defending\y + *hurtbox\y, *hurtbox\x2, *hurtbox\y2)
-            bgc = #Black
+        *hitbox = @*attacking\currentAnimation\frames()\model\hitboxes()
+        
+        ;checking shield
+        If *defending\state = #STATE_GUARD
+          If testRectCircleCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y - *hitbox\y2, *hitbox\x2, *hitbox\y2, *defending\x + *defending\character\shieldInfo\x, *defending\y + *defending\character\shieldInfo\y, *defending\shieldSize * *defending\character\shieldInfo\size) 
+            shieldHit = 1
             If Not *successfulHitbox Or *hitbox\priority > *successfulHitbox\priority
               *successfulHitbox = *hitbox
+            EndIf
+          EndIf
+        EndIf
+        
+        ;checking hurtboxes 
+        If Not shieldHit
+          ForEach *defending\currentAnimation\frames()\model\hurtboxes()
+            *hurtbox = @*defending\currentAnimation\frames()\model\hurtboxes()
+            If testRectCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y, *hitbox\x2, *hitbox\y2,
+                                 getRealCboxX(*hurtbox, *defending\facing) + *defending\x, *defending\y + *hurtbox\y, *hurtbox\x2, *hurtbox\y2) 
+              
+              If Not *successfulHitbox Or *hitbox\priority > *successfulHitbox\priority
+                *successfulHitbox = *hitbox
+              EndIf 
             EndIf 
-          EndIf 
-        Next
+          Next
+        EndIf 
+        
       Next
       If *successfulHitbox 
-        hit(*successfulHitbox, *hurtbox, *attacking, *defending)
+        hit(*successfulHitbox, *hurtbox, *attacking, *defending, shieldHit)
       EndIf 
     Next
     ChangeCurrentElement(*game\fighters(), *attacking)  
@@ -717,10 +808,27 @@ Procedure increaseFrameRate()
   updateFrameRate()
 EndProcedure
   
-
+; ====start=====
+; 605
+; 372
+; 40
+; 14
+; 594
+; 330
+; 40.0
+; Shield Not hit
+; ====start=====
+; 605
+; 362
+; 40
+; 14
+; 594
+; 330
+; 40.0
+; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 554
-; FirstLine = 519
+; CursorPosition = 482
+; FirstLine = 428
 ; Folding = --0-4----
 ; EnableXP
 ; SubSystem = OpenGL

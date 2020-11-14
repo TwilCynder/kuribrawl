@@ -55,7 +55,12 @@ C:Tag
     - Air Friction (deceleration/backwards acceleration applied when airborne)
     - Landing duration (duration of the landing state. Leave to 0 to set it to the duration of the lading animation)  
     - Shield Startup : number of frames between the frame you press Guard and the frame your shield appears.
-    - Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.
+    - Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.  
+
+It is important to note that for every value indicating a duration, two special values can be used :  
+    - 1 : indicates that the default duration should be used
+    0 : indicates that the duration of the animation should be used
+
 After the first 2 lines, all lines indicate facultative info, and can be included in any order.
 
 - `〔m<id> | m:<move name>〕[l<land lag>]`
@@ -173,5 +178,5 @@ All subsequent lines describe facultative info and can be omitted and included i
 
 - `h<frame id> <x> <y> <w> <h> <damages> <angle> [<hitID>] [<priority>]` : creates a hitbox on the secified frame, with the specified damage and angle.
     - `hitID` is the numerical identifier of the hit this hitbox belongs to. If an hitbox connects with another fighter that has already been hit by an hitbox with the same hitID, it will do nothing. This means that only two hitboxes with different hitIDs can both connect. For most moves hitID will always be 0, but different hitIDs allow for the creation of multihits.
-    - `priority` of two hitboxes connect on the same frame, the hitbox with the highest priority is used.
+    - `priority` if two hitboxes connect on the same frame, the hitbox with the highest priority is used.
     

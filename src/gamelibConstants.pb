@@ -44,6 +44,7 @@ Enumeration
   #STATE_ATTACK
   ;ATTACK_AIR = ATTACK && !grounded
   #STATE_HITSTUN
+  #STATE_GUARDSTUN
   #STATE_TUMBLE
   #STATE_LANDING_LAG
   #STATE_CROUCH_START
@@ -69,6 +70,12 @@ EndEnumeration
 Enumeration
   #KB_NORMAL
   #KB_TUMBLE
+EndEnumeration
+
+Enumeration 
+  #HIT_NORMAL
+  #HIT_SHIELD
+  #HIT_CUSTOM
 EndEnumeration
 
 Enumeration ;commands
@@ -105,6 +112,6 @@ EndEnumeration
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 105
-; FirstLine = 54
+; CursorPosition = 46
+; FirstLine = 9
 ; EnableXP

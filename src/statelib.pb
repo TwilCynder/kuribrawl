@@ -6,26 +6,37 @@
 EndProcedure  
 
 Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
-  Shared ports(), defaultControler
+  Shared defaultControler
   Define jumpTypeX.b, jumpTypeY.b, element.b, elementType.b, axis.AxisState
+  Define *port.Port = *fighter\port
   
   jumpTypeX = stateinfo & %1
   jumpTypeY = (stateInfo & %10) >> 1
   elementType = (stateinfo & %1100) >> 2
   element = (stateinfo & %111110000) >> 4
   
-  If Abs(ports(*fighter\port)\currentControlStickState\x) > stickTreshold And Not jumpTypeX = #JUMP_NEUTRAL
-    If Sign(ports(*fighter\port)\currentControlStickState\x) <> *fighter\facing 
+  If Abs(*port\currentControlStickState\x) > stickTreshold And Not jumpTypeX = #JUMP_NEUTRAL
+    If Sign(*port\currentControlStickState\x) <> *fighter\facing 
       jumpTypeX = #JUMP_BACKWARDS  
     Else
       jumpTypeX = #JUMP_WALKING
     EndIf 
   EndIf 
   
-  If Not isElementPressed(element, elementType, ports(*fighter\port))
+  If Not isElementPressed(element, elementType, *port)
     jumpTypeY = 1
   EndIf
   jump(*fighter, jumpTypeX,jumpTypeY)
+EndProcedure
+
+Procedure stateCallback_DashTurn(*fighter.Fighter, stateinfo.l)
+  Define *port.Port = *fighter\port
+  If Sign(*port\currentControlStickState\x) <> *fighter\facing
+    setState(*fighter, #STATE_IDLE)
+    *fighter\facing = -*fighter\facing
+  Else
+    setState(*fighter, #STATE_DASH)
+  EndIf 
 EndProcedure
   
 Procedure manageStates(*game.Game)
@@ -56,7 +67,7 @@ Procedure manageStates(*game.Game)
         Case #STATE_DASH_TURN
           max = getStateMaxFrames(*fighter, *fighter\character\dashTurnDuration)
           If *fighter\stateTimer >= max
-            setState(*fighter, #STATE_DASH)
+            stateCallback_DashTurn(*fighter, 0)
           EndIf 
         Case #STATE_LANDING
           max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
@@ -64,15 +75,10 @@ Procedure manageStates(*game.Game)
             setState(*fighter, #STATE_IDLE)
           EndIf 
         Case #STATE_LANDING_LAG
-          max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
-          If *fighter\stateTimer >= max
-            setState(*fighter, #STATE_IDLE)
-          EndIf 
-        Case #STATE_LANDING
           max = getStateMaxFrames(*fighter, *fighter\stateInfo)
           If *fighter\stateTimer >= max
             setState(*fighter, #STATE_IDLE)
-          EndIf
+          EndIf 
         Case #STATE_HITSTUN
           max = *fighter\stateInfo >> 1
           If *fighter\stateTimer >= max
@@ -108,18 +114,17 @@ Procedure manageStates(*game.Game)
       EndSelect
       If *fighter\state = #STATE_GUARD
         *fighter\shieldSize - kuribrawl\variables\shieldDecay
-      Else
+      ElseIf Not *fighter\state = #STATE_GUARDSTUN
         *fighter\shieldSize + kuribrawl\variables\shieldRegen
         If *fighter\shieldSize > 1
           *fighter\shieldSize = 1.0
         EndIf 
       EndIf 
     EndIf 
-   
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 114
-; FirstLine = 67
+; CursorPosition = 77
+; FirstLine = 48
 ; Folding = -
 ; EnableXP

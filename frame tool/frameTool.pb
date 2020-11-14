@@ -1006,7 +1006,7 @@ Repeat
   Delay(16)
 ForEver 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 5
+; CursorPosition = 30
 ; Folding = --------
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico
