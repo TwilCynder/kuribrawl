@@ -70,6 +70,7 @@ EndProcedure
 
 Procedure applyPhysics(*game.Game)
   Define nx.l, ny.l, *fighter.Fighter
+  Define oldSpeed.Vector
 
   ForEach *game\fighters()
     *fighter = @*game\fighters()
@@ -81,6 +82,9 @@ Procedure applyPhysics(*game.Game)
     If *fighter\facing = 0
       *fighter\facing = 1
     EndIf 
+    
+    oldSpeed\x = *fighter\physics\v\x
+    oldSpeed\y = *fighter\physics\v\y
     
     ;--- Aplication de la traction/friction
     
@@ -102,6 +106,16 @@ Procedure applyPhysics(*game.Game)
       Case #STATE_DASH_TURN
         *fighter\physics\v\x + *fighter\character\dashTurnAccel * *fighter\facing
     EndSelect
+    
+    ;Détection de "fin de mouvement" (le signe de la vitesse X change)
+    If (*fighter\state = #STATE_HITSTUN Or *fighter\state = #STATE_GUARDSTUN) And *fighter\grounded And Sign(oldSpeed\x) <> Sign(*fighter\physics\v\x)
+      If *fighter\state = #STATE_HITSTUN
+        ;TODO : si le knockback était de type tumble, placer en animation au sol
+        setstate(*fighter, #STATE_IDLE)
+      Else
+        setstate(*fighter, #STATE_GUARD, (*fighter\stateInfo % 111111100000000) >> 8)
+      EndIf 
+    EndIf
     
     ;--- Gravité (fastfall, etc)
     
@@ -155,5 +169,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+; CursorPosition = 115
+; FirstLine = 83
 ; Folding = --
 ; EnableXP

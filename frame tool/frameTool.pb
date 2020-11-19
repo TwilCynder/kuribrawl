@@ -715,7 +715,7 @@ EndProcedure
 
 Procedure angleViewerCallback(angle.d)
   CloseWindow(2)
-  SetGadgetText(22, Str(Degree(angle)))
+  SetGadgetText(20, Str(Degree(angle)))
 EndProcedure
 
 Procedure promptAngle()
@@ -1006,7 +1006,8 @@ Repeat
   Delay(16)
 ForEver 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 30
+; CursorPosition = 717
+; FirstLine = 706
 ; Folding = --------
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico

@@ -141,6 +141,28 @@ Procedure setAnimationSpeed(*anim.Animation, speed.d = 0)
   *anim\carry = ratio - Int(ratio)
 EndProcedure
 
+Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0, reset.b = 0)
+  Define *anim.Animation
+  If *fighter\currentAnimationName = name And Not reset
+    ProcedureReturn 0
+  EndIf
+  
+  *anim = FindMapElement(*fighter\animations(), name)
+ 
+  If Not *anim
+    Debug "Can't set animation to " + name
+    ProcedureReturn 0
+  EndIf 
+  *fighter\currentAnimation = *anim
+  *fighter\currentAnimationName = name
+  
+  *fighter\currentAnimation\facing = facing
+  
+  setAnimationSpeed(*anim, speed)
+  resetAnimation(*anim)
+  *fighter\currentAnimation\frame = 0
+EndProcedure
+
 Procedure setStage(*game.Game, *model.StageModel)
   Define *model.StageModel
   If Not *model
@@ -163,28 +185,6 @@ Procedure setStage(*game.Game, *model.StageModel)
   Next 
   *game\camera\x = (*game\currentStage\model\w - #SCREEN_W) / 2
 EndProcedure 
-
-Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0, reset.b = 0)
-  Define *anim.Animation
-  If *fighter\currentAnimationName = name And Not reset
-    ProcedureReturn 0
-  EndIf
-  
-  *anim = FindMapElement(*fighter\animations(), name)
- 
-  If Not *anim
-    Debug "Can't set animation to " + name
-    ProcedureReturn 0
-  EndIf 
-  *fighter\currentAnimation = *anim
-  *fighter\currentAnimationName = name
-  
-  *fighter\currentAnimation\facing = facing
-  
-  setAnimationSpeed(*anim, speed)
-  resetAnimation(*anim)
-  *fighter\currentAnimation\frame = 0
-EndProcedure
 
 Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   
@@ -261,7 +261,7 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   EndIf 
   CompilerIf #DEBUG 
     Define hurtColor.l
-    If *fighter\state = #STATE_HITSTUN
+    If *fighter\state = #STATE_HITSTUN Or *fighter\state = #STATE_GUARDSTUN
       hurtColor = #YellowAlpha
     Else
       hurtColor = #GreenAlpha
@@ -610,6 +610,10 @@ Procedure getShieldKnockback(damage)
   ProcedureReturn damage / 2
 EndProcedure
 
+Procedure getShieldStun(knockback.b)
+  ProcedureReturn knockback * 5
+EndProcedure
+
 ;fonctionnement de la hitstun/tumble
 ; - à la fin de la durée de la hitstun, les persos passent soient en IDLE, soient en TUMBLE
 ; - ses changement de state sont indépendants de l'animation (un perso peut rester en anim de hitstun même s'il est en IDLE indéfiniment, jusqu'à changer son anim lui-même)
@@ -651,7 +655,6 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
     *defending\physics\v\y = 0
     anim = "hurtground"
   EndIf
-
   
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
@@ -661,8 +664,11 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
 EndProcedure
 
+;modifier la formule de vitesse (kb * 0.5 * sign(cos(angle)) + kb * 0.5 * cos(agnle))
+;voir pour l'anim
+
 Procedure shieldHit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter)
-    Define hitlag.b, type.b, hitstun.l, anim.s, facing.b, angle.d
+  Define hitlag.b, type.b, hitstun.l, anim.s, facing.b, angle.d, direction.b
   If *attacking\facing = 1
     degAngle.l = *hitbox\angle
   Else
@@ -670,41 +676,20 @@ Procedure shieldHit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defen
   EndIf
   angle = Radian(degAngle)
   
-  If *defending\state = #STATE_HITSTUN
-    Debug "TRUE"
+  If *defending\state = #STATE_GUARDSTUN
+    Debug "TRUE (shield)"
   EndIf 
-  
-  knockback = getKnockback(*hitbox\damage)
-  *defending\physics\v\x = Cos(angle) * knockback
-  *defending\physics\v\y = Sin(angle) * knockback
-  
-  facing = -Sign(*defending\physics\v\x)
-  If knockback > 10
-    type = #KB_TUMBLE
-    If degAngle > 60 And degAngle < 120 And *attacking\y < *defending\y
-      anim = "hurtup"
-      facing = 0
-    ElseIf degAngle > 240 And degAngle < 300
-      anim = "hurtdown"
-      facing = 0
-    Else
-      anim = "hurtheavy"
-    EndIf   
-  Else
-    anim = "hurt"
-  EndIf 
-  If *defending\physics\v\y < 2 And *defending\grounded And Not type = #KB_TUMBLE
-    *defending\physics\v\y = 0
-    anim = "hurtground"
-  EndIf
+ 
+  knockback = getShieldKnockback(*hitbox\damage)
 
+  *defending\physics\v\x = knockback * Sign(Cos(angle))
   
   hitlag = getHitlag(*hitbox\damage)
   *defending\paused = hitlag
   *attacking\paused = hitlag
-  hitstun = getHitstun(knockback)
-  setAnimation(*defending, anim, 0, facing)
-  setState(*defending, #STATE_HITSTUN, type + (hitstun << 1))
+  hitstun = getShieldStun(knockback)
+  ;setAnimation(*defending, anim, 0, facing)
+  setState(*defending, #STATE_GUARDSTUN, hitstun + (*defending\stateInfo << 8))
 EndProcedure
 
 Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter, type.b)
@@ -753,7 +738,7 @@ Procedure manageHitboxes(*game.Game)
         *hitbox = @*attacking\currentAnimation\frames()\model\hitboxes()
         
         ;checking shield
-        If *defending\state = #STATE_GUARD
+        If *defending\state = #STATE_GUARD Or *defending\state = #STATE_GUARDSTUN
           If testRectCircleCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y - *hitbox\y2, *hitbox\x2, *hitbox\y2, *defending\x + *defending\character\shieldInfo\x, *defending\y + *defending\character\shieldInfo\y, *defending\shieldSize * *defending\character\shieldInfo\size) 
             shieldHit = 1
             If Not *successfulHitbox Or *hitbox\priority > *successfulHitbox\priority
@@ -827,9 +812,9 @@ EndProcedure
 ; 40.0
 ; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 482
-; FirstLine = 428
-; Folding = --0-4----
+; CursorPosition = 691
+; FirstLine = 655
+; Folding = ----4-----
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

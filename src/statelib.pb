@@ -88,6 +88,11 @@ Procedure manageStates(*game.Game)
               setState(*fighter, #STATE_IDLE, 0, *fighter\grounded)
             EndIf 
           EndIf
+        Case #STATE_GUARDSTUN
+          max = *fighter\stateInfo & %11111111
+          If *fighter\stateTimer >= max
+              setState(*fighter, #STATE_IDLE, 0, *fighter\grounded)
+          EndIf
         Case #STATE_CROUCH_START
           max = animLength(*fighter\currentAnimation)
           If *fighter\stateTimer >= max
@@ -124,7 +129,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 77
-; FirstLine = 48
+; CursorPosition = 91
+; FirstLine = 78
 ; Folding = -
 ; EnableXP

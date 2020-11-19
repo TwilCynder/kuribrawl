@@ -623,7 +623,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 313
-; FirstLine = 268
+; CursorPosition = 534
+; FirstLine = 518
 ; Folding = ------
 ; EnableXP
