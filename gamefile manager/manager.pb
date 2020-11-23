@@ -33,6 +33,9 @@ Enumeration
   #TYPE_DOUBLE
 EndEnumeration
 
+#MAX_VALUE_BYTE = -127
+#MAX_VALUE_DOUBLE = %111111111111111111111111111111111111111111111111111111111111111
+
 Structure loadedFile
   *buffer
   size.l
@@ -415,7 +418,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 28
+; CursorPosition = 105
+; FirstLine = 84
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

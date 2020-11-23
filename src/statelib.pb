@@ -15,7 +15,7 @@ Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
   elementType = (stateinfo & %1100) >> 2
   element = (stateinfo & %111110000) >> 4
   
-  If Abs(*port\currentControlStickState\x) > stickTreshold And Not jumpTypeX = #JUMP_NEUTRAL
+  If Abs(*port\currentControlStickState\x) > *port\controllerInfo\config\analogStickThreshold And Not jumpTypeX = #JUMP_NEUTRAL
     If Sign(*port\currentControlStickState\x) <> *fighter\facing 
       jumpTypeX = #JUMP_BACKWARDS  
     Else
@@ -91,7 +91,7 @@ Procedure manageStates(*game.Game)
         Case #STATE_GUARDSTUN
           max = *fighter\stateInfo & %11111111
           If *fighter\stateTimer >= max
-              setState(*fighter, #STATE_IDLE, 0, *fighter\grounded)
+              setState(*fighter, #STATE_GUARD, (*fighter\stateInfo & %111111100000000) >> 8, *fighter\grounded)
           EndIf
         Case #STATE_CROUCH_START
           max = animLength(*fighter\currentAnimation)
@@ -129,7 +129,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 91
-; FirstLine = 78
+; CursorPosition = 93
+; FirstLine = 66
 ; Folding = -
 ; EnableXP

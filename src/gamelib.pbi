@@ -47,6 +47,7 @@ Structure Fighter
   jumps.b
   paused.b
   shieldSize.d
+  shieldPosition.Vector
   List fightersHit.fighterHitIdPair()
 EndStructure
 
@@ -234,7 +235,7 @@ EndProcedure
 Procedure renderShield(*fighter.Fighter, *camera, x.l, y.l)
   *info.ShieldInfo = *fighter\character\shieldInfo
   DrawingMode(#PB_2DDrawing_AlphaBlend)
-  Circle( x + *info\x,  y - *info\y, *info\size * *fighter\shieldSize, shieldColor)
+  Circle( x + *info\x + *fighter\shieldPosition\x,  y - *info\y + *fighter\shieldPosition\y, *info\size * *fighter\shieldSize, shieldColor)
 EndProcedure
 
 Procedure renderFighter(*fighter.Fighter, *camera.Camera)
@@ -556,6 +557,18 @@ Procedure.d getShieldDecrement(currentShield.d)
   ProcedureReturn kuribrawl\variables\shieldDecay
 EndProcedure
 
+Procedure.d getShieldTiltFactor(*fighter.Fighter)
+  ProcedureReturn *fighter\character\shieldInfo\size * (1 - *fighter\shieldSize)
+EndProcedure
+
+Procedure getActualShieldX(*fighter.Fighter)
+  ProcedureReturn  *fighter\x + *fighter\character\shieldInfo\x + *fighter\shieldPosition\x
+EndProcedure
+
+Procedure getActualShieldY(*fighter.Fighter)
+  ProcedureReturn  *fighter\y + *fighter\character\shieldInfo\y + *fighter\shieldPosition\y
+EndProcedure
+
 Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
   If x1 < x2 + w2 And
      x1 + w1 > x2 And
@@ -599,7 +612,7 @@ Procedure.d getKnockback(damage.d)
 EndProcedure
 
 Procedure getHitlag(damage.d)
-  ProcedureReturn (damage * 0.65) + 6
+  ProcedureReturn (damage * 0.5) + 2
 EndProcedure
 
 Procedure getHitstun(knockback.b)
@@ -739,7 +752,7 @@ Procedure manageHitboxes(*game.Game)
         
         ;checking shield
         If *defending\state = #STATE_GUARD Or *defending\state = #STATE_GUARDSTUN
-          If testRectCircleCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y - *hitbox\y2, *hitbox\x2, *hitbox\y2, *defending\x + *defending\character\shieldInfo\x, *defending\y + *defending\character\shieldInfo\y, *defending\shieldSize * *defending\character\shieldInfo\size) 
+          If testRectCircleCollision(getRealCboxX(*hitbox, *attacking\facing) + *attacking\x, *attacking\y + *hitbox\y - *hitbox\y2, *hitbox\x2, *hitbox\y2, getActualShieldX(*defending), getActualShieldY(*defending), *defending\shieldSize * *defending\character\shieldInfo\size) 
             shieldHit = 1
             If Not *successfulHitbox Or *hitbox\priority > *successfulHitbox\priority
               *successfulHitbox = *hitbox
@@ -812,8 +825,8 @@ EndProcedure
 ; 40.0
 ; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 691
-; FirstLine = 655
+; CursorPosition = 754
+; FirstLine = 736
 ; Folding = ----4-----
 ; EnableXP
 ; SubSystem = OpenGL

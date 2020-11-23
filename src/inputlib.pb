@@ -6,9 +6,9 @@ Structure InputConfig
   analogTriggerThreshold.l
 EndStructure
 
-Macro stickTreshold : defaultControler\config\analogStickThreshold : EndMacro
-Macro stickSmashTreshold : defaultControler\config\analogStickSmashThreshold : EndMacro
-Macro triggerTreshold : defaultControler\config\analogTriggerThreshold : EndMacro
+Macro stickTreshold : *controller\config\analogStickThreshold : EndMacro
+Macro stickSmashTreshold : *controller\config\analogStickSmashThreshold : EndMacro
+Macro triggerTreshold : *controller\config\analogTriggerThreshold : EndMacro
 
 Structure Bind
   ID.b
@@ -17,6 +17,7 @@ EndStructure
 
 Structure InputBinding
   controlStickID.b
+  secondaryStickID.b ;utile pour le shield tilt
   List buttons.Bind()
   List axises.Bind()
   List triggers.Bind()
@@ -51,6 +52,7 @@ Structure Port
   currentControlStickState.AxisState
   controlStickBuffer.b[4]
   active.b
+  controllerInfo.knownController
   *figher.Fighter
 EndStructure
 Dim ports.Port(4)
@@ -60,10 +62,11 @@ XIncludeFile "inputlibData.pbi"
 NewList inputQ.l()
 
 Procedure setPort(port, joyID, active = 1)
-  Shared ports()
+  Shared ports(), defaultControler
   ports(port)\joyID = joyID
   ports(port)\active = active
   ports(port)\id = port
+  ports(port)\controllerInfo = defaultControler
 EndProcedure
 
 Procedure setPortFighter(port, *fighter.Fighter)
@@ -82,17 +85,17 @@ Procedure readAxis(*state.AxisState, axis.b, *port.Port)
   *state\z = JoystickAxisZ(*port\joyID, axis, #PB_Relative)
 EndProcedure
 
-Procedure stickDirection(*state.AxisState)
+Procedure stickDirection(*state.AxisState, *controllerConfig.InputConfig)
   Shared defaultControler
   x.l = *state\x
   y.l = *state\y
-  If x > stickTreshold And x > Abs(y)
+  If x > *controllerConfig\analogStickThreshold And x > Abs(y)
     ProcedureReturn #DIRECTION_RIGHT
-  ElseIf y > stickTreshold And y > Abs(x)
+  ElseIf y > *controllerConfig\analogStickThreshold And y > Abs(x)
     ProcedureReturn #DIRECTION_DOWN
-  ElseIf x < -stickTreshold And -x > Abs(y)
+  ElseIf x < -*controllerConfig\analogStickThreshold And -x > Abs(y)
     ProcedureReturn #DIRECTION_LEFT
-  ElseIf y < -stickTreshold And -y > Abs(x)
+  ElseIf y < -*controllerConfig\analogStickThreshold And -y > Abs(x)
     ProcedureReturn #DIRECTION_UP
   Else 
     ProcedureReturn #DIRECTION_NONE
@@ -100,7 +103,7 @@ Procedure stickDirection(*state.AxisState)
 EndProcedure
 
 Procedure controlStickDirection(*port.Port)
-  ProcedureReturn stickDirection(*port\currentControlStickState)
+  ProcedureReturn stickDirection(*port\currentControlStickState, *port\controllerInfo\config)
 EndProcedure
 
 Procedure readTrigger(axis.b, *port.Port) ;keep in mind that a trigger is just the Z axis of an axis oh wait apparently it depends on the jystick :^)
@@ -109,8 +112,7 @@ Procedure readTrigger(axis.b, *port.Port) ;keep in mind that a trigger is just t
 EndProcedure  
 
 Procedure triggerPressed(axis.b, *port.Port)
-  Shared defaultControler
-  ProcedureReturn Bool(readTrigger(axis, *port) > triggerTreshold)
+  ProcedureReturn Bool(readTrigger(axis, *port) > *port\controllerInfo\config\analogTriggerThreshold)
 EndProcedure
 
 Procedure makeInputValue(input.b, time.b, port.b, element.b, elementType.b)
@@ -129,8 +131,8 @@ Procedure registerInput(port, input, element = #MAX_BUTTON_NB, elementType = #EL
 EndProcedure
 
 Procedure readInputs()
-  Shared ports(), defaultControler, *port.Port
-  Define state.b, id.b, axisState.AxisState
+  Shared ports(), *port.Port
+  Define state.b, id.b, axisState.AxisState, *controller.knownController, *binding.InputBinding
 
   For i = 0 To 3
     If Not ports(i)\active
@@ -143,21 +145,24 @@ Procedure readInputs()
       Continue
     EndIf 
     
+    *controller = *port\controllerInfo
+    *binding = *controller\defaultBinding
+    
     ;--- Buttons
     
-    ForEach defaultControler\defaultBinding\buttons()
-      id = defaultControler\defaultBinding\buttons()\ID
+    ForEach *binding\buttons()
+      id = *binding\buttons()\ID
       state = readButton(id, *port)
       
       If state And Not ports(i)\previousState\buttons[id]
-        registerInput(i, defaultControler\defaultBinding\buttons()\input, id)
+        registerInput(i, *binding\buttons()\input, id)
       EndIf
       *port\previousState\buttons[id] = state
     Next 
     
     ;--- Controlstick : smashinputs
     
-    id = defaultControler\defaultBinding\controlStickID
+    id = *binding\controlStickID
     readAxis(*port\currentControlStickState, id, *port)
     
     If *port\currentControlStickState\x > stickSmashTreshold
@@ -212,22 +217,22 @@ Procedure readInputs()
     
     ;--- Sticks
     
-    ForEach defaultControler\defaultBinding\axises()
-      id = defaultControler\defaultBinding\axises()\ID
-      readAxis(@axisState, defaultControler\defaultBinding\axises()\ID, *port)
+    ForEach *binding\axises()
+      id = *binding\axises()\ID
+      readAxis(@axisState, *binding\axises()\ID, *port)
       If axisState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
+        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_RIGHT)
       ElseIf axisState\x < -stickTreshold And *port\previousState\axis[id]\x > -stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
+        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_LEFT)
       EndIf 
         
       If axisState\y > stickTreshold And *port\previousState\axis[id]\y < stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
+        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_DOWN)
       ElseIf  axisState\y < -stickTreshold And *port\previousState\axis[id]\y > -stickTreshold
-        registerInput(i, defaultControler\defaultBinding\axises()\input, id, #ELEMENTTYPE_STICK)
+        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
         ;registerInput(i, #INPUT_ControlStick_UP)
       EndIf 
       *port\previousState\axis[id]\x = axisState\x
@@ -236,11 +241,11 @@ Procedure readInputs()
     
     ;--- Triggers
     
-    ForEach defaultControler\defaultBinding\triggers()
-      id = defaultControler\defaultBinding\triggers()\ID
+    ForEach *binding\triggers()
+      id = *binding\triggers()\ID
       axisState\z = readTrigger(id, *port)
-      If axisState\z > triggerTreshold And *port\previousState\axis[defaultControler\defaultBinding\triggers()\ID]\z < triggerTreshold
-        registerInput(i, defaultControler\defaultBinding\triggers()\input, id, #ELEMENTTYPE_TRIGGER)
+      If axisState\z > triggerTreshold And *port\previousState\axis[*binding\triggers()\ID]\z < triggerTreshold
+        registerInput(i, *binding\triggers()\input, id, #ELEMENTTYPE_TRIGGER)
       EndIf 
       *port\previousState\axis[id]\z = axisState\z
     Next 
@@ -320,7 +325,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
   If *info\elementType = #ELEMENTTYPE_STICK
     state.AxisState
     readAxis(@state, *info\element, *port)
-    direction = stickDirection(@state)
+    direction = stickDirection(@state, *port\controllerInfo\config)
   Else 
     direction = controlStickDirection(*port)
   EndIf 
@@ -393,8 +398,7 @@ Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
   EndIf 
   Define state.b
   state = *port\figher\state
-  If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
-    Debug "oui"
+  If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or (state = #STATE_DASH_START And *port\figher\facing = -1)
     *port\figher\facing = 1
     setState(*port\figher, #STATE_DASH_START)
   EndIf 
@@ -412,7 +416,7 @@ Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
   If *port\figher\paused Or state = #STATE_DASH_TURN
     ProcedureReturn 0
   EndIf 
-  If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or state = #STATE_DASH_START
+  If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or (state = #STATE_DASH_START And *port\figher\facing = 1)
     *port\figher\facing = -1
     setState(*port\figher, #STATE_DASH_START)
   EndIf 
@@ -467,7 +471,7 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
     EndIf 
     setState(*port\figher, #STATE_JUMPSQUAT, jumpType + (typeY << 1) + (*info\elementType << 2) + (*info\element << 4))
   ElseIf *port\figher\jumps > 0
-    If Abs(*port\currentControlStickState\x) > stickTreshold
+    If Abs(*port\currentControlStickState\x) > *port\controllerInfo\config\analogStickThreshold
       If  Sign(*port\currentControlStickState\x) = *port\figher\facing 
         jump(*port\figher, #JUMP_WALKING, #YJUMP_DOUBLE)
       Else
@@ -516,8 +520,8 @@ Procedure inputManager_guard(*port.Port, *info.inputData)
 EndProcedure
 *inputManagers(#INPUT_Guard) = @inputManager_guard()
 
-Procedure checkControlStickState(*port.Port) ;not a real input manager
-  Shared defaultControler
+Procedure checkSticksState(*port.Port) ;not a real input manager
+  Define *controller.knownController = *port\controllerInfo
   Select *port\figher\state
     Case #STATE_CROUCH_STOP
       If *port\currentControlStickState\y > stickTreshold
@@ -552,6 +556,19 @@ Procedure checkControlStickState(*port.Port) ;not a real input manager
         If Abs(*port\currentControlStickState\x) > stickTreshold
           applyAirAccel(*port\figher, Sign(*port\currentControlStickState\x))
         EndIf 
+      EndIf
+    Case #STATE_GUARD
+      x.d = JoystickAxisX(*port\joyID, *port\controllerInfo\defaultBinding\secondaryStickID, #PB_Relative)
+      y.d = JoystickAxisY(*port\joyID, *port\controllerInfo\defaultBinding\secondaryStickID, #PB_Relative)
+      norm.l = Sqr(x * x + y * y)
+      If norm > stickTreshold
+        factor.d = getShieldTiltFactor(*port\figher)
+        Debug factor
+        *port\figher\shieldPosition\x = (x / 1000) * factor
+        *port\figher\shieldPosition\y = (y / 1000) * factor
+      Else
+        *port\figher\shieldPosition\x = 0
+        *port\figher\shieldPosition\y = 0
       EndIf 
   EndSelect 
 EndProcedure
@@ -584,7 +601,7 @@ Procedure updateInputs()
       Continue  
     EndIf 
     *port = ports(i)
-    checkControlStickState(*port)
+    checkSticksState(*port)
     checkInputReleases(*port)
   Next
   
@@ -623,7 +640,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 534
-; FirstLine = 518
+; CursorPosition = 562
+; FirstLine = 537
 ; Folding = ------
 ; EnableXP

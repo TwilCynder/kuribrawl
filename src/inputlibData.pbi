@@ -36,6 +36,7 @@ With defaultControler\defaultBinding
   AddElement(\triggers()) : \triggers()\ID = #AXIS_LEFT : \triggers()\input = #INPUT_Guard
   AddElement(\triggers()) : \triggers()\ID = #AXIS_RIGHT : \triggers()\input = #INPUT_Jump
   \controlStickID = 0
+  \secondaryStickID = #AXIS_RIGHT
 EndWith
 
 
@@ -59,5 +60,6 @@ EndWith
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 6
+; CursorPosition = 38
+; FirstLine = 8
 ; EnableXP
