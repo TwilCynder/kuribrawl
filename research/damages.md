@@ -1,3 +1,11 @@
+<style>
+    img{
+        background-color:#1E1E1E;
+        border: solid 3px #1E1E1E;
+        border-radius: 5px;
+    }
+</style>
+
 # Damage related technical aspects
 
 ## Knockback Formula
