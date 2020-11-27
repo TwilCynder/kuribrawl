@@ -12,7 +12,7 @@
 ; régler finalement la question du : substructure directement en field ou pointer vers heap
 ; transformer les données sous forme de nombre fragmenté (input) en structures
 
-#DEBUG = 1
+#DEBUG = 0
 
 Global shieldColor = RGBA(255, 0, 0, 96)
 
@@ -48,6 +48,8 @@ Procedure startTestGame()
   *f1\name = "Test One"
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
+  
+  Debug *f1\character\airAcceleration
   
   setPort(0, 0)
   setPortFighter(0, *f1)
@@ -121,7 +123,7 @@ Repeat
      Debug "/!\Can't keep up !"
    Else 
      CompilerIf Not #DEBUG
-       If frameWait < 10
+       If frameWait < 8
          bgc = #Red 
          Debug "/!\Frame process lasted more than 6.6ms !"
        EndIf 
@@ -139,8 +141,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 56
-; FirstLine = 42
+; CursorPosition = 127
+; FirstLine = 90
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

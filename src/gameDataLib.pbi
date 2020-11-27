@@ -81,17 +81,17 @@ Structure Champion
   dashTurnAccel.d
   maxAirSpeed.d
   airAcceleration.d
+  airFriction.d
   traction.d
   jumpSpeed.d
-  jumpsquatDuration.b
-  dashStopDuration.b
-  dashStartDuration.b
-  dashTurnDuration.b
   shorthopSpeed.d
   doubleJumpSpeed.d
   maxFallSpeed.d
   fastFallSpeed.d
-  airFriction.d
+  jumpsquatDuration.b
+  dashStopDuration.b
+  dashStartDuration.b
+  dashTurnDuration.b
   landingDuration.b
   shieldStartup.b
   shieldEndlag.b
@@ -304,7 +304,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 130
-; FirstLine = 98
+; CursorPosition = 84
+; FirstLine = 58
 ; Folding = ----
 ; EnableXP

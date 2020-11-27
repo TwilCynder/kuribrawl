@@ -1,0 +1,92 @@
+<style>
+body{
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+    color:white;
+    background-color: #1E1E1E;
+    font-size: 14;
+    line-height: 1.6;
+    width: 70%;
+    min-width: 600px;
+}
+
+code{
+    color:#C9AE76;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+pre{
+    background-color: #161616;
+    margin-right: 7%;
+    padding: 10px;
+}
+
+pre>code{
+    color:white;
+}
+
+h1:after
+{
+    content:' ';
+    display:block;
+    border-bottom:1px solid #666666;
+}
+
+h2:after
+{
+    margin-top: 3px;
+    content:' ';
+    display:block;
+    border-bottom:1px solid #666666;
+    width: 40%;
+}
+</style>
+<h1 id="damage-related-technical-aspects">Damage related technical aspects</h1>
+<h2 id="knockback-formula">Knockback Formula</h2>
+<h3 id="in-other-pfs">In other PFs</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p</td>
+<td>percentage of the target (after damage application)</td>
+</tr>
+<tr>
+<td>d</td>
+<td>attack damage</td>
+</tr>
+<tr>
+<td>w</td>
+<td>target weight</td>
+</tr>
+<tr>
+<td>s</td>
+<td>scaling knockback of the attack</td>
+</tr>
+<tr>
+<td>b</td>
+<td>base knockback of the attack</td>
+</tr>
+<tr>
+<td>r</td>
+<td>other ratios</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>Super Smash Bros. 64<br><img src="https://latex.codecogs.com/png.latex?{\color{White}\(\(\(\(\(\(\frac{p}{10}+\frac{p+d}{20}\" alt="LateX Equation (via Codecogs)">\times%20w)\times%201.4)+18)\times%20s)+b)\times%20r})  </p>
+</li>
+<li><p>Super Smash Bros. Melee-Ultimate<br><img src="https://latex.codecogs.com/png.latex?{\color{White}\(\(\(\(\(\(\frac{p}{10}+\frac{p+d}{20}\" alt="LateX Equation (via Codecogs)">\times%20\frac{200}{w+100})\times%201.4)+18)\times%20s)+b)\times%20r})</p>
+</li>
+</ul>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?x+x" alt="LateX Equation (via Codecogs)"></li>
+</ul>

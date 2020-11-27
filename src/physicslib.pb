@@ -25,7 +25,7 @@ Procedure landCallback(*fighter.Fighter)
 EndProcedure
 
 Procedure applyAirAccel(*fighter.Fighter, direction.b)
-  If *fighter\physics\v\x < *fighter\character\maxAirSpeed And *fighter\physics\v\x > -*fighter\character\maxAirSpeed
+  If Not (Sign(*fighter\physics\v\x) = direction And Abs(*fighter\physics\v\x) > *fighter\character\maxAirSpeed )
     *fighter\physics\v\x + *fighter\character\airAcceleration * direction
     If *fighter\physics\v\x > *fighter\character\maxAirSpeed 
       *fighter\physics\v\x = *fighter\character\maxAirSpeed 
@@ -169,7 +169,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 115
-; FirstLine = 83
+; CursorPosition = 26
+; FirstLine = 2
 ; Folding = --
 ; EnableXP

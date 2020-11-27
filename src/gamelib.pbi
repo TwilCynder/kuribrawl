@@ -32,6 +32,7 @@ Structure Fighter
   y.l
   physics.Physics
   *character.Champion
+  damage.d
   Map animations.Animation()
   *currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
   currentAnimationName.s
@@ -608,7 +609,7 @@ Procedure testRectCircleCollision(rx.l, ry.l, rw.l, rh.l, cx.l, cy.l, cr.l)
 EndProcedure
 
 Procedure.d getKnockback(damage.d)
-  ProcedureReturn damage
+  ProcedureReturn damage / 4
 EndProcedure
 
 Procedure getHitlag(damage.d)
@@ -620,7 +621,7 @@ Procedure getHitstun(knockback.b)
 EndProcedure 
 
 Procedure getShieldKnockback(damage)
-  ProcedureReturn damage / 2
+  ProcedureReturn damage / 6
 EndProcedure
 
 Procedure getShieldStun(knockback.b)
@@ -645,7 +646,9 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
     Debug "TRUE"
   EndIf 
   
-  knockback = getKnockback(*hitbox\damage)
+  *defending\damage + *hitbox\damage
+  
+  knockback = getKnockback(*defending\damage)
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
   
@@ -825,8 +828,8 @@ EndProcedure
 ; 40.0
 ; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 754
-; FirstLine = 736
+; CursorPosition = 623
+; FirstLine = 601
 ; Folding = ----4-----
 ; EnableXP
 ; SubSystem = OpenGL

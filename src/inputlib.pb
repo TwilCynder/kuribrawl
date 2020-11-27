@@ -549,6 +549,9 @@ Procedure checkSticksState(*port.Port) ;not a real input manager
     Case #STATE_DASH
       If Abs(*port\currentControlStickState\x) < stickTreshold
         setState(*port\figher, #STATE_DASH_STOP)
+      ElseIf Sign(*port\currentControlStickState\x) <> *port\figher\facing
+        setState(*port\figher, #STATE_DASH_TURN)
+        *port\figher\facing = -*port\figher\facing
       EndIf
     Case #STATE_ATTACK
       If *port\figher\grounded
@@ -640,7 +643,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 562
-; FirstLine = 537
+; CursorPosition = 553
+; FirstLine = 522
 ; Folding = ------
 ; EnableXP

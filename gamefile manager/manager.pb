@@ -160,10 +160,20 @@ Procedure writeFileDescriptor(type.b, infos.s)
       line = ReadString(2)
       PrintN("- - Values : " + line)
       For i = 1 To #CHAMPION_VALUES_NB
-        If championValues(i) = #TYPE_DOUBLE
-          WriteDouble(1, ValD(StringField(line, i, " ")))
-        Else 
-          WriteByte(1, Val(StringField(line, i, " ")))
+        value = StringField(line, i, " ")
+        If value = "x"
+          PrintN("Value " + Str(i) + " has the special value (x)")
+          If championValues(i) = #TYPE_DOUBLE
+            WriteDouble(1, #MAX_VALUE_DOUBLE)
+          Else 
+            WriteByte(1, #MAX_VALUE_BYTE)
+          EndIf 
+        Else
+          If championValues(i) = #TYPE_DOUBLE
+            WriteDouble(1, ValD(value))
+          Else 
+            WriteByte(1, Val(value))
+          EndIf 
         EndIf 
       Next 
       While Not Eof(2)
@@ -418,8 +428,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 105
-; FirstLine = 84
+; CursorPosition = 164
+; FirstLine = 135
 ; Folding = --
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

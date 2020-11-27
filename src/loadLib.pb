@@ -25,6 +25,9 @@ Enumeration
   #ANIMATIONTYPE_STAGE
 EndEnumeration
 
+#MAX_VALUE_BYTE = -127
+#MAX_VALUE_DOUBLE = %111111111111111111111111111111111111111111111111111111111111111
+
 Procedure readChampionValues(*champion.Champion)
  *champion\walkSpeed = ReadDouble(0)
  *champion\dashSpeed = ReadDouble(0)
@@ -32,17 +35,17 @@ Procedure readChampionValues(*champion.Champion)
  *champion\dashTurnAccel = ReadDouble(0)
  *champion\maxAirSpeed = ReadDouble(0)
  *champion\airAcceleration = ReadDouble(0)
+ *champion\airFriction = ReadDouble(0)
  *champion\traction = ReadDouble(0)
  *champion\jumpSpeed = ReadDouble(0) 
- *champion\jumpsquatDuration = ReadByte(0)
- *champion\dashStopDuration = ReadByte(0)
- *champion\dashStartDuration = ReadByte(0)
- *champion\dashTurnDuration = ReadByte(0)
  *champion\shortHopSpeed = ReadDouble(0)
  *champion\doubleJumpSpeed = ReadDouble(0)
  *champion\maxFallSpeed = ReadDouble(0)
  *champion\fastFallSpeed = ReadDouble(0)
- *champion\airFriction = ReadDouble(0)
+ *champion\jumpsquatDuration = ReadByte(0)
+ *champion\dashStopDuration = ReadByte(0)
+ *champion\dashStartDuration = ReadByte(0)
+ *champion\dashTurnDuration = ReadByte(0)
  *champion\landingDuration = ReadByte(0)
  *champion\shieldStartup = ReadByte(0)
  *champion\shieldEndlag = ReadByte(0)
@@ -50,6 +53,15 @@ Procedure readChampionValues(*champion.Champion)
  *champion\shieldInfo\y = ReadByte(0)
  *champion\shieldInfo\size = ReadByte(0)
 EndProcedure  
+
+Procedure adaptChampionValues(*champion.Champion)
+  If *champion\shieldStartup = #MAX_VALUE_BYTE
+    *champion\shieldStartup = kuribrawl\variables\shieldStartup
+  EndIf 
+  If *champion\shieldEndlag = #MAX_VALUE_BYTE
+    *champion\shieldEndlag = kuribrawl\variables\shieldEndlag
+  EndIf
+EndProcedure
 
 Procedure readStageValues(*stage.StageModel)
   *stage\w = ReadWord(0)
@@ -140,6 +152,7 @@ Procedure loadGameData(path.s)
         *character = tryChampion(tag)
         *character\displayName = ReadString(0, #PB_UTF8)
         readChampionValues(*character)  
+        adaptChampionValues(*character)
         Repeat 
           byte = ReadByte(0)
           Select byte
@@ -316,7 +329,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 50
-; FirstLine = 9
+; CursorPosition = 154
+; FirstLine = 150
 ; Folding = --
 ; EnableXP

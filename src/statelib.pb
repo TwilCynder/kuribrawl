@@ -1,5 +1,5 @@
 ﻿Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
-  If characterProperty < 1
+  If characterProperty < 0
     ProcedureReturn animLength(*fighter\currentAnimation)
   EndIf 
   ProcedureReturn characterProperty
@@ -129,7 +129,6 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 93
-; FirstLine = 66
+; CursorPosition = 1
 ; Folding = -
 ; EnableXP
