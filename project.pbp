@@ -7,7 +7,7 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2020-11-27 17:47" user="twilc" host="TWIL-DESKTOP"/>
+    <lastopen date="2020-11-28 14:13" user="twilc" host="TWIL-DESKTOP"/>
   </section>
   <section name="files">
     <file name="src\animations.pbi">

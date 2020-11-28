@@ -304,7 +304,6 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 84
-; FirstLine = 58
+; CursorPosition = 30
 ; Folding = ----
 ; EnableXP
