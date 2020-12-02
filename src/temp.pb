@@ -71,13 +71,14 @@ Structure Game
   *currentStage.Stage
   window.l
   camera.Camera
-  *base.GameData
 EndStructure
 
 Define frameRate.b = 60, frameDuration.f
 
 ;- Rendering objects
-CreateImage(0, #SCREEN_W, #SCREEN_H, 32, #PB_Image_Transparent)
+Procedure initRenderingEnvironment()
+  CreateSprite(0, #SCREEN_W, #SCREEN_H, #PB_Sprite_AlphaBlending)
+EndProcedure
 
 Procedure initAnimation(*anim.Animation, *model.AnimationModel)
   *anim\endCallback = *model\endCallback
@@ -90,11 +91,11 @@ Procedure initAnimation(*anim.Animation, *model.AnimationModel)
 EndProcedure
 
 Procedure initGame(window.l)
+  initRenderingEnvironment()
   *game.Game = AllocateStructure(Game)
   *game\window = window
   *game\camera\x = 0
   *game\camera\y = 0
-  *game\base = kuribrawl
   ProcedureReturn *game
 EndProcedure
  
@@ -222,29 +223,6 @@ Procedure getRealCboxX(*cbox.CollisionBox, facing)
   EndIf 
 EndProcedure
 
-;TODO supporter l'affichage des décimales
-Procedure DrawDamageText(*font.Font, damage.l, x.l, y.l)
-  Define digit.b, started
-  Define w = *font\fontDimensions\x
-  digit = damage / 100
-  If digit
-    ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
-    DisplaySprite(*font\fontImage, x, y)
-    x + w
-    started = 1
-  EndIf
-  damage = damage - (digit * 100)
-  digit = damage / 10
-  If digit Or started
-    ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
-    DisplaySprite(*font\fontImage, x, y)
-    x + w
-  EndIf
-  digit = damage - digit * 10
-  ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
-  DisplaySprite(*font\fontImage, x, y)
-EndProcedure
-
 Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing = 1)
   Define dx.l
   With *frame
@@ -256,14 +234,6 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing 
     ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
     DisplayTransparentSprite(spriteSheet, dx, y - \origin\y)
   EndWith
-EndProcedure
-
-Procedure renderHUD(*game.Game)
-  y = 20
-  ForEach *game\fighters()
-    DrawDamageText(kuribrawl\HUD\damageFont, Int(*game\fighters()\damage), 20, y)
-    y + 50
-  Next
 EndProcedure
 
 Procedure renderShield(*fighter.Fighter, *camera, x.l, y.l)
@@ -290,7 +260,7 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   drawAnimationFrame(*frame, spriteSheet, x, y, facing)
   
   ;direct drawing
-  StartDrawing(ImageOutput(0)) 
+  StartDrawing(SpriteOutput(0))
   If *fighter\state = #STATE_GUARD Or *fighter\state = #STATE_GUARDSTUN
     renderShield(*fighter, *camera, x, y)
   EndIf 
@@ -368,20 +338,19 @@ Procedure renderFrame(*game.Game)
     renderPlatform(@*game\currentStage\platforms(), *game\camera)
   Next
   
-
   ForEach *game\fighters()
     renderFighter(@*game\fighters(), *game\camera)
   Next
-  StartDrawing(ScreenOutput()) ;takes between 4 and 6 ms
-  DrawAlphaImage(ImageID(0), 0, 0)
-  StopDrawing()
-  StartDrawing(ImageOutput(0)) ;takes between 0 and 1 ms
+  ;StartDrawing(ScreenOutput()) ;takes between 4 and 6 ms
+  ;DrawAlphaImage(ImageID(0), 0, 0)
+  ;StopDrawing()
+  DisplayTransparentSprite(0, 0, 0)
+  time.l = ElapsedMilliseconds()
+  StartDrawing(SpriteOutput(0)) ;takes between 5 and 6 ms
+  Debug ElapsedMilliseconds() - time
   DrawingMode(#PB_2DDrawing_AlphaChannel)
   Box(0, 0, #SCREEN_W, #SCREEN_H, $00000000)
   StopDrawing()
-  
-  renderHUD(*game)
-  
   FlipBuffers()
   bgc = #White
 EndProcedure
@@ -652,7 +621,7 @@ Procedure getHitlag(damage.d)
 EndProcedure
 
 Procedure getHitstun(knockback.b)
-  ProcedureReturn knockback * 5
+  ProcedureReturn knockback * 2
 EndProcedure 
 
 Procedure getShieldKnockback(percentage.l, bkb.f, skb.f, weight.d)
@@ -693,7 +662,7 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
     If degAngle > 60 And degAngle < 120 And *attacking\y < *defending\y
       anim = "hurtup"
       facing = 0
-    ElseIf degAngle > 240 And degAngle < 300 And Not *defending\grounded
+    ElseIf degAngle > 240 And degAngle < 300
       anim = "hurtdown"
       facing = 0
     Else
@@ -865,9 +834,7 @@ EndProcedure
 ; 40.0
 ; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 654
-; FirstLine = 653
+; CursorPosition = 262
+; FirstLine = 237
 ; Folding = ----------
 ; EnableXP
-; SubSystem = OpenGL
-; EnableUnicode

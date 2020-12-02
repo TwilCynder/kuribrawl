@@ -96,6 +96,7 @@ Structure Champion
   shieldStartup.b
   shieldEndlag.b
   shieldInfo.ShieldInfo
+  weight.d
 EndStructure
 
 Structure PlatformModel
@@ -131,16 +132,35 @@ Structure GameVariables
   shieldDecay.d
   shieldRegen.d
   cameraMaxSpeed.d
+  
+  knockbackMult.d
+  knockbackBase.d
+EndStructure
+
+Structure Font
+  fontImage.l
+  fontDimensions.Vector
+EndStructure
+
+Structure HUDInfo
+  damageFont.Font
 EndStructure
 
 Structure GameData
   Map characters.Champion()
   Map stages.StageModel()
   variables.GameVariables
+  HUD.HUDInfo
 EndStructure  
 Global kuribrawl.GameData
 
 InitSprite()
+
+Procedure initHUD()
+  kuribrawl\HUD\damageFont\fontImage = LoadSprite(#PB_Any, "res/damages_font.png")
+  kuribrawl\HUD\damageFont\fontDimensions\x = 15
+  kuribrawl\HUD\damageFont\fontDimensions\y = 30
+EndProcedure
 
 Procedure newCharacter(name.s)
   *r = AddMapElement(kuribrawl\characters(), name)
@@ -304,6 +324,7 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 30
+; CursorPosition = 159
+; FirstLine = 117
 ; Folding = ----
 ; EnableXP

@@ -278,8 +278,9 @@ Procedure saveAnimationDescriptor(*animation.AnimationModel, path.s)
     ForEach *animation\frames()\hitboxes()
       WriteStringN(0, "h" + Str(i) + " " + Str(*animation\frames()\hitboxes()\x) + " " + 
                       Str(*animation\frames()\hitboxes()\y) + " " + Str(*animation\frames()\hitboxes()\x2) + " " +
-                      Str(*animation\frames()\hitboxes()\y2) + " " + StrD(*animation\frames()\hitboxes()\damage) + " " +
-                      Str(*animation\frames()\hitboxes()\angle) + " " + Str(*animation\frames()\hitboxes()\priority) + " " +
+                      Str(*animation\frames()\hitboxes()\y2) + " " + StrF(*animation\frames()\hitboxes()\damage) + " " +
+                      Str(*animation\frames()\hitboxes()\angle) + " " + StrF(*animation\frames()\hitboxes()\bkb, 2) + " " +
+                      StrF(*animation\frames()\hitboxes()\skb, 2) + " " + Str(*animation\frames()\hitboxes()\priority) + " " +
                       Str(*animation\frames()\hitboxes()\hit))
     Next 
     ForEach *animation\frames()\hurtboxes()
@@ -554,26 +555,37 @@ EndProcedure
 Procedure editCBoxInfo()
   Shared *selectedCollisionBox, selectedCollisionBoxType
   
-  OpenWindow(1, 0, 0, 150, 150, "Editing collision box info", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
+  OpenWindow(1, 0, 0, 150, 200, "Editing collision box info", #PB_Window_WindowCentered | #PB_Window_SystemMenu, WindowID(0))
   
   If selectedCollisionBoxType = #CBOX_TYPE_HIT
     TextGadget(#PB_Any, 5, 5, 140, 20, "Damages")
     SpinGadget(21, 80, 5, 60, 20, 0, 999)
-    SetGadgetText(21, StrD(getField(*selectedCollisionBox, Hitbox, damage, D)))
+    SetGadgetText(21, StrF(getField(*selectedCollisionBox, Hitbox, damage, D)))
+    
     TextGadget(#PB_Any, 5, 30, 140, 20, "Angle")
     ButtonGadget(22, 40, 30, 20, 20, "")
     SpinGadget(20, 80, 30, 60, 20, 0, 360, #PB_Spin_Numeric)
     SetGadgetText(20, StrD(getField(*selectedCollisionBox, Hitbox, angle, W)))
-    TextGadget(#PB_Any, 5, 55, 140, 20, "Priority")
-    SpinGadget(26, 80, 55, 60, 20, 0, 99, #PB_Spin_Numeric)
+    
+    TextGadget(#PB_Any, 5, 55, 140, 20, "Base KB")
+    SpinGadget(28, 80, 55, 60, 20, 0, 99, #PB_Spin_Numeric)
+    SetGadgetText(28, StrF(getField(*selectedCollisionBox, Hitbox, bkb, D)))
+    
+    TextGadget(#PB_Any, 5, 80, 140, 20, "Scaling KB")
+    SpinGadget(29, 80, 80, 60, 20, 0, 99, #PB_Spin_Numeric)
+    SetGadgetText(29, StrF(getField(*selectedCollisionBox, Hitbox, skb, D)))
+    
+    TextGadget(#PB_Any, 5, 105, 140, 20, "Priority")
+    SpinGadget(26, 80, 105, 60, 20, 0, 99, #PB_Spin_Numeric)
     SetGadgetText(26, StrD(getField(*selectedCollisionBox, Hitbox, priority, B)))
-    TextGadget(#PB_Any, 5, 80, 140, 20, "HitID")
-    SpinGadget(27, 80, 80, 60, 20, 0, 99, #PB_Spin_Numeric)
+    
+    TextGadget(#PB_Any, 5, 130, 140, 20, "HitID")
+    SpinGadget(27, 80, 130, 60, 20, 0, 99, #PB_Spin_Numeric)
     GadgetToolTip(27, "An hitbox can hit a fighter that has already been struck by another hitbox in the same move If they have different hitIDs. Useful For multihits.")    
     SetGadgetText(27, StrD(getField(*selectedCollisionBox, Hitbox, hit, B)))
   ElseIf selectedCollisionBoxType = #CBOX_TYPE_HURT
   EndIf 
-  ButtonGadget(23, 5, 125, 140, 20, "Save")
+  ButtonGadget(23, 5, 175, 140, 20, "Save")
   
   EnableWindow_(WindowID(0), 0)
 EndProcedure
@@ -817,6 +829,8 @@ Procedure gadgetCallback()
           setField(*selectedCollisionBox, Hitbox, angle, W, Val(GetGadgetText(20)))
           setField(*selectedCollisionBox, Hitbox, priority, B, Val(GetGadgetText(26)))
           setField(*selectedCollisionBox, Hitbox, hit, B, Val(GetGadgetText(27)))
+          setField(*selectedCollisionBox, Hitbox, bkb, D, ValD(GetGadgetText(28)))
+          setField(*selectedCollisionBox, Hitbox, skb, D, ValD(GetGadgetText(29)))
       EndSelect
       CloseWindow(1)
       EnableWindow_(WindowID(0), 1)
@@ -1006,8 +1020,8 @@ Repeat
   Delay(16)
 ForEver 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 717
-; FirstLine = 706
+; CursorPosition = 833
+; FirstLine = 816
 ; Folding = --------
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconFT.ico

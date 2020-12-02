@@ -45,12 +45,14 @@ Wrastor|Rivals|66|1.20
 Acid R.|Rivals|80|1.11
 
 ### Kuribrawl
-The RoA formula seems particularily adapted, since it is, like Kuribrawl, a 2D game with fixed distances. That being said, it can be improved, and the SSBM weight system will probably be used.
+The RoA formula seems particularily adapted, since it is, like Kuribrawl, a 2D game with fixed distances. That being said, it can be improved, and the SSBM weight system will probably be used.  
+Also, this formula might be a little to linear (in a sense that very low KBs seem very possible at low %), and i might add a fixed base value, like the Smash formulas that add 18 before applying scaling KB.
+
+
 
 It is unclear whether i am going to consider the target's damages after application of the attack damages (like in every other PF) or before (making the damage of the attack completely unrelated to KB if not directly included in the formula).
 
 Temporary result :   
-![LaTeX Equation (via Codecogs)](https://latex.codecogs.com/png.latex?{\color{White}b+\(p\times%20\frac{200}{w+100}\times%20s\times0.12\)})
+![LaTeX Equation (via Codecogs)](https://latex.codecogs.com/png.latex?{\color{White}b+\(\(p\times%20\frac{200}{w+100}+10\)\times%20s\times0.12\)})
 
 ## Hitstun
-

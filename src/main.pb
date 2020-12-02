@@ -12,7 +12,7 @@
 ; régler finalement la question du : substructure directement en field ou pointer vers heap
 ; transformer les données sous forme de nombre fragmenté (input) en structures
 
-#DEBUG = 0
+#DEBUG = 1
 
 Global shieldColor = RGBA(255, 0, 0, 96)
 
@@ -33,9 +33,9 @@ CompilerEndIf
 
 Define *game.Game, window.l
 
+
 Procedure startTestGame()
   Shared *game, window
-  
   If *game
     Debug *game
     endGame(*game)
@@ -49,8 +49,6 @@ Procedure startTestGame()
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
   
-  Debug *f1\character\airAcceleration
-  
   setPort(0, 0)
   setPortFighter(0, *f1)
   setPort(1, 3)
@@ -58,6 +56,7 @@ Procedure startTestGame()
   
   initFighters(*game)
 EndProcedure  
+
 
 ;- Game window
 window = OpenWindow(-1, 0, 0, #SCREEN_W + 210, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
@@ -75,8 +74,7 @@ CompilerEndIf
   AddKeyboardShortcut(window, #PB_Shortcut_F7, 2)
   BindMenuEvent(0, 2, @increaseFrameRate())
   
-  
-;- game data
+;- loading game data
 CompilerIf #DEBUG
   loadGameData("res/data.twl")
   For i = 1 To availableJosticks
@@ -86,10 +84,13 @@ CompilerElse
   loadGameData("data.twl")
 CompilerEndIf
 
+;- Initialization
 ForEach kuribrawl\characters()
   initDefaultAnimationsConfig(kuribrawl\characters())
 Next 
+initHUD()
 
+;- Starting the game (test)
 startTestGame()
 
 ;- Main loop (game)
@@ -141,8 +142,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 127
-; FirstLine = 90
+; CursorPosition = 94
+; FirstLine = 51
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

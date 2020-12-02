@@ -48,8 +48,9 @@ moveNames("nspecial") = #COMMAND_NSpecial
 moveNames("sspecial") = #COMMAND_SSpecial
 moveNames("dspecial" ) = #COMMAND_DSpecial
 
+;NE SUPPORTE QUE BYTE ET DOUBLE ATM (si ajout de long ou float, mettre à jour la partie écriture de des champion values)
 Dim championValues.b(#CHAMPION_VALUES_NB)
-championValues(1) = #TYPE_DOUBLE 
+championValues(1) = #TYPE_DOUBLE
 championValues(2) = #TYPE_DOUBLE 
 championValues(3) = #TYPE_DOUBLE 
 championValues(4) = #TYPE_DOUBLE 
@@ -62,7 +63,7 @@ championValues(10) = #TYPE_DOUBLE
 championValues(11) = #TYPE_DOUBLE
 championValues(12) = #TYPE_DOUBLE
 championValues(13) = #TYPE_DOUBLE
-championValues(14) = #TYPE_BYTE
+championValues(14) = #TYPE_DOUBLE
 championValues(15) = #TYPE_BYTE
 championValues(16) = #TYPE_BYTE
 championValues(17) = #TYPE_BYTE
@@ -72,8 +73,9 @@ championValues(20) = #TYPE_BYTE
 championValues(21) = #TYPE_BYTE
 championValues(22) = #TYPE_BYTE
 championValues(23) = #TYPE_BYTE
+championValues(24) = #TYPE_BYTE
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 67
+; CursorPosition = 50
 ; FirstLine = 23
 ; EnableXP

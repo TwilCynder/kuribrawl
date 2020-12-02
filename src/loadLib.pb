@@ -18,6 +18,7 @@ Enumeration
   #FILETYPE_LEFTANIM
   #FILETYPE_CHAMPION
   #FILETYPE_STAGE
+  #FILETYPE_IMAGE
 EndEnumeration
 
 Enumeration 
@@ -28,30 +29,36 @@ EndEnumeration
 #MAX_VALUE_BYTE = -127
 #MAX_VALUE_DOUBLE = %111111111111111111111111111111111111111111111111111111111111111
 
+Procedure skipToNextInterfile()
+  While Not ReadByte(0) = #FILEMARKER_INTERFILE
+  Wend  
+EndProcedure
+
 Procedure readChampionValues(*champion.Champion)
- *champion\walkSpeed = ReadDouble(0)
- *champion\dashSpeed = ReadDouble(0)
- *champion\initialDashSpeed = ReadDouble(0)
- *champion\dashTurnAccel = ReadDouble(0)
- *champion\maxAirSpeed = ReadDouble(0)
- *champion\airAcceleration = ReadDouble(0)
- *champion\airFriction = ReadDouble(0)
- *champion\traction = ReadDouble(0)
- *champion\jumpSpeed = ReadDouble(0) 
- *champion\shortHopSpeed = ReadDouble(0)
- *champion\doubleJumpSpeed = ReadDouble(0)
- *champion\maxFallSpeed = ReadDouble(0)
- *champion\fastFallSpeed = ReadDouble(0)
- *champion\jumpsquatDuration = ReadByte(0)
- *champion\dashStopDuration = ReadByte(0)
- *champion\dashStartDuration = ReadByte(0)
- *champion\dashTurnDuration = ReadByte(0)
- *champion\landingDuration = ReadByte(0)
- *champion\shieldStartup = ReadByte(0)
- *champion\shieldEndlag = ReadByte(0)
- *champion\shieldInfo\x = ReadByte(0)
- *champion\shieldInfo\y = ReadByte(0)
- *champion\shieldInfo\size = ReadByte(0)
+  *champion\weight = ReadDouble(0)
+  *champion\walkSpeed = ReadDouble(0)
+  *champion\dashSpeed = ReadDouble(0)
+  *champion\initialDashSpeed = ReadDouble(0)
+  *champion\dashTurnAccel = ReadDouble(0)
+  *champion\maxAirSpeed = ReadDouble(0)
+  *champion\airAcceleration = ReadDouble(0)
+  *champion\airFriction = ReadDouble(0)
+  *champion\traction = ReadDouble(0)
+  *champion\jumpSpeed = ReadDouble(0) 
+  *champion\shortHopSpeed = ReadDouble(0)
+  *champion\doubleJumpSpeed = ReadDouble(0)
+  *champion\maxFallSpeed = ReadDouble(0)
+  *champion\fastFallSpeed = ReadDouble(0)
+  *champion\jumpsquatDuration = ReadByte(0)
+  *champion\dashStopDuration = ReadByte(0)
+  *champion\dashStartDuration = ReadByte(0)
+  *champion\dashTurnDuration = ReadByte(0)
+  *champion\landingDuration = ReadByte(0)
+  *champion\shieldStartup = ReadByte(0)
+  *champion\shieldEndlag = ReadByte(0)
+  *champion\shieldInfo\x = ReadByte(0)
+  *champion\shieldInfo\y = ReadByte(0)
+  *champion\shieldInfo\size = ReadByte(0)
 EndProcedure  
 
 Procedure adaptChampionValues(*champion.Champion)
@@ -147,7 +154,9 @@ Procedure loadGameData(path.s)
     Select type
       Case #FILETYPE_CHAMPION
         If Not ReadByte(0) = #FILEMARKER_DESCRIPTORSTART
-          Debug "Error : unexpected byte (no descriptorstart at the beginning of a champion data)"
+          PrintN("Error : unexpected byte (no descriptorstart at the beginning of a champion data)")
+          skipToNextInterfile()
+          Continue
         EndIf 
         *character = tryChampion(tag)
         *character\displayName = ReadString(0, #PB_UTF8)
@@ -186,7 +195,9 @@ Procedure loadGameData(path.s)
         ForEver
       Case #FILETYPE_STAGE
         If Not ReadByte(0) = #FILEMARKER_DESCRIPTORSTART
-          Debug "Error : unexpected byte (no descriptorstart at the beginning of a stage data)"
+          PrintN("Error : unexpected byte (no descriptorstart at the beginning of a stage data)")
+          skipToNextInterfile()
+          Continue
         EndIf 
         *stage.StageModel = tryStage(tag)
         *stage\displayName = ReadString(0, #PB_UTF8)
@@ -283,8 +294,10 @@ Procedure loadGameData(path.s)
               w.l = ReadWord(0)
               h.l = ReadWord(0)
               addHitbox(*frames(selectedElement), x, y, w, h)
-              *frames(selectedElement)\hitboxes()\damage = ReadDouble(0)
+              *frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
               *frames(selectedElement)\hitboxes()\angle = ReadWord(0)
+              *frames(selectedElement)\hitboxes()\bkb = ReadFloat(0)
+              *frames(selectedElement)\hitboxes()\skb = ReadFloat(0)
               *frames(selectedElement)\hitboxes()\priority = ReadByte(0)
               *frames(selectedElement)\hitboxes()\hit = ReadByte(0)
             Case #FILEMARKER_HURTBOXINFO
@@ -329,7 +342,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 154
-; FirstLine = 150
+; CursorPosition = 197
+; FirstLine = 188
 ; Folding = --
 ; EnableXP

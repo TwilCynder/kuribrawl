@@ -1,5 +1,8 @@
 ﻿Enumeration 
-  #FILETYPE_ANIMATION
+  #TYPE_BYTE
+  #TYPE_DOUBLE
+  #TYPE_LONG
+  #TYPE_FLOAT
 EndEnumeration
 
 NewMap loadedSprites.l()
@@ -40,6 +43,6 @@ Procedure checkInterfile()
  ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 32
+; CursorPosition = 43
 ; Folding = --
 ; EnableXP

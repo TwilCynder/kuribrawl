@@ -34,6 +34,9 @@ kuribrawl\variables\shieldEndlag = 6
 kuribrawl\variables\minimumShieldDuration = 2
 kuribrawl\variables\shieldDecay = 0.004
 kuribrawl\variables\shieldRegen = 0.002
+
+kuribrawl\variables\knockbackMult = 0.1
+kuribrawl\variables\knockbackBase = 10
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 34
+; CursorPosition = 37
 ; EnableXP

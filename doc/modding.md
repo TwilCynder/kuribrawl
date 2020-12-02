@@ -36,6 +36,7 @@ C:Tag
 
 - The first line of a Champion Descriptor must contain its *display name*. If you want it to be the same as it's internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).
 - The second line must contain all the *values* of this champions, separated by spaces. These values are (in this order): 
+    - Weight
     - Walk Speed
     - Dash Speed
     - Initial Dash Speed

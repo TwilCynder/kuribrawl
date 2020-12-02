@@ -54,6 +54,8 @@ Structure Port
   active.b
   controllerInfo.knownController
   *figher.Fighter
+  
+  guardPressed.b
 EndStructure
 Dim ports.Port(4)
 
@@ -141,6 +143,8 @@ Procedure readInputs()
     
     *port = @ports(i)
     
+    *port\guardPressed = #False
+    
     If Not ExamineJoystick(*port\joyID)
       Continue
     EndIf 
@@ -154,7 +158,11 @@ Procedure readInputs()
       id = *binding\buttons()\ID
       state = readButton(id, *port)
       
-      If state And Not ports(i)\previousState\buttons[id]
+      If state And *binding\buttons()\input = #INPUT_Guard
+        *port\guardPressed = #True
+      EndIf
+      
+      If state And Not *port\previousState\buttons[id]
         registerInput(i, *binding\buttons()\input, id)
       EndIf
       *port\previousState\buttons[id] = state
@@ -244,12 +252,16 @@ Procedure readInputs()
     ForEach *binding\triggers()
       id = *binding\triggers()\ID
       axisState\z = readTrigger(id, *port)
+      
+      If axisState\z > triggerTreshold And *binding\triggers()\input = #INPUT_Guard
+        *port\guardPressed = #True
+      EndIf
+      
       If axisState\z > triggerTreshold And *port\previousState\axis[*binding\triggers()\ID]\z < triggerTreshold
         registerInput(i, *binding\triggers()\input, id, #ELEMENTTYPE_TRIGGER)
       EndIf 
       *port\previousState\axis[id]\z = axisState\z
     Next 
-  
   Next 
   
 EndProcedure
@@ -504,7 +516,7 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_DOWN) = @inputManager_smashStickDown()
 
 Procedure inputManager_guard(*port.Port, *info.inputData)
-  If Not *port\figher\grounded Or *port\figher\state = #STATE_ATTACK
+  If Not *port\figher\grounded Or *port\figher\state = #STATE_ATTACK Or *port\figher\state = #STATE_GUARD
     ProcedureReturn 0
   EndIf 
   Select findDirectionalInput()
@@ -532,6 +544,9 @@ Procedure checkSticksState(*port.Port) ;not a real input manager
         setState(*port\figher, #STATE_CROUCH_STOP)
       EndIf       
     Case #STATE_IDLE
+      If *port\guardPressed And *port\figher\grounded
+        setState(*port\figher, #STATE_GUARD, 0)
+      EndIf 
       If *port\currentControlStickState\y > stickTreshold And *port\figher\grounded
         crouch(*port\figher)
       EndIf   
@@ -579,7 +594,7 @@ EndProcedure
 Procedure checkInputReleases(*port.Port)
   Select *port\figher\state
     Case #STATE_GUARD
-      If *port\figher\stateTimer >= kuribrawl\variables\minimumShieldDuration And Not isElementPressed((*port\figher\stateInfo & %1111100) >> 2, *port\figher\stateInfo & %11, *port)
+      If *port\figher\stateTimer >= kuribrawl\variables\minimumShieldDuration And Not *port\guardPressed
         shieldEndlag.b = *port\figher\character\shieldEndlag
         If Not shieldEndlag
           shieldEndlag = kuribrawl\variables\shieldEndlag
@@ -643,7 +658,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 553
-; FirstLine = 522
+; CursorPosition = 518
+; FirstLine = 514
 ; Folding = ------
 ; EnableXP

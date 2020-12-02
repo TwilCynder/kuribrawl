@@ -1,9 +1,12 @@
-﻿#SCREEN_W = 960
+﻿#DEBUG = 1
+
+#SCREEN_W = 960
 #SCREEN_H = 540
 
 ;TODO
 ;more informative error messages (line number etc)
 
+#FILEMARKER_404 = $55
 #FILEMARKER_DESCRIPTORSTART = $53
 #FILEMARKER_ANIMSPEED = 1
 #FILEMARKER_FRAMEINFO = 2
@@ -24,13 +27,16 @@ Enumeration
   #FILETYPE_LEFTANIM
   #FILETYPE_CHAMPION
   #FILETYPE_STAGE
+  #FILETYPE_IMAGE
 EndEnumeration
 
-#CHAMPION_VALUES_NB = 23
+#CHAMPION_VALUES_NB = 24
 
 Enumeration 
   #TYPE_BYTE
   #TYPE_DOUBLE
+  #TYPE_LONG
+  #TYPE_FLOAT
 EndEnumeration
 
 #MAX_VALUE_BYTE = -127
@@ -48,6 +54,10 @@ Structure toLoad
 EndStructure
 
 IncludeFile "managerData.pbi"
+
+CompilerIf #DEBUG
+  IncludeFile "managerDebug.pbi"
+CompilerEndIf
 
 Procedure readFileToMemory(filename$, *file.loadedFile)
   If Not ReadFile(0, filename$)
@@ -105,20 +115,26 @@ EndProcedure
 
 Procedure writeFileDescriptor(type.b, infos.s)
   Shared championValues()
+  CompilerIf #DEBUG
+    Shared championValuesNames()
+  CompilerEndIf
   Define line.s, value.s, i.b
   
   If infos = ""
     ProcedureReturn 0
   EndIf   
   Select type
+    Case #FILETYPE_IMAGE
+      PrintN("- Image")
+      
     Case #FILETYPE_STAGE
-      PrintN("- Stage descriptor")
-      WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
       If Not ReadFile(2, infos)
-        WriteByte(1, -1)
+        WriteByte(1, #FILEMARKER_404)
         PrintN("- - Can't find descriptor " + infos)
         ProcedureReturn 1
       EndIf 
+      PrintN("- Stage descriptor")
+      WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
       line = ReadString(2)
       PrintN("- - Display name : " + line)
       WriteString(1, line, #PB_UTF8)
@@ -143,15 +159,15 @@ Procedure writeFileDescriptor(type.b, infos.s)
             WriteByte(1, 0)
         EndSelect
       Wend 
-        
+      CloseFile(2)
     Case #FILETYPE_CHAMPION
-      PrintN("- Champion descriptor")
-      WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
       If Not ReadFile(2, infos)
-        WriteByte(1, -1)
+        WriteByte(1, #FILEMARKER_404)
         PrintN("- - Can't find descriptor " + infos)
         ProcedureReturn 1
-      EndIf 
+      EndIf
+      PrintN("- Champion descriptor")
+      WriteByte(1, #FILEMARKER_DESCRIPTORSTART) 
       line = ReadString(2)
       PrintN("- - Display name : " + line)
       WriteString(1, line, #PB_UTF8)
@@ -161,6 +177,9 @@ Procedure writeFileDescriptor(type.b, infos.s)
       PrintN("- - Values : " + line)
       For i = 1 To #CHAMPION_VALUES_NB
         value = StringField(line, i, " ")
+        CompilerIf #DEBUG
+          PrintN(championValuesNames(i) + " = " + value)
+        CompilerEndIf        
         If value = "x"
           PrintN("Value " + Str(i) + " has the special value (x)")
           If championValues(i) = #TYPE_DOUBLE
@@ -216,6 +235,7 @@ Procedure writeFileDescriptor(type.b, infos.s)
             WriteByte(1, #FILEMARKER_MULTIMOVEEND)
         EndSelect
       Wend 
+      CloseFile(2)
     Case #FILETYPE_ANIMATION
       PrintN("- starting descriptor")
       WriteByte(1, #FILEMARKER_DESCRIPTORSTART)
@@ -224,7 +244,7 @@ Procedure writeFileDescriptor(type.b, infos.s)
 
         PrintN("- descriptor file : " + infos)
         If Not ReadFile(2, infos)
-          WriteByte(1, -1)
+          WriteByte(1, #FILEMARKER_404)
           ProcedureReturn 1
         EndIf 
         line = ReadString(2)
@@ -297,14 +317,16 @@ Procedure writeFileDescriptor(type.b, infos.s)
               PrintN("- - adding hitbox to frame : " + value)
               For i = 2 To 5
                 PrintN("- - - value : " + value)
-                value = StringField(line, i, " ")
+                value = StringField(line, i, " ");x, y, w, h
                 WriteWord(1, Val(value))
               Next 
               PrintN("- - - damages : " + StringField(line, 6, " "))
-              WriteDouble(1, ValD(StringField(line, 6, " ")))
-              WriteWord(1, Val(StringField(line, 7, " ")))
-              WriteByte(1, Val(StringField(line, 8, " ")))
-              WriteByte(1, Val(StringField(line, 9, " ")))
+              WriteFloat(1, ValF(StringField(line, 6, " ")));damages
+              WriteWord(1, Val(StringField(line, 7, " ")))  ;angle
+              WriteFloat(1, ValF(StringField(line, 8, " ")));bkb
+              WriteFloat(1, ValF(StringField(line, 9, " ")));skb
+              WriteByte(1, Val(StringField(line, 10, " ")));hitID
+              WriteByte(1, Val(StringField(line, 11, " ")));prio
           EndSelect
         Wend 
         CloseFile(2)
@@ -399,6 +421,8 @@ While Not Eof(2)
       type = #FILETYPE_CHAMPION
     Case "S"
       type = #FILETYPE_STAGE
+    Case "I"
+      type = #FILETYPE_IMAGE
     Default:Continue
   EndSelect
   tag = StringField(tag, 2, ":")
@@ -428,9 +452,9 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 164
-; FirstLine = 135
-; Folding = --
+; CursorPosition = 128
+; FirstLine = 81
+; Folding = ---
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico
 ; Executable = ..\src\res\dataFileMaker.exe

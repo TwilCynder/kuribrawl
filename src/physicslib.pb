@@ -70,7 +70,7 @@ EndProcedure
 
 Procedure applyPhysics(*game.Game)
   Define nx.l, ny.l, *fighter.Fighter
-  Define oldSpeed.Vector
+  Define oldSpeed.VectorDouble
 
   ForEach *game\fighters()
     *fighter = @*game\fighters()
@@ -108,6 +108,11 @@ Procedure applyPhysics(*game.Game)
     EndSelect
     
     ;Détection de "fin de mouvement" (le signe de la vitesse X change)
+    If *fighter\state = #STATE_HITSTUN 
+      Debug "oui ma gatée"
+      Debug oldSpeed\x
+      Debug *fighter\physics\v\x
+    EndIf 
     If (*fighter\state = #STATE_HITSTUN Or *fighter\state = #STATE_GUARDSTUN) And *fighter\grounded And Sign(oldSpeed\x) <> Sign(*fighter\physics\v\x)
       If *fighter\state = #STATE_HITSTUN
         ;TODO : si le knockback était de type tumble, placer en animation au sol
@@ -137,7 +142,7 @@ Procedure applyPhysics(*game.Game)
     *plat = groundCollision(*game, *fighter\x, *fighter\y, nx, ny)
     If *plat
       ny = *plat\model\y
-      If *fighter\physics\v\y < -15 And (*fighter\state = #STATE_TUMBLE Or *fighter\state = #STATE_HITSTUN)
+      If *fighter\physics\v\y < -5 And (*fighter\state = #STATE_HITSTUN)
         knockbackBounce(*fighter)
       Else  
         If *fighter\grounded = 0
@@ -169,7 +174,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 26
-; FirstLine = 2
+; CursorPosition = 72
+; FirstLine = 59
 ; Folding = --
 ; EnableXP
