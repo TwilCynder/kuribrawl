@@ -47,12 +47,11 @@ EndStructure
 Structure Port
   id.b
   joyID.l
-  *joyType.knownController
   previousState.ControllerState
   currentControlStickState.AxisState
   controlStickBuffer.b[4]
   active.b
-  controllerInfo.knownController
+  *controllerInfo.knownController
   *figher.Fighter
   
   guardPressed.b
@@ -68,7 +67,7 @@ Procedure setPort(port, joyID, active = 1)
   ports(port)\joyID = joyID
   ports(port)\active = active
   ports(port)\id = port
-  ports(port)\controllerInfo = defaultControler
+  ports(port)\controllerInfo = @defaultControler
 EndProcedure
 
 Procedure setPortFighter(port, *fighter.Fighter)
@@ -290,17 +289,25 @@ Procedure startAttack(*fighter.Fighter, attack.b, *info.inputData = 0)
   EndIf 
 EndProcedure
 
+Procedure startGuard(*fighter.Fighter, *info.inputData = 0)
+  shieldStartup.b = *fighter\character\shieldStartup
+  setState(*fighter, #STATE_GUARD_START, shieldStartup)
+EndProcedure
+
 Macro Atk(attack)
   startAttack(*port\figher, attack, *info)
 EndMacro
 
-Procedure findDirectionalInput()
+Procedure findDirectionalInput(port.b)
   Shared InputQ()
   ForEach inputQ()
-    input.b = inputQ() & %11111
-    If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
-      DeleteElement(inputQ())
-      ProcedureReturn input
+    inputPort.b = (inputQ() & %111000000000) >> 9
+    If inputPort = port
+      input.b = inputQ() & %11111
+      If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
+        DeleteElement(inputQ())
+        ProcedureReturn input
+      EndIf 
     EndIf 
   Next 
 EndProcedure
@@ -342,7 +349,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     direction = controlStickDirection(*port)
   EndIf 
   If isFighterGrounded(*port\figher)
-    input.b = findDirectionalInput()
+    input.b = findDirectionalInput(*port\id)
     Select input
       Case #INPUT_ControlStick_SUP
         Debug "Upsmash (" + *port\figher\name + ")"
@@ -516,23 +523,20 @@ EndProcedure
 *inputManagers(#INPUT_ControlStick_DOWN) = @inputManager_smashStickDown()
 
 Procedure inputManager_guard(*port.Port, *info.inputData)
-  If Not *port\figher\grounded Or *port\figher\state = #STATE_ATTACK Or *port\figher\state = #STATE_GUARD
+  If Not *port\figher\grounded Or *port\figher\state = #STATE_ATTACK
     ProcedureReturn 0
   EndIf 
-  Select findDirectionalInput()
-    Case #INPUT_ControlStick_SDOWN
-    Default 
-      shieldStartup.b = *port\figher\character\shieldStartup
-      If Not shieldStartup
-        shieldStartup = kuribrawl\variables\shieldStartup
-      EndIf 
-      setState(*port\figher, #STATE_GUARD_START, *info\elementType + (*info\element << 2) + (shieldStartup << 7))
-  EndSelect
-  ProcedureReturn 1
+  If findDirectionalInput(*port\id) = #INPUT_ControlStick_SDOWN Or *port\currentControlStickState\y < -*port\controllerInfo\config\analogStickThreshold
+    
+    Debug "spot dodge"
+  ElseIf  Not *port\figher\state = #STATE_GUARD
+    startGuard(*port\figher, *info)
+    ProcedureReturn 1
+  EndIf 
 EndProcedure
 *inputManagers(#INPUT_Guard) = @inputManager_guard()
 
-Procedure checkSticksState(*port.Port) ;not a real input manager
+Procedure checkSticksState(*port.Port)
   Define *controller.knownController = *port\controllerInfo
   Select *port\figher\state
     Case #STATE_CROUCH_STOP
@@ -545,7 +549,7 @@ Procedure checkSticksState(*port.Port) ;not a real input manager
       EndIf       
     Case #STATE_IDLE
       If *port\guardPressed And *port\figher\grounded
-        setState(*port\figher, #STATE_GUARD, 0)
+        startGuard(*port\figher)
       EndIf 
       If *port\currentControlStickState\y > stickTreshold And *port\figher\grounded
         crouch(*port\figher)
@@ -619,7 +623,6 @@ Procedure updateInputs()
       Continue  
     EndIf 
     *port = ports(i)
-    checkSticksState(*port)
     checkInputReleases(*port)
   Next
   
@@ -651,6 +654,14 @@ Procedure updateInputs()
         EndIf 
     EndSelect  
   Next 
+  
+  For i = 0 To 3
+    If Not ports(i)\active
+      Continue  
+    EndIf 
+    *port = ports(i)
+    checkSticksState(*port)
+  Next
 
 EndProcedure
 
@@ -658,7 +669,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 518
-; FirstLine = 514
+; CursorPosition = 538
+; FirstLine = 530
 ; Folding = ------
 ; EnableXP

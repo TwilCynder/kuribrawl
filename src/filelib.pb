@@ -43,6 +43,6 @@ Procedure checkInterfile()
  ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 43
+; CursorPosition = 8
 ; Folding = --
 ; EnableXP

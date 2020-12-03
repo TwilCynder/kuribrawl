@@ -83,7 +83,7 @@ Procedure manageStates(*game.Game)
           max = *fighter\stateInfo >> 1
           If *fighter\stateTimer >= max
             If *fighter\stateInfo & 1 And Not *fighter\grounded
-              setState(*fighter, #STATE_TUMBLE, 0)
+              setState(*fighter, #STATE_TUMBLE, 0, 0)
             Else
               setState(*fighter, #STATE_IDLE, 0, *fighter\grounded)
             EndIf 
@@ -91,7 +91,7 @@ Procedure manageStates(*game.Game)
         Case #STATE_GUARDSTUN
           max = *fighter\stateInfo & %11111111
           If *fighter\stateTimer >= max
-              setState(*fighter, #STATE_GUARD, (*fighter\stateInfo & %111111100000000) >> 8, *fighter\grounded)
+              setState(*fighter, #STATE_GUARD)
           EndIf
         Case #STATE_CROUCH_START
           max = animLength(*fighter\currentAnimation)
@@ -104,9 +104,9 @@ Procedure manageStates(*game.Game)
             setState(*fighter, #STATE_IDLE)
           EndIf 
         Case #STATE_GUARD_START
-          max = getStateMaxFrames(*fighter, *fighter\stateInfo & ~%1111111)
+          max = getStateMaxFrames(*fighter, *fighter\stateInfo)
           If *fighter\stateTimer >= max
-            setState(*fighter, #STATE_GUARD, *fighter\stateInfo)
+            setState(*fighter, #STATE_GUARD)
           EndIf 
         Case #STATE_GUARD_STOP
           max = getStateMaxFrames(*fighter, *fighter\character\shieldEndlag)
@@ -129,6 +129,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 1
+; CursorPosition = 82
+; FirstLine = 60
 ; Folding = -
 ; EnableXP

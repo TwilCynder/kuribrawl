@@ -28,7 +28,7 @@ ClipSprite takes virtually no time (less than a nanosecond), having to clip a sp
 Since sprites can be displayed to screen extremely fast, and StartDrawing is extremely slow on screen, it seems like the best method to draw anything would be to do it on a sprite and then displaying the sprite. However, if we are 2DDrawing a lots of things, the fact it is 8 times faster on Screen than on Sprite might make it faster to 2ddraw directly on screen ?
 
 ## Experiments on the game code
-Changing the Image that was used to render shields and hitboxes to a sprite didn't go well : render time went from 0-1ms to 9-10. (approx 5ms per renderFighter()) It would seem that for some reason, direct drawing on sprites is a generally bad idea.
+Changing the Image that was used to render shields and hitboxes to a sprite didn't go well : render time went from 0-1ms to 9-10. (approx 5ms per renderFighter()) It would seem that for some reason, direct drawing on sprites is a generally bad idea. The reason for that is StartDrawing taking 5ms, and i don't KNOWN WHY PUTAIN
 
 ## Summary of the different drawing methods
 

@@ -81,7 +81,7 @@ Procedure readStageValues(*stage.StageModel)
   setStageCameraZone(*stage, camera\x, camera\y, camera\w, camera\h)
 EndProcedure
 
-Procedure.s LoadSprite_(*buffer, tag.s)
+Procedure LoadSprite_(*buffer, tag.s)
   Shared loadedSprites()
   Define sprite.l
   sprite = CatchSprite(#PB_Any, *buffer, #PB_Sprite_AlphaBlending)
@@ -90,7 +90,7 @@ Procedure.s LoadSprite_(*buffer, tag.s)
     End
   EndIf 
   loadedSprites(tag) = sprite
-  ProcedureReturn tag
+  ProcedureReturn sprite
 EndProcedure
 
 Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.FrameModel(1), originType)
@@ -139,7 +139,7 @@ Procedure loadGameData(path.s)
   EndIf 
   readVersion()
 
-  Define type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, x.l, y.l, w.l, h.l, valueF.f, subType.b, value$
+  Define sprite.l, type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, x.l, y.l, w.l, h.l, valueF.f, subType.b, value$
   Dim *frames.FrameModel(0)
   
   *buffer = 0
@@ -333,6 +333,13 @@ Procedure loadGameData(path.s)
         
         addLeftSpritesheet(getAnimation(getCharacter(character), animationName), tag)
         checkInterfile()
+      Case #FILETYPE_IMAGE
+        Debug tag
+        sprite = LoadSprite_(*buffer, tag)
+        checkInterfile()
+      Default
+        Debug "Error at " + Str(Loc(0)) + " : unexpected byte (not a filetype)"
+        skipToNextInterfile()
     EndSelect  
   Until Eof(0)
 
@@ -342,7 +349,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 197
-; FirstLine = 188
+; CursorPosition = 337
+; FirstLine = 298
 ; Folding = --
 ; EnableXP

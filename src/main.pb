@@ -86,7 +86,8 @@ CompilerEndIf
 
 ;- Initialization
 ForEach kuribrawl\characters()
-  initDefaultAnimationsConfig(kuribrawl\characters())
+  initChampion(kuribrawl\characters())
+  Debug kuribrawl\characters()\assets\HUDIcon
 Next 
 initHUD()
 
@@ -142,8 +143,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 94
-; FirstLine = 51
+; CursorPosition = 89
+; FirstLine = 78
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

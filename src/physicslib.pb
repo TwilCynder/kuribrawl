@@ -1,4 +1,5 @@
-﻿#GRAVITY = 0.6
+﻿#GRAVITY = 0.7
+#HITSTUN_GRAVITY = 0.5
 
 Procedure groundCollision(*game.Game, x.l, y.l, nx.l, ny.l) ;ajouter le fighter au cas où les ECB pourraient être différentes selon le fighter
   Define *plat.Platform
@@ -64,7 +65,7 @@ Procedure groundToAir(*fighter.Fighter)
 EndProcedure
 
 Procedure knockbackBounce(*fighter.Fighter)
-  *fighter\physics\v\y = (-*fighter\physics\v\y) * 0.7
+  *fighter\physics\v\y = (-*fighter\physics\v\y) * 0.85
   setAnimation(*fighter, "hurtbounce", 0, -Sign(*fighter\physics\v\x))
 EndProcedure
 
@@ -75,12 +76,23 @@ Procedure applyPhysics(*game.Game)
   ForEach *game\fighters()
     *fighter = @*game\fighters()
     
+    If *fighter\state = #STATE_HITSTUN
+      Debug *fighter\physics\v\y
+    EndIf 
+    
     If *fighter\paused > 0
       Continue
     EndIf 
     
     If *fighter\facing = 0
       *fighter\facing = 1
+    EndIf 
+    
+    If Abs(*fighter\physics\v\x) < 0.001 
+      *fighter\physics\v\x = 0
+    EndIf 
+    If Abs(*fighter\physics\v\y) < 0.001 
+      *fighter\physics\v\y = 0
     EndIf 
     
     oldSpeed\x = *fighter\physics\v\x
@@ -108,15 +120,10 @@ Procedure applyPhysics(*game.Game)
     EndSelect
     
     ;Détection de "fin de mouvement" (le signe de la vitesse X change)
-    If *fighter\state = #STATE_HITSTUN 
-      Debug "oui ma gatée"
-      Debug oldSpeed\x
-      Debug *fighter\physics\v\x
-    EndIf 
     If (*fighter\state = #STATE_HITSTUN Or *fighter\state = #STATE_GUARDSTUN) And *fighter\grounded And Sign(oldSpeed\x) <> Sign(*fighter\physics\v\x)
       If *fighter\state = #STATE_HITSTUN
         ;TODO : si le knockback était de type tumble, placer en animation au sol
-        setstate(*fighter, #STATE_IDLE)
+        setstate(*fighter, #STATE_IDLE, 0, *fighter\grounded)
       Else
         setstate(*fighter, #STATE_GUARD, (*fighter\stateInfo % 111111100000000) >> 8)
       EndIf 
@@ -125,7 +132,11 @@ Procedure applyPhysics(*game.Game)
     ;--- Gravité (fastfall, etc)
     
     If *fighter\physics\v\y > -*fighter\character\maxFallSpeed
-      *fighter\physics\v\y - #GRAVITY
+      If *fighter\state = #STATE_HITSTUN
+        *fighter\physics\v\y - #HITSTUN_GRAVITY
+      Else
+        *fighter\physics\v\y - #GRAVITY
+      EndIf   
       If *fighter\physics\v\y < -*fighter\character\maxFallSpeed
         *fighter\physics\v\y = -*fighter\character\maxFallSpeed
       EndIf 
@@ -142,7 +153,7 @@ Procedure applyPhysics(*game.Game)
     *plat = groundCollision(*game, *fighter\x, *fighter\y, nx, ny)
     If *plat
       ny = *plat\model\y
-      If *fighter\physics\v\y < -5 And (*fighter\state = #STATE_HITSTUN)
+      If *fighter\physics\v\y < -5 And (*fighter\state = #STATE_HITSTUN);TODO 
         knockbackBounce(*fighter)
       Else  
         If *fighter\grounded = 0
@@ -174,7 +185,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 72
-; FirstLine = 59
+; CursorPosition = 138
+; FirstLine = 90
 ; Folding = --
 ; EnableXP

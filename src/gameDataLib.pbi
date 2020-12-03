@@ -69,10 +69,15 @@ Structure ShieldInfo Extends Vector
   size.b
 EndStructure
 
+Structure ChampionAssets
+  HUDIcon.l
+EndStructure
+
 ;si ajout de variable, penser à update : loadLib, DFM, doc
 Structure Champion
   Map animations.AnimationModel()
   Array moves.moveInfo(#Commands)
+  assets.ChampionAssets
   name.s
   displayName.s
   walkSpeed.d
@@ -157,7 +162,8 @@ Global kuribrawl.GameData
 InitSprite()
 
 Procedure initHUD()
-  kuribrawl\HUD\damageFont\fontImage = LoadSprite(#PB_Any, "res/damages_font.png")
+  Shared loadedSprites()
+  kuribrawl\HUD\damageFont\fontImage = loadedSprites("damages_font")
   kuribrawl\HUD\damageFont\fontDimensions\x = 15
   kuribrawl\HUD\damageFont\fontDimensions\y = 30
 EndProcedure
@@ -323,8 +329,18 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
     EndIf
   Next 
 EndProcedure
+
+Procedure.s getChampionAssetTag(championName.s, assetName.s)
+  ProcedureReturn "@" + championName + "/" + assetName
+EndProcedure
+
+Procedure initChampion(*char.Champion)
+  Shared loadedSprites()
+  initDefaultAnimationsConfig(*char)
+  *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
+EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 159
-; FirstLine = 117
+; CursorPosition = 165
+; FirstLine = 141
 ; Folding = ----
 ; EnableXP

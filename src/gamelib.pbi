@@ -28,28 +28,28 @@ Structure fighterHitIdPair
 EndStructure
 
 Structure Fighter
-  x.l
+  x.l ;position of its origin (relative to stage center, upward Y)
   y.l
-  physics.Physics
-  *character.Champion
+  physics.Physics 
+  *character.Champion ;base character
   damage.d
   Map animations.Animation()
   *currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
   currentAnimationName.s
-  currentMove.MoveInfo
-  *port
-  name.s
-  grounded.b
-  facing.b ;1 = right | -1 = left
-  state.b
-  stateInfo.l ;attack, direction
-  stateTimer.u
-  updateAnim.b ;wheter state has been changed since last animation change
-  jumps.b
-  paused.b
-  shieldSize.d
-  shieldPosition.Vector
-  List fightersHit.fighterHitIdPair()
+  currentMove.MoveInfo ;infos on the current move (not reset at the end of the move, thus can point to a move even when not attacking)
+  *port ;inputLib port
+  name.s ;identification name (mainly for debug purposes)
+  grounded.b ;whether the fighter is on the ground or not
+  facing.b ;1 = right | -1 = left 
+  state.b 
+  stateInfo.l ;attack, direction, input that was used to start this state, etc
+  stateTimer.u ;number of frame since the state was set
+  updateAnim.b ;"should update anim" : generally wheter state has been changed since last animation change (sometimes state is changed without updating the anim)
+  jumps.b ;remaining aerial jumps
+  paused.b ;indicates freeze state (for hitlag)
+  shieldSize.d ;multiplier of the actual shield size (btw 0 and 1)
+  shieldPosition.Vector ;current pos of the shield (changed by shield tilting)
+  List fightersHit.fighterHitIdPair() ;hits that have connected in the current move (to avoid hitting the same fighter twice with the same hit)
 EndStructure
 
 Structure Platform
@@ -224,6 +224,10 @@ EndProcedure
 
 ;TODO supporter l'affichage des décimales
 Procedure DrawDamageText(*font.Font, damage.l, x.l, y.l)
+  If Not IsSprite(*font\fontImage)
+    Debug "OULA"
+    ProcedureReturn 1
+  EndIf 
   Define digit.b, started
   Define w = *font\fontDimensions\x
   digit = damage / 100
@@ -243,6 +247,7 @@ Procedure DrawDamageText(*font.Font, damage.l, x.l, y.l)
   digit = damage - digit * 10
   ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
   DisplaySprite(*font\fontImage, x, y)
+  ProcedureReturn x + w
 EndProcedure
 
 Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing = 1)
@@ -259,9 +264,11 @@ Procedure drawAnimationFrame(*frame.FrameModel, spriteSheet.l, x.l, y.l, facing 
 EndProcedure
 
 Procedure renderHUD(*game.Game)
+  Define x.l, y.l
   y = 20
   ForEach *game\fighters()
-    DrawDamageText(kuribrawl\HUD\damageFont, Int(*game\fighters()\damage), 20, y)
+    x = DrawDamageText(kuribrawl\HUD\damageFont, Int(*game\fighters()\damage), 20, y)
+    DisplaySprite(*game\fighters()\character\assets\HUDIcon, x, y)
     y + 50
   Next
 EndProcedure
@@ -652,7 +659,7 @@ Procedure getHitlag(damage.d)
 EndProcedure
 
 Procedure getHitstun(knockback.b)
-  ProcedureReturn knockback * 5
+  ProcedureReturn knockback * 2
 EndProcedure 
 
 Procedure getShieldKnockback(percentage.l, bkb.f, skb.f, weight.d)
@@ -687,6 +694,7 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   *defending\physics\v\x = Cos(angle) * knockback
   *defending\physics\v\y = Sin(angle) * knockback
   
+  
   facing = -Sign(*defending\physics\v\x)
   If knockback > 10
     type = #KB_TUMBLE
@@ -702,7 +710,7 @@ Procedure startKnockback(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *
   Else
     anim = "hurt"
   EndIf 
-  If *defending\physics\v\y < 2 And *defending\grounded And Not type = #KB_TUMBLE
+  If *defending\physics\v\y < 2 And *defending\physics\v\y > 0 And *defending\grounded And Not type = #KB_TUMBLE
     *defending\physics\v\y = 0
     anim = "hurtground"
   EndIf
@@ -740,7 +748,7 @@ Procedure shieldHit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defen
   *attacking\paused = hitlag
   hitstun = getShieldStun(knockback)
   ;setAnimation(*defending, anim, 0, facing)
-  setState(*defending, #STATE_GUARDSTUN, hitstun + (*defending\stateInfo << 8))
+  setState(*defending, #STATE_GUARDSTUN, hitstun)
 EndProcedure
 
 Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.Fighter, type.b)
@@ -865,8 +873,8 @@ EndProcedure
 ; 40.0
 ; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 654
-; FirstLine = 653
+; CursorPosition = 713
+; FirstLine = 677
 ; Folding = ----------
 ; EnableXP
 ; SubSystem = OpenGL
