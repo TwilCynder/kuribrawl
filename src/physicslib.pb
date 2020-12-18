@@ -76,9 +76,6 @@ Procedure applyPhysics(*game.Game)
   ForEach *game\fighters()
     *fighter = @*game\fighters()
     
-    If *fighter\state = #STATE_HITSTUN
-      Debug *fighter\physics\v\y
-    EndIf 
     
     If *fighter\paused > 0
       Continue
@@ -185,7 +182,7 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 138
-; FirstLine = 90
+; CursorPosition = 77
+; FirstLine = 76
 ; Folding = --
 ; EnableXP

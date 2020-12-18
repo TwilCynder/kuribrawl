@@ -1,1 +1,1 @@
-Execution lasted 13693ms  and 816 frames were displayed (average framewait : 8).
+Execution lasted 35030ms  and 2085 frames were displayed (average framewait : 7).

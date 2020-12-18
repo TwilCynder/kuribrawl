@@ -143,8 +143,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 89
-; FirstLine = 78
+; CursorPosition = 14
+; FirstLine = 12
 ; Folding = -
 ; EnableXP
 ; EnableUnicode
