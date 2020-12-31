@@ -249,9 +249,6 @@ Procedure loadGameData(path.s)
             *animation\spriteSheet = loadedSprites(tag)
           EndIf 
         EndIf 
-          
-        w = SpriteWidth(loadedSprites(tag))
-        h = SpriteHeight(loadedSprites(tag))
         
         byte = ReadByte(0)
         If byte = #FILEMARKER_INTERFILE
@@ -261,6 +258,9 @@ Procedure loadGameData(path.s)
           End
         EndIf 
         ;- - - reading descriptor
+        
+        w = SpriteWidth(loadedSprites(tag))
+        h = SpriteHeight(loadedSprites(tag))
         
         byte = ReadByte(0)
         
@@ -349,7 +349,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 337
-; FirstLine = 298
+; CursorPosition = 261
+; FirstLine = 229
 ; Folding = --
 ; EnableXP

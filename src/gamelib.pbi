@@ -4,12 +4,12 @@ Global testVal.b = 0
 
 ;- Structures
 
-Structure Frame
+Structure Frame__
   *model.FrameModel
   timeLeft.d
 EndStructure  
 
-Structure Animation
+Structure Animation__
   *model.AnimationModel
   List frames.Frame()
   frame.b
@@ -22,19 +22,29 @@ Structure Animation
   endCallback.f_callback
 EndStructure  
 
+Structure Animation
+  *model.AnimationModel
+  currentFrame.b
+  speed.d
+  frameMultiplier.b
+  carry.f
+  currentCarry.f
+  facing.b
+  onFrameChanged.f_callback ;TODO remplacer par un vrai système d'event
+  endCallback.f_callback
+EndStructure
+
 Structure fighterHitIdPair
   *fighter
   hitID.b
 EndStructure
 
 Structure Fighter
+  *character.Champion ;base character
   x.l ;position of its origin (relative to stage center, upward Y)
   y.l
   physics.Physics 
-  *character.Champion ;base character
-  damage.d
-  Map animations.Animation()
-  *currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
+  currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
   currentAnimationName.s
   currentMove.MoveInfo ;infos on the current move (not reset at the end of the move, thus can point to a move even when not attacking)
   *port ;inputLib port
@@ -45,7 +55,8 @@ Structure Fighter
   stateInfo.l ;attack, direction, input that was used to start this state, etc
   stateTimer.u ;number of frame since the state was set
   updateAnim.b ;"should update anim" : generally wheter state has been changed since last animation change (sometimes state is changed without updating the anim)
-  jumps.b ;remaining aerial jumps
+  jumps.b      ;remaining aerial jumps
+  damage.d
   paused.b ;indicates freeze state (for hitlag)
   shieldSize.d ;multiplier of the actual shield size (btw 0 and 1)
   shieldPosition.Vector ;current pos of the shield (changed by shield tilting)
@@ -53,13 +64,13 @@ Structure Fighter
 EndStructure
 
 Structure Platform
-  *animation.Animation
+  animation.Animation
   *model.PlatformModel
 EndStructure
 
 Structure Stage
   *model.StageModel
-  *backgroundAnim.Animation
+  backgroundAnim.Animation
   List platforms.Platform()
 EndStructure 
 
@@ -78,16 +89,6 @@ Define frameRate.b = 60, frameDuration.f
 
 ;- Rendering objects
 CreateImage(0, #SCREEN_W, #SCREEN_H, 32, #PB_Image_Transparent)
-
-Procedure initAnimation(*anim.Animation, *model.AnimationModel)
-  *anim\endCallback = *model\endCallback
-  *anim\model = *model
-    
-  ForEach *model\frames()
-    AddElement(*anim\frames())
-    *anim\frames()\model = @*model\frames()
-  Next 
-EndProcedure
 
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
@@ -873,8 +874,8 @@ EndProcedure
 ; 40.0
 ; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 713
-; FirstLine = 677
+; CursorPosition = 91
+; FirstLine = 62
 ; Folding = ----------
 ; EnableXP
 ; SubSystem = OpenGL

@@ -44,8 +44,8 @@ EndStructure
 Prototype.i f_callback(*fighter, *data)
 
 Structure AnimationModel
-  noCollisions.b ;indicates that this animation doesn't not interact with fighters (no hit/hurtboxes)
-  List frames.FrameModel()
+  noCollisions.b ;indicates that this animation doesn't interact with fighters (no hit/hurtboxes)
+  Array frames.FrameModel(0)
   spriteSheet.l ;handle de l'image servant de spritesheet
   spriteSheetL.l;image pour les sprite retournés
   baseSpeed.d
@@ -199,6 +199,10 @@ Procedure initAnimationModel(*animation.AnimationModel, spriteTag.s, speed.d = 1
   *animation\baseSpeed = speed
 EndProcedure
 
+Procedure setAnimationFrameNumber(*animation.AnimationModel, n.b)
+  ReDim *animation\frames(n - 1)
+EndProcedure
+
 Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
   *animation.AnimationModel = AddMapElement(*character\animations(), name)
   initAnimationModel(*animation, spriteTag, speed)
@@ -340,7 +344,7 @@ Procedure initChampion(*char.Champion)
   *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 165
-; FirstLine = 141
-; Folding = ----
+; CursorPosition = 204
+; FirstLine = 174
+; Folding = -----
 ; EnableXP
