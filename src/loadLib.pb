@@ -93,23 +93,23 @@ Procedure LoadSprite_(*buffer, tag.s)
   ProcedureReturn sprite
 EndProcedure
 
-Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, Array *frames.FrameModel(1), originType)
+Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, originType)
   If Not *animation
-    ProcedureReturn 0
+    Debug "makeframes : Animation is null"
   EndIf 
+  setAnimationFrameNumber(*animation, nb)
   Define x.l, y.l, w.l, h.l
-  ReDim *frames(nb - 1)
   x = 0
   y = 0
   w = w / nb
   If originType = #ANIMATIONTYPE_CHAMPION
     For i = 0 To nb - 1
-      *frames(i) = addFrame(*animation, x, y, w, h, w / 2, h)
+      setFrameProperties(*animation\frames(i), x, y, w, h, w / 2, h)
       x + w
     Next
   Else 
     For i = 0 To nb - 1
-      *frames(i) = addFrame(*animation, x, y, w, h, 0, 0)
+      setFrameProperties(*animation\frames(i), x, y, w, h, 0, h)
       x + w
     Next
   EndIf 
@@ -140,7 +140,6 @@ Procedure loadGameData(path.s)
   readVersion()
 
   Define sprite.l, type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, x.l, y.l, w.l, h.l, valueF.f, subType.b, value$
-  Dim *frames.FrameModel(0)
   
   *buffer = 0
   Repeat
@@ -265,7 +264,7 @@ Procedure loadGameData(path.s)
         byte = ReadByte(0)
         
         If byte > 0
-          makeFrames(*animation, w, h, byte, *frames(), subType)
+          makeFrames(*animation, w, h, byte, subType)
         EndIf 
         
         Repeat 
@@ -279,41 +278,41 @@ Procedure loadGameData(path.s)
             Case #FILEMARKER_FRAMEINFO
               selectedElement = ReadByte(0)
             Case #FILEMARKER_FRAMEDURATION
-              *frames(selectedElement)\duration = ReadUnicodeCharacter(0)
+              *animation\frames(selectedElement)\duration = ReadUnicodeCharacter(0)
             Case #FILEMARKER_FRAMEORIGIN
-              *frames(selectedElement)\origin\x = ReadLong(0)
-              *frames(selectedElement)\origin\y = ReadLong(0)
+              *animation\frames(selectedElement)\origin\x = ReadLong(0)
+              *animation\frames(selectedElement)\origin\y = ReadLong(0)
             Case #FILEMARKER_FRAMEMOVEMENT
-              *frames(selectedElement)\speedMode = ReadByte(0)
-              *frames(selectedElement)\speed\x = ReadDouble(0)
-              *frames(selectedElement)\speed\y = ReadDouble(0)
+              *animation\frames(selectedElement)\speedMode = ReadByte(0)
+              *animation\frames(selectedElement)\speed\x = ReadDouble(0)
+              *animation\frames(selectedElement)\speed\y = ReadDouble(0)
             Case #FILEMARKER_HITBOXINFO
               selectedElement = ReadByte(0)
               x.l = ReadWord(0)
               y.l = ReadWord(0)
               w.l = ReadWord(0)
               h.l = ReadWord(0)
-              addHitbox(*frames(selectedElement), x, y, w, h)
-              *frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
-              *frames(selectedElement)\hitboxes()\angle = ReadWord(0)
-              *frames(selectedElement)\hitboxes()\bkb = ReadFloat(0)
-              *frames(selectedElement)\hitboxes()\skb = ReadFloat(0)
-              *frames(selectedElement)\hitboxes()\priority = ReadByte(0)
-              *frames(selectedElement)\hitboxes()\hit = ReadByte(0)
+              addHitbox(*animation\frames(selectedElement), x, y, w, h)
+              *animation\frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
+              *animation\frames(selectedElement)\hitboxes()\angle = ReadWord(0)
+              *animation\frames(selectedElement)\hitboxes()\bkb = ReadFloat(0)
+              *animation\frames(selectedElement)\hitboxes()\skb = ReadFloat(0)
+              *animation\frames(selectedElement)\hitboxes()\priority = ReadByte(0)
+              *animation\frames(selectedElement)\hitboxes()\hit = ReadByte(0)
             Case #FILEMARKER_HURTBOXINFO
               selectedElement = ReadByte(0)
               x.l = ReadWord(0)
               If x = $5454
-                x = - *frames(selectedElement)\origin\x
-                y = - *frames(selectedElement)\origin\y
-                w = *frames(selectedElement)\display\w
-                h = *frames(selectedElement)\display\h
+                x = - *animation\frames(selectedElement)\origin\x
+                y = - *animation\frames(selectedElement)\origin\y
+                w = *animation\frames(selectedElement)\display\w
+                h = *animation\frames(selectedElement)\display\h
               Else
                 y.l = ReadWord(0)
                 w.l = ReadWord(0)
                 h.l = ReadWord(0)
               EndIf 
-              addHurtbox(*frames(selectedElement), x, y, w, h)
+              addHurtbox(*animation\frames(selectedElement), x, y, w, h)
           EndSelect
         ForEver
         If *animation\baseSpeed = 0
@@ -342,14 +341,14 @@ Procedure loadGameData(path.s)
         skipToNextInterfile()
     EndSelect  
   Until Eof(0)
-
+  
   CloseFile(0)
   ProcedureReturn 1
 EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 261
-; FirstLine = 229
+; CursorPosition = 60
+; FirstLine = 15
 ; Folding = --
 ; EnableXP

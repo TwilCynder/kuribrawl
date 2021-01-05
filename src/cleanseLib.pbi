@@ -1,11 +1,6 @@
 ﻿;freeFrame : no need (only pointers/numbers)
 
-Procedure freeAnimation(*animation.Animation)
-  FreeList(*animation\frames())
-EndProcedure
-
 Procedure freePlatform(*platform.Platform)
-  freeAnimation(*platform\animation)
 EndProcedure
 
 Procedure freeStage(*stage.Stage)
@@ -13,17 +8,11 @@ Procedure freeStage(*stage.Stage)
     freePlatform(*stage\platforms())
   Next
   FreeList(*stage\platforms())
-  
-  freeAnimation(*stage\backgroundAnim)
-  FreeStructure(*stage\backgroundAnim)
+ 
   FreeStructure(*stage)
 EndProcedure
 
 Procedure freeFighter(*fighter.Fighter)
-  ForEach *fighter\animations()
-    freeAnimation(*fighter\animations())
-  Next
-  FreeMap(*fighter\animations())
   
   FreeList(*fighter\fightersHit())
   
@@ -45,6 +34,6 @@ Procedure freeChampion(*champ.Champion)
 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 27
-; Folding = --
+; CursorPosition = 10
+; Folding = -
 ; EnableXP

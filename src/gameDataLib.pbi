@@ -31,12 +31,12 @@ Structure Hitbox Extends CollisionBox
   priority.b  
 EndStructure  
 
-Structure FrameModel
-  display.Rect_
-  origin.Vector
-  speed.VectorDouble
+Structure Frame
+  display.Rect_ ;part of the source image that this frames displays
+  origin.Vector ;position of the origin of this frame (relative to the upleft corner of display). The origin is the point that will be at the actual position of the object that displays the animation
+  speed.VectorDouble ;speed applied to the object while this frame is active (if the object is a Fighter)
   speedMode.b ;bit 0 : {0 : disabled | 1 : enabled} ; bit 1 : {0 : speed is added | 1 : speed is set} ; bit 2 : {0 : when this frame comes out | 1 : during the whole frame}
-  duration.b
+  duration.b ;duration of this frame (overrides the animation speed, i.e. if duration != 0, the frame will always be displayed this many frames)
   List hurtboxes.Hurtbox()
   List hitboxes.Hitbox()
 EndStructure
@@ -45,11 +45,13 @@ Prototype.i f_callback(*fighter, *data)
 
 Structure AnimationModel
   noCollisions.b ;indicates that this animation doesn't interact with fighters (no hit/hurtboxes)
-  Array frames.FrameModel(0)
+  frameNb.b
+  Array frames.Frame(0)
   spriteSheet.l ;handle de l'image servant de spritesheet
   spriteSheetL.l;image pour les sprite retournés
   baseSpeed.d
   endCallback.f_callback
+  frameCallback.f_callback
 EndStructure
 
 Dim stateDefaultAnimation.s(#STATES)
@@ -119,12 +121,7 @@ Structure StageModel
   w.l
   h.l
   cameraZone.RECT
-  *backgroundAnim.AnimationModel
-EndStructure
-
-Structure ArtifactModel
-  Map animations.AnimationModel()
-  durability.b
+  *backgroundAnim.AnimationModel  ;pointer to one the the animModels of tha animations map
 EndStructure
 
 Structure GameVariables
@@ -191,7 +188,7 @@ Procedure getAnimation(*character.Champion, name.s)
   ProcedureReturn FindMapElement(*character\animations(), name)
 EndProcedure
 
-Procedure initAnimationModel(*animation.AnimationModel, spriteTag.s, speed.d = 1)
+Procedure initAnimationModel(*animation.AnimationModel, spriteTag.s, speed.d = 1) ;associates a sprite handle with an Animation model, and maybe sets its speed
   Shared loadedSprites()
   If spriteTag
     *animation\spriteSheet = loadedSprites(spriteTag)
@@ -199,11 +196,22 @@ Procedure initAnimationModel(*animation.AnimationModel, spriteTag.s, speed.d = 1
   *animation\baseSpeed = speed
 EndProcedure
 
-Procedure setAnimationFrameNumber(*animation.AnimationModel, n.b)
-  ReDim *animation\frames(n - 1)
+Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
+  *animation.AnimationModel = AddMapElement(*character\animations(), name)
+  initAnimationModel(*animation, spriteTag, speed)
+  ProcedureReturn *animation
 EndProcedure
 
-Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
+Procedure setAnimationFrameNumber(*animation.AnimationModel, n.b) ;by default AnimationModels are created with one frame. This changes the size of their internal Frames array
+  ReDim *animation\frames(n - 1)
+  *animation\frameNb = n
+EndProcedure
+
+Procedure framesCount(*anim.AnimationModel)
+  ProcedureReturn ArraySize(*anim\frames()) + 1
+EndProcedure
+
+Procedure newChampionAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1) ;creates an animation in a champion's animation map, and initializes it.
   *animation.AnimationModel = AddMapElement(*character\animations(), name)
   initAnimationModel(*animation, spriteTag, speed)
   ProcedureReturn *animation
@@ -219,11 +227,14 @@ Procedure setAnimationEndCallback(*animation.AnimationModel, f.f_callback)
 EndProcedure
 
 Procedure AnimBaseLength(*animation.AnimationModel)
-  
+  If *animation\baseSpeed > 1 Or *animation\baseSpeed = -1
+    ProcedureReturn *animation\baseSpeed
+  Else
+    ProcedureReturn ArraySize(*animation\frames()) * Int(1 / *animation\baseSpeed)
+  EndIf 
 EndProcedure
 
-Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0)
-  *f.FrameModel = AddElement(*animation\frames())
+Procedure setFrameProperties(*f.Frame, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.b = 0) ;sets the basic properties of a Frame
   *f\display\x = x
   *f\display\y = y
   *f\display\w = w
@@ -234,7 +245,7 @@ Procedure addFrame(*animation.AnimationModel, x.l, y.l, w.l, h.l, xo.l, yo.l, du
   ProcedureReturn *f
 EndProcedure
 
-Procedure addHitbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
+Procedure addHitbox(*frame.Frame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
   *r.Hitbox = AddElement(*frame\hitboxes())
   Select shape
     Case #CBOX_SHAPE_RECT
@@ -247,7 +258,7 @@ Procedure addHitbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_R
   ProcedureReturn *r
 EndProcedure
 
-Procedure addHurtbox(*frame.FrameModel, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
+Procedure addHurtbox(*frame.Frame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
   *r.Hurtbox = AddElement(*frame\hurtboxes())
   Select shape
     Case #CBOX_SHAPE_RECT
@@ -344,7 +355,7 @@ Procedure initChampion(*char.Champion)
   *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 204
-; FirstLine = 174
+; CursorPosition = 210
+; FirstLine = 198
 ; Folding = -----
 ; EnableXP

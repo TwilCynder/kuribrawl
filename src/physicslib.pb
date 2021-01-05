@@ -182,7 +182,6 @@ Procedure applyPhysics(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 77
-; FirstLine = 76
+; CursorPosition = 23
 ; Folding = --
 ; EnableXP

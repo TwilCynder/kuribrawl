@@ -15,6 +15,7 @@
 #DEBUG = 1
 
 Global shieldColor = RGBA(255, 0, 0, 96)
+Global testVar.b
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
@@ -44,13 +45,13 @@ Procedure startTestGame()
   *game = initGame(window)
   
   setStage(*game, getStage("Snowdin"))
-  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
-  *f1\name = "Test One"
+  ;*f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
+  ;*f1\name = "Test One"
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
   
-  setPort(0, 0)
-  setPortFighter(0, *f1)
+  ;setPort(0, 0)
+  ;setPortFighter(0, *f1)
   setPort(1, 3)
   setPortFighter(1, *f2)
   
@@ -143,8 +144,7 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 14
-; FirstLine = 12
+; CursorPosition = 17
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

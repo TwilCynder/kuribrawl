@@ -322,7 +322,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     Case #STATE_ATTACK 
       If  *port\figher\currentMove\multiMove
         part.b = (*port\figher\stateInfo % %11100000) >> 5
-        If (part = 0) Or (part <= ArraySize(*port\figher\currentMove\multiMove\partStartFrames())) And *port\figher\currentAnimation\frame >= *port\figher\currentMove\multiMove\partStartFrames(part - 1)
+        If (part = 0) Or (part <= ArraySize(*port\figher\currentMove\multiMove\partStartFrames())) And *port\figher\currentAnimation\currentFrame >= *port\figher\currentMove\multiMove\partStartFrames(part - 1)
           part + 1
         Else
           ProcedureReturn 0
@@ -419,11 +419,12 @@ Procedure inputManager_smashStickRight(*port.Port, *info.inputData)
   state = *port\figher\state
   If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or (state = #STATE_DASH_START And *port\figher\facing = -1)
     *port\figher\facing = 1
-    setState(*port\figher, #STATE_DASH_START)
+    setState(*port\figher, #STATE_DASH_START, 0, 2)
   EndIf 
   If (state = #STATE_DASH Or state = #STATE_DASH_STOP) And *port\figher\facing = -1
     *port\figher\facing = 1
     setState(*port\figher, #STATE_DASH_TURN)
+    Debug *port\figher\updateAnim
   EndIf 
   ProcedureReturn 1
 EndProcedure
@@ -437,7 +438,7 @@ Procedure inputManager_smashStickLeft(*port.Port, *info.inputData)
   EndIf 
   If state = #STATE_WALK Or (state = #STATE_IDLE And *port\figher\grounded) Or (state = #STATE_DASH_START And *port\figher\facing = 1)
     *port\figher\facing = -1
-    setState(*port\figher, #STATE_DASH_START)
+    setState(*port\figher, #STATE_DASH_START, 0, 2)
   EndIf 
   If (state = #STATE_DASH Or state = #STATE_DASH_STOP) And *port\figher\facing = 1
     *port\figher\facing = -1
@@ -669,7 +670,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 538
-; FirstLine = 530
+; CursorPosition = 440
+; FirstLine = 401
 ; Folding = ------
 ; EnableXP

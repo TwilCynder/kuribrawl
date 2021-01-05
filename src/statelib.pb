@@ -1,11 +1,4 @@
-﻿Procedure getStateMaxFrames(*fighter.Fighter, characterProperty.b)
-  If characterProperty < 0
-    ProcedureReturn animLength(*fighter\currentAnimation)
-  EndIf 
-  ProcedureReturn characterProperty
-EndProcedure  
-
-Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
+﻿  Procedure stateCallback_Jumpsquat(*fighter.Fighter, stateinfo.l)
   Shared defaultControler
   Define jumpTypeX.b, jumpTypeY.b, element.b, elementType.b, axis.AxisState
   Define *port.Port = *fighter\port
@@ -38,7 +31,12 @@ Procedure stateCallback_DashTurn(*fighter.Fighter, stateinfo.l)
     setState(*fighter, #STATE_DASH)
   EndIf 
 EndProcedure
-  
+
+Macro stateEnd(l)
+  ((l >= 0) And *fighter\stateTimer >= l) Or (l < 0 And *fighter\currentAnimation\finished)
+EndMacro
+
+
 Procedure manageStates(*game.Game)
   Define *fighter.Fighter, max.l
   ForEach *game\fighters()
@@ -50,33 +48,27 @@ Procedure manageStates(*game.Game)
       *fighter\stateTimer + 1
       Select *fighter\state
         Case #STATE_JUMPSQUAT
-          max = getStateMaxFrames(*fighter, *fighter\character\jumpsquatDuration)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\jumpsquatDuration) 
             stateCallback_Jumpsquat(*fighter, *fighter\stateInfo)
-          EndIf
+          EndIf 
         Case #STATE_DASH_STOP
-          max = getStateMaxFrames(*fighter, *fighter\character\dashStopDuration)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\dashStopDuration)  
             setState(*fighter, #STATE_IDLE)
           EndIf  
         Case #STATE_DASH_START
-          max = getStateMaxFrames(*fighter, *fighter\character\dashStartDuration)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\dashStartDuration) 
             setState(*fighter, #STATE_DASH)
           EndIf 
         Case #STATE_DASH_TURN
-          max = getStateMaxFrames(*fighter, *fighter\character\dashTurnDuration)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\dashTurnDuration) 
             stateCallback_DashTurn(*fighter, 0)
           EndIf 
         Case #STATE_LANDING
-          max = getStateMaxFrames(*fighter, *fighter\character\landingDuration)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\landingDuration) 
             setState(*fighter, #STATE_IDLE)
           EndIf 
         Case #STATE_LANDING_LAG
-          max = getStateMaxFrames(*fighter, *fighter\stateInfo)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\stateInfo) 
             setState(*fighter, #STATE_IDLE)
           EndIf 
         Case #STATE_HITSTUN
@@ -94,26 +86,19 @@ Procedure manageStates(*game.Game)
               setState(*fighter, #STATE_GUARD)
           EndIf
         Case #STATE_CROUCH_START
-          max = animLength(*fighter\currentAnimation)
-          If *fighter\stateTimer >= max
+          If *fighter\currentAnimation\finished
             setState(*fighter, #STATE_CROUCH)
           EndIf 
         Case #STATE_CROUCH_STOP
-          max = animLength(*fighter\currentAnimation)
-          If *fighter\stateTimer >= max
+          If *fighter\currentAnimation\finished
             setState(*fighter, #STATE_IDLE)
           EndIf 
         Case #STATE_GUARD_START
-          max = getStateMaxFrames(*fighter, *fighter\stateInfo)
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\shieldStartup)
             setState(*fighter, #STATE_GUARD)
           EndIf 
         Case #STATE_GUARD_STOP
-          max = getStateMaxFrames(*fighter, *fighter\character\shieldEndlag)
-          If Not max 
-            max = kuribrawl\variables\shieldEndlag
-          EndIf
-          If *fighter\stateTimer >= max
+          If stateEnd(*fighter\character\shieldEndlag) 
             setState(*fighter, #STATE_IDLE)
           EndIf
       EndSelect
@@ -125,11 +110,11 @@ Procedure manageStates(*game.Game)
           *fighter\shieldSize = 1.0
         EndIf 
       EndIf 
-    EndIf 
+    EndIf  
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 82
-; FirstLine = 60
+; CursorPosition = 65
+; FirstLine = 48
 ; Folding = -
 ; EnableXP
