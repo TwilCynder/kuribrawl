@@ -46,13 +46,13 @@ Procedure startTestGame()
   *game = initGame(window)
   
   setStage(*game, getStage("Snowdin"))
-  ;*f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
-  ;*f1\name = "Test One"
+  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
+  *f1\name = "Test One"
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
   
-  ;setPort(0, 0)
-  ;setPortFighter(0, *f1)
+  setPort(0, 0)
+  setPortFighter(0, *f1)
   setPort(1, 3)
   setPortFighter(1, *f2)
   
@@ -92,12 +92,11 @@ CompilerEndIf
 ;- Initialization
 ForEach kuribrawl\characters()
   initChampion(kuribrawl\characters())
-  Debug kuribrawl\characters()\assets\HUDIcon
 Next 
 initHUD()
 
 ;- Starting the game (test)
-startTestGame()
+;startTestGame()
 
 ;- Main loop (game)
 
@@ -112,14 +111,20 @@ Repeat
   startTime = endTime
   nextFrame = nextFrame + frameDuration
   startTime = ElapsedMilliseconds()
-  readInputs()
-  manageStates(*game)
-  updateInputs()  
-  manageHitboxes(*game)
-  applyPhysics(*game)
-  updateAnimations(*game)
+  
+  readInputs(*game)
+  If *game
+    manageStates(*game)
+    updateInputs(*game)  
+    manageHitboxes(*game)
+    applyPhysics(*game)
+    updateAnimations(*game)
+  EndIf 
   renderFrame(*game)
-  advanceAnimations(*game)
+  If *game
+    advanceAnimations(*game)
+  EndIf
+  
   SetWindowTitle(window, Str(lastFrameDuration))
   
   currentTime = ElapsedMilliseconds()
@@ -148,8 +153,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 58
-; FirstLine = 40
-; Folding = -
+; CursorPosition = 98
+; FirstLine = 62
+; Folding = 8
 ; EnableXP
 ; EnableUnicode

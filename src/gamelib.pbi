@@ -11,6 +11,7 @@ EndStructure
 
 Structure Fighter
   *character.Champion ;base character
+  *game.Game
   List sprites.Sprite()
   x.l ;position of its origin (relative to stage center, upward Y)
   y.l
@@ -52,6 +53,7 @@ Structure Game
   window.l
   camera.Camera
   *base.GameData
+  List inputQ.l()
 EndStructure
 
 Define frameRate.b = 60, frameDuration.f
@@ -124,7 +126,7 @@ Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0, reset.
   
   *model = getAnimation(*fighter\character, name)
   If Not *model
-    Debug "Animation " + name + " not found. (in character " + *fighter\character\name + ".)"
+    error("Animation " + name + " not found. (in character " + *fighter\character\name + ".)")
   EndIf
   
   *fighter\currentAnimationName = name
@@ -134,7 +136,9 @@ EndProcedure
 Procedure setAnimationState(*fighter.Fighter, speed.d = 0, reset.b = 0) ;sets the current animation according to the state
   Shared stateDefaultAnimation()
   animation.s = stateDefaultAnimation(*fighter\state)
-  setAnimation(*fighter, animation, speed, 0, reset)
+  If Not animation = ""
+    setAnimation(*fighter, animation, speed, 0, reset)
+  EndIf 
 EndProcedure
 
 Procedure addFighterSprite(*fighter.Fighter, x.l = 0, y.l = 0)
@@ -344,60 +348,63 @@ Procedure renderFrame(*game.Game)
   Define medPos.Vector
   ClearScreen(bgc)
   
-  ForEach *game\fighters()
-    medPos\x + *game\fighters()\x 
-    medPos\y + *game\fighters()\y
-  Next 
-  medPos\x / ListSize(*game\fighters())
-  medPos\x - (#SCREEN_W / 2)
+  If *game
   
-  medPos\y / ListSize(*game\fighters())
-  medPos\y - (#SCREEN_H / 2)
+    ForEach *game\fighters()
+      medPos\x + *game\fighters()\x 
+      medPos\y + *game\fighters()\y
+    Next 
+    medPos\x / ListSize(*game\fighters())
+    medPos\x - (#SCREEN_W / 2)
+    
+    medPos\y / ListSize(*game\fighters())
+    medPos\y - (#SCREEN_H / 2)
+    
+    If Abs (*game\camera\x - medPos\x) < kuribrawl\variables\cameraMaxSpeed
+      *game\camera\x = medPos\x
+    Else
+      *game\camera\x + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\x - medPos\x))
+    EndIf 
+    
+    If *game\camera\x < *game\currentStage\model\cameraZone\left
+      *game\camera\x = *game\currentStage\model\cameraZone\left
+    ElseIf *game\camera\x + #SCREEN_W > *game\currentStage\model\cameraZone\right
+      *game\camera\x =  *game\currentStage\model\cameraZone\right - #SCREEN_W
+    EndIf 
+    
+    If Abs (*game\camera\y - medPos\y) < kuribrawl\variables\cameraMaxSpeed
+      *game\camera\y = medPos\y
+    Else
+      *game\camera\y + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\y - medPos\y))
+    EndIf 
+    
+    If *game\camera\y < *game\currentStage\model\cameraZone\bottom
+      *game\camera\y = *game\currentStage\model\cameraZone\bottom
+    ElseIf *game\camera\y + #SCREEN_H > *game\currentStage\model\cameraZone\top 
+      *game\camera\y =  *game\currentStage\model\cameraZone\top - #SCREEN_H
+    EndIf 
+    
+    If *game\currentStage
+      renderStage(*game\currentStage)
+    EndIf 
+    ForEach *game\currentStage\platforms()
+      renderPlatform(@*game\currentStage\platforms(), *game\camera)
+    Next
+    
   
-  If Abs (*game\camera\x - medPos\x) < kuribrawl\variables\cameraMaxSpeed
-    *game\camera\x = medPos\x
-  Else
-    *game\camera\x + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\x - medPos\x))
+    ForEach *game\fighters()
+      renderFighter(@*game\fighters(), *game\camera)
+    Next
+    StartDrawing(ScreenOutput()) ;takes between 4 and 6 ms
+    DrawAlphaImage(ImageID(0), 0, 0)
+    StopDrawing()
+    StartDrawing(ImageOutput(0)) ;takes between 0 and 1 ms
+    DrawingMode(#PB_2DDrawing_AlphaChannel)
+    Box(0, 0, #SCREEN_W, #SCREEN_H, $00000000)
+    StopDrawing()
+    
+    renderHUD(*game)
   EndIf 
-  
-  If *game\camera\x < *game\currentStage\model\cameraZone\left
-    *game\camera\x = *game\currentStage\model\cameraZone\left
-  ElseIf *game\camera\x + #SCREEN_W > *game\currentStage\model\cameraZone\right
-    *game\camera\x =  *game\currentStage\model\cameraZone\right - #SCREEN_W
-  EndIf 
-  
-  If Abs (*game\camera\y - medPos\y) < kuribrawl\variables\cameraMaxSpeed
-    *game\camera\y = medPos\y
-  Else
-    *game\camera\y + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\y - medPos\y))
-  EndIf 
-  
-  If *game\camera\y < *game\currentStage\model\cameraZone\bottom
-    *game\camera\y = *game\currentStage\model\cameraZone\bottom
-  ElseIf *game\camera\y + #SCREEN_H > *game\currentStage\model\cameraZone\top 
-    *game\camera\y =  *game\currentStage\model\cameraZone\top - #SCREEN_H
-  EndIf 
-  
-  If *game\currentStage
-    renderStage(*game\currentStage)
-  EndIf 
-  ForEach *game\currentStage\platforms()
-    renderPlatform(@*game\currentStage\platforms(), *game\camera)
-  Next
-  
-
-  ForEach *game\fighters()
-    renderFighter(@*game\fighters(), *game\camera)
-  Next
-  StartDrawing(ScreenOutput()) ;takes between 4 and 6 ms
-  DrawAlphaImage(ImageID(0), 0, 0)
-  StopDrawing()
-  StartDrawing(ImageOutput(0)) ;takes between 0 and 1 ms
-  DrawingMode(#PB_2DDrawing_AlphaChannel)
-  Box(0, 0, #SCREEN_W, #SCREEN_H, $00000000)
-  StopDrawing()
-  
-  renderHUD(*game)
   
   FlipBuffers()
   bgc = #White
@@ -705,7 +712,11 @@ EndProcedure
 
 ;- Game methods ---
 
-
+Procedure startGame(window.l, *stage.StageModel)
+  *game.Game = initGame(window.l)
+  setStage(*game, *stage)
+  ProcedureReturn 
+EndProcedure
 
 Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
@@ -730,9 +741,9 @@ Procedure increaseFrameRate()
   updateFrameRate()
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 707
-; FirstLine = 676
-; Folding = --v------
+; CursorPosition = 407
+; FirstLine = 360
+; Folding = -+--------
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

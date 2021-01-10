@@ -338,11 +338,13 @@ Procedure initDefaultAnimationsConfig(*char.Champion)
     setAnimationEndCallback(@*char\animations("jump"), @defaultJumpAnimCallback())
     setAnimationEndCallback(@*char\animations("doublejump"), @defaultJumpAnimCallback())
   EndIf 
+  
   For i = 0 To #COMMANDS - 1
-    If *char\animations(commandDefaultAnimation(i))
+    If getAnimation(*char, commandDefaultAnimation(i))
       setAnimationEndCallback(*char\animations(commandDefaultAnimation(i)), @defaultAttackAnimCallback())
     EndIf
   Next 
+  
 EndProcedure
 
 Procedure.s getChampionAssetTag(championName.s, assetName.s)
@@ -351,11 +353,12 @@ EndProcedure
 
 Procedure initChampion(*char.Champion)
   Shared loadedSprites()
+ 
   initDefaultAnimationsConfig(*char)
   *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 210
-; FirstLine = 198
+; CursorPosition = 342
+; FirstLine = 307
 ; Folding = -----
 ; EnableXP

@@ -31,6 +31,7 @@ EndStructure
 Structure inputData
   element.b ; the element (stick/button) responsible for this input
   elementType.b ;wheter the said element was a button, stick or trigger
+  *game.Game
 EndStructure
 
 Structure AxisState
@@ -59,8 +60,6 @@ EndStructure
 Dim ports.Port(4)
 
 XIncludeFile "inputlibData.pbi"
-
-NewList inputQ.l()
 
 Procedure setPort(port, joyID, active = 1)
   Shared ports(), defaultControler
@@ -123,24 +122,24 @@ EndProcedure
 CompilerIf #DEBUG
   Declare logInput(port.b, input.b, element.b, elementType.b, frame.l = -1)
 CompilerEndIf
-Procedure registerInput(port, input, element = #MAX_BUTTON_NB, elementType = #ELEMENTTYPE_BUTTON)
-  Shared inputQ(), defaultInputDurability(), frame
-  AddElement(inputQ()) : inputQ() = makeInputValue(input, defaultInputDurability(input), port, element, elementType)
+Procedure registerInput(*game.Game, port, input, element = #MAX_BUTTON_NB, elementType = #ELEMENTTYPE_BUTTON)
+  Shared defaultInputDurability(), frame
+  addElementVal(*game\inputQ(), makeInputValue(input, defaultInputDurability(input), port, element, elementType))
   CompilerIf #DEBUG
    logInput(port, input, element, elementType, frame)
   CompilerEndIf
 EndProcedure
 
-Procedure readInputs()
+Procedure readInputs(*game.Game)
   Shared ports(), *port.Port
   Define state.b, id.b, axisState.AxisState, *controller.knownController, *binding.InputBinding
 
   For i = 0 To 3
-    If Not ports(i)\active
+    *port = @ports(i)
+    
+    If Not (*port\active And *game)
       Continue  
     EndIf 
-    
-    *port = @ports(i)
     
     *port\guardPressed = #False
     
@@ -162,7 +161,7 @@ Procedure readInputs()
       EndIf
       
       If state And Not *port\previousState\buttons[id]
-        registerInput(i, *binding\buttons()\input, id)
+        registerInput(*game, i, *binding\buttons()\input, id)
       EndIf
       *port\previousState\buttons[id] = state
     Next 
@@ -174,8 +173,8 @@ Procedure readInputs()
     
     If *port\currentControlStickState\x > stickSmashTreshold
       If *port\previousState\axis[id]\x < stickTreshold XOr *port\controlStickBuffer[#DIRECTION_RIGHT] = 1
-        registerInput(i, #INPUT_ControlStick_SRIGHT)
-        registerInput(i, #INPUT_ControlStick_RIGHT)
+        registerInput(*game, i, #INPUT_ControlStick_SRIGHT)
+        registerInput(*game, i, #INPUT_ControlStick_RIGHT)
       EndIf 
       *port\controlStickBuffer[#DIRECTION_RIGHT] = 0
     ElseIf *port\currentControlStickState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold And 
@@ -183,8 +182,8 @@ Procedure readInputs()
       *port\controlStickBuffer[#DIRECTION_RIGHT] = 1
     ElseIf *port\currentControlStickState\x < -stickSmashTreshold
       If *port\previousState\axis[id]\x > -stickTreshold XOr *port\controlStickBuffer[#DIRECTION_LEFT] = 1
-        registerInput(i, #INPUT_ControlStick_SLEFT)
-        registerInput(i, #INPUT_ControlStick_LEFT)
+        registerInput(*game, i, #INPUT_ControlStick_SLEFT)
+        registerInput(*game, i, #INPUT_ControlStick_LEFT)
       EndIf 
       *port\controlStickBuffer[#DIRECTION_LEFT] = 0
     ElseIf *port\currentControlStickState\x < -stickTreshold And *port\previousState\axis[id]\x > -stickTreshold
@@ -198,8 +197,8 @@ Procedure readInputs()
     
     If *port\currentControlStickState\y > stickSmashTreshold
       If *port\previousState\axis[id]\y < stickTreshold XOr *port\controlStickBuffer[#DIRECTION_RIGHT] = 1
-        registerInput(i, #INPUT_ControlStick_SDOWN)
-        registerInput(i, #INPUT_ControlStick_DOWN)
+        registerInput(*game, i, #INPUT_ControlStick_SDOWN)
+        registerInput(*game, i, #INPUT_ControlStick_DOWN)
       EndIf 
       *port\controlStickBuffer[#DIRECTION_DOWN] = 0
     ElseIf *port\currentControlStickState\y > stickTreshold And *port\previousState\axis[id]\y < stickTreshold
@@ -207,8 +206,8 @@ Procedure readInputs()
       *port\controlStickBuffer[#DIRECTION_DOWN] = 1
     ElseIf *port\currentControlStickState\y < -stickSmashTreshold
       If *port\previousState\axis[id]\y > -stickTreshold XOr *port\controlStickBuffer[#DIRECTION_LEFT] = 1
-        registerInput(i, #INPUT_ControlStick_SUP)
-        registerInput(i, #INPUT_ControlStick_UP)
+        registerInput(*game, i, #INPUT_ControlStick_SUP)
+        registerInput(*game, i, #INPUT_ControlStick_UP)
       EndIf         
       *port\controlStickBuffer[#DIRECTION_UP] = 0
     ElseIf *port\currentControlStickState\y < -stickTreshold And *port\previousState\axis[id]\y > -stickTreshold
@@ -228,19 +227,19 @@ Procedure readInputs()
       id = *binding\axises()\ID
       readAxis(@axisState, *binding\axises()\ID, *port)
       If axisState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold
-        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
-        ;registerInput(i, #INPUT_ControlStick_RIGHT)
+        registerInput(*game, i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
+        ;registerInput(*game, i, #INPUT_ControlStick_RIGHT)
       ElseIf axisState\x < -stickTreshold And *port\previousState\axis[id]\x > -stickTreshold
-        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
-        ;registerInput(i, #INPUT_ControlStick_LEFT)
+        registerInput(*game, i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
+        ;registerInput(*game, i, #INPUT_ControlStick_LEFT)
       EndIf 
         
       If axisState\y > stickTreshold And *port\previousState\axis[id]\y < stickTreshold
-        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
-        ;registerInput(i, #INPUT_ControlStick_DOWN)
+        registerInput(*game, i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
+        ;registerInput(*game, i, #INPUT_ControlStick_DOWN)
       ElseIf  axisState\y < -stickTreshold And *port\previousState\axis[id]\y > -stickTreshold
-        registerInput(i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
-        ;registerInput(i, #INPUT_ControlStick_UP)
+        registerInput(*game, i, *binding\axises()\input, id, #ELEMENTTYPE_STICK)
+        ;registerInput(*game, i, #INPUT_ControlStick_UP)
       EndIf 
       *port\previousState\axis[id]\x = axisState\x
       *port\previousState\axis[id]\y = axisState\y
@@ -257,7 +256,7 @@ Procedure readInputs()
       EndIf
       
       If axisState\z > triggerTreshold And *port\previousState\axis[*binding\triggers()\ID]\z < triggerTreshold
-        registerInput(i, *binding\triggers()\input, id, #ELEMENTTYPE_TRIGGER)
+        registerInput(*game, i, *binding\triggers()\input, id, #ELEMENTTYPE_TRIGGER)
       EndIf 
       *port\previousState\axis[id]\z = axisState\z
     Next 
@@ -298,14 +297,13 @@ Macro Atk(attack)
   startAttack(*port\figher, attack, *info)
 EndMacro
 
-Procedure findDirectionalInput(port.b)
-  Shared InputQ()
-  ForEach inputQ()
-    inputPort.b = (inputQ() & %111000000000) >> 9
+Procedure findDirectionalInput(*game.Game, port.b)
+  ForEach *game\inputQ()
+    inputPort.b = (*game\inputQ() & %111000000000) >> 9
     If inputPort = port
-      input.b = inputQ() & %11111
+      input.b = *game\inputQ() & %11111
       If input = #INPUT_ControlStick_SDOWN Or input = #INPUT_ControlStick_SUP Or input = #INPUT_ControlStick_SLEFT Or input = #INPUT_ControlStick_SRIGHT
-        DeleteElement(inputQ())
+        DeleteElement(*game\inputQ())
         ProcedureReturn input
       EndIf 
     EndIf 
@@ -335,7 +333,6 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     Case  #STATE_HITSTUN, #STATE_LANDING_LAG, #STATE_GUARD, #STATE_GUARDSTUN
       ProcedureReturn 0
     Case #STATE_JUMPSQUAT
-      Debug "oui"
       ProcedureReturn 2
   EndSelect
   
@@ -349,7 +346,7 @@ Procedure inputManager_Attack(*port.Port, *info.inputData)
     direction = controlStickDirection(*port)
   EndIf 
   If isFighterGrounded(*port\figher)
-    input.b = findDirectionalInput(*port\id)
+    input.b = findDirectionalInput(*info\game, *port\id)
     Select input
       Case #INPUT_ControlStick_SUP
         Debug "Upsmash (" + *port\figher\name + ")"
@@ -479,7 +476,7 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
       *port\figher\facing = Sign(*port\currentControlStickState\x)
       elementType.b = (*port\figher\stateInfo & %1100000000) >> 8
       element.b = (*port\figher\stateInfo & %111110000000000) >> 10
-      registerInput(*port\id, #INPUT_Attack, elementType, element)
+      registerInput(*info\game, *port\id, #INPUT_Attack, elementType, element)
     EndIf 
   EndIf 
   
@@ -527,7 +524,7 @@ Procedure inputManager_guard(*port.Port, *info.inputData)
   If Not *port\figher\grounded Or *port\figher\state = #STATE_ATTACK
     ProcedureReturn 0
   EndIf 
-  If findDirectionalInput(*port\id) = #INPUT_ControlStick_SDOWN Or *port\currentControlStickState\y < -*port\controllerInfo\config\analogStickThreshold
+  If findDirectionalInput(*info\game, *port\id) = #INPUT_ControlStick_SDOWN Or *port\currentControlStickState\y < -*port\controllerInfo\config\analogStickThreshold
     
     Debug "spot dodge"
   ElseIf  Not *port\figher\state = #STATE_GUARD
@@ -616,8 +613,8 @@ EndProcedure
 ; - 2 bits : elementType
 ; - 5 bits : element
 
-Procedure updateInputs()
-  Shared inputQ(), ports(), *inputManagers(), *port.Port
+Procedure updateInputs(*game.Game)
+  Shared inputCode.l, ports(), *inputManagers(), *port.Port
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
   For i = 0 To 3
     If Not ports(i)\active
@@ -627,31 +624,33 @@ Procedure updateInputs()
     checkInputReleases(*port)
   Next
   
-  ForEach inputQ()
-    input = inputQ() & %11111
-    durability = (inputQ() & %111100000) >> 5
-    port = (inputQ() & %111000000000) >> 9
-    info\elementType = (inputQ() & %11000000000000) >> 12
-    info\element = (inputQ() & %11111 << 14) >> 14
+  ForEach *game\inputQ()
+    inputCode = *game\inputQ()
+    input = inputCode & %11111
+    durability = (inputCode & %111100000) >> 5
+    port = (inputCode & %111000000000) >> 9
+    info\elementType = (inputCode & %11000000000000) >> 12
+    info\element = (inputCode & %11111 << 14) >> 14
+    info\game = *game
     
     If *inputManagers(input)
-      *currentElement = @inputQ()
+      *currentElement = @*game\inputQ()
       inputManager.inputManager = *inputManagers(input)
       res = inputManager(@ports(port), @info)
-      ChangeCurrentElement(inputQ(), *currentElement)
+      ChangeCurrentElement(*game\inputQ(), *currentElement)
     Else
       res = 0
     EndIf
     Select res
       Case 1
-        DeleteElement(inputQ())
+        DeleteElement(*game\inputQ())
         Continue 
       Case 0
         durability - 1
         If durability < 1
-          DeleteElement(inputQ())
+          DeleteElement(*game\inputQ())
         Else
-          inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
+          *game\inputQ() = makeInputValue(input, durability, port, info\element, info\elementType)
         EndIf 
     EndSelect  
   Next 
@@ -670,7 +669,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 440
-; FirstLine = 401
+; CursorPosition = 125
+; FirstLine = 125
 ; Folding = ------
 ; EnableXP
