@@ -21,6 +21,7 @@ XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
 XIncludeFile "gameDataLib.pbi"
 XIncludeFile "loadlib.pb"
+XIncludeFile "animationlib.pbi"
 XIncludeFile "gamelib.pbi"
 XIncludeFile "cleanseLib.pbi"
 XIncludeFile "physicslib.pb"
@@ -54,6 +55,9 @@ Procedure startTestGame()
   ;setPortFighter(0, *f1)
   setPort(1, 3)
   setPortFighter(1, *f2)
+  
+  *sprite = addFighterSprite(*f2, 30, 30)
+  setSpriteAnimation(*sprite, getAnimation(getCharacter("Acid"), "test_sprite"))
   
   initFighters(*game)
 EndProcedure  
@@ -144,7 +148,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 17
+; CursorPosition = 58
+; FirstLine = 40
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

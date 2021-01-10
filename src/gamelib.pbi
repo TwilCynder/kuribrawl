@@ -4,33 +4,14 @@ Global testVal.b = 0
 
 ;- Structures
 
-Structure Animation
-  *model.AnimationModel 
-  currentFrame.b  ;index of the current frame
-  timeLeft.d
-  speed.d  ;current speed
-  frameMultiplier.b  ;default duration of all frames (depends on speed)
-  carry.f  
-  currentCarry.f
-  facing.b
-  finished.b ;indicates that this animation has reached its end. It has already looped back to the first frame.
-  onFrameChanged.f_callback ;TODO remplacer par un vrai système d'event
-  endCallback.f_callback
-EndStructure
-
 Structure fighterHitIdPair
   *fighter
   hitID.b
 EndStructure
 
-Structure Sprite
-  animation.Animation
-  xy.Vector
-EndStructure
-
 Structure Fighter
   *character.Champion ;base character
-  List sprite.Sprite()
+  List sprites.Sprite()
   x.l ;position of its origin (relative to stage center, upward Y)
   y.l
   physics.Physics 
@@ -65,9 +46,6 @@ Structure Stage
   List platforms.Platform()
 EndStructure 
 
-Structure Camera Extends Vector
-EndStructure
-
 Structure Game
   List fighters.Fighter()
   *currentStage.Stage
@@ -78,8 +56,7 @@ EndStructure
 
 Define frameRate.b = 60, frameDuration.f
 
-;- Rendering objects
-CreateImage(0, #SCREEN_W, #SCREEN_H, 32, #PB_Image_Transparent)
+;- Object initialization ---
 
 Procedure initGame(window.l)
   *game.Game = AllocateStructure(Game)
@@ -90,99 +67,24 @@ Procedure initGame(window.l)
   ProcedureReturn *game
 EndProcedure
 
-Procedure resetAnimation(*animation.Animation) ;completely resets an Animation (to be used right before setting+initializing it again)
-  *animation\currentFrame = 0
-  *animation\currentCarry = 0
-EndProcedure
-
-Procedure currentAnimLength(*animation.Animation, speed.d = 0.0) ;returns the length of an animation if played with the specified speed, or its current speed, of its base speed.
-  If (Not speed) 
-    If *animation\speed
-      speed = *animation\speed
-    Else
-      speed = *animation\model\baseSpeed
-    EndIf
-  EndIf 
+Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
   
-  If speed > 1 Or speed = -1
-    ProcedureReturn speed
-  Else
-    ProcedureReturn framesCount(*animation) * Int(1 / speed)
-  EndIf 
-EndProcedure
-
-Procedure getCurrentFrame(*animation.Animation)
-  ProcedureReturn *animation\model\frames(*animation\currentFrame)
-EndProcedure
-
-;TODO rendre les speed < 1 plus précises
-Procedure setAnimationSpeed(*anim.Animation, speed = 0)
-  Define frameCount.b, ratio.d, cutFrames.b
-  If speed = 0 ;if no speed is specified
-    *anim\speed = *anim\model\baseSpeed
-  Else
-    *anim\speed = speed
-  EndIf
+  Define *anim.Animation, *model.AnimationModel
+  *r.Fighter = AddElement(*game\fighters())
+  *r\character = *character
+  *r\x = x
+  *r\y = y
+  *r\physics\v\x = 0
+  *r\physics\v\y = 0
+  *r\physics\a\x = 0
+  *r\physics\a\y = 0
   
-  If *anim\speed = 0
-    Debug "Can't set animation speed to 0 (neither the specified speed or the base speed were non-zero, there is a problem with the base speed)"
-    *anim\speed = 1
-  EndIf 
+  initAnimation(*r\currentAnimation, getAnimation(*character, "idle"))  ;TODO make that fighters don't need to always have a current animation
   
-  If *anim\speed > 1  ;the speed must be used as a total duration of the animation
-    frameCount = framesCount(*anim\model)
-    ratio = *anim\speed / frameCount
-    *anim\frameMultiplier = Round(ratio, #PB_Round_Up)
-    If frameCount > 1 And Not (*anim\frameMultiplier + 0.0 = ratio)
-      cutFrames = (*anim\frameMultiplier * frameCount) - *anim\speed
-      *anim\carry = (1 / (frameCount - 1) * cutFrames)
-    EndIf 
-  Else
-    *anim\frameMultiplier = 1 / *anim\speed
-  EndIf 
-EndProcedure
-
-Procedure initAnimation(*anim.Animation, *model.AnimationModel)
-  *anim\currentFrame = 0
-  *anim\carry = 0
-  *anim\facing = 0
-  *anim\frameMultiplier = 1
-  *anim\model = 0
-  *anim\onFrameChanged = 0
-  *anim\speed = 1
-  *anim\finished = 0
+  *r\state = #STATE_IDLE
   
-  *anim\model = *model
-  *anim\endCallback = *model\endCallback
-  *anim\onFrameChanged = *model\frameCallback
-EndProcedure
-
-Procedure startAnimation(*anim.Animation) ;to be called when an animation start
-  *frame.Frame = getCurrentFrame(*anim)
-  If *frame\duration
-    *anim\timeLeft = *frame\duration
-  ElseIf Not *anim\speed = 1 And Not *anim\speed = -1
-    *anim\timeLeft = *anim\frameMultiplier
-  EndIf 
-EndProcedure
-
-Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0, reset.b = 0)  ;sets the current animation of a fighter
-  Define *model.AnimationModel
-  
-  If *fighter\currentAnimationName = name And Not reset
-    ProcedureReturn 0
-  EndIf
-  
-  *model = getAnimation(*fighter\character, name)
-  Debug name
-  If Not *model
-    Debug "Animation " + name + " not found. (in character " + *fighter\character\name + ".)"
-  EndIf
-  
-  *fighter\currentAnimationName = name
-  initAnimation(*fighter\currentAnimation, *model)
-  setAnimationSpeed(*fighter\currentAnimation, speed) 
-  startAnimation(*fighter\currentAnimation)
+  *r\portID = port
+  ProcedureReturn *r
 EndProcedure
 
 Procedure setStage(*game.Game, *model.StageModel) ;actually creates a stage and sets it as the current stage of the game
@@ -211,24 +113,74 @@ Procedure setStage(*game.Game, *model.StageModel) ;actually creates a stage and 
   *game\camera\x = (*game\currentStage\model\w - #SCREEN_W) / 2
 EndProcedure 
 
-Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
+;- Fighter methods ---
+
+Procedure setAnimation(*fighter.Fighter, name.s, speed.d = 0, facing = 0, reset.b = 0)  ;sets the current animation of a fighter
+  Define *model.AnimationModel
   
-  Define *anim.Animation, *model.AnimationModel
-  *r.Fighter = AddElement(*game\fighters())
-  *r\character = *character
-  *r\x = x
-  *r\y = y
-  *r\physics\v\x = 0
-  *r\physics\v\y = 0
-  *r\physics\a\x = 0
-  *r\physics\a\y = 0
+  If *fighter\currentAnimationName = name And Not reset
+    ProcedureReturn 0
+  EndIf
   
-  initAnimation(*r\currentAnimation, getAnimation(*character, "idle"))  ;TODO make that fighters don't need to always have a current animation
+  *model = getAnimation(*fighter\character, name)
+  If Not *model
+    Debug "Animation " + name + " not found. (in character " + *fighter\character\name + ".)"
+  EndIf
   
-  *r\state = #STATE_IDLE
-  
-  *r\portID = port
-  ProcedureReturn *r
+  *fighter\currentAnimationName = name
+  setAnimationModel(*fighter\currentAnimation, *model, speed)
+EndProcedure
+
+Procedure setAnimationState(*fighter.Fighter, speed.d = 0, reset.b = 0) ;sets the current animation according to the state
+  Shared stateDefaultAnimation()
+  animation.s = stateDefaultAnimation(*fighter\state)
+  setAnimation(*fighter, animation, speed, 0, reset)
+EndProcedure
+
+Procedure addFighterSprite(*fighter.Fighter, x.l = 0, y.l = 0)
+  *sprite.Sprite = AddElement(*fighter\sprites())
+  *sprite\pos\x = x
+  *sprite\pos\y = y
+  ProcedureReturn *sprite
+EndProcedure
+
+Procedure removeFighterSprite(*fighter.Fighter, *sprite)
+  ChangeCurrentElement(*fighter\sprites(), *sprite)
+  DeleteElement(*fighter\sprites())
+EndProcedure
+
+;- Fighter getters ---
+
+Procedure isFighterGrounded(*fighter.Fighter)
+  ProcedureReturn *fighter\grounded
+EndProcedure
+
+Procedure figherDirection(*fighter.Fighter)
+  ProcedureReturn *fighter\facing
+EndProcedure
+
+Procedure getCurrentAttack(*fighter.Fighter)
+  ProcedureReturn *fighter\stateInfo & %11111
+EndProcedure
+
+Procedure getCurrentAttackInfo(*fighter.Fighter)
+  ProcedureReturn *fighter\character\moves(getCurrentAttack(*fighter))
+EndProcedure
+
+Procedure.d getShieldDecrement(currentShield.d)
+  ProcedureReturn kuribrawl\variables\shieldDecay
+EndProcedure
+
+Procedure.d getShieldTiltFactor(*fighter.Fighter)
+  ProcedureReturn *fighter\character\shieldInfo\size * (1 - *fighter\shieldSize)
+EndProcedure
+
+Procedure getActualShieldX(*fighter.Fighter)
+  ProcedureReturn  *fighter\x + *fighter\character\shieldInfo\x + *fighter\shieldPosition\x
+EndProcedure
+
+Procedure getActualShieldY(*fighter.Fighter)
+  ProcedureReturn  *fighter\y + *fighter\character\shieldInfo\y + *fighter\shieldPosition\y
 EndProcedure
 
 Procedure getRealCboxX(*cbox.CollisionBox, facing)
@@ -239,45 +191,80 @@ Procedure getRealCboxX(*cbox.CollisionBox, facing)
   EndIf 
 EndProcedure
 
-;TODO supporter l'affichage des décimales
-Procedure DrawDamageText(*font.Font, damage.l, x.l, y.l)
-  If Not IsSprite(*font\fontImage)
-    error("The current font image is not an initialized sprite")
-  EndIf 
-  Define digit.b, started
-  Define w = *font\fontDimensions\x
-  digit = damage / 100
-  If digit
-    ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
-    DisplaySprite(*font\fontImage, x, y)
-    x + w
-    started = 1
-  EndIf
-  damage = damage - (digit * 100)
-  digit = damage / 10
-  If digit Or started
-    ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
-    DisplaySprite(*font\fontImage, x, y)
-    x + w
-  EndIf
-  digit = damage - digit * 10
-  ClipSprite(*font\fontImage, digit * w, 0, w, *font\fontDimensions\y)
-  DisplaySprite(*font\fontImage, x, y)
-  ProcedureReturn x + w
+;- Fighter state ---
+
+CompilerIf #DEBUG
+  Declare logState(state.b, facing.b = 0, previousTime.u = 0)
+CompilerEndIf
+Procedure setState(*fighter.Fighter, state.b, info.l = 0, updateAnim.b = 1)
+  *fighter\state = state
+  *fighter\stateInfo = info
+  CompilerIf #DEBUG
+    logState(state, *fighter\facing, *fighter\stateTimer)
+  CompilerEndIf
+  *fighter\stateTimer = 0
+  *fighter\updateAnim = updateAnim
 EndProcedure
 
-Procedure drawAnimationFrame(*frame.Frame, spriteSheet.l, x.l, y.l, facing = 1)
-  Define dx.l
-  With *frame
-    If facing = 1
-      dx = x - \origin\x
-    Else
-      dx = x + \origin\x - \display\w
-    EndIf
-    ClipSprite(spriteSheet, \display\x, \display\y, \display\w, \display\h)
-    DisplayTransparentSprite(spriteSheet, dx, y - \origin\y)
-  EndWith
+Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
+  Select jumpTypeX
+    Case #JUMP_WALKING
+      *fighter\physics\v\x + (kuribrawl\variables\walkingJumpBoost * *fighter\facing)
+    Case #JUMP_BACKWARDS
+      If jumpTypeY = #YJUMP_DOUBLE
+        *fighter\physics\v\x = (kuribrawl\variables\doubleJumpBackwardSpeed * -*fighter\facing)
+      Else  
+        *fighter\physics\v\x + (kuribrawl\variables\backwardJumpBoost * -*fighter\facing)
+      EndIf 
+  EndSelect    
+     
+  Select jumpTypeY
+    Case #YJUMP_SHORT
+      *fighter\physics\v\y = *fighter\character\shorthopSpeed
+      setAnimation(*fighter, "jump")
+    Case #YJUMP_NORMAL
+      *fighter\physics\v\y = *fighter\character\jumpSpeed
+      setAnimation(*fighter, "jump")
+    Case #YJUMP_DOUBLE
+      *fighter\physics\v\y = *fighter\character\doubleJumpSpeed
+      setAnimation(*fighter, "doublejump", 0, 0, 1)
+  EndSelect
+  *fighter\grounded = 0
+  setState(*fighter, #STATE_IDLE, 1, 0)
 EndProcedure
+
+Procedure crouch(*fighter.Fighter)
+  setState(*fighter, #STATE_CROUCH_START)
+EndProcedure
+
+Declare multiMoveFrameCallback(*fighter.Fighter, *frame.Frame)
+Procedure attack(*fighter.Fighter, attack.b)
+  Shared commandDefaultAnimation()
+  ClearList(*fighter\fightersHit())
+  setState(*fighter, #STATE_ATTACK, attack + (elementType << 8) + (element << 10), 0)
+  setAnimation(*fighter, commandDefaultAnimation(attack))
+  *fighter\currentMove = *fighter\character\moves(attack)
+  If *fighter\currentMove\multiMove
+    *fighter\currentAnimation\onFrameChanged = @multiMoveFrameCallback()
+  EndIf
+EndProcedure
+
+Procedure endAttack(*fighter)
+  Define attack.b = getCurrentAttack(*fighter)
+  setState(*fighter, #STATE_IDLE)
+EndProcedure
+
+Procedure death(*fighter.Fighter, *game.Game)
+  *fighter\x = *game\currentStage\model\w / 2
+  *fighter\y = 500
+  *fighter\physics\v\x = 0
+  *fighter\physics\v\y = 0
+  setState(*fighter, #STATE_IDLE)
+  
+  *fighter\damage = 0
+EndProcedure
+
+;- Rendering ---
 
 Procedure renderHUD(*game.Game)
   Define x.l, y.l
@@ -296,7 +283,7 @@ Procedure renderShield(*fighter.Fighter, *camera, x.l, y.l)
 EndProcedure
 
 Procedure renderFighter(*fighter.Fighter, *camera.Camera)
-  Define spriteSheet.l, facing.b, x.l, y.l
+  Define facing.b, x.l, y.l, *sprite.Sprite
   
   If *fighter\currentAnimation\facing = 0
     facing = *fighter\facing
@@ -304,18 +291,21 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
     facing = *fighter\currentAnimation\facing
   EndIf 
   
-  If facing = -1 And *fighter\currentAnimation\model\spriteSheetL
-    spriteSheet = *fighter\currentAnimation\model\spriteSheetL
-  Else
-    spriteSheet = *fighter\currentAnimation\model\spriteSheet
-  EndIf
-  
-  *frame.Frame = getCurrentFrame(*fighter\currentAnimation)
   x = *fighter\x - *camera\x
   y = #SCREEN_H - (*fighter\y - *camera\y)
-  drawAnimationFrame(*frame, spriteSheet, x, y, facing)
+  
+  *frame.Frame = renderAnimation(*fighter\currentAnimation, *camera, x, y, Bool(facing = -1))
+  
+  If ListSize(*fighter\sprites()) 
+    ForEach *fighter\sprites()
+      *sprite = @*fighter\sprites()
+      
+      renderAnimation(*sprite\animation, *camera, x + *sprite\pos\x, y - *sprite\pos\y)
+    Next
+  EndIf 
   
   ;direct drawing
+  
   StartDrawing(ImageOutput(0)) 
   If *fighter\state = #STATE_GUARD Or *fighter\state = #STATE_GUARDSTUN
     renderShield(*fighter, *camera, x, y)
@@ -413,59 +403,7 @@ Procedure renderFrame(*game.Game)
   bgc = #White
 EndProcedure
 
-Procedure applyFrameMovement(*fighter.Fighter, *frame.Frame)
-  Define add.b = 1 - ((*frame\speedMode & %10) >> 1)
-  If Not *frame\speedMode & %1000
-    *fighter\physics\v\x = *frame\speed\x + (add * *fighter\physics\v\x)
-  EndIf 
-  If Not *frame\speedMode & %10000
-    *fighter\physics\v\y = *frame\speed\y + (add * *fighter\physics\v\y)
-  EndIf 
-EndProcedure
-
-; TODO avancer les anims des stages (bg/plat)
-Procedure nextFrame(*animation.Animation, *fighter.Fighter = 0)
-  Define *frame.Frame, res.i
-  *animation\currentFrame + 1
-  *animation\finished = 0 
-  
-  If *animation\currentFrame >= *animation\model\frameNb
-    *animation\finished = 1
-    If *animation\endCallback
-      If *animation\endCallback = 1
-        ProcedureReturn
-      EndIf 
-      res = *animation\endCallback(*fighter, 0)
-      If res > 0
-        ProcedureReturn res
-      EndIf
-    EndIf 
-    resetAnimation(*animation)
-  EndIf 
-  
-  *frame = getCurrentFrame(*animation)
-  If *frame\duration
-    *animation\timeLeft = *frame\duration
-  ElseIf Not *animation\speed = 1 And Not *animation\speed = -1
-    *animation\timeLeft = *animation\frameMultiplier
-    If *animation\currentCarry >= 1
-      *animation\currentCarry - 1
-      *animation\timeLeft - 1
-    EndIf
-  EndIf
-  
-  If *animation\onFrameChanged
-    *animation\onFrameChanged(*fighter, *frame)
-  EndIf 
-  
-  If *fighter And *frame\speedMode & 1 And Not (*frame\speedMode & %100) 
-    applyFrameMovement(*fighter, *frame)
-  EndIf 
-EndProcedure
-
-Procedure skipToFrame(*animation.Animation, frame.b) ; not compatible with animations with anim modifiers. or maybe it is. idk
-  *animation\currentFrame = frame
-EndProcedure
+;- Game animations ---
 
 Procedure advanceAnimations(*game.Game)
   Define *fighter.Fighter
@@ -474,99 +412,28 @@ Procedure advanceAnimations(*game.Game)
     If *fighter\paused > 0
       ProcedureReturn 0
     EndIf
-    If *fighter\state = #STATE_LANDING
-      ;Debug *fighter\currentAnimation\timeLeft
-    EndIf 
-    If Not *fighter\currentAnimation\speed = -1
-      *fighter\currentAnimation\timeLeft - 1
-      If *fighter\currentAnimation\timeLeft <= 0
-        *fighter\currentAnimation\currentCarry + *fighter\currentAnimation\carry
-        nextFrame(*fighter\currentAnimation, *fighter)
-        ProcedureReturn 1
-      EndIf 
-    EndIf 
+    advanceAnimation(*fighter\currentAnimation, *fighter)
     *frame.Frame = getCurrentFrame(*fighter\currentAnimation)
     If *frame\speedMode & %101
       applyFrameMovement(*fighter, *frame)
     EndIf  
+    
+    If ListSize(*fighter\sprites())
+      ForEach *fighter\sprites()
+        advanceAnimation(*fighter\sprites()\animation)
+      Next
+    EndIf
   Next
 EndProcedure
 
-Procedure isFighterGrounded(*fighter.Fighter)
-  ProcedureReturn *fighter\grounded
-EndProcedure
-
-Procedure figherDirection(*fighter.Fighter)
-  ProcedureReturn *fighter\facing
-EndProcedure
-
-Procedure getCurrentAttack(*fighter.Fighter)
-  ProcedureReturn *fighter\stateInfo & %11111
-EndProcedure
-
-Procedure getCurrentAttackInfo(*fighter.Fighter)
-  ProcedureReturn *fighter\character\moves(getCurrentAttack(*fighter))
-EndProcedure
-
-CompilerIf #DEBUG
-  Declare logState(state.b, facing.b = 0, previousTime.u = 0)
-CompilerEndIf
-Procedure setState(*fighter.Fighter, state.b, info.l = 0, updateAnim.b = 1)
-  *fighter\state = state
-  *fighter\stateInfo = info
-  CompilerIf #DEBUG
-    logState(state, *fighter\facing, *fighter\stateTimer)
-  CompilerEndIf
-  *fighter\stateTimer = 0
-  *fighter\updateAnim = updateAnim
-EndProcedure
-
-Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
-  Select jumpTypeX
-    Case #JUMP_WALKING
-      *fighter\physics\v\x + (kuribrawl\variables\walkingJumpBoost * *fighter\facing)
-    Case #JUMP_BACKWARDS
-      If jumpTypeY = #YJUMP_DOUBLE
-        *fighter\physics\v\x = (kuribrawl\variables\doubleJumpBackwardSpeed * -*fighter\facing)
-      Else  
-        *fighter\physics\v\x + (kuribrawl\variables\backwardJumpBoost * -*fighter\facing)
-      EndIf 
-  EndSelect    
-     
-  Select jumpTypeY
-    Case #YJUMP_SHORT
-      *fighter\physics\v\y = *fighter\character\shorthopSpeed
-      setAnimation(*fighter, "jump")
-    Case #YJUMP_NORMAL
-      *fighter\physics\v\y = *fighter\character\jumpSpeed
-      setAnimation(*fighter, "jump")
-    Case #YJUMP_DOUBLE
-      *fighter\physics\v\y = *fighter\character\doubleJumpSpeed
-      setAnimation(*fighter, "doublejump", 0, 0, 1)
-  EndSelect
-  *fighter\grounded = 0
-  setState(*fighter, #STATE_IDLE, 1, 0)
-EndProcedure
-
-Procedure crouch(*fighter.Fighter)
-  setState(*fighter, #STATE_CROUCH_START)
-EndProcedure
-
-Declare multiMoveFrameCallback(*fighter.Fighter, *frame.Frame)
-Procedure attack(*fighter.Fighter, attack.b)
-  Shared commandDefaultAnimation()
-  ClearList(*fighter\fightersHit())
-  setState(*fighter, #STATE_ATTACK, attack + (elementType << 8) + (element << 10), 0)
-  setAnimation(*fighter, commandDefaultAnimation(attack))
-  *fighter\currentMove = *fighter\character\moves(attack)
-  If *fighter\currentMove\multiMove
-    *fighter\currentAnimation\onFrameChanged = @multiMoveFrameCallback()
-  EndIf
-EndProcedure
-
-Procedure endAttack(*fighter)
-  Define attack.b = getCurrentAttack(*fighter)
-  setState(*fighter, #STATE_IDLE)
+Procedure applyFrameMovement(*fighter.Fighter, *frame.Frame)
+  Define add.b = 1 - ((*frame\speedMode & %10) >> 1)
+  If Not *frame\speedMode & %1000
+    *fighter\physics\v\x = *frame\speed\x + (add * *fighter\physics\v\x)
+  EndIf 
+  If Not *frame\speedMode & %10000
+    *fighter\physics\v\y = *frame\speed\y + (add * *fighter\physics\v\y)
+  EndIf 
 EndProcedure
 
 Procedure defaultJumpAnimCallback(*fighter.Fighter, *data)
@@ -584,12 +451,6 @@ Procedure multiMoveFrameCallback(*fighter.Fighter, *frame.Frame)
   ElseIf part <= ArraySize(*fighter\currentMove\multiMove\partStartFrames()) And *fighter\currentAnimation\currentFrame = *fighter\currentMove\multiMove\partStartFrames(part)
     endAttack(*fighter)
   EndIf 
-EndProcedure
-
-Procedure setAnimationState(*fighter.Fighter, speed.d = 0, reset.b = 0) ;sets the current animation according to the state
-  Shared stateDefaultAnimation()
-  animation.s = stateDefaultAnimation(*fighter\state)
-  setAnimation(*fighter, animation, speed, 0, reset)
 EndProcedure
 
 ;système d'acceptable animations
@@ -629,21 +490,7 @@ Procedure initFighters(*game.Game)
   updateAnimations(*game)
 EndProcedure
 
-Procedure.d getShieldDecrement(currentShield.d)
-  ProcedureReturn kuribrawl\variables\shieldDecay
-EndProcedure
-
-Procedure.d getShieldTiltFactor(*fighter.Fighter)
-  ProcedureReturn *fighter\character\shieldInfo\size * (1 - *fighter\shieldSize)
-EndProcedure
-
-Procedure getActualShieldX(*fighter.Fighter)
-  ProcedureReturn  *fighter\x + *fighter\character\shieldInfo\x + *fighter\shieldPosition\x
-EndProcedure
-
-Procedure getActualShieldY(*fighter.Fighter)
-  ProcedureReturn  *fighter\y + *fighter\character\shieldInfo\y + *fighter\shieldPosition\y
-EndProcedure
+;- Hits ---
 
 Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
   If x1 < x2 + w2 And
@@ -807,16 +654,6 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
     EndSelect
 EndProcedure
 
-Procedure death(*fighter.Fighter, *game.Game)
-  *fighter\x = *game\currentStage\model\w / 2
-  *fighter\y = 500
-  *fighter\physics\v\x = 0
-  *fighter\physics\v\y = 0
-  setState(*fighter, #STATE_IDLE)
-  
-  *fighter\damage = 0
-EndProcedure
-
 Procedure manageHitboxes(*game.Game)
   Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox, shieldHit.b, *attackingFrame.Frame, *defendingFrame.Frame
   ForEach *game\fighters()
@@ -866,6 +703,10 @@ Procedure manageHitboxes(*game.Game)
   Next  
 EndProcedure
 
+;- Game methods ---
+
+
+
 Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
   freeGame(*game)
@@ -888,29 +729,10 @@ Procedure increaseFrameRate()
   frameRate + 5
   updateFrameRate()
 EndProcedure
-  
-; ====start=====
-; 605
-; 372
-; 40
-; 14
-; 594
-; 330
-; 40.0
-; Shield Not hit
-; ====start=====
-; 605
-; 362
-; 40
-; 14
-; 594
-; 330
-; 40.0
-; Shield hit
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 558
-; FirstLine = 525
-; Folding = --v--------
+; CursorPosition = 707
+; FirstLine = 676
+; Folding = --v------
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

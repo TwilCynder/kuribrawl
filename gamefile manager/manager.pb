@@ -332,6 +332,9 @@ Procedure writeFileDescriptor(type.b, infos.s)
         CloseFile(2)
       Else
         value = StringField(infos, 1, " ")
+        If value = ""
+          value = "1"
+        EndIf 
         PrintN("- frame number : " + value)
         WriteByte(1, Val(value))
         value = StringField(infos, 2, " ")
@@ -452,8 +455,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 128
-; FirstLine = 81
+; CursorPosition = 334
+; FirstLine = 315
 ; Folding = ---
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

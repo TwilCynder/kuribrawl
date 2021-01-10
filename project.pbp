@@ -7,9 +7,13 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-06 00:11" user="twilc" host="TWIL-DESKTOP"/>
+    <lastopen date="2021-01-10 01:15" user="twilc" host="TWIL-DESKTOP"/>
   </section>
   <section name="files">
+    <file name="src\animationlib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="cf365efea0bbc266b9e352e9b52e13d6"/>
+    </file>
     <file name="src\animations.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5="a9d6b398b113a35cbfe22eeb1bb4d066"/>
@@ -40,11 +44,11 @@
     </file>
     <file name="src\gamelib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="6b56dad831b2f7144001ede07083bcdd"/>
+      <fingerprint md5="b20dcb5fee3ea936e09f9b01f965f3a9"/>
     </file>
     <file name="src\gamelibConstants.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="e1882d5af88d331df1d92cd22f4fd381"/>
+      <fingerprint md5="94fa803d429c22f771b3cb72b1ba4082"/>
     </file>
     <file name="src\inputlib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -64,7 +68,7 @@
     </file>
     <file name="src\main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="9252f82e51b3628bf5c95160411d7b6d"/>
+      <fingerprint md5="aa98373b35565bb2987c7f12b457bf86"/>
     </file>
     <file name="src\physicslib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -76,7 +80,7 @@
     </file>
     <file name="src\utilCore.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="ec8d066a0b5b63c16645f7a643e244b6"/>
+      <fingerprint md5="fa4b74c1c4c017edfcc72a08fa0d72e0"/>
     </file>
   </section>
   <section name="targets">

@@ -106,6 +106,8 @@ doublejump_strip8.png
 A:Acid/doublejump doublejump.dat
 doublejump_strip8L.png
 AL:Acid/doublejump
+test_secondary_sprite.png
+A:Acid/test_sprite 4 0.1
 stage_plat_main.png
 A:_Snowdin/platform platform.dat
 stage_bg.png

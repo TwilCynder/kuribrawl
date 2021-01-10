@@ -78,6 +78,12 @@ Enumeration
   #HIT_CUSTOM
 EndEnumeration
 
+Enumeration 
+  #POSITION_RELATIVE_OWNER
+  #POSITION_ABSOLUTE ;to use with movements
+  #POSITION_RELATIVE_SCREEN ;idk how it can be useful but maybe one day idk
+EndEnumeration
+
 Enumeration ;commands
   #COMMAND_Jab
   #COMMAND_FTilt
@@ -112,6 +118,6 @@ EndEnumeration
 #MAX_BUTTON_NB = 31
 #MAX_AXIS_NB = 8
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 46
-; FirstLine = 9
+; CursorPosition = 81
+; FirstLine = 66
 ; EnableXP
