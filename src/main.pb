@@ -19,6 +19,7 @@ Global testVar.b
 
 XIncludeFile "utilCore.pb"
 XIncludeFile "filelib.pb"
+XIncludeFile "menulib.pbi"
 XIncludeFile "gameDataLib.pbi"
 XIncludeFile "loadlib.pb"
 XIncludeFile "animationlib.pbi"
@@ -27,26 +28,26 @@ XIncludeFile "cleanseLib.pbi"
 XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
+XIncludeFile "mainlib.pbi"
+
 XIncludeFile "gameData.pb"
+XIncludeFile "menus.pbi"
 
 CompilerIf #DEBUG
   XIncludeFile "debug.pb"
 CompilerEndIf
 
-Define *game.Game, window.l
-
+Define main.MainData, window.l
 
 Procedure startTestGame()
-  Shared *game, window
-  If *game
-    Debug *game
-    endGame(*game)
+  Shared main, window
+  If main\currentGame
+    Debug "A game is already running. (game object adress : " + Hex(main\currentGame) 
+    endGame(main\currentGame)
   EndIf 
   
-  *game = initGame(window)
-  
-  setStage(*game, getStage("Snowdin"))
-  *f1.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
+  main\currentGame = startGame(window, get
+  *f1.Fighter = newFighter(main\currentGame, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
   *f1\name = "Test One"
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
@@ -56,12 +57,8 @@ Procedure startTestGame()
   setPort(1, 3)
   setPortFighter(1, *f2)
   
-  *sprite = addFighterSprite(*f2, 30, 30)
-  setSpriteAnimation(*sprite, getAnimation(getCharacter("Acid"), "test_sprite"))
-  
   initFighters(*game)
 EndProcedure  
-
 
 ;- Game window
 window = OpenWindow(-1, 0, 0, #SCREEN_W + 210, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
@@ -153,8 +150,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 98
-; FirstLine = 62
-; Folding = 8
+; CursorPosition = 48
+; FirstLine = 21
+; Folding = z
 ; EnableXP
 ; EnableUnicode

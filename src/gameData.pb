@@ -25,18 +25,18 @@ commandDefaultAnimation(#COMMAND_Jab) = "jab"
 
 ;- ========VARIABLES=====================
 
-kuribrawl\variables\walkingJumpBoost = 3.0
-kuribrawl\variables\backwardJumpBoost = 3.0
-kuribrawl\variables\doubleJumpBackwardSpeed = 3.0
-kuribrawl\variables\cameraMaxSpeed = 10
-kuribrawl\variables\shieldStartup = 2
-kuribrawl\variables\shieldEndlag = 6
-kuribrawl\variables\minimumShieldDuration = 2
-kuribrawl\variables\shieldDecay = 0.004
-kuribrawl\variables\shieldRegen = 0.002
+kuribrawl\ingameData\walkingJumpBoost = 3.0
+kuribrawl\ingameData\backwardJumpBoost = 3.0
+kuribrawl\ingameData\doubleJumpBackwardSpeed = 3.0
+kuribrawl\ingameData\cameraMaxSpeed = 10
+kuribrawl\ingameData\shieldStartup = 2
+kuribrawl\ingameData\shieldEndlag = 6
+kuribrawl\ingameData\minimumShieldDuration = 2
+kuribrawl\ingameData\shieldDecay = 0.004
+kuribrawl\ingameData\shieldRegen = 0.002
 
-kuribrawl\variables\knockbackMult = 0.1
-kuribrawl\variables\knockbackBase = 10
+kuribrawl\ingameData\knockbackMult = 0.1
+kuribrawl\ingameData\knockbackBase = 10
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 37
+; CursorPosition = 38
 ; EnableXP

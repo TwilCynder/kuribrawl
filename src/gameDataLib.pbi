@@ -124,7 +124,7 @@ Structure StageModel
   *backgroundAnim.AnimationModel  ;pointer to one the the animModels of tha animations map
 EndStructure
 
-Structure GameVariables
+Structure IngameData
   backwardJumpBoost.d
   walkingJumpBoost.d
   doubleJumpBackwardSpeed.d
@@ -134,7 +134,6 @@ Structure GameVariables
   shieldDecay.d
   shieldRegen.d
   cameraMaxSpeed.d
-  
   knockbackMult.d
   knockbackBase.d
 EndStructure
@@ -151,7 +150,8 @@ EndStructure
 Structure GameData
   Map characters.Champion()
   Map stages.StageModel()
-  variables.GameVariables
+  Map menus.Menu()
+  ingameData.IngameData
   HUD.HUDInfo
 EndStructure  
 Global kuribrawl.GameData
@@ -358,7 +358,7 @@ Procedure initChampion(*char.Champion)
   *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 342
-; FirstLine = 307
+; CursorPosition = 152
+; FirstLine = 123
 ; Folding = -----
 ; EnableXP

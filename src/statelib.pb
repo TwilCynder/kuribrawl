@@ -103,9 +103,9 @@ Procedure manageStates(*game.Game)
           EndIf
       EndSelect
       If *fighter\state = #STATE_GUARD
-        *fighter\shieldSize - kuribrawl\variables\shieldDecay
+        *fighter\shieldSize - kuribrawl\ingameData\shieldDecay
       ElseIf Not *fighter\state = #STATE_GUARDSTUN
-        *fighter\shieldSize + kuribrawl\variables\shieldRegen
+        *fighter\shieldSize + kuribrawl\ingameData\shieldRegen
         If *fighter\shieldSize > 1
           *fighter\shieldSize = 1.0
         EndIf 
@@ -114,7 +114,7 @@ Procedure manageStates(*game.Game)
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 65
-; FirstLine = 48
+; CursorPosition = 107
+; FirstLine = 63
 ; Folding = -
 ; EnableXP

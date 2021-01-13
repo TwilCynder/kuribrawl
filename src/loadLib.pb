@@ -63,10 +63,10 @@ EndProcedure
 
 Procedure adaptChampionValues(*champion.Champion)
   If *champion\shieldStartup = #MAX_VALUE_BYTE
-    *champion\shieldStartup = kuribrawl\variables\shieldStartup
+    *champion\shieldStartup = kuribrawl\ingameData\shieldStartup
   EndIf 
   If *champion\shieldEndlag = #MAX_VALUE_BYTE
-    *champion\shieldEndlag = kuribrawl\variables\shieldEndlag
+    *champion\shieldEndlag = kuribrawl\ingameData\shieldEndlag
   EndIf
 EndProcedure
 
@@ -337,7 +337,7 @@ Procedure loadGameData(path.s)
         sprite = LoadSprite_(*buffer, tag)
         checkInterfile()
       Default
-        Debug "Error at " + Str(Loc(0)) + " : unexpected byte (not a filetype)"
+        Debug "Error at " + Hex(Loc(0)) + " : unexpected byte (not a filetype)"
         skipToNextInterfile()
     EndSelect  
   Until Eof(0)
@@ -348,7 +348,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 60
-; FirstLine = 15
+; CursorPosition = 68
+; FirstLine = 64
 ; Folding = --
 ; EnableXP

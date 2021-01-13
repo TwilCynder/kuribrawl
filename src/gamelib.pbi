@@ -172,7 +172,7 @@ Procedure getCurrentAttackInfo(*fighter.Fighter)
 EndProcedure
 
 Procedure.d getShieldDecrement(currentShield.d)
-  ProcedureReturn kuribrawl\variables\shieldDecay
+  ProcedureReturn kuribrawl\ingameData\shieldDecay
 EndProcedure
 
 Procedure.d getShieldTiltFactor(*fighter.Fighter)
@@ -213,12 +213,12 @@ EndProcedure
 Procedure jump(*fighter.Fighter, jumpTypeX.b, jumpTypeY.b)
   Select jumpTypeX
     Case #JUMP_WALKING
-      *fighter\physics\v\x + (kuribrawl\variables\walkingJumpBoost * *fighter\facing)
+      *fighter\physics\v\x + (kuribrawl\ingameData\walkingJumpBoost * *fighter\facing)
     Case #JUMP_BACKWARDS
       If jumpTypeY = #YJUMP_DOUBLE
-        *fighter\physics\v\x = (kuribrawl\variables\doubleJumpBackwardSpeed * -*fighter\facing)
+        *fighter\physics\v\x = (kuribrawl\ingameData\doubleJumpBackwardSpeed * -*fighter\facing)
       Else  
-        *fighter\physics\v\x + (kuribrawl\variables\backwardJumpBoost * -*fighter\facing)
+        *fighter\physics\v\x + (kuribrawl\ingameData\backwardJumpBoost * -*fighter\facing)
       EndIf 
   EndSelect    
      
@@ -360,10 +360,10 @@ Procedure renderFrame(*game.Game)
     medPos\y / ListSize(*game\fighters())
     medPos\y - (#SCREEN_H / 2)
     
-    If Abs (*game\camera\x - medPos\x) < kuribrawl\variables\cameraMaxSpeed
+    If Abs (*game\camera\x - medPos\x) < kuribrawl\ingameData\cameraMaxSpeed
       *game\camera\x = medPos\x
     Else
-      *game\camera\x + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\x - medPos\x))
+      *game\camera\x + (kuribrawl\ingameData\cameraMaxSpeed * -Sign(*game\camera\x - medPos\x))
     EndIf 
     
     If *game\camera\x < *game\currentStage\model\cameraZone\left
@@ -372,10 +372,10 @@ Procedure renderFrame(*game.Game)
       *game\camera\x =  *game\currentStage\model\cameraZone\right - #SCREEN_W
     EndIf 
     
-    If Abs (*game\camera\y - medPos\y) < kuribrawl\variables\cameraMaxSpeed
+    If Abs (*game\camera\y - medPos\y) < kuribrawl\ingameData\cameraMaxSpeed
       *game\camera\y = medPos\y
     Else
-      *game\camera\y + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\y - medPos\y))
+      *game\camera\y + (kuribrawl\ingameData\cameraMaxSpeed * -Sign(*game\camera\y - medPos\y))
     EndIf 
     
     If *game\camera\y < *game\currentStage\model\cameraZone\bottom
@@ -538,7 +538,7 @@ Procedure testRectCircleCollision(rx.l, ry.l, rw.l, rh.l, cx.l, cy.l, cr.l)
 EndProcedure
 
 Procedure getKnockback(percentage.l, bkb.f, skb.f, weight.d)
-  ProcedureReturn bkb + (((percentage * weight) + kuribrawl\variables\knockbackBase) * skb * kuribrawl\variables\knockbackMult)
+  ProcedureReturn bkb + (((percentage * weight) + kuribrawl\ingameData\knockbackBase) * skb * kuribrawl\ingameData\knockbackMult)
 EndProcedure
 
 Procedure getHitlag(damage.d)
@@ -712,8 +712,14 @@ EndProcedure
 
 ;- Game methods ---
 
-Procedure startGame(window.l, *stage.StageModel)
+Procedure startGame(window.l, stage.s)
   *game.Game = initGame(window.l)
+  
+  *stage = getStage(stage)
+  If Not *stage
+    error("Can't load stage " + stage
+  EndIf 
+  
   setStage(*game, *stage)
   ProcedureReturn 
 EndProcedure
@@ -721,6 +727,11 @@ EndProcedure
 Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
   freeGame(*game)
+EndProcedure
+
+Declare setPortFighter()
+Procedure addFighter()
+  
 EndProcedure
 
 Procedure updateFrameRate()
@@ -741,8 +752,8 @@ Procedure increaseFrameRate()
   updateFrameRate()
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 407
-; FirstLine = 360
+; CursorPosition = 731
+; FirstLine = 680
 ; Folding = -+--------
 ; EnableXP
 ; SubSystem = OpenGL

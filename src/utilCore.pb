@@ -16,6 +16,10 @@ Macro error(stuff)
   End
 EndMacro
 
+Macro DebugHex(stuff)
+  Debug Hex(stuff)
+EndMacro
+
 Macro getField(pointer, Structure, field, type)
   Peek#type(pointer + OffsetOf(Structure\field))
 EndMacro
@@ -53,6 +57,6 @@ Macro BGRA(r, g, b, a)
   RGBA(b, g, r, a)
 EndMacro
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 14
+; CursorPosition = 20
 ; Folding = --
 ; EnableXP

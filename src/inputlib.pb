@@ -596,11 +596,8 @@ EndProcedure
 Procedure checkInputReleases(*port.Port)
   Select *port\figher\state
     Case #STATE_GUARD
-      If *port\figher\stateTimer >= kuribrawl\variables\minimumShieldDuration And Not *port\guardPressed
+      If *port\figher\stateTimer >= kuribrawl\ingameData\minimumShieldDuration And Not *port\guardPressed
         shieldEndlag.b = *port\figher\character\shieldEndlag
-        If Not shieldEndlag
-          shieldEndlag = kuribrawl\variables\shieldEndlag
-        EndIf 
         setState(*port\figher, #STATE_GUARD_STOP, shieldEndlag)
       EndIf 
   EndSelect 
@@ -669,7 +666,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 125
-; FirstLine = 125
+; CursorPosition = 599
+; FirstLine = 576
 ; Folding = ------
 ; EnableXP
