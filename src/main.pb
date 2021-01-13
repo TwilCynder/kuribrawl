@@ -28,7 +28,12 @@ XIncludeFile "cleanseLib.pbi"
 XIncludeFile "physicslib.pb"
 XIncludeFile "inputlib.pb"
 XIncludeFile "statelib.pb"
+<<<<<<< Updated upstream
 XIncludeFile "mainlib.pbi"
+=======
+XIncludeFile "gametools.pbi"
+XIncludeFile "menu.pbi"
+>>>>>>> Stashed changes
 
 XIncludeFile "gameData.pb"
 XIncludeFile "menus.pbi"
@@ -46,17 +51,25 @@ Procedure startTestGame()
     endGame(main\currentGame)
   EndIf 
   
+<<<<<<< Updated upstream
   main\currentGame = startGame(window, get
   *f1.Fighter = newFighter(main\currentGame, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
   *f1\name = "Test One"
   *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
   *f2\name = "Test Two"
   
+=======
+>>>>>>> Stashed changes
   setPort(0, 0)
-  setPortFighter(0, *f1)
   setPort(1, 3)
-  setPortFighter(1, *f2)
   
+<<<<<<< Updated upstream
+=======
+  *game = startGame(window, "Snowdin")
+  addFighter(*game, "Acid", *game\currentStage\model\w / 2 -200, 300, 0, "TwilCynder")
+  addFighter(*game, "Acid", *game\currentStage\model\w / 2 +200, 300, 0, "Naelink")
+  
+>>>>>>> Stashed changes
   initFighters(*game)
 EndProcedure  
 
@@ -93,7 +106,7 @@ Next
 initHUD()
 
 ;- Starting the game (test)
-;startTestGame()
+startTestGame()
 
 ;- Main loop (game)
 
@@ -150,8 +163,13 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+<<<<<<< Updated upstream
 ; CursorPosition = 48
 ; FirstLine = 21
 ; Folding = z
+=======
+; CursorPosition = 30
+; Folding = 8
+>>>>>>> Stashed changes
 ; EnableXP
 ; EnableUnicode

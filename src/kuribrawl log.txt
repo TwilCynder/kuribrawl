@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 Execution lasted 2941ms  and 174 frames were displayed (average framewait : 14).
+=======
+Execution lasted 64846ms  and 3873 frames were displayed (average framewait : 8).
+>>>>>>> Stashed changes

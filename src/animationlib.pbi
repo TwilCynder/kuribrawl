@@ -1,7 +1,6 @@
 ﻿;-structures
 
-Structure Animation
-  *model.AnimationModel 
+Structure AnimationBase ;should NOT be used, as it has no model
   currentFrame.b  ;index of the current frame
   timeLeft.d
   speed.d  ;current speed
@@ -12,6 +11,14 @@ Structure Animation
   finished.b ;indicates that this animation has reached its end. It has already looped back to the first frame.
   onFrameChanged.f_callback ;TODO remplacer par un vrai système d'event
   endCallback.f_callback
+EndStructure  
+  
+Structure Animation Extends AnimationBase
+  *model.AnimationModel
+EndStructure
+
+Structure FighterAnimation Extends AnimationBase
+  *model.FighterAnimationModel
 EndStructure
 
 Structure Sprite
@@ -138,7 +145,7 @@ Procedure DrawDamageText(*font.Font, damage.l, x.l, y.l)
   ProcedureReturn x + w
 EndProcedure
 
-Procedure drawAnimationFrame(*frame.Frame, spriteSheet.l, x.l, y.l, facing = 1)
+Procedure drawAnimationFrame(*frame.Frame, spriteSheet.l, x.l, y.l)
   Define dx.l
   With *frame
     If facing = 1
@@ -151,8 +158,14 @@ Procedure drawAnimationFrame(*frame.Frame, spriteSheet.l, x.l, y.l, facing = 1)
   EndWith
 EndProcedure
 
+Procedure handleFighterAnims_nextFrame(*frame.FighterFrame, *owner = 0)
+  If isFighterAnim And *owner And *frame\speedMode & 1 And Not (*frame\speedMode & %100) 
+    applyFrameMovement(*owner, *frame)
+  EndIf 
+EndProcedure
+
 ; TODO avancer les anims des stages (bg/plat)
-Procedure nextFrame(*animation.Animation, *owner = 0)
+Procedure nextFrame(*animation.Animation, *owner = 0, isFighterAnim.b = 0)
   Define *frame.Frame, res.i
   *animation\currentFrame + 1
   *animation\finished = 0 
@@ -186,29 +199,34 @@ Procedure nextFrame(*animation.Animation, *owner = 0)
     *animation\onFrameChanged(*owner, *frame)
   EndIf 
   
-  If *owner And *frame\speedMode & 1 And Not (*frame\speedMode & %100) 
-    applyFrameMovement(*owner, *frame)
+  If isFighterAnim
+    handleFighterAnims_nextFrame(*frame, *owner)
   EndIf 
 EndProcedure
 
-Procedure advanceAnimation(*animation.Animation, *owner = 0)
+Procedure advanceAnimation(*animation.Animation, *owner = 0, isFighterAnim.b = 0)
   If Not *animation\speed = -1 And *animation\model
     *animation\timeLeft - 1
     If *animation\timeLeft <= 0
       *animation\currentCarry + *animation\carry
-      nextFrame(*animation, *owner)
+      nextFrame(*animation, *owner, isFighterAnim)
       ProcedureReturn 1
     EndIf 
   EndIf 
 EndProcedure
 
-Procedure renderAnimation(*animation.Animation, *camera.Camera, x.l, y.l, useLeftSpritesheet.b = 0)
+Procedure renderAnimation(*animation.Animation, *camera.Camera, x.l, y.l)
   *frame.Frame = getCurrentFrame(*animation)
+  drawAnimationFrame(*frame, *animation\model\spriteSheet, x, y)
+EndProcedure
+
+Procedure renderFighterAnimation(*animation.FighterAnimation, *camera.Camera, x.l, y.l, useLeftSpritesheet.b = 0)
+  *frame.FighterFrame = getCurrentFrame(*animation)
   
   If useLeftSpritesheet And *animation\model\spriteSheetL
-    drawAnimationFrame(*frame, *animation\model\spriteSheetL, x, y, facing)
+    drawAnimationFrame(*frame, *animation\model\spriteSheetL, x, y)
   Else
-    drawAnimationFrame(*frame, *animation\model\spriteSheet, x, y, facing)
+    drawAnimationFrame(*frame, *animation\model\spriteSheet, x, y)
   EndIf 
   
   ProcedureReturn *frame
@@ -225,7 +243,7 @@ Procedure setSpriteAnimation(*sprite.Sprite, *model.AnimationModel, speed.d = 0)
   setAnimationModel(*sprite\animation, *model, speed)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 205
-; FirstLine = 174
+; CursorPosition = 223
+; FirstLine = 191
 ; Folding = ---
 ; EnableXP

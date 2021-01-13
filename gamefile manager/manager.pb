@@ -358,7 +358,7 @@ Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   EndIf 
   writeType(type)
   writeFileTag(tag)
-  PrintN("Pointer position : " + Str(Loc(1)))
+  PrintN("Pointer position : " + Hex(Loc(1)))
   If type = #FILETYPE_CHAMPION Or type = #FILETYPE_STAGE
     WriteFileLength(0)
     writeFileDescriptor(type, path)
@@ -455,8 +455,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 334
-; FirstLine = 315
+; CursorPosition = 360
+; FirstLine = 356
 ; Folding = ---
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico

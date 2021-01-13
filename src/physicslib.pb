@@ -175,13 +175,14 @@ Procedure applyPhysics(*game.Game)
    ;--- Vérification de sortie de blastzone
       ;TODO: calculer l'angle de sortie
     If ny < 0 Or nx < 0 Or nx > *game\currentStage\model\w Or (ny > *game\currentStage\model\h And *fighter\state = #STATE_HITSTUN)
-      Debug "DEATH"
+      Debug "DEATH (" + *fighter\name + ")" 
       death(*fighter, *game)
     EndIf
     
   Next 
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 23
+; CursorPosition = 177
+; FirstLine = 131
 ; Folding = --
 ; EnableXP

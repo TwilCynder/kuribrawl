@@ -137,7 +137,7 @@ Procedure readInputs(*game.Game)
   For i = 0 To 3
     *port = @ports(i)
     
-    If Not (*port\active And *game)
+    If Not (*port\active And *game And *port\figher)
       Continue  
     EndIf 
     
@@ -180,8 +180,8 @@ Procedure readInputs(*game.Game)
     ElseIf *port\currentControlStickState\x > stickTreshold And *port\previousState\axis[id]\x < stickTreshold And 
       *port\controlStickBuffer[#DIRECTION_LEFT] = 0
       *port\controlStickBuffer[#DIRECTION_RIGHT] = 1
-    ElseIf *port\currentControlStickState\x < -stickSmashTreshold
-      If *port\previousState\axis[id]\x > -stickTreshold XOr *port\controlStickBuffer[#DIRECTION_LEFT] = 1
+    ElseIf *port\currentControlStickState\x < - stickSmashTreshold
+      If *port\previousState\axis[id]\x > - stickTreshold XOr *port\controlStickBuffer[#DIRECTION_LEFT] = 1
         registerInput(*game, i, #INPUT_ControlStick_SLEFT)
         registerInput(*game, i, #INPUT_ControlStick_LEFT)
       EndIf 
@@ -614,7 +614,7 @@ Procedure updateInputs(*game.Game)
   Shared inputCode.l, ports(), *inputManagers(), *port.Port
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
   For i = 0 To 3
-    If Not ports(i)\active
+    If Not (ports(i)\active And ports(i)\figher)
       Continue  
     EndIf 
     *port = ports(i)
@@ -653,7 +653,7 @@ Procedure updateInputs(*game.Game)
   Next 
   
   For i = 0 To 3
-    If Not ports(i)\active
+    If Not (ports(i)\active And ports(i)\figher)
       Continue  
     EndIf 
     *port = ports(i)
@@ -666,7 +666,12 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+<<<<<<< Updated upstream
 ; CursorPosition = 599
 ; FirstLine = 576
+=======
+; CursorPosition = 182
+; FirstLine = 148
+>>>>>>> Stashed changes
 ; Folding = ------
 ; EnableXP

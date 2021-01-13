@@ -93,7 +93,7 @@ Procedure LoadSprite_(*buffer, tag.s)
   ProcedureReturn sprite
 EndProcedure
 
-Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, originType)
+Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, animType.b)
   If Not *animation
     Debug "makeframes : Animation is null"
   EndIf 
@@ -102,7 +102,7 @@ Procedure makeFrames(*animation.AnimationModel, w.l, h.l, nb.b, originType)
   x = 0
   y = 0
   w = w / nb
-  If originType = #ANIMATIONTYPE_CHAMPION
+  If animType = #ANIMATIONTYPE_CHAMPION
     For i = 0 To nb - 1
       setFrameProperties(*animation\frames(i), x, y, w, h, w / 2, h)
       x + w
@@ -130,7 +130,45 @@ Procedure tryStage(name.s)
   EndIf 
   ProcedureReturn *r
 EndProcedure
-  
+
+Procedure selectFighterAnimationInfo(*animation.FighterAnimationModel, value, selectedElement.b)
+  Select value
+    Case #FILEMARKER_FRAMEMOVEMENT
+      *animation\frames(selectedElement)\speedMode = ReadByte(0)
+      *animation\frames(selectedElement)\speed\x = ReadDouble(0)
+      *animation\frames(selectedElement)\speed\y = ReadDouble(0)
+    Case #FILEMARKER_HITBOXINFO
+      selectedElement = ReadByte(0)
+      x.l = ReadWord(0)
+      y.l = ReadWord(0)
+      w.l = ReadWord(0)
+      h.l = ReadWord(0)
+      addHitbox(*animation\frames(selectedElement), x, y, w, h)
+      *animation\frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
+      *animation\frames(selectedElement)\hitboxes()\angle = ReadWord(0)
+      *animation\frames(selectedElement)\hitboxes()\bkb = ReadFloat(0)
+      *animation\frames(selectedElement)\hitboxes()\skb = ReadFloat(0)
+      *animation\frames(selectedElement)\hitboxes()\priority = ReadByte(0)
+      *animation\frames(selectedElement)\hitboxes()\hit = ReadByte(0)
+    Case #FILEMARKER_HURTBOXINFO
+      selectedElement = ReadByte(0)
+      x.l = ReadWord(0)
+      If x = $5454
+        x = - *animation\frames(selectedElement)\origin\x
+        y = - *animation\frames(selectedElement)\origin\y
+        w = *animation\frames(selectedElement)\display\w
+        h = *animation\frames(selectedElement)\display\h
+      Else
+        y.l = ReadWord(0)
+        w.l = ReadWord(0)
+        h.l = ReadWord(0)
+      EndIf
+      addHurtbox(*animation\frames(selectedElement), x, y, w, h)
+    Default 
+      error("Loading : unexpected filemarker byte " + Str(byte) + " in animation descriptor For " + tag + " at " + Hex(Loc(0)))
+  EndSelect
+EndProcedure
+
 Procedure loadGameData(path.s)
   Shared loadedSprites()
   ;- opening file
@@ -139,7 +177,7 @@ Procedure loadGameData(path.s)
   EndIf 
   readVersion()
 
-  Define sprite.l, type.b, tag.s, size.l, *buffer, byte.b, *animation.AnimationModel, *character.Champion, selectedElement.b, value.l, x.l, y.l, w.l, h.l, valueF.f, subType.b, value$
+  Define sprite.l, type.b, tag.s, size.l, *buffer, byte.b, *character.Champion, selectedElement.b, value.l, x.l, y.l, w.l, h.l, valueF.f, subType.b, value$
   
   *buffer = 0
   Repeat
@@ -221,33 +259,31 @@ Procedure loadGameData(path.s)
       Case #FILETYPE_ANIMATION
         ;- - File type : Animation
         ;- - - Parsing animation tag
-        character.s = StringField(tag, 1, "/")
+        namespace.s = StringField(tag, 1, "/")
         animationName.s = StringField(tag, 2, "/")
         
         ;- - - Loading spritesheet
         LoadSprite_(*buffer, tag)
         
-        *animation = 0
+        *animation.AnimationModel = 0
         
-        ;- - - Obtaining animation object
-        If (Left(character, 1) = "_")
+        If Left(namespace, 1) = "_"
           subType = #ANIMATIONTYPE_STAGE
-          character = Mid(character, 2)
-          *stage.StageModel = tryStage(character)
+          namespace = Mid(namespace, 2)
+          *stage.StageModel = tryStage(namespace)
           *animation = newStageAnimation(*stage, animationName, tag)
-          *animation\noCollisions = 1
           If animationName = "background"
             *stage\backgroundAnim = *animation
-          EndIf 
+          EndIf
         Else
           subType = #ANIMATIONTYPE_CHAMPION
-          *animation = getAnimation(tryChampion(character), animationName)
+          *animation = getAnimation(tryChampion(namespace), animationName)
           If Not *animation
-            *animation = newAnimation(tryChampion(character), animationName, tag)
+            *animation = newAnimation(tryChampion(namespace), animationName, tag)
           Else
             *animation\spriteSheet = loadedSprites(tag)
           EndIf 
-        EndIf 
+        EndIf   
         
         byte = ReadByte(0)
         If byte = #FILEMARKER_INTERFILE
@@ -266,7 +302,7 @@ Procedure loadGameData(path.s)
         If byte > 0
           makeFrames(*animation, w, h, byte, subType)
         EndIf 
-        
+ 
         Repeat 
           byte = ReadByte(0)
           Select byte
@@ -282,39 +318,16 @@ Procedure loadGameData(path.s)
             Case #FILEMARKER_FRAMEORIGIN
               *animation\frames(selectedElement)\origin\x = ReadLong(0)
               *animation\frames(selectedElement)\origin\y = ReadLong(0)
-            Case #FILEMARKER_FRAMEMOVEMENT
-              *animation\frames(selectedElement)\speedMode = ReadByte(0)
-              *animation\frames(selectedElement)\speed\x = ReadDouble(0)
-              *animation\frames(selectedElement)\speed\y = ReadDouble(0)
-            Case #FILEMARKER_HITBOXINFO
-              selectedElement = ReadByte(0)
-              x.l = ReadWord(0)
-              y.l = ReadWord(0)
-              w.l = ReadWord(0)
-              h.l = ReadWord(0)
-              addHitbox(*animation\frames(selectedElement), x, y, w, h)
-              *animation\frames(selectedElement)\hitboxes()\damage = ReadFloat(0)
-              *animation\frames(selectedElement)\hitboxes()\angle = ReadWord(0)
-              *animation\frames(selectedElement)\hitboxes()\bkb = ReadFloat(0)
-              *animation\frames(selectedElement)\hitboxes()\skb = ReadFloat(0)
-              *animation\frames(selectedElement)\hitboxes()\priority = ReadByte(0)
-              *animation\frames(selectedElement)\hitboxes()\hit = ReadByte(0)
-            Case #FILEMARKER_HURTBOXINFO
-              selectedElement = ReadByte(0)
-              x.l = ReadWord(0)
-              If x = $5454
-                x = - *animation\frames(selectedElement)\origin\x
-                y = - *animation\frames(selectedElement)\origin\y
-                w = *animation\frames(selectedElement)\display\w
-                h = *animation\frames(selectedElement)\display\h
+            Default 
+              If subType = #ANIMATIONTYPE_CHAMPION
+                selectFighterAnimationInfo(*animation, byte, selectedElement)
               Else
-                y.l = ReadWord(0)
-                w.l = ReadWord(0)
-                h.l = ReadWord(0)
+                error("Loading : unexpected tag byte " + Str(byte) + " in animation descriptor For " + tag + " at " + Hex(Loc(0)))
               EndIf 
-              addHurtbox(*animation\frames(selectedElement), x, y, w, h)
           EndSelect
         ForEver
+        
+        
         If *animation\baseSpeed = 0
           *animation\baseSpeed = 1
         EndIf 
@@ -348,7 +361,12 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+<<<<<<< Updated upstream
 ; CursorPosition = 68
 ; FirstLine = 64
+=======
+; CursorPosition = 164
+; FirstLine = 137
+>>>>>>> Stashed changes
 ; Folding = --
 ; EnableXP

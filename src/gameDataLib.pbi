@@ -2,6 +2,8 @@
 
 ;- Structures
 
+Prototype.i f_callback(*fighter, *data)
+
 Structure Physics
   v.VectorDouble
   a.VectorDouble
@@ -34,26 +36,34 @@ EndStructure
 Structure Frame
   display.Rect_ ;part of the source image that this frames displays
   origin.Vector ;position of the origin of this frame (relative to the upleft corner of display). The origin is the point that will be at the actual position of the object that displays the animation
-  speed.VectorDouble ;speed applied to the object while this frame is active (if the object is a Fighter)
-  speedMode.b ;bit 0 : {0 : disabled | 1 : enabled} ; bit 1 : {0 : speed is added | 1 : speed is set} ; bit 2 : {0 : when this frame comes out | 1 : during the whole frame}
   duration.b ;duration of this frame (overrides the animation speed, i.e. if duration != 0, the frame will always be displayed this many frames)
-  List hurtboxes.Hurtbox()
-  List hitboxes.Hitbox()
 EndStructure
 
-Prototype.i f_callback(*fighter, *data)
+Structure FighterFrame Extends Frame
+  List hurtboxes.Hurtbox()
+  List hitboxes.Hitbox()
+  speed.VectorDouble ;speed applied to the object while this frame is active (if the object is a Fighter)
+  speedMode.b ;bit 0 : {0 : disabled | 1 : enabled} ; bit 1 : {0 : speed is added | 1 : speed is set} ; bit 2 : {0 : when this frame comes out | 1 : during the whole frame}
+EndStructure
 
-Structure AnimationModel
-  noCollisions.b ;indicates that this animation doesn't interact with fighters (no hit/hurtboxes)
+Structure AnimationModelBase ;should NOT be used as it contains no frames
   frameNb.b
-  Array frames.Frame(0)
   spriteSheet.l ;handle de l'image servant de spritesheet
-  spriteSheetL.l;image pour les sprite retournés
   baseSpeed.d
   endCallback.f_callback
   frameCallback.f_callback
 EndStructure
 
+Structure AnimationModel Extends AnimationModelBase ;simple animation
+  Array frames.Frame(0)
+EndStructure
+
+Structure FighterAnimationModel Extends AnimationModelBase ;animation designed for Fighters (supporting collision boxes, frame movement and left spritesheets), usable for anything really
+  Array frames.FighterFrame(0)
+  spriteSheetL.l ;image pour les sprite retournés
+  noCollisions.b ;indicates that this animation doesn't interact with fighters (no hit/hurtboxes)
+EndStructure
+  
 Dim stateDefaultAnimation.s(#STATES)
 Dim commandDefaultAnimation.s(#COMMANDS)
 
@@ -77,7 +87,7 @@ EndStructure
 
 ;si ajout de variable, penser à update : loadLib, DFM, doc
 Structure Champion
-  Map animations.AnimationModel()
+  Map animations.FighterAnimationModel()
   Array moves.moveInfo(#Commands)
   assets.ChampionAssets
   name.s
@@ -202,7 +212,7 @@ Procedure newAnimation(*character.Champion, name.s, spriteTag.s, speed.d = 1)
   ProcedureReturn *animation
 EndProcedure
 
-Procedure setAnimationFrameNumber(*animation.AnimationModel, n.b) ;by default AnimationModels are created with one frame. This changes the size of their internal Frames array
+Procedure setAnimationFrameNumber(*animation.FighterAnimationModel, n.b) ;by default AnimationModels are created with one frame. This changes the size of their internal Frames array
   ReDim *animation\frames(n - 1)
   *animation\frameNb = n
 EndProcedure
@@ -217,7 +227,7 @@ Procedure newChampionAnimation(*character.Champion, name.s, spriteTag.s, speed.d
   ProcedureReturn *animation
 EndProcedure
 
-Procedure addLeftSpritesheet(*animation.AnimationModel, tag.s)
+Procedure addLeftSpritesheet(*animation.FighterAnimationModel, tag.s)
   Shared loadedSprites()
   *animation\spriteSheetL = loadedSprites(tag)
 EndProcedure
@@ -245,7 +255,7 @@ Procedure setFrameProperties(*f.Frame, x.l, y.l, w.l, h.l, xo.l, yo.l, duration.
   ProcedureReturn *f
 EndProcedure
 
-Procedure addHitbox(*frame.Frame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
+Procedure addHitbox(*frame.FighterFrame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
   *r.Hitbox = AddElement(*frame\hitboxes())
   Select shape
     Case #CBOX_SHAPE_RECT
@@ -258,7 +268,7 @@ Procedure addHitbox(*frame.Frame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
   ProcedureReturn *r
 EndProcedure
 
-Procedure addHurtbox(*frame.Frame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
+Procedure addHurtbox(*frame.FighterFrame, x.l, y.l, w.l, h.l, shape = #CBOX_SHAPE_RECT)
   *r.Hurtbox = AddElement(*frame\hurtboxes())
   Select shape
     Case #CBOX_SHAPE_RECT
@@ -358,7 +368,12 @@ Procedure initChampion(*char.Champion)
   *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+<<<<<<< Updated upstream
 ; CursorPosition = 152
 ; FirstLine = 123
+=======
+; CursorPosition = 215
+; FirstLine = 203
+>>>>>>> Stashed changes
 ; Folding = -----
 ; EnableXP

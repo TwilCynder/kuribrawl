@@ -16,7 +16,7 @@ Structure Fighter
   x.l ;position of its origin (relative to stage center, upward Y)
   y.l
   physics.Physics 
-  currentAnimation.Animation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
+  currentAnimation.FighterAnimation ;on pourrait s'en passer mais avoir un ptr vers l'objet évite de faire un accès map à chaque fois
   currentAnimationName.s
   currentMove.MoveInfo ;infos on the current move (not reset at the end of the move, thus can point to a move even when not attacking)
   *port                ;inputLib port
@@ -56,11 +56,18 @@ Structure Game
   List inputQ.l()
 EndStructure
 
+Structure FighterInitializer
+  champion.s
+  position.Vector
+  displayName.s
+  port.b
+EndStructure
+
 Define frameRate.b = 60, frameDuration.f
 
 ;- Object initialization ---
 
-Procedure initGame(window.l)
+Procedure createGame(window.l)
   *game.Game = AllocateStructure(Game)
   *game\window = window
   *game\camera\x = 0
@@ -69,23 +76,32 @@ Procedure initGame(window.l)
   ProcedureReturn *game
 EndProcedure
 
-Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
-  
-  Define *anim.Animation, *model.AnimationModel
+Procedure newFighter(*game.Game, *character.Champion)
   *r.Fighter = AddElement(*game\fighters())
   *r\character = *character
+  ProcedureReturn *r
+EndProcedure
+
+Declare setPortFighter(port, *fighter.Fighter)
+Procedure addFighter(*game.Game, champion.s, x.l, y.l, port = -1, name.s = "")
+  *r.Fighter = newFighter(*game, getCharacter(champion))
   *r\x = x
   *r\y = y
   *r\physics\v\x = 0
   *r\physics\v\y = 0
   *r\physics\a\x = 0
   *r\physics\a\y = 0
+  *r\name = name
   
-  initAnimation(*r\currentAnimation, getAnimation(*character, "idle"))  ;TODO make that fighters don't need to always have a current animation
+  initAnimation(*r\currentAnimation, getAnimation(*r\character, "idle"))  ;TODO make that fighters don't need to always have a current animation
   
   *r\state = #STATE_IDLE
   
-  *r\portID = port
+  If port > -1
+    setPortFighter(port, *r)
+  Else
+    *r\portID = -1
+  EndIf 
   ProcedureReturn *r
 EndProcedure
 
@@ -298,13 +314,13 @@ Procedure renderFighter(*fighter.Fighter, *camera.Camera)
   x = *fighter\x - *camera\x
   y = #SCREEN_H - (*fighter\y - *camera\y)
   
-  *frame.Frame = renderAnimation(*fighter\currentAnimation, *camera, x, y, Bool(facing = -1))
+  *frame.FighterFrame = renderFighterAnimation(*fighter\currentAnimation, *camera, x, y, Bool(facing = -1))
   
   If ListSize(*fighter\sprites()) 
     ForEach *fighter\sprites()
       *sprite = @*fighter\sprites()
       
-      renderAnimation(*sprite\animation, *camera, x + *sprite\pos\x, y - *sprite\pos\y)
+      renderFighterAnimation(*sprite\animation, *camera, x + *sprite\pos\x, y - *sprite\pos\y)
     Next
   EndIf 
   
@@ -344,19 +360,50 @@ Procedure renderStage(*stage.Stage)
   EndIf 
 EndProcedure
 
-Procedure renderFrame(*game.Game)
+Procedure calculateCamerapos(*game.Game)
   Define medPos.Vector
+  ForEach *game\fighters()
+    medPos\x + *game\fighters()\x 
+    medPos\y + *game\fighters()\y
+  Next 
+  medPos\x / ListSize(*game\fighters())
+  medPos\x - (#SCREEN_W / 2)
+  
+  medPos\y / ListSize(*game\fighters())
+  medPos\y - (#SCREEN_H / 2)
+  
+  If Abs (*game\camera\x - medPos\x) < kuribrawl\variables\cameraMaxSpeed
+    *game\camera\x = medPos\x
+  Else
+    *game\camera\x + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\x - medPos\x))
+  EndIf 
+  
+  If *game\camera\x < *game\currentStage\model\cameraZone\left
+    *game\camera\x = *game\currentStage\model\cameraZone\left
+  ElseIf *game\camera\x + #SCREEN_W > *game\currentStage\model\cameraZone\right
+    *game\camera\x =  *game\currentStage\model\cameraZone\right - #SCREEN_W
+  EndIf 
+  
+  If Abs (*game\camera\y - medPos\y) < kuribrawl\variables\cameraMaxSpeed
+    *game\camera\y = medPos\y
+  Else
+    *game\camera\y + (kuribrawl\variables\cameraMaxSpeed * -Sign(*game\camera\y - medPos\y))
+  EndIf 
+  
+  If *game\camera\y < *game\currentStage\model\cameraZone\bottom
+    *game\camera\y = *game\currentStage\model\cameraZone\bottom
+  ElseIf *game\camera\y + #SCREEN_H > *game\currentStage\model\cameraZone\top 
+    *game\camera\y =  *game\currentStage\model\cameraZone\top - #SCREEN_H
+  EndIf 
+EndProcedure
+
+
+Procedure renderFrame(*game.Game)
   ClearScreen(bgc)
   
   If *game
-  
-    ForEach *game\fighters()
-      medPos\x + *game\fighters()\x 
-      medPos\y + *game\fighters()\y
-    Next 
-    medPos\x / ListSize(*game\fighters())
-    medPos\x - (#SCREEN_W / 2)
     
+<<<<<<< Updated upstream
     medPos\y / ListSize(*game\fighters())
     medPos\y - (#SCREEN_H / 2)
     
@@ -383,6 +430,9 @@ Procedure renderFrame(*game.Game)
     ElseIf *game\camera\y + #SCREEN_H > *game\currentStage\model\cameraZone\top 
       *game\camera\y =  *game\currentStage\model\cameraZone\top - #SCREEN_H
     EndIf 
+=======
+    calculateCamerapos(*game)
+>>>>>>> Stashed changes
     
     If *game\currentStage
       renderStage(*game\currentStage)
@@ -419,8 +469,8 @@ Procedure advanceAnimations(*game.Game)
     If *fighter\paused > 0
       ProcedureReturn 0
     EndIf
-    advanceAnimation(*fighter\currentAnimation, *fighter)
-    *frame.Frame = getCurrentFrame(*fighter\currentAnimation)
+    advanceAnimation(*fighter\currentAnimation, *fighter, 1)
+    *frame.FighterFrame = getCurrentFrame(*fighter\currentAnimation)
     If *frame\speedMode & %101
       applyFrameMovement(*fighter, *frame)
     EndIf  
@@ -433,7 +483,7 @@ Procedure advanceAnimations(*game.Game)
   Next
 EndProcedure
 
-Procedure applyFrameMovement(*fighter.Fighter, *frame.Frame)
+Procedure applyFrameMovement(*fighter.Fighter, *frame.FighterFrame)
   Define add.b = 1 - ((*frame\speedMode & %10) >> 1)
   If Not *frame\speedMode & %1000
     *fighter\physics\v\x = *frame\speed\x + (add * *fighter\physics\v\x)
@@ -497,7 +547,7 @@ Procedure initFighters(*game.Game)
   updateAnimations(*game)
 EndProcedure
 
-;- Hits ---
+;- Collisions ---
 
 Procedure testRectCollision(x1.l, y1.l, w1.l, h1.l, x2.l, y2.l, w2.l, h2.l)
   If x1 < x2 + w2 And
@@ -662,7 +712,7 @@ Procedure hit(*hitbox.Hitbox, *hurtbox.Hurtbox, *attacking.Fighter, *defending.F
 EndProcedure
 
 Procedure manageHitboxes(*game.Game)
-  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox, shieldHit.b, *attackingFrame.Frame, *defendingFrame.Frame
+  Define *attacking.Fighter, *defending.Fighter, *hitbox.Hitbox, *hurtbox.Hurtbox, *successfulHitbox.Hitbox, shieldHit.b, *attackingFrame.FighterFrame, *defendingFrame.FighterFrame
   ForEach *game\fighters()
     *attacking = @*game\fighters()
     *attackingFrame = getCurrentFrame(*attacking\currentAnimation)
@@ -713,6 +763,7 @@ EndProcedure
 ;- Game methods ---
 
 Procedure startGame(window.l, stage.s)
+<<<<<<< Updated upstream
   *game.Game = initGame(window.l)
   
   *stage = getStage(stage)
@@ -722,6 +773,11 @@ Procedure startGame(window.l, stage.s)
   
   setStage(*game, *stage)
   ProcedureReturn 
+=======
+  *game.Game = createGame(window.l)
+  setStage(*game, getStage(stage))
+  ProcedureReturn *game
+>>>>>>> Stashed changes
 EndProcedure
 
 Declare freeGame(*game.Game)
@@ -752,9 +808,15 @@ Procedure increaseFrameRate()
   updateFrameRate()
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
+<<<<<<< Updated upstream
 ; CursorPosition = 731
 ; FirstLine = 680
 ; Folding = -+--------
+=======
+; CursorPosition = 685
+; FirstLine = 675
+; Folding = -0--------
+>>>>>>> Stashed changes
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode
