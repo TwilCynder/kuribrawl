@@ -7,7 +7,7 @@
   <section name="data">
     <explorer view="src\" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2021-01-13 02:44" user="twilc" host="TWIL-DESKTOP"/>
+    <lastopen date="2021-01-13 03:31" user="twilc" host="TWIL-DESKTOP"/>
   </section>
   <section name="files">
     <file name="src\animationlib.pbi">
@@ -44,7 +44,7 @@
     </file>
     <file name="src\gamelib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="c16194cec0b37cbc5d37e0c4732e5e4c"/>
+      <fingerprint md5="72abb7b110c27159bef3a689b3d3b29b"/>
     </file>
     <file name="src\gamelibConstants.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
@@ -68,7 +68,7 @@
     </file>
     <file name="src\main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="26cbe9b0434d38449ad8595080720282"/>
+      <fingerprint md5="f0ef52f981cd96af23264bb775baa4e3"/>
     </file>
     <file name="src\menulib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -88,7 +88,11 @@
     </file>
     <file name="src\utilCore.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="9b8b1867138b677e265ce895ab5e1db5"/>
+      <fingerprint md5="5966034fbe8adc58dfc92e92666f3247"/>
+    </file>
+    <file name="mainlib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
+      <fingerprint md5="a9540e7a1a71177506a63acae0b8a79a"/>
     </file>
   </section>
   <section name="targets">

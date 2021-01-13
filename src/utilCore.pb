@@ -57,6 +57,6 @@ Macro BGRA(r, g, b, a)
   RGBA(b, g, r, a)
 EndMacro
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 20
+; CursorPosition = 16
 ; Folding = --
 ; EnableXP
