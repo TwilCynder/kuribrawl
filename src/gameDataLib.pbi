@@ -357,8 +357,21 @@ Procedure initChampion(*char.Champion)
   initDefaultAnimationsConfig(*char)
   *char\assets\HUDIcon = loadedSprites(getChampionAssetTag(*char\name, "hud_icon"))
 EndProcedure
+
+Procedure newMenu(name.s)
+  Shared kuribrawl
+  *menu.Menu = AddMapElement(kuribrawl\menus(), name)
+  *menu\needRedraw = 1
+  *menu\render = @baseMenuRenderer()
+  ProcedureReturn *menu
+EndProcedure
+
+Procedure getMenu(name.s)
+  Shared kuribrawl
+  ProcedureReturn FindMapElement(kuribrawl\menus(), name)
+EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 152
-; FirstLine = 123
+; CursorPosition = 364
+; FirstLine = 320
 ; Folding = -----
 ; EnableXP

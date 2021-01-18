@@ -41,23 +41,23 @@ Define main.MainData, window.l
 
 Procedure startTestGame()
   Shared main, window
-  If main\currentGame
-    Debug "A game is already running. (game object adress : " + Hex(main\currentGame) 
-    endGame(main\currentGame)
+  *game.Game = main\currentGame
+  
+  If *game
+    Debug "A game is already running. (game object adress : " + Hex(*game) + ")"
+    endGame(*game)
   EndIf 
   
-  main\currentGame = startGame(window, get
-  *f1.Fighter = newFighter(main\currentGame, getCharacter("Acid"), *game\currentStage\model\w / 2 -200, 300)
-  *f1\name = "Test One"
-  *f2.Fighter = newFighter(*game, getCharacter("Acid"), *game\currentStage\model\w / 2 +200, 300)
-  *f2\name = "Test Two"
-  
   setPort(0, 0)
-  setPortFighter(0, *f1)
-  setPort(1, 3)
-  setPortFighter(1, *f2)
+  setPort(1, 2)
+  
+  *game = startGame(window, "Snowdin")
+  addFighter(*game, "Acid", *game\currentStage\model\w / 2 -200, 300, 0, "TwilCynder")
+  addFighter(*game, "Acid", *game\currentStage\model\w / 2 +200, 300, 1, "Naelink")
   
   initFighters(*game)
+  
+  setCurrentGame(@main, *game)
 EndProcedure  
 
 ;- Game window
@@ -91,12 +91,15 @@ ForEach kuribrawl\characters()
   initChampion(kuribrawl\characters())
 Next 
 initHUD()
+initStartMenu()
 
 ;- Starting the game (test)
-;startTestGame()
+startTestGame()
+;startMenu(@main, getMenu("start"))
 
 ;- Main loop (game)
 
+*game.Game = main\currentGame
 Define nextFrame.f, frameWait.f, startTime.l, endTime.l, lastFrameDuration.l, currentTime.l, launchTime.l
 Define totalFrameWait.q
 updateFrameRate()
@@ -116,11 +119,11 @@ Repeat
     manageHitboxes(*game)
     applyPhysics(*game)
     updateAnimations(*game)
-  EndIf 
-  renderFrame(*game)
-  If *game
+    renderFrame(*game)
     advanceAnimations(*game)
-  EndIf
+  ElseIf main\currentMenu
+    renderMenu(main\currentMenu)
+  EndIf 
   
   SetWindowTitle(window, Str(lastFrameDuration))
   
@@ -150,8 +153,8 @@ totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 48
-; FirstLine = 21
+; CursorPosition = 97
+; FirstLine = 79
 ; Folding = z
 ; EnableXP
 ; EnableUnicode

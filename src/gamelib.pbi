@@ -69,23 +69,32 @@ Procedure initGame(window.l)
   ProcedureReturn *game
 EndProcedure
 
-Procedure newFighter(*game.Game, *character.Champion, x.l, y.l, port = -1)
-  
-  Define *anim.Animation, *model.AnimationModel
+Procedure newFighter(*game.Game, *character.Champion)
   *r.Fighter = AddElement(*game\fighters())
   *r\character = *character
+  ProcedureReturn *r
+EndProcedure
+
+Declare setPortFighter(port, *fighter.Fighter)
+Procedure addFighter(*game.Game, champion.s, x.l, y.l, port = -1, name.s = "")
+  *r.Fighter = newFighter(*game, getCharacter(champion))
   *r\x = x
   *r\y = y
   *r\physics\v\x = 0
   *r\physics\v\y = 0
   *r\physics\a\x = 0
   *r\physics\a\y = 0
+  *r\name = name
   
-  initAnimation(*r\currentAnimation, getAnimation(*character, "idle"))  ;TODO make that fighters don't need to always have a current animation
+  initAnimation(*r\currentAnimation, getAnimation(*r\character, "idle"))  ;TODO make that fighters don't need to always have a current animation
   
   *r\state = #STATE_IDLE
   
-  *r\portID = port
+  If port > -1
+    setPortFighter(port, *r)
+  Else
+    *r\portID = -1
+  EndIf 
   ProcedureReturn *r
 EndProcedure
 
@@ -717,21 +726,16 @@ Procedure startGame(window.l, stage.s)
   
   *stage = getStage(stage)
   If Not *stage
-    error("Can't load stage " + stage
+    error("Can't load stage " + stage)
   EndIf 
   
   setStage(*game, *stage)
-  ProcedureReturn 
+  ProcedureReturn *game
 EndProcedure
 
 Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
   freeGame(*game)
-EndProcedure
-
-Declare setPortFighter()
-Procedure addFighter()
-  
 EndProcedure
 
 Procedure updateFrameRate()
@@ -752,9 +756,9 @@ Procedure increaseFrameRate()
   updateFrameRate()
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 731
-; FirstLine = 680
-; Folding = -+--------
+; CursorPosition = 732
+; FirstLine = 703
+; Folding = -0--------
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

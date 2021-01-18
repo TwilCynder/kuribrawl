@@ -117,7 +117,7 @@ I:damages_font
 hud.png
 I:@Acid/hud_icon
 menu_start.png
-I:startMenu/start 
+I:start_menu/start 
 menu_quit.png
 I:start_menu/quit
 menu_cursor.png

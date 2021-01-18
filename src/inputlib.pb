@@ -161,6 +161,7 @@ Procedure readInputs(*game.Game)
       EndIf
       
       If state And Not *port\previousState\buttons[id]
+        If 
         registerInput(*game, i, *binding\buttons()\input, id)
       EndIf
       *port\previousState\buttons[id] = state
@@ -614,7 +615,7 @@ Procedure updateInputs(*game.Game)
   Shared inputCode.l, ports(), *inputManagers(), *port.Port
   Define input.b, durability.b, port.b, res.b, *currentElement, info.inputData
   For i = 0 To 3
-    If Not ports(i)\active
+    If Not (ports(i)\active And ports(i)\figher)
       Continue  
     EndIf 
     *port = ports(i)
@@ -653,7 +654,7 @@ Procedure updateInputs(*game.Game)
   Next 
   
   For i = 0 To 3
-    If Not ports(i)\active
+    If Not (ports(i)\active And ports(i)\figher)
       Continue  
     EndIf 
     *port = ports(i)
@@ -666,7 +667,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 599
-; FirstLine = 576
+; CursorPosition = 139
+; FirstLine = 126
 ; Folding = ------
 ; EnableXP

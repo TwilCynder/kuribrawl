@@ -348,7 +348,7 @@ EndProcedure
 
 UsePNGImageDecoder()
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 68
-; FirstLine = 64
+; CursorPosition = 81
+; FirstLine = 63
 ; Folding = --
 ; EnableXP
