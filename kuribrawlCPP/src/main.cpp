@@ -3,14 +3,10 @@
 
 int main(int argc, char **argv)
 {
-    App app;
+    App app = App();
 
     app.init();
-
-    while(1){
-        app.handleEvents();
-        SDL_Delay(15);
-    }
+    app.loop();
 
     return 0;
 }

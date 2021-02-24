@@ -6,7 +6,7 @@ LDFLAGS = `sdl2-config --libs` -lSDL2_mixer -lSDL2_image -lSDL2_ttf -lm
 vpath %.h include
 vpath %.cpp src
 
-_OBJS = app.o main.o
+_OBJS = app.o main.o sdlHelper.o
 OBJS = $(patsubst %,bin/%,$(_OBJS))
 
 all: $(EXEC)

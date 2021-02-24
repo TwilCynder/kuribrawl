@@ -1,4 +1,4 @@
-#include "defs.h"
+#include "sdlHelper.h"
 #include "app.h"
 
 App::App(){
@@ -6,26 +6,22 @@ App::App(){
 }
 
 void App::init(){
-	
+	SDLHelper::initSDL(this);
+}
+
+void App::render(){
+	SDLHelper::prepareRender(this);
+	SDLHelper::render(this);
 }
 
 void App::handleEvents(){
-    SDL_Event event;
-	
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-			case SDL_QUIT:
-				exit(0);
-				break;
-
-			default:
-				break;
-		}
-	}
+	SDLHelper::handleInputs(this);
 }
 
 void App::loop(){
-
+    while(1){
+        this->handleEvents();
+		this->render();
+        SDL_Delay(15);
+    }
 }

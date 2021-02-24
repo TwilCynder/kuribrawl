@@ -1,6 +1,8 @@
+#include "SDL2/SDL_image.h"
 #include "sdlHelper.h"
 #include "defs.h"
-#include "app.h"
+
+namespace SDLHelper {
 
 void initSDL(App* app)
 {
@@ -14,7 +16,7 @@ void initSDL(App* app)
 		exit(1);
 	}
 
-	app->window = SDL_CreateWindow("Shooter 01", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, windowFlags);
+	app->window = SDL_CreateWindow("KuriX", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, windowFlags);
 	
 	if (!app->window){
 		printf("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
@@ -25,16 +27,17 @@ void initSDL(App* app)
 
 	app->renderer = SDL_CreateRenderer(app->window, -1, rendererFlags);
 	
-	if (!app->renderer)
-	{
+	if (!app->renderer){
 		printf("Failed to create renderer: %s\n", SDL_GetError());
 		exit(1);
 	}
+
+	IMG_Init(IMG_INIT_PNG);
 }
 
 void prepareRender(App* app)
 {
-    SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(app->renderer, 255, 0, 0, 255);
 	SDL_RenderClear(app->renderer);
 }
 
@@ -59,4 +62,6 @@ void handleInputs(App* app)
 				break;
 		}
 	}
+}
+
 }

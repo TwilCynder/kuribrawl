@@ -1,3 +1,5 @@
+#pragma once
+
 #include "SDL2/SDL.h"
 
 class App
@@ -7,8 +9,11 @@ class App
 
     void init();
     void loop();
-    void handleEvents();
 
     SDL_Window* window;
     SDL_Renderer* renderer;
+
+    private:
+    void handleEvents();
+    void render();
 };
