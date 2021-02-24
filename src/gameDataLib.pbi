@@ -363,6 +363,7 @@ Procedure newMenu(name.s)
   *menu.Menu = AddMapElement(kuribrawl\menus(), name)
   *menu\needRedraw = 1
   *menu\render = @baseMenuRenderer()
+  *menu\render = @baseMenuInputHandler()
   ProcedureReturn *menu
 EndProcedure
 
@@ -371,7 +372,7 @@ Procedure getMenu(name.s)
   ProcedureReturn FindMapElement(kuribrawl\menus(), name)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 364
-; FirstLine = 320
+; CursorPosition = 365
+; FirstLine = 312
 ; Folding = -----
 ; EnableXP

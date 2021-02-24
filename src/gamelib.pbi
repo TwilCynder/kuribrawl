@@ -50,19 +50,15 @@ EndStructure
 Structure Game
   List fighters.Fighter()
   *currentStage.Stage
-  window.l
   camera.Camera
   *base.GameData
   List inputQ.l()
 EndStructure
 
-Define frameRate.b = 60, frameDuration.f
-
 ;- Object initialization ---
 
-Procedure initGame(window.l)
+Procedure initGame()
   *game.Game = AllocateStructure(Game)
-  *game\window = window
   *game\camera\x = 0
   *game\camera\y = 0
   *game\base = kuribrawl
@@ -123,6 +119,10 @@ Procedure setStage(*game.Game, *model.StageModel) ;actually creates a stage and 
   Next 
   *game\camera\x = (*game\currentStage\model\w - #SCREEN_W) / 2
 EndProcedure 
+
+Procedure getCurrentStage(*game.Game)
+  ProcedureReturn *game\currentStage\model
+EndProcedure
 
 ;- Fighter methods ---
 
@@ -205,10 +205,6 @@ Procedure getRealCboxX(*cbox.CollisionBox, facing)
 EndProcedure
 
 ;- Fighter state ---
-
-CompilerIf #DEBUG
-  Declare logState(state.b, facing.b = 0, previousTime.u = 0)
-CompilerEndIf
 Procedure setState(*fighter.Fighter, state.b, info.l = 0, updateAnim.b = 1)
   *fighter\state = state
   *fighter\stateInfo = info
@@ -721,8 +717,8 @@ EndProcedure
 
 ;- Game methods ---
 
-Procedure startGame(window.l, stage.s)
-  *game.Game = initGame(window.l)
+Procedure startGame(stage.s)
+  *game.Game = initGame()
   
   *stage = getStage(stage)
   If Not *stage
@@ -730,6 +726,7 @@ Procedure startGame(window.l, stage.s)
   EndIf 
   
   setStage(*game, *stage)
+  
   ProcedureReturn *game
 EndProcedure
 
@@ -737,28 +734,10 @@ Declare freeGame(*game.Game)
 Procedure endGame(*game.Game)
   freeGame(*game)
 EndProcedure
-
-Procedure updateFrameRate()
-  Shared frameRate, frameDuration
-  frameDuration.f = 1000 / frameRate
-  Debug "New framerate " + Str(frameRate)
-EndProcedure  
-  
-Procedure lowerFrameRate()
-  Shared frameRate
-  frameRate - 5
-  updateFrameRate()
-EndProcedure
-  
-Procedure increaseFrameRate()
-  Shared frameRate
-  frameRate + 5
-  updateFrameRate()
-EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 732
-; FirstLine = 703
-; Folding = -0--------
+; CursorPosition = 206
+; FirstLine = 194
+; Folding = -8-------
 ; EnableXP
 ; SubSystem = OpenGL
 ; EnableUnicode

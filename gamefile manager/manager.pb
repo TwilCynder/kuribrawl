@@ -71,7 +71,7 @@ Procedure readFileToMemory(filename$, *file.loadedFile)
 EndProcedure
 
 Procedure writeSignature()
-  WriteInteger(1, $54545454)
+  WriteLong(1, $54545454)
 EndProcedure
 
 Procedure writeVersion(maj.a, min.a, rev.a)
@@ -358,12 +358,12 @@ Procedure addFile(*f.loadedFile, path.s, tag.s, type.b, info.s)
   EndIf 
   writeType(type)
   writeFileTag(tag)
-  PrintN("Pointer position : " + Str(Loc(1)))
   If type = #FILETYPE_CHAMPION Or type = #FILETYPE_STAGE
     WriteFileLength(0)
     writeFileDescriptor(type, path)
   Else
     WriteFileLength(*f\size)
+    PrintN("Pointer position : " + Hex(Loc(1)))
     writeMemoryToFile(1, *f)
     writeFileDescriptor(type, info)
   EndIf 
@@ -406,7 +406,7 @@ If buildPath = "" Or Not CreateFile(1, buildPath)
   CreateFile(1, "data.twl")
 EndIf 
 writeSignature()
-writeVersion(0, 2, 0)
+writeVersion(0, 3, 0)
 
 While Not Eof(2)
   path = ReadString(2)
@@ -455,10 +455,10 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 334
-; FirstLine = 315
+; CursorPosition = 365
+; FirstLine = 346
 ; Folding = ---
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico
-; Executable = ..\src\res\dataFileMaker.exe
+; Executable = ..\src\res\datafileMaker.exe
 ; CommandLine = test/oui

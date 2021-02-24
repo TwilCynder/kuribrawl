@@ -5,6 +5,7 @@
 EndEnumeration
 
 Enumeration ;inputs
+  #INPUT_None
   #INPUT_Attack
   #INPUT_Special
   #INPUT_Jump
@@ -23,23 +24,42 @@ Enumeration ;inputs
   #INPUTS
 EndEnumeration
 
-Enumeration ;probablement useless
+Enumeration ;
   #BUTTON_A
   #BUTTON_B
   #BUTTON_X
   #BUTTON_Y
-  #BUTTON_Z
-  #BUTTON_R
-  #BUTTON_L
+  #BUTTON_LT
+  #BUTTON_RT
+  #BUTTON_LB
+  #BUTTON_RB
+  #BUTTON_RIGHT
+  #BUTTON_UP
+  #BUTTON_LEFT
+  #BUTTON_DOWN
   #BUTTON_START
+  #BUTTON_SELECT
   #BUTTONS
 EndEnumeration
-  
+
+Enumeration ;probablement useless
+  #GCBUTTON_A
+  #GCBUTTON_B
+  #GCBUTTON_X
+  #GCBUTTON_Y
+  #GCBUTTON_Z
+  #GCBUTTON_R
+  #GCBUTTON_L
+  #GCBUTTON_START
+  #GCBUTTONS
+EndEnumeration
+
 Enumeration ;same
   #AXIS_LEFT
   #AXIS_RIGHT
   #AXISES
 EndEnumeration
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 10
+; CursorPosition = 26
+; FirstLine = 9
 ; EnableXP

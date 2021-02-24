@@ -8,12 +8,13 @@ EndEnumeration
 NewMap loadedSprites.l()
 
 Procedure getLoadedSprite(name.s)
+  Debug name
   Shared loadedSprites()
   ProcedureReturn PeekL(FindMapElement(loadedSprites(), name))
 EndProcedure
 
 Procedure checkSignature()
-  ProcedureReturn Bool(ReadInteger(0) = $54545454)
+  ProcedureReturn Bool(ReadLong(0) = $54545454)
 EndProcedure
 
 Procedure readVersion()
@@ -48,6 +49,6 @@ Procedure checkInterfile()
  ProcedureReturn Bool(ReadAsciiCharacter(0) = $54)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 7
+; CursorPosition = 42
 ; Folding = --
 ; EnableXP

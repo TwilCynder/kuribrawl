@@ -2,10 +2,10 @@
   cursorSprite.i
 EndStructure
   
-Declare startTestGame()  
+Declare startTestGame(*app.App)  
 
-Procedure menu_startGame()
-  startTestGame()
+Procedure menu_startGame(*element, *menu.Menu)
+  startTestGame(*menu\app)
 EndProcedure
 
 Procedure menu_quit()
@@ -32,6 +32,6 @@ Procedure initStartMenu()
   *menu\data = *data
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 27
+; CursorPosition = 7
 ; Folding = -
 ; EnableXP

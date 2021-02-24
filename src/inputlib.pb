@@ -16,18 +16,24 @@ Structure Bind
 EndStructure
 
 Structure InputBinding
-  controlStickID.b
-  secondaryStickID.b ;utile pour le shield tilt
-  List buttons.Bind()
+  List buttons.Bind() ;inputs array
   List axises.Bind()
   List triggers.Bind()
+EndStructure
+
+Structure SpecialButtons
+  start.l
 EndStructure
 
 Structure knownController
   config.InputConfig
   defaultBinding.InputBinding
+  menuBinding.InputBinding
+  controlStickID.b
+  secondaryStickID.b ;utile pour le shield tilt
+  special.SpecialButtons
 EndStructure  
- 
+
 Structure inputData
   element.b ; the element (stick/button) responsible for this input
   elementType.b ;wheter the said element was a button, stick or trigger
@@ -45,6 +51,10 @@ Structure ControllerState
   axis.AxisState[#MAX_AXIS_NB]
 EndStructure
 
+Structure InputsState
+  commands.b[#BUTTONS]
+EndStructure
+  
 Structure Port
   id.b
   joyID.l
@@ -54,19 +64,23 @@ Structure Port
   active.b
   *controllerInfo.knownController
   *figher.Fighter
-  
   guardPressed.b
 EndStructure
 Dim ports.Port(4)
 
 XIncludeFile "inputlibData.pbi"
 
+Procedure getDefaultControler()
+  Shared gameCube
+  ProcedureReturn @gameCube
+EndProcedure
+
 Procedure setPort(port, joyID, active = 1)
-  Shared ports(), defaultControler
+  Shared ports()
   ports(port)\joyID = joyID
   ports(port)\active = active
   ports(port)\id = port
-  ports(port)\controllerInfo = @defaultControler
+  ports(port)\controllerInfo = getDefaultControler()
 EndProcedure
 
 Procedure setPortFighter(port, *fighter.Fighter)
@@ -86,7 +100,6 @@ Procedure readAxis(*state.AxisState, axis.b, *port.Port)
 EndProcedure
 
 Procedure stickDirection(*state.AxisState, *controllerConfig.InputConfig)
-  Shared defaultControler
   x.l = *state\x
   y.l = *state\y
   If x > *controllerConfig\analogStickThreshold And x > Abs(y)
@@ -119,9 +132,6 @@ Procedure makeInputValue(input.b, time.b, port.b, element.b, elementType.b)
   ProcedureReturn input + (time << 5) + (port << 9) + (elementType << 12) + (element << 14)
 EndProcedure
 
-CompilerIf #DEBUG
-  Declare logInput(port.b, input.b, element.b, elementType.b, frame.l = -1)
-CompilerEndIf
 Procedure registerInput(*game.Game, port, input, element = #MAX_BUTTON_NB, elementType = #ELEMENTTYPE_BUTTON)
   Shared defaultInputDurability(), frame
   addElementVal(*game\inputQ(), makeInputValue(input, defaultInputDurability(input), port, element, elementType))
@@ -130,46 +140,60 @@ Procedure registerInput(*game.Game, port, input, element = #MAX_BUTTON_NB, eleme
   CompilerEndIf
 EndProcedure
 
-Procedure readInputs(*game.Game)
-  Shared ports(), *port.Port
-  Define state.b, id.b, axisState.AxisState, *controller.knownController, *binding.InputBinding
+Prototype inputHandler(*object, port, input, element = #MAX_BUTTON_NB, elementType = #ELEMENTTYPE_BUTTON)  
 
+Procedure readInputs(*app.App)
+  Shared ports(), *port.Port
+  Define state.b, id.b, axisState.AxisState, *controller.knownController, *binding.InputBinding, *inputHandler.inputHandler, *target, mode.b ;0 = game
+  
+  *game.Game = *app\currentGame
+  
   For i = 0 To 3
     *port = @ports(i)
     
-    If Not (*port\active And *game)
+    If Not (*port\active And (*app\currentGame Or *app\currentMenu))
       Continue  
     EndIf 
-    
-    *port\guardPressed = #False
     
     If Not ExamineJoystick(*port\joyID)
       Continue
     EndIf 
     
+    
     *controller = *port\controllerInfo
-    *binding = *controller\defaultBinding
-    
+    If Not *app\currentGame
+      *binding = *controller\menuBinding
+      *inputHandler = @handleMenuInput()
+      *target = *app\currentMenu
+      mode = 1
+    Else
+      *port\guardPressed = #False
+      *binding = *controller\defaultBinding
+      *inputHandler = @registerInput()
+      *target = *app\currentGame
+      mode = 0
+    EndIf
+
     ;--- Buttons
-    
+     
     ForEach *binding\buttons()
       id = *binding\buttons()\ID
       state = readButton(id, *port)
       
-      If state And *binding\buttons()\input = #INPUT_Guard
+      If Not *menu And state And *binding\buttons()\input = #INPUT_Guard
         *port\guardPressed = #True
       EndIf
       
       If state And Not *port\previousState\buttons[id]
-        If 
-        registerInput(*game, i, *binding\buttons()\input, id)
+        *inputHandler(*target, i, *binding\buttons()\input, id)
       EndIf
       *port\previousState\buttons[id] = state
     Next 
+       
     
     ;--- Controlstick : smashinputs
     
-    id = *binding\controlStickID
+    id = *controller\controlStickID
     readAxis(*port\currentControlStickState, id, *port)
     
     If *port\currentControlStickState\x > stickSmashTreshold
@@ -451,7 +475,6 @@ Procedure jumpManager(*port.Port, *info.inputData, typeY.b)
     ProcedureReturn 2
   EndIf 
   
-  Shared defaultControler
   Define jumpType.b, jumpElement.b, jumpElementType.b
   If *port\figher\state = #STATE_JUMPSQUAT
     jumpElementType = (*port\figher\stateInfo & %1100) >> 2
@@ -579,8 +602,8 @@ Procedure checkSticksState(*port.Port)
         EndIf 
       EndIf
     Case #STATE_GUARD
-      x.d = JoystickAxisX(*port\joyID, *port\controllerInfo\defaultBinding\secondaryStickID, #PB_Relative)
-      y.d = JoystickAxisY(*port\joyID, *port\controllerInfo\defaultBinding\secondaryStickID, #PB_Relative)
+      x.d = JoystickAxisX(*port\joyID, *port\controllerInfo\secondaryStickID, #PB_Relative)
+      y.d = JoystickAxisY(*port\joyID, *port\controllerInfo\secondaryStickID, #PB_Relative)
       norm.l = Sqr(x * x + y * y)
       If norm > stickTreshold
         factor.d = getShieldTiltFactor(*port\figher)
@@ -667,7 +690,7 @@ availableJosticks.b = InitJoystick()
 
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 139
-; FirstLine = 126
+; CursorPosition = 133
+; FirstLine = 123
 ; Folding = ------
 ; EnableXP
