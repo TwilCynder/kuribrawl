@@ -3,7 +3,7 @@
 
 int main(int argc, char **argv)
 {
-    App app = App();
+    App app;
 
     app.init();
     app.loop();

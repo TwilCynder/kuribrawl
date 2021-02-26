@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
+#include <map>
 #include "util.h"
+
+class Animation;
 
 class Champion {
     public:
@@ -9,7 +12,7 @@ class Champion {
         int size;
     };
 
-    struct ChampionValues {
+    struct Values {
         double walk_speed;
         double dash_speed;
         double dash_start_speed;
@@ -37,11 +40,12 @@ class Champion {
 
     Champion();
 
-    ChampionValues val;
+    Champion::Values val;
 
     private:
     std::string name;
     std::string display_name;
-
+    std::map<std::string, Animation> animations;
+    std::string current;
 };
 

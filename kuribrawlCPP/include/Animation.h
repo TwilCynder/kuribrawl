@@ -1,7 +1,7 @@
 #pragma once
-#include <list>
 #include "SDL2/SDL_image.h"
 #include "util.h"
+#include <memory>
 
 using namespace Kuribrawl;
 
@@ -28,16 +28,26 @@ class Animation {
     };
 
     struct Frame {
-        Rect display;
+        SDL_Rect display;
         Vector origin;
         int duration;
+        std::unique_ptr<Hurtbox[]> hurtboxes;
+        std::unique_ptr<Hitbox[]> hitboxes;
     };
 
     Animation();
+    Animation(SDL_Texture* spritesheet);
+    ~Animation();
+
+    void setSpritesheet(SDL_Texture* spritesheet);
+    void initFrames(int n);
+
+    void draw(SDL_Renderer* target, int x, int y);
 
     private:
     SDL_Texture* spritesheet;
-    std::list<Frame> frames;
+    std::unique_ptr<Frame[]> frames;
     double base_speed;
     int nb_frames;
+    SDL_Rect display;
 };
