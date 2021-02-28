@@ -1,10 +1,16 @@
 #pragma once
+
+#include "SDL2/SDL.h"
 #include "Animation.h"
 
 class CurrentAnimation{
     public:
 
     CurrentAnimation();
+    CurrentAnimation(Animation* animation);
+    void draw(SDL_Renderer* target, int x, int y);
+    bool is_initialized();
+    void setAnimation(Animation* anim);
 
     private:
     Animation* model;

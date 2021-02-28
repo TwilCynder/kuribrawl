@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 #include <map>
+#include "SDL2/SDL.h"
 #include "util.h"
-
-class Animation;
+#include "Animation.h"
 
 class Champion {
     public:
@@ -38,7 +38,10 @@ class Champion {
         double weight;
     };
 
-    Champion();
+    Champion(const std::string& name_);
+    Animation* addAnimation(const std::string& name);
+    Animation* addAnimation(const std::string& name, SDL_Texture* spritesheet);
+    Animation* getAnimation(const std::string& name);
 
     Champion::Values val;
 

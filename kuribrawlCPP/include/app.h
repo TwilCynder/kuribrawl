@@ -2,6 +2,8 @@
 
 #include "SDL2/SDL.h"
 #include "Animation.h"
+#include "Game.h"
+#include "GameData.h"
 
 class App
 {
@@ -15,6 +17,8 @@ class App
 
     SDL_Texture* loadTextureFromFile(const char* path);
 
+    GameData gameData;
+
     private:
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -22,6 +26,5 @@ class App
     void handleEvents();
     void render();
 
-    //test
-    Animation* testAnim;
+    Game* current_game;
 };

@@ -1,6 +1,10 @@
 #pragma once
 #include <map>
 #include <string>
+#include "SDL2/SDL.h"
+#include "CurrentAnimation.h"
+#include "Champion.h"
+#include "util.h"
 
 class Fighter {
     public:
@@ -28,7 +32,19 @@ class Fighter {
         CROUCH_STOP
     };
 
-    static const std::map<State, std::string> state_default_animation; 
+    Fighter(Champion* model_);
+    Fighter(Champion* model_, int x, int y);
+
+    void draw(SDL_Renderer* target, int x, int y);
+    const Kuribrawl::Vector* getPosition();
+
+    bool is_initialized();
+
+    static const std::map<State, std::string> state_default_animation_name; 
 
     private:
+    Champion* model;
+    CurrentAnimation current_animation;
+    std::string current_animation_name;
+    Kuribrawl::Vector position;
 };

@@ -1,5 +1,5 @@
+#include "Debug.h"
 #include "Animation.h"
-#include "KBException.h"
 #include <stdio.h>
 
 Animation::Animation():
@@ -29,6 +29,10 @@ void Animation::setSpritesheet(SDL_Texture* spritesheet){
 }
 
 void Animation::initFrames(int n){
+    if (n < 1){
+        throw KBFatal("Tried to init animation with 0 frames");
+    }
+
     this->frames = std::make_unique<Frame[]>(n);
     int w = this->display.w / n;
     int h = this->display.h;
@@ -43,7 +47,21 @@ void Animation::initFrames(int n){
     }
 }
 
-void Animation::draw(SDL_Renderer* target, int x, int y){
+void Animation::draw(SDL_Renderer* target, int x, int y, int frame){
     if (!this->spritesheet) return;
-    SDL_RenderCopy(target, this->spritesheet, NULL, &this->display);
+
+    if (frame > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+
+    SDL_Rect* source = &frames[frame].display;
+
+    SDL_Rect dest;
+    dest.x = x;
+    dest.y = y;
+    dest.w = source->w;
+    dest.h = source->h;
+
+
+    SDL_RenderCopy(target, spritesheet, source, &dest);
 }

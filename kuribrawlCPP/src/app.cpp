@@ -1,6 +1,12 @@
+#include <iostream>
+
 #include "sdlHelper.h"
 #include "app.h"
 #include "defs.h"
+#include "Champion.h"
+#include "GameData.h"
+
+using namespace std;
 
 App::App(){
 
@@ -39,12 +45,23 @@ void App::initSDL(){
 
 void App::init(){
 	initSDL();
-	this->testAnim = new Animation(IMG_LoadTexture(this->renderer, "../src/res/air_idle.png"));
+
+	Champion* acid = this->gameData.addChampion("acid");
+
+	Animation* idle = acid->addAnimation("idle", IMG_LoadTexture(this->renderer, "../src/res/idle_strip4.png"));
+	idle->initFrames(4);
+
+	current_game = new Game();
+
+	current_game->addFighter(acid, 100, 50);
+	current_game->addFighter(acid, 500, 50);
 }
 
 void App::render(){
 	SDLHelper::prepareRender(this->renderer);
-	this->testAnim->draw(this->renderer, 50, 50);
+	if (current_game && current_game->is_running()){
+		current_game->draw(renderer);
+	}
 	SDLHelper::render(this->renderer);
 }
 

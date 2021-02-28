@@ -1,5 +1,5 @@
 #pragma once
-#include "SDL2/SDL_image.h"
+#include "SDL2/SDL.h"
 #include "util.h"
 #include <memory>
 
@@ -42,7 +42,7 @@ class Animation {
     void setSpritesheet(SDL_Texture* spritesheet);
     void initFrames(int n);
 
-    void draw(SDL_Renderer* target, int x, int y);
+    void draw(SDL_Renderer* target, int x, int y, int frame);
 
     private:
     SDL_Texture* spritesheet;
