@@ -36,6 +36,7 @@ class Fighter {
     Fighter(Champion* model_, int x, int y);
 
     void draw(SDL_Renderer* target, int x, int y);
+    CurrentAnimation* getCurrentAnimation();
     const Kuribrawl::Vector* getPosition();
 
     bool is_initialized();

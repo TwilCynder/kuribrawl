@@ -9,7 +9,7 @@ Fighter::Fighter(Champion* model_, int x_, int y_):
     model(model_)
 {
     Animation* idle_anim = model->getAnimation("idle");
-    current_animation.setAnimation(idle_anim);
+    current_animation.setAnimation(idle_anim, 0.05);
 
     position.x = x_;
     position.y = y_;
@@ -21,6 +21,10 @@ bool Fighter::is_initialized(){
 
 const Kuribrawl::Vector* Fighter::getPosition(){
     return &position;
+}
+
+CurrentAnimation* Fighter::getCurrentAnimation(){
+    return &current_animation;
 }
 
 void Fighter::draw(SDL_Renderer* target, int x, int y){

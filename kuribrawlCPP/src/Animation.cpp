@@ -34,17 +34,30 @@ void Animation::initFrames(int n){
     }
 
     this->frames = std::make_unique<Frame[]>(n);
-    int w = this->display.w / n;
-    int h = this->display.h;
+    int w = display.w / n;
+    int h = display.h;
     int x = 0;
     Frame* frame;
     for (int i = 0; i < n; i++){
-        frame = &this->frames[i];
+        frame = &frames[i];
         frame->display.x = x;
         frame->display.y = 0;
         frame->display.w = w;
         frame->display.h = h;
     }
+    nb_frames = n;
+}
+
+bool Animation::is_initialized(){
+    return spritesheet;
+}
+
+int Animation::getNbFrames(){
+    return nb_frames;
+}
+
+Animation::Frame* Animation::getFrame(int n){
+    return &frames[n];
 }
 
 void Animation::draw(SDL_Renderer* target, int x, int y, int frame){

@@ -26,5 +26,7 @@ class App
     void handleEvents();
     void render();
 
+    void startTestGame();
+
     Game* current_game;
 };
