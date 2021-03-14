@@ -32,7 +32,7 @@ void CurrentAnimation::setAnimation(Animation* anim, double speed_){
 }
 
 void CurrentAnimation::setSpeed(double speed_){
-    if (speed){
+    if (speed_){
         speed = speed_;
     } else {
         speed = model->base_speed;
@@ -92,7 +92,7 @@ void CurrentAnimation::nextFrame(){
 
     if (current_frame >= model->nb_frames){
         finished = true;
-        //resetAnim
+        reset();
     }
 
     Animation::Frame* f = &(model->frames[current_frame]);
@@ -109,7 +109,7 @@ void CurrentAnimation::nextFrame(){
 
 void CurrentAnimation::draw(SDL_Renderer* target, int x, int y){
     if (!model){
-        throw KBFatal("Tried to draw un-initalized CAnimation");
+        throw KBFatal("Tried to draw un-initalized CurrentAnimation");
     }
 
     model->draw(target, x, y, current_frame);

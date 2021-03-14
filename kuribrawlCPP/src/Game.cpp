@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Game.h"
 #include "util.h"
+#include "CurrentAnimation.h"
 
 using namespace std;
 
@@ -30,5 +31,16 @@ void Game::draw(SDL_Renderer* target){
     for (it = fighters.begin(); it != fighters.end(); ++it){
         pos = it->getPosition();
         it->draw(target, pos->x, pos->y);
+    }
+}
+
+void Game::advanceAnimations(){
+    std::forward_list<Fighter>::iterator it;
+    CurrentAnimation* anim;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        anim = it->getCurrentAnimation();
+        if (anim->is_initialized()){
+            anim->advance();
+        }
     }
 }

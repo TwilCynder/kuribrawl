@@ -6,14 +6,16 @@ Animation::Animation():
     base_speed(1),
     nb_frames(0)
 {
-
 }
 
-Animation::Animation(SDL_Texture* spritesheet){
-    Animation();
+Animation::Animation(SDL_Texture* spritesheet) : Animation(){
     setSpritesheet(spritesheet);
     this->display.x = 0;
     this->display.y = 0;
+}
+
+Animation::Animation(SDL_Texture* spritesheet, int nFrames) : Animation(spritesheet){
+    initFrames(nFrames);
 }
 
 Animation::~Animation(){
@@ -44,6 +46,7 @@ void Animation::initFrames(int n){
         frame->display.y = 0;
         frame->display.w = w;
         frame->display.h = h;
+        x += w;
     }
     nb_frames = n;
 }
@@ -60,6 +63,10 @@ Animation::Frame* Animation::getFrame(int n){
     return &frames[n];
 }
 
+void Animation::setBaseSpeed(double speed){
+    base_speed = speed;
+}
+
 void Animation::draw(SDL_Renderer* target, int x, int y, int frame){
     if (!this->spritesheet) return;
 
@@ -74,7 +81,6 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame){
     dest.y = y;
     dest.w = source->w;
     dest.h = source->h;
-
 
     SDL_RenderCopy(target, spritesheet, source, &dest);
 }

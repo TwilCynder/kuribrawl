@@ -20,6 +20,7 @@ class Animation {
 
     Animation();
     Animation(SDL_Texture* spritesheet);
+    Animation(SDL_Texture* spritesheet, int nFrames);
     ~Animation();
 
     void setSpritesheet(SDL_Texture* spritesheet);
@@ -27,11 +28,12 @@ class Animation {
     bool is_initialized();
     int getNbFrames();
     Frame* getFrame(int n);
+    void setBaseSpeed(double speed);
 
     void draw(SDL_Renderer* target, int x, int y, int frame);
 
     private:
-    SDL_Texture* spritesheet;
+    SDL_Texture* spritesheet; //image used as the spritesheet
     std::unique_ptr<Frame[]> frames;
     int nb_frames;
     SDL_Rect display;

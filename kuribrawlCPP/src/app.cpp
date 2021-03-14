@@ -76,6 +76,9 @@ void App::handleEvents(){
 void App::loop(){
     while(1){
         this->handleEvents();
+		if (current_game && current_game->is_running()){
+			current_game->advanceAnimations();
+		}
 		this->render();
         SDL_Delay(15);
     }

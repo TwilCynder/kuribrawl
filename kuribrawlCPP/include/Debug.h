@@ -1,3 +1,5 @@
+#pragma once
+
 #include "KBException.h"
 #include <iostream>
 

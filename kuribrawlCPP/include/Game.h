@@ -3,6 +3,7 @@
 #include "SDL2/SDL.h"
 #include "Fighter.h"
 #include "Champion.h"
+#include "InputManager.h"
 
 class Game {
     public:
@@ -17,4 +18,5 @@ class Game {
     std::forward_list<Fighter> fighters;
     SDL_Rect camera;
     bool running;
+    InputManager input_manager;
 };

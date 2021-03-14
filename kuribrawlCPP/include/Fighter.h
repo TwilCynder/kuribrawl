@@ -6,6 +6,8 @@
 #include "Champion.h"
 #include "util.h"
 
+class Port;
+
 class Fighter {
     public:
 
@@ -48,4 +50,5 @@ class Fighter {
     CurrentAnimation current_animation;
     std::string current_animation_name;
     Kuribrawl::Vector position;
+    Port* port;
 };

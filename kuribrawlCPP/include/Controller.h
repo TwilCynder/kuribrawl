@@ -1,25 +1,27 @@
 #pragma once
 #include <memory>
-#include "inputs.h"
+#include <map>
+#include <string>
+#include "Binding.h"
 
 #define DEFAULT_NB_BUTTONS 24
 #define DEFAULT_NB_STICKS 3
 
-struct Binding {
-    std::unique_ptr<Input[]> buttons;
-    private:
-    int nb_buttons;
-    int nb_sticks;
-}
-
 class Controller {
     public:
-    static Controller GC;
+    static std::map<std::string, Controller> known_controllers;
 
     Controller(int nb_buttons, int nb_sticks);
     Controller();
 
+    std::unique_ptr<Binding> default_binding;
+
     private:
     int nb_buttons;
     int nb_sticks; //Sticks include triggers 
+    int analogStickThreshold;
+    int analogStickSmashThreshold;
+    int analogTriggerThreshold;
+    int start_button;
+    int control_stick;
 };

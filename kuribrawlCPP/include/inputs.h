@@ -12,27 +12,23 @@ enum Input {
     RIGHT,
     UP,
     LEFT,
-    DOWN
-}
+    DOWN,
+    TOTAL
+};
 
-/*
+enum CommonElement {
+    A,
+    B,
+    X,
+    Y,
+    Z,
+    L,
+    R,
+    START
+};
 
-  #INPUT_None
-  #INPUT_Attack
-  #INPUT_Special
-  #INPUT_Jump
-  #INPUT_Shorthop
-  #INPUT_Grab
-  #INPUT_Guard
-  #INPUT_Smash
-  #INPUT_ControlStick_RIGHT
-  #INPUT_ControlStick_UP
-  #INPUT_ControlStick_LEFT
-  #INPUT_ControlStick_DOWN
-  #INPUT_ControlStick_SRIGHT
-  #INPUT_ControlStick_SUP
-  #INPUT_ControlStick_SLEFT
-  #INPUT_ControlStick_SDOWN
-  #INPUTS
-
-  */
+enum ElementType {
+    BUTTON,
+    STICK,
+    TRIGGER
+};

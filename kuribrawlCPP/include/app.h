@@ -1,9 +1,11 @@
 #pragma once
 
+#include <forward_list>
 #include "SDL2/SDL.h"
 #include "Animation.h"
 #include "Game.h"
 #include "GameData.h"
+#include "input.h"
 
 class App
 {
@@ -29,4 +31,5 @@ class App
     void startTestGame();
 
     Game* current_game;
+    std::forward_list<RegisteredInput> inputQ;
 };
