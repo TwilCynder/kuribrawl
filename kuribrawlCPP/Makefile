@@ -17,6 +17,7 @@ all: clear $(EXEC)
 
 clear: 
 	clear
+	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 
 bin/%.o: %.cpp 
 	g++ $(CFLAGS) -c $< -o $@
@@ -26,3 +27,4 @@ clean:
 
 $(EXEC): $(OBJS)
 	g++ $^ -o $@ $(LDFLAGS) 
+	@printf "\033[0;32mCompilation finished successfully !"

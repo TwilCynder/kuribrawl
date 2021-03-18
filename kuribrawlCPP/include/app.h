@@ -1,15 +1,20 @@
 #pragma once
 
 #include <forward_list>
+#include <array>
 #include "SDL2/SDL.h"
 #include "Animation.h"
 #include "Game.h"
+#include "Port.h"
 #include "GameData.h"
 #include "input.h"
+
+#define NB_PORTS 4
 
 class App
 {
     public:
+
     App();
     ~App();
 
@@ -22,14 +27,15 @@ class App
     GameData gameData;
 
     private:
-    SDL_Window* window;
-    SDL_Renderer* renderer;
     void initSDL();
     void handleEvents();
     void render();
 
     void startTestGame();
 
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+
     Game* current_game;
-    std::forward_list<RegisteredInput> inputQ;
+    std::array<Port, NB_PORTS> ports;
 };

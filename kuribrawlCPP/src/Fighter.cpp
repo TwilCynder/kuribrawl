@@ -30,3 +30,11 @@ CurrentAnimation* Fighter::getCurrentAnimation(){
 void Fighter::draw(SDL_Renderer* target, int x, int y){
     current_animation.draw(target, x, y);
 }
+
+const std::map<Fighter::State, std::string> Fighter::state_default_animation_name = {
+    {Fighter::State::IDLE, "idle"},
+    {Fighter::State::WALK, "walking"},
+    {Fighter::State::WALK_TURN, "walk_turn"},
+    {Fighter::State::JUMPSQUAT, "jumpsquat"},
+    {Fighter::State::LANDING, "landing"}
+}

@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Debug.h"
 #include "sdlHelper.h"
 #include "app.h"
 #include "defs.h"
@@ -8,7 +9,9 @@
 
 using namespace std;
 
-App::App(){
+App::App() : 
+	ports{{Port(), Port(), Port(), Port()}}
+{
 	current_game = NULL;
 }
 
@@ -41,10 +44,13 @@ void App::initSDL(){
 		printf("Failed to create renderer: %s\n", SDL_GetError());
 		exit(1);
 	}
+
+	SDL_JoystickEventState(SDL_ENABLE);
 }
 
 void App::init(){
 	initSDL();
+	Controller::initControllersData();
 	startTestGame();
 }
 
@@ -66,7 +72,15 @@ void App::handleEvents(){
 			case SDL_QUIT:
 				exit(0);
 				break;
-
+			case SDL_JOYBUTTONDOWN:
+				
+				{
+					Port* port = Port::joysticks[event.jbutton.which];
+					if (port != nullptr && port->isActive()){
+						Debug::log(port->getInputBinding()->buttons[event.jbutton.button]);
+					}
+				}
+				break;
 			default:
 				break;
 		}

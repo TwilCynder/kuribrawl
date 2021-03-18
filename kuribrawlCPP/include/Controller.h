@@ -10,6 +10,9 @@
 class Controller {
     public:
     static std::map<std::string, Controller> known_controllers;
+    static void initControllersData();
+    static Controller& addController(const std::string& name);
+    static Controller* getController(const std::string& name);
 
     Controller(int nb_buttons, int nb_sticks);
     Controller();

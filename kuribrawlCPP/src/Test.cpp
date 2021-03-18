@@ -1,6 +1,7 @@
 #include "app.h"
 #include "SDL2/SDL_image.h"
 #include "Debug.h"
+#include "Controller.h"
 
 void App::startTestGame(){
 
@@ -13,4 +14,6 @@ void App::startTestGame(){
 
 	current_game->addFighter(acid, 100, 50);
 	current_game->addFighter(acid, 500, 50);
+
+	this->ports[0].setJoystick(0, Controller::getController("GC"));
 }

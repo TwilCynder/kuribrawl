@@ -35,7 +35,7 @@ void Animation::initFrames(int n){
         throw KBFatal("Tried to init animation with 0 frames");
     }
 
-    this->frames = std::make_unique<Frame[]>(n);
+    frames = std::make_unique<Frame[]>(n);
     int w = display.w / n;
     int h = display.h;
     int x = 0;

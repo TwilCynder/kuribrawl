@@ -40,7 +40,7 @@ class Fighter {
     void draw(SDL_Renderer* target, int x, int y);
     CurrentAnimation* getCurrentAnimation();
     const Kuribrawl::Vector* getPosition();
-
+    
     bool is_initialized();
 
     static const std::map<State, std::string> state_default_animation_name; 

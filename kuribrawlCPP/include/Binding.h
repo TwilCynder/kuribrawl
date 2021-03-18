@@ -5,8 +5,10 @@
 #define MAX_NB_BUTTONS 32
 #define MAX_NB_STICKS 4
 
+class Controller;
+
 struct Binding {
     Input buttons[MAX_NB_BUTTONS];
     int tilt_stick;
-
+    Controller* controller;
 };
