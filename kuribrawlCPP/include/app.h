@@ -1,13 +1,12 @@
 #pragma once
 
-#include <forward_list>
-#include <array>
+#include <memory>
 #include "SDL2/SDL.h"
 #include "Animation.h"
 #include "Game.h"
 #include "Port.h"
 #include "GameData.h"
-#include "input.h"
+#include "ControllersData.h"
 
 #define NB_PORTS 4
 
@@ -24,14 +23,21 @@ class App
 
     SDL_Texture* loadTextureFromFile(const char* path);
 
-    GameData gameData;
+    GameData& gameData();
+    ControllersData& controllersData();
 
     private:
     void initSDL();
+    void initControllersData();
     void handleEvents();
+    void handleButtonEvent(const SDL_JoyButtonEvent* evt);
     void render();
 
     void startTestGame();
+
+    //Data singletons
+    std::unique_ptr<GameData> game_data;
+    std::unique_ptr<ControllersData> controllers_data;
 
     SDL_Window* window;
     SDL_Renderer* renderer;

@@ -28,6 +28,7 @@ enum CommonElement {
 };
 
 enum ElementType {
+    UNKNOWN = -1,
     BUTTON,
     STICK,
     TRIGGER

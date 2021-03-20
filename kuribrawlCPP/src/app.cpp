@@ -10,13 +10,23 @@
 using namespace std;
 
 App::App() : 
-	ports{{Port(), Port(), Port(), Port()}}
+	ports{{Port(), Port(), Port(), Port()}},
+	game_data(std::make_unique<GameData>()),
+	controllers_data(std::make_unique<ControllersData>())
 {
 	current_game = NULL;
 }
 
 App::~App(){
 
+}
+
+GameData& App::gameData(){
+	return *game_data;
+}
+
+ControllersData& App::controllersData(){
+	return *controllers_data;
 }
 
 void App::initSDL(){
@@ -48,9 +58,13 @@ void App::initSDL(){
 	SDL_JoystickEventState(SDL_ENABLE);
 }
 
+void App::initControllersData(){
+	controllers_data->initControllersData();
+}
+
 void App::init(){
 	initSDL();
-	Controller::initControllersData();
+	initControllersData();
 	startTestGame();
 }
 
@@ -60,6 +74,13 @@ void App::render(){
 		current_game->draw(renderer);
 	}
 	SDLHelper::render(this->renderer);
+}
+
+void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
+	Port* port = Port::joysticks[evt->which];
+	if (port != nullptr && port->isActive()){
+		port->handleButtonPress(evt->button);
+	}
 }
 
 void App::handleEvents(){
@@ -73,13 +94,7 @@ void App::handleEvents(){
 				exit(0);
 				break;
 			case SDL_JOYBUTTONDOWN:
-				
-				{
-					Port* port = Port::joysticks[event.jbutton.which];
-					if (port != nullptr && port->isActive()){
-						Debug::log(port->getInputBinding()->buttons[event.jbutton.button]);
-					}
-				}
+				handleButtonEvent(&event.jbutton);
 				break;
 			default:
 				break;

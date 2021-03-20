@@ -1,11 +1,14 @@
 #pragma once 
 #include "inputs.h"
-#include "Port.h"
 
-typedef struct {
+class Port;
+
+struct RegisteredInput{
     Input input;
     Port* port;
     int element;
     ElementType element_type;
     int data;
-} RegisteredInput;
+
+    RegisteredInput(Input input, Port* port, int element, ElementType element_type, int data);
+} ;

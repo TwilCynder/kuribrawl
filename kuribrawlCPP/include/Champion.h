@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <map>
+#include <vector>
 #include "SDL2/SDL.h"
 #include "util.h"
 #include "Animation.h"
@@ -42,6 +43,7 @@ class Champion {
     Animation* addAnimation(const std::string& name);
     Animation* addAnimation(const std::string& name, SDL_Texture* spritesheet);
     Animation* getAnimation(const std::string& name);
+    void initAnimations(void);
 
     Champion::Values val;
 
@@ -49,6 +51,7 @@ class Champion {
     std::string name;
     std::string display_name;
     std::map<std::string, Animation> animations;
+    std::vector<Animation*> state_animations;
     std::string current;
 };
 

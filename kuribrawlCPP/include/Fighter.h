@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "CurrentAnimation.h"
 #include "Champion.h"
+#include "InputManager.h"
 #include "util.h"
 
 class Port;
@@ -41,6 +42,9 @@ class Fighter {
     CurrentAnimation* getCurrentAnimation();
     const Kuribrawl::Vector* getPosition();
     
+    State getState() const;
+    void setState(const State s, int info, bool update_anim_);
+
     bool is_initialized();
 
     static const std::map<State, std::string> state_default_animation_name; 
@@ -50,5 +54,10 @@ class Fighter {
     CurrentAnimation current_animation;
     std::string current_animation_name;
     Kuribrawl::Vector position;
+    Kuribrawl::Vector speed;
     Port* port;
+    std::unique_ptr<InputManager> input_manager;
+    State state;
+    int state_info;
+    bool update_anim;
 };

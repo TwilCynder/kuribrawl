@@ -36,3 +36,7 @@ Animation* Champion::getAnimation(const std::string& name){
     }
     return &(it->second);
 }
+
+void Champion::initAnimations(){
+    
+}

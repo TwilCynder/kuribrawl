@@ -1,5 +1,6 @@
 #include "Port.h"
 #include "Debug.h"
+#include "DebugInput.h"
 #include <stdlib.h>
 
 Port* Port::joysticks[16];
@@ -40,6 +41,11 @@ void Port::setController(Controller* c){
 //use only with active ports : controller can be null if the port is inactive
 Binding* Port::getInputBinding() const {
     return (input_binding && input_binding->controller == controller) ? input_binding : controller->default_binding.get();
+}
+
+void Port::handleButtonPress(int button){
+    Input input = getInputBinding()->buttons[button];
+	Debug::log(input);
 }
 
 void Port::setJoystick_(int id){

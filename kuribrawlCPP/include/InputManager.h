@@ -1,6 +1,6 @@
 #pragma once
 
-#include <deque>
+#include <queue>
 #include "input.h"
 #include "Port.h"
 
@@ -13,5 +13,5 @@ class InputManager {
 
     private:
 
-    std::deque<RegisteredInput> inputQ;
+    std::queue<RegisteredInput> inputQ;
 };

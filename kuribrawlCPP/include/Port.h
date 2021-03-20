@@ -23,6 +23,7 @@ class Port {
     void setController(Controller* c);
     Controller* getController() const;
     Binding* getInputBinding() const;
+    void handleButtonPress(int button);
     
     private:
     void swap_control_stick_buffers();
