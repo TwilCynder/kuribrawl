@@ -38,26 +38,53 @@ class Fighter {
     Fighter(Champion* model_);
     Fighter(Champion* model_, int x, int y);
 
-    void draw(SDL_Renderer* target, int x, int y);
-    CurrentAnimation* getCurrentAnimation();
-    const Kuribrawl::Vector* getPosition();
-    
+    void draw(SDL_Renderer* target);
+    //Physics
+    void applyPhysics();
+    //Inputs
+    void updateInputs();
+    //States
+    void updateState();
+
     State getState() const;
-    void setState(const State s, int info, bool update_anim_);
+    void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = 0);
+    CurrentAnimation* getCurrentAnimation();
+    Kuribrawl::Vector* getPosition();
+    void setSpeed(double x, double y);
+    bool getGrounded() const;
+
+
+    InputManager* getInputManager() const;
+    Port* getPort() const;
+    void setPort(Port* port);
 
     bool is_initialized();
 
     static const std::map<State, std::string> state_default_animation_name; 
 
     private:
-    Champion* model;
+    Champion* model;    //Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)
+
     CurrentAnimation current_animation;
     std::string current_animation_name;
+
     Kuribrawl::Vector position;
-    Kuribrawl::Vector speed;
-    Port* port;
+    Kuribrawl::VectorDouble speed;
+    Port* port;     ////Pointer validity : dla merde
     std::unique_ptr<InputManager> input_manager;
+
     State state;
     int state_info;
+    int state_timer;
     bool update_anim;
+    bool paused;
+    int facing;
+    bool grounded;
+
+    //Inputs
+    void checkStickState();
+
+    //Physics
+    void groundCollision();
+    void groundToAir();
 };

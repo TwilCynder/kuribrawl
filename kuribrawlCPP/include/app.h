@@ -10,6 +10,8 @@
 
 #define NB_PORTS 4
 
+class Port;
+
 class App
 {
     public:
@@ -26,11 +28,13 @@ class App
     GameData& gameData();
     ControllersData& controllersData();
 
+    Port* joysticks[16]; //Pointer validity : can be invalidated if a Port is deleted
     private:
     void initSDL();
     void initControllersData();
     void handleEvents();
     void handleButtonEvent(const SDL_JoyButtonEvent* evt);
+    void readPorts();
     void render();
 
     void startTestGame();
@@ -42,6 +46,6 @@ class App
     SDL_Window* window;
     SDL_Renderer* renderer;
 
-    Game* current_game;
-    std::array<Port, NB_PORTS> ports;
+    Game* current_game; //Pointer validity : is invalitated when the game is destroyed (everytime a game ends)
+    std::vector<Port> ports;
 };

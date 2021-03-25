@@ -46,6 +46,8 @@ void Animation::initFrames(int n){
         frame->display.y = 0;
         frame->display.w = w;
         frame->display.h = h;
+        frame->origin.x = w / 2;
+        frame->origin.y = h;
         x += w;
     }
     nb_frames = n;
@@ -74,13 +76,13 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame){
         throw KBFatal("Frame index out of bounds");
     }
 
-    SDL_Rect* source = &frames[frame].display;
+    Frame& source = frames[frame];
 
     SDL_Rect dest;
-    dest.x = x;
-    dest.y = y;
-    dest.w = source->w;
-    dest.h = source->h;
+    dest.x = x - source.origin.x;
+    dest.y = y - source.origin.y;
+    dest.w = source.display.w;
+    dest.h = source.display.h;
 
-    SDL_RenderCopy(target, spritesheet, source, &dest);
+    SDL_RenderCopy(target, spritesheet, &source.display, &dest);
 }

@@ -1,10 +1,14 @@
 #include "Champion.h"
 #include "Debug.h"
 
+#define DEFAULT_GRAVITY 0.6
+
 Champion::Champion(const std::string& name_):
     name(name_)
 {
-    
+    this->val.gravity = DEFAULT_GRAVITY;
+    this->val.jump_speed = 8;
+    this->val.walk_speed = 2.0;
 }
 
 Animation* Champion::addAnimation(const std::string& name){

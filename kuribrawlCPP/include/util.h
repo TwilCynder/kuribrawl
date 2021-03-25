@@ -23,5 +23,7 @@ namespace Kuribrawl {
         double x;
         double y;
     };
+
+    int sign(int);
 }
 

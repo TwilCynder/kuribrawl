@@ -18,7 +18,7 @@ class CurrentAnimation{
     void advance();
 
     private:
-    Animation* model;
+    Animation* model;  //Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)
 
     int current_frame; //index of the current frame
     int timeleft; //number of frames remaining *on the current frame*

@@ -5,8 +5,8 @@
 
 using namespace std;
 
-Game::Game(){
-
+Game::Game()
+{
 }
 
 Fighter* Game::addFighter(Champion* model){
@@ -27,10 +27,29 @@ bool Game::is_running(){
 
 void Game::draw(SDL_Renderer* target){
     std::forward_list<Fighter>::iterator it;
-    const Kuribrawl::Vector* pos;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        pos = it->getPosition();
-        it->draw(target, pos->x, pos->y);
+        it->draw(target);
+    }
+}
+
+void Game::updateInputs(){
+    std::forward_list<Fighter>::iterator it;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        it->updateInputs();
+    }
+}
+
+void Game::updateInputs(){
+    std::forward_list<Fighter>::iterator it;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        it->updateState();
+    }
+}
+
+void Game::applyPhysics(){
+    std::forward_list<Fighter>::iterator it;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        it->applyPhysics();
     }
 }
 

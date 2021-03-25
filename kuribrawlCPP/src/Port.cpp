@@ -1,13 +1,16 @@
 #include "Port.h"
+#include "InputManager.h"
 #include "Debug.h"
 #include "DebugInput.h"
+#include "app.h"
 #include <stdlib.h>
 
-Port* Port::joysticks[16];
-
-Port::Port() : 
+Port::Port(App* app_) : 
+    app(app_),
     joystick_id(-1),
-    input_binding(0)
+    input_binding(0),
+    debug(12),
+    active(false)
 {
     int* buffer = (int*)malloc(CONTROL_STICK_FRAME_BUFFER * 4);
 
@@ -29,14 +32,13 @@ bool Port::isActive() const{
     return active;
 }
 
-Controller* Port::getController() const {
+ControllerType* Port::getController() const {
     return controller;
 }
 
-void Port::setController(Controller* c){
+void Port::setController(ControllerType* c){
     controller = c;
 }
-
 
 //use only with active ports : controller can be null if the port is inactive
 Binding* Port::getInputBinding() const {
@@ -44,23 +46,52 @@ Binding* Port::getInputBinding() const {
 }
 
 void Port::handleButtonPress(int button){
+    if (!fighter) return;
+
     Input input = getInputBinding()->buttons[button];
-	Debug::log(input);
+    InputManager* manager = fighter->getInputManager();
+    manager->registerInput(input, this, button, ElementType::BUTTON, 0);
+}
+
+const Kuribrawl::Vector& Port::getControlStickState() const{
+    return control_stick.current_state;
+}
+
+const Kuribrawl::Vector& Port::getSecondaryStickState() const{
+    return secondary_stick.current_state;
+}
+
+void Port::readController(){
+    control_stick.current_state.x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTX);
+    control_stick.current_state.y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTY);
+    secondary_stick.current_state.x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTX);
+    secondary_stick.current_state.y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTY);
+
+    //détection du passage de threshold
+
+    control_stick.updatePrevious();
+    secondary_stick.updatePrevious();
 }
 
 void Port::setJoystick_(int id){
-    joystick = SDL_JoystickOpen(id);
-    SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
+    joystick = SDL_GameControllerOpen(id);
+    SDL_JoystickID instance_id = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(joystick));
 
     if (active){
-        joysticks[joystick_id] = nullptr;
+        app->joysticks[joystick_id] = nullptr;
     }
+
+    if (instance_id < 0) {
+        Debug::log(SDL_GetError());
+        return;
+    }
+
     active = true;
     joystick_id = instance_id;
-    joysticks[instance_id] = this;
+    app->joysticks[instance_id] = this;
 }
 
-void Port::setJoystick(int id, Controller* c){
+void Port::setJoystick(int id, ControllerType* c){
     if (!c){
         throw KBFatal("Trying to enable joystick with null controller pointer");
     }
@@ -75,6 +106,16 @@ void Port::setJoystick(int id){
     setJoystick_(id);
 }
 
+void Port::setFighter(Fighter* fighter_){
+    fighter = fighter_;
+    fighter->setPort(this);
+}
+
 void Port::deactivate(){
     active = false;
+}
+
+void Port::Stick::updatePrevious(){
+    previous_state.x = current_state.x;
+    previous_state.y = current_state.y;
 }

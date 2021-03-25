@@ -6,11 +6,13 @@
 #include "defs.h"
 #include "Champion.h"
 #include "GameData.h"
+#include "InputManager.h"
+#include "Port.h"
 
 using namespace std;
 
 App::App() : 
-	ports{{Port(), Port(), Port(), Port()}},
+	ports{Port(this), Port(this), Port(this), Port(this)},
 	game_data(std::make_unique<GameData>()),
 	controllers_data(std::make_unique<ControllersData>())
 {
@@ -64,6 +66,7 @@ void App::initControllersData(){
 
 void App::init(){
 	initSDL();
+	InputManager::initInputHandlers();
 	initControllersData();
 	startTestGame();
 }
@@ -71,15 +74,22 @@ void App::init(){
 void App::render(){
 	SDLHelper::prepareRender(this->renderer);
 	if (current_game && current_game->is_running()){
-		current_game->draw(renderer);
 	}
 	SDLHelper::render(this->renderer);
 }
 
 void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
-	Port* port = Port::joysticks[evt->which];
+	Port* port = joysticks[evt->which];
 	if (port != nullptr && port->isActive()){
 		port->handleButtonPress(evt->button);
+	}
+}
+
+void App::readPorts(){
+	for (int i = 0; i < ports.size(); i++){
+		if (ports[i].isActive()){
+			ports[i].readController();
+		}
 	}
 }
 
@@ -105,10 +115,16 @@ void App::handleEvents(){
 void App::loop(){
     while(1){
         this->handleEvents();
+		SDLHelper::prepareRender(this->renderer);
+		readPorts();
 		if (current_game && current_game->is_running()){
+			current_game->updateStates();
+			current_game->updateInputs();
+			current_game->applyPhysics();
+			current_game->draw(renderer);
 			current_game->advanceAnimations();
 		}
-		this->render();
+		SDLHelper::render(this->renderer);
         SDL_Delay(15);
     }
 }

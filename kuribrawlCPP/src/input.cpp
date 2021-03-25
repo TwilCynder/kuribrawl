@@ -1,4 +1,5 @@
 #include "input.h"
+#include "Debug.h"
 
 RegisteredInput::RegisteredInput(Input input_, Port* port_, int element_ = -1, ElementType element_type_ = ElementType::UNKNOWN, int data_ = 0) : 
     input(input_),
@@ -6,4 +7,5 @@ RegisteredInput::RegisteredInput(Input input_, Port* port_, int element_ = -1, E
     element(element_),
     element_type(element_type_),
     data(data_)
-{}
+{   
+}

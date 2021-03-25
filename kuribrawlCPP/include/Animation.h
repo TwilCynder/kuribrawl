@@ -8,7 +8,6 @@ using namespace Kuribrawl;
 
 class Animation {
     friend class CurrentAnimation;
-    public:
 
     struct Frame {
         SDL_Rect display;
@@ -17,6 +16,8 @@ class Animation {
         std::unique_ptr<Hurtbox[]> hurtboxes;
         std::unique_ptr<Hitbox[]> hitboxes;
     };
+
+    public:
 
     Animation();
     Animation(SDL_Texture* spritesheet);
@@ -27,7 +28,7 @@ class Animation {
     void initFrames(int n);
     bool is_initialized();
     int getNbFrames();
-    Frame* getFrame(int n);
+    Frame* getFrame(int n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
     void setBaseSpeed(double speed);
 
     void draw(SDL_Renderer* target, int x, int y, int frame);

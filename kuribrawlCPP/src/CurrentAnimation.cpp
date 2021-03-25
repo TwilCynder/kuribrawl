@@ -1,5 +1,3 @@
-#pragma once
-
 #include <math.h>
 #include "CurrentAnimation.h"
 #include "Debug.h"
@@ -109,7 +107,7 @@ void CurrentAnimation::nextFrame(){
 
 void CurrentAnimation::draw(SDL_Renderer* target, int x, int y){
     if (!model){
-        throw KBFatal("Tried to draw un-initalized CurrentAnimation");
+        throw KBFatal("Tried to draw non-initalized CurrentAnimation");
     }
 
     model->draw(target, x, y, current_frame);

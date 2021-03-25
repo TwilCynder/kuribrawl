@@ -1,7 +1,8 @@
 #include "app.h"
 #include "SDL2/SDL_image.h"
 #include "Debug.h"
-#include "Controller.h"
+#include "ControllerType.h"
+#include "Fighter.h"
 
 void App::startTestGame(){
     Champion* acid = this->gameData().addChampion("acid");
@@ -9,11 +10,11 @@ void App::startTestGame(){
 
 	idle->initFrames(4);
 
-
 	current_game = new Game();
 
-	current_game->addFighter(acid, 100, 50);
-	current_game->addFighter(acid, 500, 50);
+	Fighter* f1 = current_game->addFighter(acid, 100, 50);
+	//current_game->addFighter(acid, 500, 50);
 
-	this->ports[0].setJoystick(0, this->controllersData().getController("GC"));
+	ports[0].setJoystick(0, this->controllersData().getController("GC"));
+	ports[0].setFighter(f1);
 }

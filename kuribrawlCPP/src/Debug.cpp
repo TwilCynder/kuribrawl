@@ -10,6 +10,11 @@ void Debug::log(int i){
     fflush(stdout);
 }
 
+void Debug::log(double d){
+    cout << d << '\n';
+    fflush(stdout);
+}
+
 void Debug::log(void * p){
     cout << p << '\n';
     fflush(stdout);

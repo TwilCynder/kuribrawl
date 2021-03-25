@@ -9,5 +9,6 @@
 namespace Debug {
     void log(std::string s);
     void log(int i);
+    void log(double d);
     void log(void* p);
 }
