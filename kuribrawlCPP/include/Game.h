@@ -14,11 +14,11 @@ class Game {
     //main loop
 
     void applyPhysics();
-    void updateAnimations();
     void advanceAnimations();
     void draw(SDL_Renderer* target);
     void updateInputs();
     void updateStates();
+    void updateAnimations();
 
     private:
     std::forward_list<Fighter> fighters;

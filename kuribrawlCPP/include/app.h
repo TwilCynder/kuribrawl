@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "SDL2/SDL.h"
 #include "Animation.h"
 #include "Game.h"
@@ -23,15 +24,17 @@ class App
     void loop();
     void stop();
 
-    SDL_Texture* loadTextureFromFile(const char* path);
-
     GameData& gameData();
     ControllersData& controllersData();
 
-    Port* joysticks[16]; //Pointer validity : can be invalidated if a Port is deleted
+    //SDL functions
+    SDL_Texture* LoadTexture(const char *file);
+
+    Port* joysticks[16]; //Pointer validity : can be invalidated if a Port is deleted or moved
     private:
     void initSDL();
     void initControllersData();
+    void initGameData();
     void handleEvents();
     void handleButtonEvent(const SDL_JoyButtonEvent* evt);
     void readPorts();

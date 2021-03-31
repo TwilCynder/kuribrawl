@@ -6,14 +6,18 @@
 
 
 int main(int argc, char** argv) try {
-    
-    App app;
-    app.init();
-    app.loop();
+    try {
+        App app;
+        app.init();
+        app.loop();
+    } catch (KBFatal& exception){
+        cerr << "Uncaught exception : \033[0;31m" << exception.what() << "\033[0m\n";
+        exit (1);
+    }
 
     return 0;
 
 } catch (KBFatal& exception){
-    cerr << "Uncaught exception : " << exception.what() << '\n';
+    cerr << "Uncaught exception : \033[0;31m" << exception.what() << "\033[0m\n";
     exit (1);
 }

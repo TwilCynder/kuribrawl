@@ -4,11 +4,16 @@
 #define DEFAULT_GRAVITY 0.6
 
 Champion::Champion(const std::string& name_):
-    name(name_)
+    name(name_),
+    state_animations(std::make_unique<Animation*[]>((int)Fighter::State::STATES))
 {
     this->val.gravity = DEFAULT_GRAVITY;
     this->val.jump_speed = 8;
     this->val.walk_speed = 2.0;
+}
+
+const std::string& Champion::getName(){
+    return name;
 }
 
 Animation* Champion::addAnimation(const std::string& name){
@@ -41,6 +46,15 @@ Animation* Champion::getAnimation(const std::string& name){
     return &(it->second);
 }
 
+Animation* Champion::getStateAnimation(const Fighter::State state) const {
+    return state_animations[(int)state];
+}
+
 void Champion::initAnimations(){
-    
+    Animation* anim;
+    for (auto const& [state, name] : Fighter::state_default_animation_name){
+        if (anim = getAnimation(name)){
+            state_animations[(int)state] = anim;
+        }
+    }
 }

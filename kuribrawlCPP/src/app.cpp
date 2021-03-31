@@ -8,6 +8,7 @@
 #include "GameData.h"
 #include "InputManager.h"
 #include "Port.h"
+#include "hardCoded.h"
 
 using namespace std;
 
@@ -60,14 +61,25 @@ void App::initSDL(){
 	SDL_JoystickEventState(SDL_ENABLE);
 }
 
+SDL_Texture* App::LoadTexture(const char *file){
+	return IMG_LoadTexture(renderer, file);
+}
+
+void App::initGameData(){
+	HardCoded::initGameData(this);
+}
+
 void App::initControllersData(){
-	controllers_data->initControllersData();
+	HardCoded::initControllersData(*controllers_data);
 }
 
 void App::init(){
 	initSDL();
 	InputManager::initInputHandlers();
+	initGameData();
 	initControllersData();
+	game_data->readDataFile();
+	
 	startTestGame();
 }
 
@@ -121,6 +133,7 @@ void App::loop(){
 			current_game->updateStates();
 			current_game->updateInputs();
 			current_game->applyPhysics();
+			current_game->updateAnimations();
 			current_game->draw(renderer);
 			current_game->advanceAnimations();
 		}

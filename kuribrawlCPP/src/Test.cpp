@@ -5,13 +5,9 @@
 #include "Fighter.h"
 
 void App::startTestGame(){
-    Champion* acid = this->gameData().addChampion("acid");
-	Animation* idle = acid->addAnimation("idle", IMG_LoadTexture(this->renderer, "../src/res/idle_strip4.png"));
-
-	idle->initFrames(4);
-
 	current_game = new Game();
 
+	Champion* acid = game_data->getChampion("acid");
 	Fighter* f1 = current_game->addFighter(acid, 100, 50);
 	//current_game->addFighter(acid, 500, 50);
 

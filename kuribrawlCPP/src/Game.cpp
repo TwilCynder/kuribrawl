@@ -39,10 +39,17 @@ void Game::updateInputs(){
     }
 }
 
-void Game::updateInputs(){
+void Game::updateStates(){
     std::forward_list<Fighter>::iterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->updateState();
+    }
+}
+
+void Game::updateAnimations(){
+    std::forward_list<Fighter>::iterator it;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        it->updateAnimation();
     }
 }
 

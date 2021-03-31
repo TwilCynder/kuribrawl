@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include <map>
-#include <vector>
+#include <memory>
 #include "SDL2/SDL.h"
 #include "util.h"
 #include "Animation.h"
+#include "Fighter.h"
 
 class Champion {
     public:
@@ -40,9 +41,11 @@ class Champion {
     };
 
     Champion(const std::string& name_);
+    const std::string& getName();
     Animation* addAnimation(const std::string& name);
     Animation* addAnimation(const std::string& name, SDL_Texture* spritesheet);
     Animation* getAnimation(const std::string& name);
+    Animation* getStateAnimation(const Fighter::State state) const;
     void initAnimations(void);
 
     Champion::Values val;
@@ -51,7 +54,7 @@ class Champion {
     std::string name;
     std::string display_name;
     std::map<std::string, Animation> animations;
-    std::vector<Animation*> state_animations;
+    std::unique_ptr<Animation*[]> state_animations;  //Pointer validity : can be invalidated if an Animation is moved or deleted
     std::string current;
 };
 

@@ -14,6 +14,12 @@ namespace Kuribrawl {
         int y;
     };
 
+    template <typename T>
+    struct VectorT {
+        T x;
+        T y;
+    };
+
     struct Rect {
         int w;
         int y;

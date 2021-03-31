@@ -28,5 +28,5 @@ class ControllerType {
     private:
     ControllerVals vals;
     int nb_buttons;
-    int nb_sticks; //Sticks include triggers 
+    int nb_sticks; //Sticks include triggers //no they don't
 };

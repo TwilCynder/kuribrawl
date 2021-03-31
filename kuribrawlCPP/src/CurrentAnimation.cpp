@@ -19,11 +19,11 @@ bool CurrentAnimation::is_initialized(){
 }
 
 void CurrentAnimation::setAnimation(Animation* anim){
-    setAnimation(anim, speed);
+    setAnimation(anim, anim->base_speed);
 }
 
 void CurrentAnimation::setAnimation(Animation* anim, double speed_){
-    this->model = anim;
+    model = anim;
     init();
     setSpeed(speed_);
     start();

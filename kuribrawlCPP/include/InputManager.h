@@ -1,5 +1,4 @@
 #pragma once
-
 #include <deque>
 #include "input.h"
 #include "inputs.h"

@@ -3,11 +3,11 @@
 #include <string>
 #include "SDL2/SDL.h"
 #include "CurrentAnimation.h"
-#include "Champion.h"
 #include "InputManager.h"
 #include "util.h"
 
 class Port;
+class Champion;
 
 class Fighter {
     public:
@@ -32,7 +32,8 @@ class Fighter {
         LANDING_LAG,
         CROUCH,
         CROUCH_START,
-        CROUCH_STOP
+        CROUCH_STOP,
+        STATES
     };
 
     Fighter(Champion* model_);
@@ -45,9 +46,10 @@ class Fighter {
     void updateInputs();
     //States
     void updateState();
+    void updateAnimation();
 
     State getState() const;
-    void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = 0);
+    void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
     CurrentAnimation* getCurrentAnimation();
     Kuribrawl::Vector* getPosition();
     void setSpeed(double x, double y);

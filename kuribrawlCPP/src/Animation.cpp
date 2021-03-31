@@ -61,7 +61,7 @@ int Animation::getNbFrames(){
     return nb_frames;
 }
 
-Animation::Frame* Animation::getFrame(int n){
+Frame* Animation::getFrame(int n){
     return &frames[n];
 }
 

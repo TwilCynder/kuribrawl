@@ -1,5 +1,6 @@
 #include <math.h>
 #include "Fighter.h"
+#include "Champion.h"
 #include "Debug.h"
 #include "util.h"
 

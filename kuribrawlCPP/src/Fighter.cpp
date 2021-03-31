@@ -4,6 +4,7 @@
 #include "Port.h"
 #include "defs.h"
 #include "util.h"
+#include "Champion.h"
 #include <math.h>
 
 Fighter::Fighter(Champion* model_):
@@ -21,7 +22,12 @@ Fighter::Fighter(Champion* model_, int x_, int y_):
     state(State::IDLE)
 {
     Animation* idle_anim = model->getAnimation("idle");
-    current_animation.setAnimation(idle_anim, 0.05);
+
+    if (!idle_anim){
+        throw KBFatal("Tried to instanciate a champion with no idle animation");
+    }
+
+    current_animation.setAnimation(idle_anim);
 
     position.x = x_;
     position.y = y_;
@@ -77,6 +83,16 @@ void Fighter::updateInputs(){
 
 void Fighter::updateState(){
     ++state_timer; 
+}
+
+void Fighter::updateAnimation(){
+    if (update_anim){
+        Animation* anim = model->getStateAnimation(state);
+        if (anim){
+            current_animation.setAnimation(anim);
+        }
+        update_anim = false;
+    }
 }
 
 InputManager* Fighter::getInputManager() const{

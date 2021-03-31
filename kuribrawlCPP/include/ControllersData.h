@@ -8,5 +8,4 @@ class ControllersData {
     std::map<std::string, ControllerType> known_controllers;
     ControllerType& addController(const std::string& name);
     ControllerType* getController(const std::string& name);
-    void initControllersData();
 };

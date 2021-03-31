@@ -4,7 +4,6 @@
 #include "Fighter.h"
 #include "ControllerType.h"
 #include "Binding.h"
-#include "ControllerState.h"
 #include "inputs.h"
 #include "util.h"
 
