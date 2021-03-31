@@ -45,6 +45,7 @@ class Champion {
     Animation* addAnimation(const std::string& name);
     Animation* addAnimation(const std::string& name, SDL_Texture* spritesheet);
     Animation* getAnimation(const std::string& name);
+    Animation& tryAnimation(const std::string& name);
     Animation* getStateAnimation(const Fighter::State state) const;
     void initAnimations(void);
 

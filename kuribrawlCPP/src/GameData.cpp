@@ -38,7 +38,9 @@ void GameData::readDataFile(){
     while (!data_file.eof()){
         switch (data_file.readFileType()){
             case DataFile::FileType::ANIMATION:
-                tag.assign(data_file.readFileTag());
+                
+                data_file.readAnimationFile(tryChampion(tag).tryAnimation(tag));
+
                 Debug::log(tag);
                 return;
                 break;

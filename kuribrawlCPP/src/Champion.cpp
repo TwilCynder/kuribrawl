@@ -46,6 +46,11 @@ Animation* Champion::getAnimation(const std::string& name){
     return &(it->second);
 }
 
+Animation& Champion::tryAnimation(const std::string& name){
+    auto [node, success] = animations.try_emplace(name, name);
+    return node->second;
+}
+
 Animation* Champion::getStateAnimation(const Fighter::State state) const {
     return state_animations[(int)state];
 }
