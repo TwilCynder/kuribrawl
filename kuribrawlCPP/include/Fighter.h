@@ -9,6 +9,10 @@
 class Port;
 class Champion;
 
+/**
+ * @brief In-game character ("instance" of a Champion)
+ * 
+ */
 class Fighter {
     public:
 
