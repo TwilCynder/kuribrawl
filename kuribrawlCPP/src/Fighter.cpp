@@ -7,11 +7,23 @@
 #include "Champion.h"
 #include <math.h>
 
+/**
+ * @brief Construct a new Fighter:: Fighter object
+ * Creates a Fighter at position 0,0
+ * @param model_ : the Champion used as a model
+ */
 Fighter::Fighter(Champion* model_):
     Fighter(model_, 0, 0)
 {
 }
 
+/**
+ * @brief Construct a new Fighter:: Fighter object
+ * 
+ * @param model_ 
+ * @param x_ 
+ * @param y_ 
+ */
 Fighter::Fighter(Champion* model_, int x_, int y_):
     model(model_),
     input_manager(std::make_unique<InputManager>(this)),
@@ -60,7 +72,7 @@ void Fighter::draw(SDL_Renderer* target){
     current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y);
 }
 
-void Fighter::checkStickState(){
+void Fighter::checkStickState(){ //lots of error checks to do
     Kuribrawl::Vector control_stick_state = port->getControlStickState();
     ControllerType::ControllerVals controller_vals = port->getController()->getControllerVals();
     switch (state){
@@ -69,6 +81,11 @@ void Fighter::checkStickState(){
                 if (grounded){
                     setState(State::WALK, Kuribrawl::sign(control_stick_state.x));
                 }
+            }
+            break;
+        case State::WALK:
+            if (abs(control_stick_state.x) < controller_vals){
+                setState(State::IDLE);
             }
             break;
         default:
