@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.72 (Windows - x64)">
+  <section name="config">
+    <options closefiles="1" openmode="0" name="KuriBrawl"/>
+  </section>
+  <section name="data">
+    <explorer view="src\" pattern="0"/>
+    <log show="1"/>
+    <lastopen date="2021-03-21 19:48" user="twilc" host="TWIL-DESKTOP"/>
+  </section>
+  <section name="files">
+    <file name="src\animationlib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="c248c130d294dc2b067251baf1fbdba4"/>
+    </file>
+    <file name="src\animations.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="a9d6b398b113a35cbfe22eeb1bb4d066"/>
+    </file>
+    <file name="src\applib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="19ef5f17b632efa9cb241c3b194c14d7"/>
+    </file>
+    <file name="src\cleanseLib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="ddef9a4a3dd02f41cccb449bd6da1b6d"/>
+    </file>
+    <file name="src\debug.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="6dee0500234372b23870c1a8072f2b44"/>
+    </file>
+    <file name="src\debugData.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="e8823eaac05284c454f53d92e6aafa8e"/>
+    </file>
+    <file name="src\debugH.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="a2171ece2ecf31a8c14c31e709525ee8"/>
+    </file>
+    <file name="src\filelib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="6551a939f269880f9654215676ff5ab6"/>
+    </file>
+    <file name="src\gameData.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="3c79438087a74cc6cd2e07dc9f81068c"/>
+    </file>
+    <file name="src\gameDataLib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="c569bdb8429942e72dcb11521a1ef492"/>
+    </file>
+    <file name="src\gameInputlib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="99856e600c990c4b7186e703e099500f"/>
+    </file>
+    <file name="src\gamelib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="3c5ac78ddf3821245cec9b75ad4007fa"/>
+    </file>
+    <file name="src\gamelibConstants.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="94fa803d429c22f771b3cb72b1ba4082"/>
+    </file>
+    <file name="src\inputlib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="4c6cd09010fad1c5c43004682271daf4"/>
+    </file>
+    <file name="src\inputlibConstants.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="df6cb81cb8a6953a18dc53798e788fcc"/>
+    </file>
+    <file name="src\inputlibData.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="f3a89527c1745f2957111dcc6cfca01f"/>
+    </file>
+    <file name="src\loadLib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="7b43eeaab306fd0daea6073d3bc538ec"/>
+    </file>
+    <file name="src\main.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="2764229b1055c9417f6266787f51e145"/>
+    </file>
+    <file name="src\mainlib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="509e6c67889e0f7d5f7a7ecf6f74e0c8"/>
+    </file>
+    <file name="src\menulib.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="2d09aefd23ee0da9713674bd8529df12"/>
+    </file>
+    <file name="src\menus.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="28d29949b46643556d7d9fa8a8273304"/>
+    </file>
+    <file name="src\physicslib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="ed297789c34833b91e2eaf62f9cfd8fa"/>
+    </file>
+    <file name="src\statelib.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
+      <fingerprint md5="0fa04c918b6c16f42d6b92d7e5191d59"/>
+    </file>
+    <file name="src\utilCore.pb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="5966034fbe8adc58dfc92e92666f3247"/>
+    </file>
+  </section>
+  <section name="targets">
+    <target name="Default Target" enabled="1" default="1">
+      <inputfile value="src\main.pb"/>
+      <outputfile value="bin\KuriBrawl.exe"/>
+      <executable value="build\KuriBrawl.exe"/>
+      <options xpskin="1" debug="1"/>
+      <purifier enable="1"/>
+      <subsystem value="openGL"/>
+      <icon enable="1">GraphicDesignIsMyPassion\icon.ico</icon>
+    </target>
+  </section>
+</project>
