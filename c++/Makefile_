@@ -1,0 +1,40 @@
+PROG = kuribrawl
+CC = gcc
+
+OUT = bin
+
+SEARCHPATH += src
+vpath %.cpp $(SEARCHPATH)
+vpath %.h $(SEARCHPATH)
+
+DEPS += defs.h
+
+_OBJS += app.o main.o
+
+OBJS = $(patsubst %,$(OUT)/%,$(_OBJS))
+
+# top-level rule to create the program.
+all: $(PROG)
+
+# compiling other source files.
+$(OUT)/%.o: %.cpp %.h $(DEPS)
+	@mkdir -p $(OUT)
+	$(CC) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+bin/main.o: main.cpp app.h
+	@mkdir -p $(OUT)
+	$(CC) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+# cleaning everything that can be automatically recreated with "make".
+clean:
+	$(RM) -rf $(OUT) $(PROG)
+
+
+CXXFLAGS += `sdl2-config --cflags`
+CXXFLAGS += -g -lefence
+
+LDFLAGS += `sdl2-config --libs` -lSDL2_mixer -lSDL2_image -lSDL2_ttf -lm
+
+# linking the program.
+$(PROG): $(OBJS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
