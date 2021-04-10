@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['fighter_449',['Fighter',['../class_fighter.html',1,'']]],
-  ['frame_450',['Frame',['../struct_frame.html',1,'']]]
+  ['fighter_426',['Fighter',['../class_fighter.html',1,'']]],
+  ['frame_427',['Frame',['../struct_frame.html',1,'']]]
 ];

@@ -7,7 +7,7 @@
 <area shape="rect" id="node4" href="$struct_champion_1_1_values.html" title=" " alt="" coords="92,199,220,225"/>
 <area shape="rect" id="node5" href="$struct_champion_1_1_shield_info.html" title=" " alt="" coords="84,96,228,123"/>
 <area shape="rect" id="node6" href="$struct_kuribrawl_1_1_vector.html" title=" " alt="" coords="95,5,217,32"/>
-<area shape="rect" id="node8" href="$class_animation.html" title=" " alt="" coords="5,148,85,175"/>
+<area shape="rect" id="node8" href="$class_animation.html" title="An animation. Animations are composed of a source image and an array of frames, which are just rectan..." alt="" coords="5,148,85,175"/>
 <area shape="rect" id="node10" href="$struct_port_1_1_stick.html" title=" " alt="" coords="557,249,641,276"/>
 <area shape="rect" id="node14" href="$class_app.html" title=" " alt="" coords="420,583,465,609"/>
 <area shape="rect" id="node11" href="$struct_binding.html" title=" " alt="" coords="497,404,562,431"/>

@@ -7,6 +7,11 @@
 using namespace Kuribrawl;
 struct Frame;
 
+/**
+ * @brief An animation. 
+ * Animations are composed of a source image and an array of frames, which are just rectangle positions on the source image.
+ */
+
 class Animation {
     friend class CurrentAnimation;
 

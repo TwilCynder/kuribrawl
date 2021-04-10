@@ -1,7 +1,7 @@
 <map id="CurrentAnimation" name="CurrentAnimation">
 <area shape="rect" id="node1" title=" " alt="" coords="17,211,140,237"/>
 <area shape="rect" id="node4" href="$class_fighter.html" title="In&#45;game character (&quot;instance&quot; of a Champion)" alt="" coords="248,407,311,433"/>
-<area shape="rect" id="node2" href="$class_animation.html" title=" " alt="" coords="65,109,145,136"/>
+<area shape="rect" id="node2" href="$class_animation.html" title="An animation. Animations are composed of a source image and an array of frames, which are just rectan..." alt="" coords="65,109,145,136"/>
 <area shape="rect" id="node3" href="$struct_kuribrawl_1_1_vector.html" title=" " alt="" coords="190,5,311,32"/>
 <area shape="rect" id="node8" href="$struct_champion_1_1_shield_info.html" title=" " alt="" coords="178,109,322,136"/>
 <area shape="rect" id="node10" href="$struct_port_1_1_stick.html" title=" " alt="" coords="403,160,487,187"/>

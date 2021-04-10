@@ -2,23 +2,53 @@
 #include "Animation.h"
 #include <stdio.h>
 
+/**
+ * @brief Construct a new Animation object, without any frames or spritesheet.
+ * The frame array is not even created, which means that this object should not be used at all until frames are created with Animation::initFrames()
+ */
+
 Animation::Animation():
     base_speed(1),
-    nb_frames(0)
+    nb_frames(0),
+    frames(NULL)
 {
 }
+
+/**
+ * @brief Construct a new Animation object, without any frames.
+ * The frame array is not even created, which means that this object should not be used at all until frames are created with Animation::initFrames().
+ * Delegates to Animation::Animation().
+ * @param spritesheet_ SDL Texture that will be used as the source image, containing all frames.
+ */
 
 Animation::Animation(SDL_Texture* spritesheet_) : Animation(){
     setSpritesheet(spritesheet_);
 }
 
+/**
+ * @brief Construct a new Animation object.
+ * 
+ * @param spritesheet SDL Texture that will be used as the source image, containing all frames.
+ * @param nFrames Number of frames this animation has.
+ */
+
 Animation::Animation(SDL_Texture* spritesheet, int nFrames) : Animation(spritesheet){
     initFrames(nFrames);
 }
 
-Animation::~Animation(){
+/**
+ * @brief Destroy the Animation object
+ * 
+ */
 
+Animation::~Animation(){
 }
+
+/**
+ * @brief Sets the current spritesheeet (source image)
+ * 
+ * @param spritesheet the SDL texture that will be used as the spritesheet.
+ */
 
 void Animation::setSpritesheet(SDL_Texture* spritesheet){
     if (!spritesheet){
@@ -28,9 +58,22 @@ void Animation::setSpritesheet(SDL_Texture* spritesheet){
     SDL_QueryTexture(spritesheet, NULL, NULL, &this->display.x, &this->display.y);
 }
 
+/**
+ * @brief Returns the current source image
+ * 
+ * @return SDL_Texture* 
+ */
+
 SDL_Texture* Animation::getSpritesheet() const {
     return spritesheet;
 }
+
+/**
+ * @brief Initializes this Animation's frames.
+ * This function creates the frames array (until it's called, the array is a NULL pointer). 
+ * 
+ * @param n 
+ */
 
 void Animation::initFrames(int n){
     if (n < 1){
