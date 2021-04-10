@@ -1,7 +1,7 @@
 #pragma once
 #include "SDL2/SDL.h"
-#include "Animation.h"
 
+class Animation;
 class Fighter;
 
 class CurrentAnimation{

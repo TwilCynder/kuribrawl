@@ -1,5 +1,6 @@
 #include <math.h>
 #include "CurrentAnimation.h"
+#include "Animation.h"
 #include "Debug.h"
 #include "Frame.h"
 

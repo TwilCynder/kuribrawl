@@ -2,6 +2,7 @@
 #include "DataFile.h"
 #include "Debug.h"
 #include "Animation.h"
+#include "GameData.h"
 
 #define FILE_SIGNATURE 0x54545454
 

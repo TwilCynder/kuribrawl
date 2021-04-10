@@ -1,5 +1,6 @@
 #include "ControllerType.h"
 #include "Debug.h"
+#include "Binding.h"
 
 ControllerType::ControllerType() : 
     ControllerType(DEFAULT_NB_BUTTONS, DEFAULT_NB_STICKS)

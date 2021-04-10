@@ -1,13 +1,15 @@
 #pragma once
 #include <map>
 #include <string>
+#include <memory>
 #include "SDL2/SDL.h"
 #include "CurrentAnimation.h"
-#include "InputManager.h"
 #include "util.h"
+#include "InputManager.h"
 
 class Port;
 class Champion;
+class InputManager;
 
 /**
  * @brief In-game character ("instance" of a Champion)

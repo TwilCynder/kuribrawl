@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "util.h"
 #include "CurrentAnimation.h"
+#include "Champion.h"
 
 using namespace std;
 

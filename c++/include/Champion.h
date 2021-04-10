@@ -4,8 +4,8 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "util.h"
-#include "Animation.h"
 #include "Fighter.h"
+#include "Animation.h"
 
 class Champion {
     public:

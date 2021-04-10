@@ -5,6 +5,7 @@
 #include "util.h"
 
 using namespace Kuribrawl;
+struct Frame;
 
 class Animation {
     friend class CurrentAnimation;

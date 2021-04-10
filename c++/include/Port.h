@@ -3,13 +3,13 @@
 #include <forward_list>
 #include "Fighter.h"
 #include "ControllerType.h"
-#include "Binding.h"
 #include "inputs.h"
 #include "util.h"
 
 #define CONTROL_STICK_FRAME_BUFFER 2 //TODO make it customizable ?
 
 class App;
+class Binding;
 
 class Port {
     struct Stick {

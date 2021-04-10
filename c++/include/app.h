@@ -4,14 +4,13 @@
 #include <vector>
 #include "SDL2/SDL.h"
 #include "Animation.h"
-#include "Game.h"
-#include "Port.h"
 #include "GameData.h"
-#include "ControllersData.h"
 
 #define NB_PORTS 4
 
 class Port;
+class Game;
+class ControllersData;
 
 class App
 {

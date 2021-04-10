@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/kuribrawlCPP/include"
+                "${workspaceFolder}/c++/include"
             ],
             "defines": [
                 "_DEBUG",

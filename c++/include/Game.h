@@ -2,7 +2,8 @@
 #include <forward_list>
 #include "SDL2/SDL.h"
 #include "Fighter.h"
-#include "Champion.h"
+
+class Champion;
 
 class Game {
     public:

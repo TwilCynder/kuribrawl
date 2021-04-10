@@ -1,17 +1,15 @@
 <map id="include/Binding.h" name="include/Binding.h">
-<area shape="rect" id="node1" title=" " alt="" coords="370,5,491,32"/>
-<area shape="rect" id="node2" href="$_controller_type_8h.html" title=" " alt="" coords="211,80,372,107"/>
-<area shape="rect" id="node12" href="$_port_8h.html" title=" " alt="" coords="399,155,502,181"/>
-<area shape="rect" id="node15" href="$_binding_8cpp.html" title=" " alt="" coords="468,80,580,107"/>
-<area shape="rect" id="node3" href="$_controllers_data_8h.html" title=" " alt="" coords="208,155,375,181"/>
-<area shape="rect" id="node10" href="$_test_8cpp.html" title=" " alt="" coords="7,304,102,331"/>
-<area shape="rect" id="node14" href="$_controller_type_8cpp.html" title=" " alt="" coords="32,155,184,181"/>
-<area shape="rect" id="node4" href="$app_8h.html" title=" " alt="" coords="290,229,389,256"/>
-<area shape="rect" id="node5" href="$hard_coded_8h.html" title=" " alt="" coords="151,304,291,331"/>
-<area shape="rect" id="node11" href="$_controllers_data_8cpp.html" title=" " alt="" coords="56,229,215,256"/>
-<area shape="rect" id="node6" href="$app_8cpp.html" title=" " alt="" coords="297,379,388,405"/>
-<area shape="rect" id="node8" href="$main_8cpp.html" title=" " alt="" coords="367,304,464,331"/>
-<area shape="rect" id="node9" href="$_port_8cpp.html" title=" " alt="" coords="489,304,582,331"/>
-<area shape="rect" id="node7" href="$hard_coded_8cpp.html" title=" " alt="" coords="142,379,273,405"/>
-<area shape="rect" id="node13" href="$_fighter_8cpp.html" title=" " alt="" coords="473,229,582,256"/>
+<area shape="rect" id="node1" title=" " alt="" coords="713,5,835,32"/>
+<area shape="rect" id="node2" href="$_controller_type_8h.html" title=" " alt="" coords="457,80,619,107"/>
+<area shape="rect" id="node11" href="$_port_8cpp.html" title=" " alt="" coords="733,229,826,256"/>
+<area shape="rect" id="node12" href="$_controller_type_8cpp.html" title=" " alt="" coords="614,155,766,181"/>
+<area shape="rect" id="node13" href="$_binding_8cpp.html" title=" " alt="" coords="841,80,953,107"/>
+<area shape="rect" id="node3" href="$_controllers_data_8h.html" title=" " alt="" coords="244,155,411,181"/>
+<area shape="rect" id="node8" href="$_test_8cpp.html" title=" " alt="" coords="404,229,499,256"/>
+<area shape="rect" id="node9" href="$_port_8h.html" title=" " alt="" coords="487,155,589,181"/>
+<area shape="rect" id="node4" href="$hard_coded_8h.html" title=" " alt="" coords="5,229,145,256"/>
+<area shape="rect" id="node5" href="$app_8cpp.html" title=" " alt="" coords="321,304,411,331"/>
+<area shape="rect" id="node7" href="$_controllers_data_8cpp.html" title=" " alt="" coords="169,229,328,256"/>
+<area shape="rect" id="node6" href="$hard_coded_8cpp.html" title=" " alt="" coords="10,304,141,331"/>
+<area shape="rect" id="node10" href="$_fighter_8cpp.html" title=" " alt="" coords="574,229,683,256"/>
 </map>

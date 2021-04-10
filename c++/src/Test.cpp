@@ -3,6 +3,9 @@
 #include "Debug.h"
 #include "ControllerType.h"
 #include "Fighter.h"
+#include "Game.h"
+#include "Port.h"
+#include "ControllersData.h"
 
 void App::startTestGame(){
 	current_game = new Game();

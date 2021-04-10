@@ -6,10 +6,12 @@
 #include "defs.h"
 #include "Champion.h"
 #include "GameData.h"
+#include "Game.h"
 #include "InputManager.h"
 #include "Port.h"
 #include "hardCoded.h"
 #include "load.h"
+#include "ControllersData.h"
 
 using namespace std;
 

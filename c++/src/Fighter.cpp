@@ -5,6 +5,7 @@
 #include "defs.h"
 #include "util.h"
 #include "Champion.h"
+#include "InputManager.h"
 #include <math.h>
 
 /**
@@ -86,7 +87,7 @@ void Fighter::checkStickState(){ //lots of error checks to do
         case State::WALK:
             if (abs(control_stick_state.x) < controller_vals.analogStickThreshold){
                 setState(State::IDLE);
-            } else if (sign(control_stick_state.x) != facing){
+            } else if (Kuribrawl::sign(control_stick_state.x) != facing){
                 
                 setState(State::WALK, -facing, 0, false);
             }

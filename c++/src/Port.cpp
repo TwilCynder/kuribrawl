@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "DebugInput.h"
 #include "app.h"
+#include "Binding.h"
 #include <stdlib.h>
 
 Port::Port(App* app_) : 

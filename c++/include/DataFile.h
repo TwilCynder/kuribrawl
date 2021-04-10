@@ -2,13 +2,13 @@
 
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_rwops.h"
-#include "GameData.h"
 #include <cstdio>
 #include <string>
 
 #define BUFFER_SIZE 64
 
 class Animation;
+class GameData;
 
 class DataFile {
     public:
