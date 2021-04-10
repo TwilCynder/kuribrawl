@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['r_317',['R',['../inputs_8h.html#a20674eccc2e43825b0b0c1a0dbcc8ea0a1784b1a3d7cbd43c45ff82c72d05e4ae',1,'inputs.h']]],
+  ['read_318',['read',['../class_data_file.html#af8ed05b919042aded80f0c9a9067bb6b',1,'DataFile']]],
+  ['readanimationfile_319',['readAnimationFile',['../class_data_file.html#a210dd625f2c33a90714fa928b3e0421d',1,'DataFile']]],
+  ['readbuffer_320',['readBuffer',['../class_data_file.html#a102127c39006a22248d3cd0962731b68',1,'DataFile']]],
+  ['readcontroller_321',['readController',['../class_port.html#a7ce187409150267d5bff175ef03dc71a',1,'Port']]],
+  ['readdatafile_322',['readDataFile',['../class_game_data.html#ac4823aa69e232526833cf4c6493dd4e7',1,'GameData']]],
+  ['readfiletag_323',['readFileTag',['../class_data_file.html#a35cecdb944dcce1304c6fd2e2a76360f',1,'DataFile']]],
+  ['readfiletype_324',['readFileType',['../class_data_file.html#aa730e3c886f28f2d8e4080357a04ef15',1,'DataFile']]],
+  ['readports_325',['readPorts',['../class_app.html#aa9b6641d746bac1c4d540666a79352d4',1,'App']]],
+  ['readversion_326',['readVersion',['../class_data_file.html#a3f8d47dd1b3d4f05d459edce18ae8317',1,'DataFile']]],
+  ['ready_327',['ready',['../class_data_file.html#a731bf05b33ed9bdbf1f393eee6054394',1,'DataFile']]],
+  ['rect_328',['Rect',['../struct_kuribrawl_1_1_rect.html',1,'Kuribrawl']]],
+  ['registeredinput_329',['RegisteredInput',['../struct_registered_input.html',1,'RegisteredInput'],['../struct_registered_input.html#a368ef45085135dca26acf8528b82a989',1,'RegisteredInput::RegisteredInput()']]],
+  ['registerinput_330',['registerInput',['../class_input_manager.html#a460806f47e722cf100c76cf57fc11669',1,'InputManager']]],
+  ['render_331',['render',['../class_app.html#aab75045d56f80a232014ee51871d872c',1,'App::render()'],['../namespace_s_d_l_helper.html#a719e2f6bf52b80d18cbdc0baaa1138d6',1,'SDLHelper::render()']]],
+  ['renderer_332',['renderer',['../class_app.html#a4ad29ac304e4ece3ddf9f275fb30f29d',1,'App']]],
+  ['reset_333',['reset',['../class_current_animation.html#ae12e07cfe6930222e17e4ce6d337cd5c',1,'CurrentAnimation']]],
+  ['right_334',['RIGHT',['../inputs_8h.html#a080a822f0093973313bd644e517a5090aec8379af7490bb9eaaf579cf17876f38',1,'RIGHT():&#160;inputs.h'],['../namespace_kuribrawl.html#ab2875d556ded63f1ddea062176a50deaaaeb79af1d1fe5a5daac9d0adbcfb263b',1,'Kuribrawl::RIGHT()']]],
+  ['roll_335',['Roll',['../game_actions_8h.html#a033f2c2ba101d1649bd36de7783782f0a9d80e5f030503ccac779c6491826a173',1,'gameActions.h']]],
+  ['running_336',['running',['../class_game.html#a8ca5b9f8a62990e6022de17785beac2c',1,'Game']]]
+];

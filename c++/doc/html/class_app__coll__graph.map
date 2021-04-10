@@ -1,0 +1,17 @@
+<map id="App" name="App">
+<area shape="rect" id="node1" title=" " alt="" coords="237,212,283,239"/>
+<area shape="rect" id="node3" href="$class_port.html" title=" " alt="" coords="270,303,317,329"/>
+<area shape="rect" id="node2" href="$class_game.html" title=" " alt="" coords="231,109,289,136"/>
+<area shape="rect" id="node9" href="$class_fighter.html" title="In&#45;game character (&quot;instance&quot; of a Champion)" alt="" coords="319,407,382,433"/>
+<area shape="rect" id="node4" href="$struct_port_1_1_stick.html" title=" " alt="" coords="354,160,438,187"/>
+<area shape="rect" id="node5" href="$struct_kuribrawl_1_1_vector.html" title=" " alt="" coords="451,5,573,32"/>
+<area shape="rect" id="node13" href="$struct_champion_1_1_shield_info.html" title=" " alt="" coords="440,109,584,136"/>
+<area shape="rect" id="node15" href="$class_animation.html" title=" " alt="" coords="584,160,664,187"/>
+<area shape="rect" id="node6" href="$struct_binding.html" title=" " alt="" coords="131,212,197,239"/>
+<area shape="rect" id="node7" href="$class_controller_type.html" title=" " alt="" coords="50,109,155,136"/>
+<area shape="rect" id="node8" href="$struct_controller_type_1_1_controller_vals.html" title=" " alt="" coords="5,5,200,32"/>
+<area shape="rect" id="node14" href="$class_current_animation.html" title=" " alt="" coords="428,496,551,523"/>
+<area shape="rect" id="node10" href="$struct_kuribrawl_1_1_vector_double.html" title=" " alt="" coords="85,303,246,329"/>
+<area shape="rect" id="node11" href="$class_champion.html" title=" " alt="" coords="407,303,487,329"/>
+<area shape="rect" id="node12" href="$struct_champion_1_1_values.html" title=" " alt="" coords="459,212,587,239"/>
+</map>

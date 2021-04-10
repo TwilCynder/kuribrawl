@@ -1,0 +1,6 @@
+<map id="Champion" name="Champion">
+<area shape="rect" id="node1" title=" " alt="" coords="37,260,117,287"/>
+<area shape="rect" id="node2" href="$struct_champion_1_1_values.html" title=" " alt="" coords="13,171,141,197"/>
+<area shape="rect" id="node3" href="$struct_champion_1_1_shield_info.html" title=" " alt="" coords="5,81,149,108"/>
+<area shape="rect" id="node4" href="$struct_kuribrawl_1_1_vector.html" title=" " alt="" coords="17,5,138,32"/>
+</map>
