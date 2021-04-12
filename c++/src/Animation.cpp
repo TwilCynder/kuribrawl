@@ -50,11 +50,11 @@ Animation::~Animation(){
  * @param spritesheet the SDL texture that will be used as the spritesheet.
  */
 
-void Animation::setSpritesheet(SDL_Texture* spritesheet){
-    if (!spritesheet){
+void Animation::setSpritesheet(SDL_Texture* spritesheet_){
+    if (!spritesheet_){
         throw KBFatal("Animation constructor : spritesheet texture pointer is null");
     }
-    this->spritesheet = spritesheet;
+    this->spritesheet = spritesheet_;
     SDL_QueryTexture(spritesheet, NULL, NULL, &this->display.x, &this->display.y);
 }
 
@@ -71,7 +71,9 @@ SDL_Texture* Animation::getSpritesheet() const {
 /**
  * @brief Initializes this Animation's frames.
  * This function creates the frames array (until it's called, the array is a NULL pointer). 
- * 
+ * The frames positions are initialized considering that the image contains all the frame lined up horizontally,
+ * filling the entire image.
+ * The origin of each frame is (width/2 ; height)
  * @param n 
  */
 
@@ -98,21 +100,57 @@ void Animation::initFrames(int n){
     nb_frames = n;
 }
 
+/**
+ * @brief Returns whether this Animation is ready for use
+ * 
+ * @return true if this Animation has a valid spritesheet and frames array.
+ * @return false otherwise.
+ */
+
 bool Animation::is_initialized(){
-    return spritesheet;
+    return spritesheet && frames;
 }
+
+/**
+ * @brief Returns the number of frames this Animation has.
+ * 
+ * @return int 
+ */
 
 int Animation::getNbFrames(){
     return nb_frames;
 }
 
+/**
+ * @brief Returns a frame of this Animation.
+ * 
+ * @param n the id of the frame. Frame ids are just array indexes, thus start at 0.
+ * @return Frame* a Frame.
+ */
+
 Frame* Animation::getFrame(int n){
     return &frames[n];
 }
 
+/**
+ * @brief Sets the base speed of this animtion.
+ * Can be < 1, in which case it will be used as a multiplier, or an integer, in which case it will
+ * be the total duration of the Animation.
+ * @param speed 
+ */
+
 void Animation::setBaseSpeed(double speed){
     base_speed = speed;
 }
+
+/**
+ * @brief Draws a certain frame of this Animation.
+ * Uses SDL_RenderCopy to copy the rectangle designated frame from.
+ * @param target the renderer the frame will be drawn to.
+ * @param x x position in the destination.
+ * @param y y position in the destination.
+ * @param frame index of the frame.
+ */
 
 void Animation::draw(SDL_Renderer* target, int x, int y, int frame){
     if (!this->spritesheet) return;

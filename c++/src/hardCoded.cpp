@@ -24,11 +24,11 @@ void HardCoded::initGameData(App* app){
     Champion* acid = data.addChampion("Acid");
     Animation* anim;
 
-	anim = acid->addAnimation("idle", app->LoadTexture("../src/res/idle_strip4.png"));
+	anim = acid->addAnimation("idle", app->LoadTexture("../res/idle_strip4.png"));
 	anim->initFrames(4);
     anim->setBaseSpeed(0.15);
 
-    anim = acid->addAnimation("walking", app->LoadTexture("../src/res/walk_strip6.png"));
+    anim = acid->addAnimation("walking", app->LoadTexture("../res/walk_strip6.png"));
     anim->initFrames(6);
     anim->setBaseSpeed(0.15);
     

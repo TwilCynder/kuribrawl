@@ -1,4 +1,0 @@
-<map id="Hitbox" name="Hitbox">
-<area shape="rect" id="node1" title=" " alt="" coords="23,80,82,107"/>
-<area shape="rect" id="node2" href="$struct_collision_box.html" title=" " alt="" coords="5,5,100,32"/>
-</map>

@@ -37,10 +37,10 @@ class Animation {
     Hitbox& addHitbox();
 
     private:
-    SDL_Texture* spritesheet; //image used as the spritesheet
-    std::unique_ptr<Frame[]> frames;
-    int nb_frames;
-    Vector display;
+    SDL_Texture* spritesheet; ///<SDL Texture used as the source image.
+    std::unique_ptr<Frame[]> frames; ///<Array (Basic array unique-pointed) containing the frames (= positions of the frames on the image) of this animation.
+    int nb_frames; ///< Number of frames in this animation.
+    Vector display; ///< Size of the source image.
 
-    double base_speed;
+    double base_speed; ///< Speed of this animation. Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.
 };

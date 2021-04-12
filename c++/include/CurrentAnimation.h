@@ -4,6 +4,11 @@
 class Animation;
 class Fighter;
 
+/**
+ * @brief An running Animation. 
+ * Contains all the information needed for an Animation *while it is running*.
+ */
+
 class CurrentAnimation{
     public:
 
@@ -17,17 +22,18 @@ class CurrentAnimation{
     void advance();
 
     private:
-    Animation* model;  //Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)
+    Animation* model;   /**< The Animation that is running.
+                        Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
 
-    int current_frame; //index of the current frame
-    int timeleft; //number of frames remaining *on the current frame*
-    double speed; //current speed
+    int current_frame; ///< Index of the current frame.
+    int timeleft; ///<Time remaining *on the current frame*.
+    double speed; ///<Current \ref Animation#base_speed "speed" at which the animation runs (will override the base speed of the Animation).
 
-    int frame_multiplier; //number of real frames each frame will be displayed for
-    double base_carry; 
-    double current_carry;
-    bool finished; //true if the animation just finished (even if it looped)
-    Fighter* owner;
+    int frame_multiplier; ///< Time each frame will be displayed for.
+    double base_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
+    double current_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
+    bool finished; ///< True if the animation just finished (even if it looped).
+    Fighter* owner; ///< Entity running this animation. Currently restricted to \ref Fighter "Fighters".
 
     void nextFrame();
     void reset();

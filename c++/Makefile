@@ -15,6 +15,12 @@ OBJS = $(patsubst src/%,bin/%,$(_OBJS))
 
 all: clear $(EXEC)
 
+doc: doc_light
+	doxygen
+
+doc_light:
+	doxygen DoxyfileLight
+
 clear: 
 	clear
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"

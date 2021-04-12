@@ -12,6 +12,11 @@ class Port;
 class Game;
 class ControllersData;
 
+/**
+ * @brief An instance of the program.
+ * Contains absolutely every persistent data needed by the program (static data like configurations, and current game data).
+ */
+
 class App
 {
     public:
@@ -43,12 +48,13 @@ class App
     void startTestGame();
 
     //Data singletons
-    std::unique_ptr<GameData> game_data;
-    std::unique_ptr<ControllersData> controllers_data;
+    std::unique_ptr<GameData> game_data; //*< the GameData (all the data related to gameplay) that will be used for games ran by this App.
+    std::unique_ptr<ControllersData> controllers_data; //*< the ControllersData (all the data related to reading controllers inputs) that will be used by this App.
 
-    SDL_Window* window;
-    SDL_Renderer* renderer;
+    SDL_Window* window; ///< The window this app is running in.
+    SDL_Renderer* renderer; ///< The SDL renderer used to render this app.
 
-    Game* current_game; //Pointer validity : is invalitated when the game is destroyed (everytime a game ends)
-    std::vector<Port> ports;
+    Game* current_game; /**< The Game that is currently running, if there is any. Pointer validity : is invalitated when the game is destroyed (everytime a game ends) .*/
+
+    std::vector<Port> ports; ///< Currently active Ports.
 };
