@@ -15,6 +15,10 @@
 
 using namespace std;
 
+/**
+ * @brief Construct a new App object
+ * 
+ */
 App::App() : 
 	ports{Port(this), Port(this), Port(this), Port(this)},
 	game_data(std::make_unique<GameData>()),
@@ -27,14 +31,30 @@ App::~App(){
 
 }
 
+/**
+ * @brief Returns the currently used game data.
+ * Doesn't follow usual getter nomenclature for historical reasons.
+ * @return GameData& 
+ */
 GameData& App::gameData(){
 	return *game_data;
 }
 
+/**
+ * @brief Returns the currently used controllers data.
+ * Doesn't follow usual getter nomenclature for historical reasons.
+ * @return ControllersData& 
+ */
 ControllersData& App::controllersData(){
 	return *controllers_data;
 }
 
+/**
+ * @brief Initializes SDL components.
+ * Initializes : 
+ * - SDL Core
+ * - SDL Joystick
+ */
 void App::initSDL(){
 	int rendererFlags, windowFlags;
 
@@ -64,14 +84,30 @@ void App::initSDL(){
 	SDL_JoystickEventState(SDL_ENABLE);
 }
 
+/**
+ * @brief Loads a texture using the current renderer.
+ * Texture are surfaces managed directly by tht GPU, which is why a renderer needs to be specified when creating/loading them.
+ * @param file 
+ * @return SDL_Texture* 
+ */
+
 SDL_Texture* App::LoadTexture(const char *file){
 	return IMG_LoadTexture(renderer, file);
 }
+
+/**
+ * @brief Initializes the game data with all hardcoded data.
+ * 
+ */
 
 void App::initGameData(){
 	HardCoded::initGameData(this);
 }
 
+/**
+ * @brief Loads 
+ * 
+ */
 void App::loadRessources(){
 	if (!Load::loadGameFile("data.twl", *game_data))
 	if (!Load::loadGameFile("../src/res/data.twl", *game_data))
