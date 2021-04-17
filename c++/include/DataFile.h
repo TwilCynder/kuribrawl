@@ -10,15 +10,46 @@
 class Animation;
 class GameData;
 
+/**
+ * @brief An opened file, treated as a Kuribrawl Data File.
+ */
+
 class DataFile {
     public:
-    enum class FileType {
-        ANIMATION,
+
+    DataFile(const char* file);
+    ~DataFile();
+
+    void read(GameData& data);
+    bool ready();
+
+    private:
+
+    /**
+     * @brief The different type of data a Data file can store
+     * 
+     */
+    enum class DataType {
+        ANIMATION, ///< aaa 
         LEFTANIM,
         CHAMPION,
         STAGE,
         IMAGE
     };
+
+    //Reading
+    bool eof(); ///
+    bool checkSignature(); 
+    void readVersion();
+    DataType readDataType();
+    const char* readFileTag();
+    SDL_Texture* LoadImageFromDatafile();
+
+    void readAnimationFile(Animation& anim);
+
+    FILE* file;
+    SDL_RWops* sdl_stream;
+    char readBuffer[BUFFER_SIZE];
 
     enum class FileMarker {
         DESCRIPTORSTART = 0x53,
@@ -34,26 +65,4 @@ class DataFile {
         PLATFORMINFO = 0x7,
         INTERFILE = 0x54
     };
-
-    DataFile(const char* file);
-    ~DataFile();
-
-    void read(GameData& data);
-    bool ready();
-
-    private:
-
-    //Reading
-    bool eof(); ///
-    bool checkSignature(); 
-    void readVersion();
-    FileType readFileType();
-    const char* readFileTag();
-    SDL_Texture* LoadImageFromDatafile();
-
-    void readAnimationFile(Animation& anim);
-
-    FILE* file;
-    SDL_RWops* sdl_stream;
-    char readBuffer[BUFFER_SIZE];
 };

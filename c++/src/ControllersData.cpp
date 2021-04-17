@@ -1,6 +1,12 @@
 #include "ControllersData.h"
 #include "Debug.h"
 
+/**
+ * @brief Returns a ControllerType.
+ * @param name the identifier of a controller type.
+ * @return ControllerType* a pointer to the ControllerType or NULL if the specified identifier doesn't match with any known ControllerType.
+ */
+
 ControllerType* ControllersData::getController(const std::string& name){
     auto it = known_controllers.find(name);
     if (it == known_controllers.end()){
@@ -10,6 +16,13 @@ ControllerType* ControllersData::getController(const std::string& name){
     }
     return nullptr;
 }
+
+/**
+ * @brief Adds a new ControllerType.
+ * Throws if the ControllerType already exists.
+ * @param name identifier of the created ControllerType.
+ * @return ControllerType& a reference to the created ControllerType. 
+ */
 
 ControllerType& ControllersData::addController(const std::string& name){
     auto [node, sucess] = known_controllers.try_emplace(name);

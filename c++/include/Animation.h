@@ -8,7 +8,7 @@ using namespace Kuribrawl;
 struct Frame;
 
 /**
- * @brief An animation. 
+ * @brief An animation (i.e. an ensemble of frames).
  * Animations are composed of a source image and an array of frames, which are just rectangle positions on the source image.
  */
 
@@ -42,5 +42,6 @@ class Animation {
     int nb_frames; ///< Number of frames in this animation.
     Vector display; ///< Size of the source image.
 
-    double base_speed; ///< Speed of this animation. Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.
+    double base_speed;  /**< Speed of this animation. 
+                        Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.*/
 };

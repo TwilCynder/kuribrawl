@@ -7,13 +7,26 @@
 #include "Fighter.h"
 #include "Animation.h"
 
+/**
+ * @brief A character of the game.
+ * Contain purely static information about this character ; does not care about what happens in-game, which is the job of Fighter.
+ */
+
 class Champion {
     public:
 
+    /**
+     * @brief Base position and size of this Charater's shield.
+     * 
+     */
     struct ShieldInfo : Kuribrawl::Vector {
         int size;
     };
 
+    /**
+     * @brief Contains all the fixed (numerical) values of a Character (speeds, weight, lags ...)
+     * 
+     */
     struct Values {
         double walk_speed;
         double dash_speed;
@@ -52,10 +65,10 @@ class Champion {
     Champion::Values val;
 
     private:
-    std::string name;
-    std::string display_name;
-    std::map<std::string, Animation> animations;
-    std::unique_ptr<Animation*[]> state_animations;  //Pointer validity : can be invalidated if an Animation is moved or deleted
-    std::string current;
+    std::string name;   ///< Internal identifier of this Champion.
+    std::string display_name;   ///< Name that will be displayed for this Champion.
+    std::map<std::string, Animation> animations;    ///< Map containing all the Animations of this Champion.    
+    std::unique_ptr<Animation*[]> state_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation. 
+                                                    Pointer validity : can be invalidated if an Animation is moved or deleted*/
 };
 

@@ -34,10 +34,10 @@ void DataFile::readVersion(){
     cout << (int)buffer << '\n' << std::flush;
 }
 
-DataFile::FileType DataFile::readFileType(){
+DataFile::DataType DataFile::readDataType(){
     Uint8 buffer;
     SDL_RWread(sdl_stream, &buffer, 1, 1);
-    return (FileType)buffer;
+    return (DataType)buffer;
 }
 
 const char* DataFile::readFileTag(){
@@ -61,9 +61,11 @@ void DataFile::read(GameData& data){
 
     const char *tag, *entity, *element;
 
+    (void)entity; (void)element;
+
     while (!eof()){
-        switch (readFileType()){
-            case DataFile::FileType::ANIMATION:
+        switch (readDataType()){
+            case DataFile::DataType::ANIMATION:
                 
                 //readAnimationFile(data.tryChampion(tag).tryAnimation(tag));
 

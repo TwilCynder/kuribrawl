@@ -8,9 +8,9 @@
  */
 
 Animation::Animation():
-    base_speed(1),
+    frames(NULL),
     nb_frames(0),
-    frames(NULL)
+    base_speed(1)
 {
 }
 
@@ -125,7 +125,7 @@ int Animation::getNbFrames(){
  * @brief Returns a frame of this Animation.
  * 
  * @param n the id of the frame. Frame ids are just array indexes, thus start at 0.
- * @return Frame* a Frame.
+ * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the Animation exists.
  */
 
 Frame* Animation::getFrame(int n){

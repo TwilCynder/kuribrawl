@@ -7,9 +7,15 @@
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
 namespace {
-    void land(Fighter* fighter);
-    void applyAirAccel(Fighter* fighter, int direction);
-    void applyAirDrift(Fighter* fighter, int direction);
+    void land(Fighter* fighter){
+
+    }
+    void applyAirAccel(Fighter* fighter, int direction){
+
+    }
+    void applyAirDrift(Fighter* fighter, int direction){
+        
+    }
 
 }
 

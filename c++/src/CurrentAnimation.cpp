@@ -4,25 +4,55 @@
 #include "Debug.h"
 #include "Frame.h"
 
+/**
+ * @brief Construct a new Current Animation object.
+ * Creates it without an Animation to run, so it is unusable until an Animation is set.
+ */
+
 CurrentAnimation::CurrentAnimation():
     current_frame(0)
 {
-    
 }
 
+/**
+ * @brief Construct a new Current Animation object.
+ * 
+ * @param animation the Animation that will be ran at first.
+ */
+
 CurrentAnimation::CurrentAnimation(Animation* animation):
-    model(animation)
+    CurrentAnimation()
 {
-    CurrentAnimation();
+    setAnimation(animation);
 }
+
+/**
+ * @brief Returns wether the animation is actually running and has an Animation to run.
+ * 
+ * @return true if there is an Animation to be ran.
+ * @return false otherwise
+ */
 
 bool CurrentAnimation::is_initialized(){
     return model && model->is_initialized();
 }
 
+/**
+ * @brief Sets the ran Animation.
+ * Delegates to setAnimation(Animation*, double) with the Animation's default speed.
+ * @param anim 
+ */
+
 void CurrentAnimation::setAnimation(Animation* anim){
     setAnimation(anim, anim->base_speed);
 }
+
+/**
+ * @brief Sets the ran Animation, and the \ref Animation#base_speed "speed" at which it will be ran.
+ * 
+ * @param anim 
+ * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
+ */
 
 void CurrentAnimation::setAnimation(Animation* anim, double speed_){
     model = anim;
@@ -30,6 +60,13 @@ void CurrentAnimation::setAnimation(Animation* anim, double speed_){
     setSpeed(speed_);
     start();
 }
+
+/**
+ * @brief Sets the current \ref Animation#base_speed "speed".
+ * 
+ * @param speed_ the \ref Animation#base_speed "speed" that will be used from now on. 
+ * For speeds that do not make each frame displayed the same amount of time, using this method while the animation has already advanced at least one frame will result in imprecisions.
+ */
 
 void CurrentAnimation::setSpeed(double speed_){
     if (speed_){
@@ -57,15 +94,29 @@ void CurrentAnimation::setSpeed(double speed_){
     }
 }
 
+/**
+ * @brief Initializes this Current Animation, to make it ready to start if it has an Animation.
+ * 
+ */
+
 void CurrentAnimation::init(){
     reset();
     finished = 0;
 }
 
+/**
+ * @brief resets this Current Animation to the initial state of the current Animation.
+ */
+
 void CurrentAnimation::reset(){
     current_frame = 0;
     current_carry = 0;
 }
+
+/**
+ * @brief Function called when the Current Animation is started.
+ * 
+ */
 
 void CurrentAnimation::start(){
     Frame* f = &(model->frames[current_frame]);
@@ -76,6 +127,11 @@ void CurrentAnimation::start(){
     }
 }
 
+/**
+ * @brief Advances the animation, which means doing all that need to be done at each iteration of the main loop for the animation to progress (at the right speed)
+ * 
+ */
+
 void CurrentAnimation::advance(){
     if (speed != -1 && is_initialized()){
         timeleft--;
@@ -85,6 +141,11 @@ void CurrentAnimation::advance(){
         }
     }
 }
+
+/**
+ * @brief Changes the current frame (and updates all the attributes that depend on the current frame)
+ * Updates the timeleft for the current frame, and the carry attriutes if needed.
+ */
 
 void CurrentAnimation::nextFrame(){
     finished = false;
@@ -106,6 +167,14 @@ void CurrentAnimation::nextFrame(){
         }
     }
 }
+
+/**
+ * @brief Draws this Current Animation.
+ * Draws the current frame of the currently ran Animation.
+ * @param target the renderer the frame will be drawn to.
+ * @param x x position on the destination.
+ * @param y y position on the destination.
+ */
 
 void CurrentAnimation::draw(SDL_Renderer* target, int x, int y){
     if (!model){

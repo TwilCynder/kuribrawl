@@ -2,18 +2,23 @@
 #include "Debug.h"
 #include "Binding.h"
 
-ControllerType::ControllerType() : 
-    ControllerType(DEFAULT_NB_BUTTONS, DEFAULT_NB_STICKS)
-{
-}
+/**
+ * @brief Construct a new Controller Type object.
+ * 
+ */
 
-ControllerType::ControllerType(int buttons, int sticks):
-    nb_buttons(buttons),
-    nb_sticks(sticks),
+ControllerType::ControllerType():
+
     default_binding(std::make_unique<Binding>())
 {
     default_binding->controller = this;
 }
+
+/**
+ * @brief Returns a structure containing all the fixed numerical values needed to read a controller of this type.
+ * See ControllerType::ControllerVals.
+ * @return const ControllerType::ControllerVals& vals.
+ */
 
 const ControllerType::ControllerVals& ControllerType::getControllerVals() const{
     return vals;

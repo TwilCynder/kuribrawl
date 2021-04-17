@@ -27,12 +27,12 @@ Fighter::Fighter(Champion* model_):
  */
 Fighter::Fighter(Champion* model_, int x_, int y_):
     model(model_),
-    input_manager(std::make_unique<InputManager>(this)),
-    facing(1),
-    grounded(false),
-    paused(false),
     port(nullptr),
-    state(State::IDLE)
+    input_manager(std::make_unique<InputManager>(this)),
+    state(State::IDLE),
+    paused(false),
+    facing(1),
+    grounded(false)
 {
     Animation* idle_anim = model->getAnimation("idle");
 

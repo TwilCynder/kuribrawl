@@ -8,9 +8,8 @@
 
 Port::Port(App* app_) : 
     app(app_),
-    joystick_id(-1),
     input_binding(0),
-    debug(12),
+    joystick_id(-1),
     active(false)
 {
     int* buffer = (int*)malloc(CONTROL_STICK_FRAME_BUFFER * 4);

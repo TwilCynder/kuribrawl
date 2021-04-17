@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <ctime> 
 #include "Debug.h"
 #include "sdlHelper.h"
 #include "app.h"
@@ -12,6 +12,7 @@
 #include "hardCoded.h"
 #include "load.h"
 #include "ControllersData.h"
+#include "System.h"
 
 using namespace std;
 
@@ -20,11 +21,12 @@ using namespace std;
  * 
  */
 App::App() : 
-	ports{Port(this), Port(this), Port(this), Port(this)},
 	game_data(std::make_unique<GameData>()),
-	controllers_data(std::make_unique<ControllersData>())
+	controllers_data(std::make_unique<ControllersData>()),
+	ports{Port(this), Port(this), Port(this), Port(this)}
 {
 	current_game = NULL;
+	setFrameRate(60);
 }
 
 App::~App(){
@@ -105,8 +107,8 @@ void App::initGameData(){
 }
 
 /**
- * @brief Loads 
- * 
+ * @brief Loads game data from a data file (data.twl).
+ * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
 	if (!Load::loadGameFile("data.twl", *game_data))
@@ -114,9 +116,20 @@ void App::loadRessources(){
 	throw KBFatal("Can't find data file");
 }
 
+/**
+ * @brief Initializes controllers data with all hardcoded data.
+ * 
+ */
+
 void App::initControllersData(){
 	HardCoded::initControllersData(*controllers_data);
 }
+
+/**
+ * @brief Does everything that needs to be done before the loop starts (including of course initialization).
+ * Calls all the initialization functions above (SDL, game data, controllers data) ; 
+ * also starts the test game.
+ */
 
 void App::init(){
 	initSDL();
@@ -127,12 +140,23 @@ void App::init(){
 	startTestGame();
 }
 
+/**
+ * @brief Renders the app, i.e. renders the current game or menu if there is any.
+ * 
+ */
+
 void App::render(){
 	SDLHelper::prepareRender(this->renderer);
 	if (current_game && current_game->is_running()){
 	}
 	SDLHelper::render(this->renderer);
 }
+
+/**
+ * @brief Called when a controller button is pressed : calls the corresponding Port's handling method.
+ * 
+ * @param evt The event structure containing all the info on the button press.
+ */
 
 void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
 	Port* port = joysticks[evt->which];
@@ -141,23 +165,50 @@ void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
 	}
 }
 
+/**
+ * @brief Handle input reading for all Ports
+ * Calls the input reading method of all active Ports.
+ */
+
 void App::readPorts(){
-	for (int i = 0; i < ports.size(); i++){
+	for (unsigned int i = 0; i < ports.size(); i++){
 		if (ports[i].isActive()){
 			ports[i].readController();
 		}
 	}
 }
 
+void App::print_report(std::ostream& out){
+	Uint32 app_duration = System::now() - start_time;
+	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration " << ((double)app_duration / frame);
+}
+
+/**
+ * @brief Stops the program.
+ * 
+ * @param code the exit code.
+ */
+void App::stop(int code){
+	print_report(cout);
+	exit(code);
+}
+
+/**
+ * @brief Handle SDL events.
+ * Currently handled events : 
+ * - Close window
+ * - Joystick button pressed.
+ */
+
 void App::handleEvents(){
 	SDL_Event event;
-	
+
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
 		{
 			case SDL_QUIT:
-				exit(0);
+				stop(0);
 				break;
 			case SDL_JOYBUTTONDOWN:
 				handleButtonEvent(&event.jbutton);
@@ -168,12 +219,54 @@ void App::handleEvents(){
 	}
 }
 
+/**
+ * @brief Sets the framerate at will the app loop will run.
+ * @param fr 
+ */
+void App::setFrameRate(int fr){
+	framerate = fr;
+	update_frame_duration();
+}
+
+/**
+ * @brief Update the duration of a a frame based on the framerate.
+ */
+void App::update_frame_duration(){
+	frame_duration = 1000.0 / framerate;
+}
+
+/**
+ * @brief Manages all operations related to making the loop run at the desired speed (framerate), at the end of each iteration.
+ */
+void App::loop_timer(){
+	Date current_date = System::now();
+	Date wait = next_frame_date - current_date;
+
+	if (wait < 0){
+		next_frame_date = current_date;
+	} else {
+		SDL_Delay(wait);
+	}
+	
+}
+
+/**
+ * @brief Main loop of the game.
+ * Never returns ; the loop is infinite and stops only when exit() is called.
+ */
+
 void App::loop(){
+	frame = 0;
+	next_frame_date = System::now();
+
+	start_time = next_frame_date;
 
     while(1){
+		next_frame_date += frame_duration;
+
         this->handleEvents();
-		SDLHelper::prepareRender(this->renderer);
 		readPorts();
+		SDLHelper::prepareRender(this->renderer);
 		if (current_game && current_game->is_running()){
 			current_game->updateStates();
 			current_game->updateInputs();
@@ -183,6 +276,8 @@ void App::loop(){
 			current_game->advanceAnimations();
 		}
 		SDLHelper::render(this->renderer);
-        SDL_Delay(15);
+
+		frame++;
+        loop_timer();
     }
 }

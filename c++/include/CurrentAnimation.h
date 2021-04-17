@@ -6,7 +6,8 @@ class Fighter;
 
 /**
  * @brief An running Animation. 
- * Contains all the information needed for an Animation *while it is running*.
+ * Contains all the information needed for an Animation *while it is running*. A Current Animation object is not restrained to a specific Animation, 
+ * and can switch to another Animation completely at any time.
  */
 
 class CurrentAnimation{

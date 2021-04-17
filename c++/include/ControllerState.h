@@ -3,6 +3,11 @@
 #define MAX_BUTTONS_NB 32
 #define MAX_STICKS_NB 4
 
+/**
+ * @brief 
+ * 
+ */
+
 struct AxisState {
     int x;
     int y;

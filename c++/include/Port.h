@@ -39,8 +39,6 @@ class Port {
     const Kuribrawl::Vector& getControlStickState() const;
     const Kuribrawl::Vector& getSecondaryStickState() const;
 
-    int debug;
-
     private:
     void swap_control_stick_buffers();
     void setJoystick_(int id);

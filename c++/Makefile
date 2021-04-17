@@ -1,6 +1,6 @@
 EXEC = kuribrawl
 
-CFLAGS = `sdl2-config --cflags` -g -Iinclude -std=c++17 -O3
+CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=c++17
 LDFLAGS = `sdl2-config --libs` -lSDL2_mixer -lSDL2_image -lSDL2_ttf -lm
 
 SRC= $(wildcard src/*.cpp)
