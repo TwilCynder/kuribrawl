@@ -4,7 +4,6 @@
 #include "Debug.h"
 #include "DebugInput.h"
 
-
 int main(int argc, char** argv) try {
     App app;
     app.init();

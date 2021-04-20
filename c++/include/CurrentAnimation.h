@@ -5,7 +5,7 @@ class Animation;
 class Fighter;
 
 /**
- * @brief An running Animation. 
+ * @brief Object that can run an Animation. 
  * Contains all the information needed for an Animation *while it is running*. A Current Animation object is not restrained to a specific Animation, 
  * and can switch to another Animation completely at any time.
  */
@@ -17,14 +17,15 @@ class CurrentAnimation{
     CurrentAnimation(Animation* animation);
     void draw(SDL_Renderer* target, int x, int y);
     bool is_initialized();
+    bool is_finished();
     void setAnimation(Animation* anim);
     void setAnimation(Animation* anim, double speed);
     void setSpeed(double speed);
     void advance();
 
     private:
-    Animation* model;   /**< The Animation that is running.
-                        Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
+    Animation* model;   ///< The Animation that is running.
+                        /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
 
     int current_frame; ///< Index of the current frame.
     int timeleft; ///<Time remaining *on the current frame*.

@@ -38,6 +38,15 @@ bool CurrentAnimation::is_initialized(){
 }
 
 /**
+ * @brief Retur whether the animation just finished (even if it looped).
+ * 
+ * @return finished or not.
+ */
+bool CurrentAnimation::is_finished(){
+    return finished;
+}
+
+/**
  * @brief Sets the ran Animation.
  * Delegates to setAnimation(Animation*, double) with the Animation's default speed.
  * @param anim 
@@ -171,7 +180,7 @@ void CurrentAnimation::nextFrame(){
 /**
  * @brief Draws this Current Animation.
  * Draws the current frame of the currently ran Animation.
- * @param target the renderer the frame will be drawn to.
+ * @param target the renderer it will be drawn to.
  * @param x x position on the destination.
  * @param y y position on the destination.
  */

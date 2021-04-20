@@ -19,14 +19,26 @@ namespace {
 
 }
 
+/**
+ * @brief Called when a Fighter touches the ground while being airborne.
+ * 
+ */
 void Fighter::groundCollision(){
     grounded = true;
 }
 
+/**
+ * @brief Called when a Fighter was grounded but is no longer on the ground.
+ * 
+ */
 void Fighter::groundToAir(){
     grounded = false;
 }
 
+/**
+ * @brief Apply physics-related mechanics.
+ * 
+ */
 void Fighter::applyPhysics(){
 
     if (paused) return;

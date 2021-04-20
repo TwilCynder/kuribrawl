@@ -5,6 +5,10 @@
 
 class App;
 
+/**
+ * @brief Class containing all data related to gameplay.
+ * This includes every Champion, Stage, etc
+ */
 class GameData {
     public:
 
@@ -16,5 +20,5 @@ class GameData {
     void finalizeChampionsInitialization();
 
     private:
-    std::map<std::string, Champion> champions;
+    std::map<std::string, Champion> champions; ///< Map containing all Champions and associating them with a string ID (= name).
 };

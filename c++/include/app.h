@@ -42,7 +42,8 @@ class App
     //SDL functions
     SDL_Texture* LoadTexture(const char *file);
 
-    Port* joysticks[16]; //Pointer validity : can be invalidated if a Port is deleted or moved
+    Port* joysticks[16];    ///<An array associating each joystick numerical id with a Port. 
+                            /**<Pointer validity : can be invalidated if a Port is deleted or moved */
     private:
     void initSDL();
     void initControllersData();
@@ -68,7 +69,7 @@ class App
     SDL_Window* window; ///< The window this app is running in.
     SDL_Renderer* renderer; ///< The SDL renderer used to render this app.
 
-    Game* current_game; /**< The Game that is currently running, if there is any. Pointer validity : is invalitated when the game is destroyed (everytime a game ends) .*/
+    Game* current_game; ///< The Game that is currently running, if there is any. Pointer validity : is invalitated when the game is destroyed (everytime a game ends) .*/
 
     std::vector<Port> ports; ///< Currently active Ports.
 

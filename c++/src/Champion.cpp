@@ -14,10 +14,13 @@ Champion::Champion(const std::string& name_):
     state_animations(std::make_unique<Animation*[]>((int)Fighter::State::STATES))
 {
     this->val.gravity = DEFAULT_GRAVITY;
-    this->val.jump_speed = 8;
-    this->val.walk_speed = 2.0;
-    this->val.traction = 0.05;
 }
+
+Champion::Values::Values() : 
+    walk_speed(2.0), dash_speed(0), dash_start_speed(0), dash_turn_accel(0), traction(0.05), 
+    max_air_speed(0), air_acceleration(0), air_friction(0), jump_speed(8), short_hop_speed(4), air_jump_speed(6), gravity(DEFAULT_GRAVITY), max_fall_speed(0), fast_fall_speed(0),
+    jump_squat_duration(5), dash_start_duration(0), dash_stop_duration(0), dash_turn_duration(0), landing_duration(0), guard_start_duration(0), guard_stop_duration(0)
+{}
 
 /**
  * @brief Returns the internal name

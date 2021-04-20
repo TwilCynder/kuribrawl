@@ -8,7 +8,8 @@ using namespace Kuribrawl;
 struct Frame;
 
 /**
- * @brief An animation (i.e. an ensemble of frames).
+ * @brief An animation (i.e.\ an ensemble of frames).
+ * 
  * Animations are composed of a source image and an array of frames, which are just rectangle positions on the source image.
  */
 
@@ -38,6 +39,7 @@ class Animation {
 
     private:
     SDL_Texture* spritesheet; ///<SDL Texture used as the source image.
+    SDL_Texture* spritesheet_left; ///< SDL Texture used as the alternative source image for entities that can be oriented in two different directions (typically Fighters)
     std::unique_ptr<Frame[]> frames; ///<Array (Basic array unique-pointed) containing the frames (= positions of the frames on the image) of this animation.
     int nb_frames; ///< Number of frames in this animation.
     Vector display; ///< Size of the source image.

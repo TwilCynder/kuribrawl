@@ -38,7 +38,7 @@ class Champion {
         double air_friction;
         double jump_speed;
         double short_hop_speed;
-        double midair_jump_speed;
+        double air_jump_speed;
         double gravity;
         double max_fall_speed;
         double fast_fall_speed;
@@ -51,6 +51,8 @@ class Champion {
         int guard_stop_duration;
         Champion::ShieldInfo shield_info;
         double weight;
+
+        Values();
     };
 
     Champion(const std::string& name_);

@@ -5,6 +5,9 @@
 
 class Champion;
 
+/**
+ * @brief Contains all information needed to run a game, like the Stage and all in-game Entities.
+ */
 class Game {
     public:
     Game();
@@ -22,7 +25,7 @@ class Game {
     void updateAnimations();
 
     private:
-    std::forward_list<Fighter> fighters;
-    SDL_Rect camera;
-    bool running;
+    std::forward_list<Fighter> fighters; ///< A list containing all Fighters present in this Game.
+    SDL_Rect camera;    ///< The area of the Stage that should be displayed.
+    bool running;       ///Indicates if the game is actually running or not.
 };

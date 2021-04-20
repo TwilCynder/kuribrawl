@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * @brief Distinct actions a player can take.
+ * 
+ */
 enum commands {
     Jab,
     FTilt,
@@ -30,12 +34,20 @@ enum commands {
     DirectionalAirDodge
 };
 
+/**
+ * @brief Types of jump height.
+ * 
+ */
 enum jumpY {
-    Normal,
+    Full,
     Short,
-    Double,
+    Air,
 };
 
+/**
+ * @brief Types of jump angle.
+ * 
+ */
 enum jumpX {
     Normal,
     Forward,

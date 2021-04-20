@@ -213,6 +213,10 @@ void App::handleEvents(){
 			case SDL_JOYBUTTONDOWN:
 				handleButtonEvent(&event.jbutton);
 				break;
+			case SDL_KEYDOWN:
+				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+					stop(0);
+				break;
 			default:
 				break;
 		}
