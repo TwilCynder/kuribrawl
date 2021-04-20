@@ -1,7 +1,7 @@
 #pragma once
 #include <forward_list>
 #include "SDL2/SDL.h"
-#include "Fighter.h"
+#include "PlayerFighter.h"
 
 class Champion;
 
@@ -11,8 +11,8 @@ class Champion;
 class Game {
     public:
     Game();
-    Fighter* addFighter(Champion* model);
-    Fighter* addFighter(Champion* model, int x, int y);
+    PlayerFighter* addFighter(Champion* model);
+    PlayerFighter* addFighter(Champion* model, int x, int y);
     bool is_running();
 
     //main loop
@@ -25,7 +25,8 @@ class Game {
     void updateAnimations();
 
     private:
-    std::forward_list<Fighter> fighters; ///< A list containing all Fighters present in this Game.
+    std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
+    using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
     SDL_Rect camera;    ///< The area of the Stage that should be displayed.
     bool running;       ///Indicates if the game is actually running or not.
 };

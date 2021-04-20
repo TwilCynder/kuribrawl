@@ -1,7 +1,7 @@
 #pragma once
 
 #include <forward_list>
-#include "Fighter.h"
+#include "PlayerFighter.h"
 #include "ControllerType.h"
 #include "inputs.h"
 #include "util.h"
@@ -27,7 +27,7 @@ class Port {
     bool isActive() const ;
     void setJoystick(int id);
     void setJoystick(int id, ControllerType* controller);
-    void setFighter(Fighter*);
+    void setFighter(PlayerFighter*);
     void deactivate();
     void setController(ControllerType* c);
     ControllerType* getController() const;
@@ -46,7 +46,7 @@ class Port {
     App* app;
 
     ControllerType* controller;
-    Fighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot
+    PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of it's normal functioning.
     Binding* input_binding;
 
     int id;

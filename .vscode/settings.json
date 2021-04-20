@@ -52,6 +52,9 @@
         "typeinfo": "cpp",
         "forward_list": "cpp",
         "iostream": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "chrono": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp"
     }
 }

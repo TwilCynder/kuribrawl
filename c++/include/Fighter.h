@@ -8,9 +8,7 @@
 #include "InputManager.h"
 #include "gameActions.h"
 
-class Port;
 class Champion;
-class InputManager;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -56,8 +54,6 @@ class Fighter {
     void draw(SDL_Renderer* target);
     //Physics
     void applyPhysics();
-    //Inputs
-    void updateInputs();
     //States
     void updateState();
     void updateAnimation();
@@ -71,10 +67,6 @@ class Fighter {
 
     void jump(jumpX x_type, jumpY y_type);
 
-    InputManager* getInputManager() const;
-    Port* getPort() const;
-    void setPort(Port* port);
-
     bool is_initialized();
 
     /**
@@ -82,6 +74,15 @@ class Fighter {
      */
     static const std::map<State, std::string> state_default_animation_name; 
 
+    protected:
+    State state;        ///< Current State.
+    int state_info;     ///< Additional data that can be set when a state is started.
+    int state_timer;    ///< Number of frames this the current state was started.
+    bool update_anim;   ///< Whether the animation should be updated according to the current state.
+    int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame. 
+    int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right. 
+    bool grounded;      ///< true if the Fighter is on the ground.
+    
     private:
     Champion* model;    ///<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)
 
@@ -90,21 +91,8 @@ class Fighter {
 
     Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
     Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
-    Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
-    std::unique_ptr<InputManager> input_manager;    ///< InputManager ised to process the input made by the Port.
-
-    State state;        ///< Current State.
-    int state_info;     ///< Additional data that can be set when a state is started.
-    int state_timer;    ///< Number of frames this the current state was started.
-    bool update_anim;   ///< Whether the animation should be updated according to the current state.
-    int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame. 
-    int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right. 
-    bool grounded;      ///< true if the Fighter is on the ground.
 
     bool isStateFinished(int stateDuration);
-
-    //Inputs
-    void checkStickState();
 
     //Physics
     void groundCollision();

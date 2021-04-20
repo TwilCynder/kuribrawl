@@ -106,7 +106,7 @@ void Port::setJoystick(int id){
     setJoystick_(id);
 }
 
-void Port::setFighter(Fighter* fighter_){
+void Port::setFighter(PlayerFighter* fighter_){
     fighter = fighter_;
     fighter->setPort(this);
 }

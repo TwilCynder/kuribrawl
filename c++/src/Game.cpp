@@ -20,8 +20,8 @@ Game::Game()
  * @param model the Champion the new Fighter will be based on.
  * @return Fighter* the Fighter created (and added).
  */
-Fighter* Game::addFighter(Champion* model){
-    std::forward_list<Fighter>::iterator it = fighters.begin();
+PlayerFighter* Game::addFighter(Champion* model){
+    Fighteriterator it = fighters.begin();
     it = fighters.emplace_after(it, model);
     return &(*it);
 }
@@ -34,8 +34,8 @@ Fighter* Game::addFighter(Champion* model){
  * @param y the y position of the new Fighter
  * @return Fighter* the Fighter created (and added).
  */
-Fighter* Game::addFighter(Champion* model, int x, int y){
-    std::forward_list<Fighter>::iterator it = fighters.before_begin();
+PlayerFighter* Game::addFighter(Champion* model, int x, int y){
+    Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, model, x, y);
     return &(*it);
 }
@@ -54,7 +54,7 @@ bool Game::is_running(){
  * @param target the renderer the Game will be displayed on.
  */
 void Game::draw(SDL_Renderer* target){
-    std::forward_list<Fighter>::iterator it;
+    Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->draw(target);
     }
@@ -65,7 +65,7 @@ void Game::draw(SDL_Renderer* target){
  * 
  */
 void Game::updateInputs(){
-    std::forward_list<Fighter>::iterator it;
+    Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->updateInputs();
     }
@@ -76,7 +76,7 @@ void Game::updateInputs(){
  * 
  */
 void Game::updateStates(){
-    std::forward_list<Fighter>::iterator it;
+    Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->updateState();
     }
@@ -87,7 +87,7 @@ void Game::updateStates(){
  * 
  */
 void Game::updateAnimations(){
-    std::forward_list<Fighter>::iterator it;
+    Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->updateAnimation();
     }
@@ -98,7 +98,7 @@ void Game::updateAnimations(){
  * This includes modifying speed based on states, applying speed, and detecting collisions and terrain interaction.
  */
 void Game::applyPhysics(){
-    std::forward_list<Fighter>::iterator it;
+    Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->applyPhysics();
     }
@@ -109,7 +109,7 @@ void Game::applyPhysics(){
  * 
  */
 void Game::advanceAnimations(){
-    std::forward_list<Fighter>::iterator it;
+    Fighteriterator it;
     CurrentAnimation* anim;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         anim = it->getCurrentAnimation();
