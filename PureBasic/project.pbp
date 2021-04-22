@@ -4,109 +4,104 @@
   <section name="config">
     <options closefiles="1" openmode="0" name="KuriBrawl"/>
   </section>
-  <section name="data">
-    <explorer view="src\" pattern="0"/>
-    <log show="1"/>
-    <lastopen date="2021-04-22 23:47" user="twilc" host="TWIL-DESKTOP"/>
-  </section>
   <section name="files">
-    <file name="src\animations.pbi">
+    <file name="animations.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\applib.pbi">
+    <file name="applib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\cleanseLib.pbi">
+    <file name="cleanseLib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\debug.pb">
+    <file name="debug.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\debugData.pbi">
+    <file name="debugData.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\debugH.pbi">
+    <file name="debugH.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\filelib.pb">
+    <file name="filelib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\gameData.pb">
+    <file name="gameData.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\gameDataLib.pbi">
+    <file name="gameDataLib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\gameInputlib.pbi">
+    <file name="gameInputlib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\gamelib.pbi">
+    <file name="gamelib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\gamelibConstants.pb">
+    <file name="gamelibConstants.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\inputlib.pb">
+    <file name="inputlib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\inputlibConstants.pbi">
+    <file name="inputlibConstants.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\inputlibData.pbi">
+    <file name="inputlibData.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\loadLib.pb">
+    <file name="loadLib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\main.pb">
+    <file name="main.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\mainlib.pbi">
+    <file name="mainlib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\menulib.pbi">
+    <file name="menulib.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\menus.pbi">
+    <file name="menus.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\physicslib.pb">
+    <file name="physicslib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\statelib.pb">
+    <file name="statelib.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
-    <file name="src\utilCore.pb">
+    <file name="utilCore.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5=""/>
     </file>
   </section>
   <section name="targets">
     <target name="Default Target" enabled="1" default="1">
-      <inputfile value="src\main.pb"/>
-      <outputfile value="bin\KuriBrawl.exe"/>
+      <inputfile value="main.pb"/>
+      <outputfile value="KuriBrawl.exe"/>
       <executable value="build\KuriBrawl.exe"/>
       <options xpskin="1" debug="1"/>
       <purifier enable="1"/>

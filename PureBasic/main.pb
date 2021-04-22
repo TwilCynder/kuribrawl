@@ -65,7 +65,7 @@ EndProcedure
 ;- loading game data
 Define dataFile.s = "data.twl"
 CompilerIf #DEBUG
-  dataFile = "res/data.twl"
+  dataFile = "../res/data.twl"
   For i = 1 To availableJosticks
     Debug Str(i - 1) + JoystickName(i - 1)
   Next
@@ -93,8 +93,8 @@ startTestGame(@app)
 startMainLoop(@app)
  
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 74
-; FirstLine = 35
-; Folding = 4
+; CursorPosition = 71
+; FirstLine = 42
+; Folding = -
 ; EnableXP
 ; EnableUnicode
