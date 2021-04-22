@@ -31,6 +31,7 @@ class Animation {
     void setBaseSpeed(double speed);
 
     void draw(SDL_Renderer* target, int x, int y, int frame);
+    void draw(SDL_Renderer* target, int x, int y, int frame, int facing);
 
     //Construction
     void initFrames(int n);

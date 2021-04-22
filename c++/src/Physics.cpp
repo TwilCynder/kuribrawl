@@ -62,6 +62,12 @@ void Fighter::applyPhysics(){
         case State::WALK:
             speed.x = model->val.walk_speed * facing;
             break;
+        case State::DASH:
+            speed.x = model->val.dash_speed * facing;
+            break;
+        case State::DASH_START:
+            speed.x = model->val.dash_start_speed * facing;
+            break;
         default:
             break;
     }

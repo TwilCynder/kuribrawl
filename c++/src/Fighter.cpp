@@ -91,15 +91,13 @@ bool Fighter::getGrounded() const{
     return grounded;
 }
 
-
 /**
  * @brief displays the Fighter.
  * Simply displays the CurrentAnimation.
  * @param target the renderer the frame will be drawn to.
  */
 void Fighter::draw(SDL_Renderer* target){
-    Debug::log(state);
-    current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y);
+    current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y, facing);
 }
 
 /**
@@ -121,6 +119,7 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
             break;
     }
     setState(State::IDLE, 0, 1);
+    grounded = false;
 }
 
 /**
@@ -146,6 +145,16 @@ void Fighter::updateState(){
                 jump(jumpX::Normal, jumpY::Full);
             }
             break;
+        case State::DASH_START:
+            if (isStateFinished(model->val.dash_start_duration)){
+                setState(State::DASH);
+            }
+            break;
+        case State::DASH_STOP:
+            if (isStateFinished(model->val.dash_stop_duration)){
+                setState(State::IDLE);
+            }
+            break;
         default:
             break;
     }
@@ -159,7 +168,6 @@ void Fighter::updateAnimation(){
     if (update_anim){
         switch(state){
             case State::IDLE:
-                break;
             default:
                 Animation* anim = model->getStateAnimation(state);
                 if (anim){
@@ -189,6 +197,7 @@ Fighter::State Fighter::getState() const {
  */
 
 void Fighter::setState(const Fighter::State s, int facing_, int info, bool update_anim_){
+    Debug::log(s);
     state = s;
     state_info = info;
     update_anim = update_anim_;
@@ -202,5 +211,9 @@ const std::map<Fighter::State, std::string> Fighter::state_default_animation_nam
     {Fighter::State::WALK, "walking"},
     {Fighter::State::WALK_TURN, "walk_turn"},
     {Fighter::State::JUMPSQUAT, "jumpsquat"},
-    {Fighter::State::LANDING, "landing"}
+    {Fighter::State::LANDING, "landing"},
+    {Fighter::State::DASH, "dash"},
+    {Fighter::State::DASH_START, "dash_start"},
+    {Fighter::State::DASH_STOP, "dash_stop"},
+    {Fighter::State::DASH_TURN, "dash_turn"}
 };

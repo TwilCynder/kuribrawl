@@ -169,3 +169,24 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame){
 
     SDL_RenderCopy(target, spritesheet, &source.display, &dest);
 }
+
+void Animation::draw(SDL_Renderer* target, int x, int y, int frame, int facing){
+    if (!this->spritesheet) return;
+
+    if (frame > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+
+    Frame& source = frames[frame];
+
+    SDL_Rect dest;
+    dest.x = x - source.origin.x;
+    dest.y = y - source.origin.y;
+    dest.w = source.display.w;
+    dest.h = source.display.h;
+
+    if (facing == -1)
+        SDL_RenderCopyEx(target, spritesheet, &source.display, &dest, 0, NULL, SDL_FLIP_HORIZONTAL);    
+    else 
+        SDL_RenderCopy(target, spritesheet, &source.display, &dest); 
+}

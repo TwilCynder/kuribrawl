@@ -22,7 +22,7 @@ InputManager::InputManager(Fighter* f) :
  * @param element_type 
  * @param data 
  */
-void InputManager::registerInput(Input input, Port* port, int element, ElementType element_type, int data = 0){
+void InputManager::registerInput(Input input, Port* port, int element, ElementType element_type, int data){
     inputQ.push_back(RegisteredInput(input, port, element, element_type, data));
 }
 
@@ -60,10 +60,21 @@ int InputHandler_Jump(Fighter* fighter, Port* port, RegisteredInput& input){
 
     return 0;
 }
+
+int InputHandler_SmashStickSide(Fighter* fighter, Port* port, RegisteredInput& input){
+    Fighter::State state = fighter->getState();
+
+    int facing = (input.input == Input::LEFT) ? -1 : 1;
+
+    fighter->setState(Fighter::State::DASH_START, facing);
+    return 0;
+}
 }
 
 InputManager::InputHandler InputManager::input_handlers[Input::TOTAL];
 
 void InputManager::initInputHandlers(){
     input_handlers[Input::JUMP] = &InputHandler_Jump;
+    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
+    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
 }

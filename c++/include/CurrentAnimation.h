@@ -15,7 +15,10 @@ class CurrentAnimation{
 
     CurrentAnimation();
     CurrentAnimation(Animation* animation);
+
     void draw(SDL_Renderer* target, int x, int y);
+    void draw(SDL_Renderer* target, int x, int y, int facing);
+
     bool is_initialized();
     bool is_finished();
     void setAnimation(Animation* anim);

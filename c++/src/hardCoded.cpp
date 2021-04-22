@@ -47,5 +47,21 @@ void HardCoded::initGameData(App* app){
     anim->initFrames(1);
     anim->setBaseSpeed(-1);
 
+    anim = acid->addAnimation("dash", app->LoadTexture("../res/dash_strip4.png"));
+    anim->initFrames(4);
+    anim->setBaseSpeed(0.18);
+    
+    anim = acid->addAnimation("dash_start", app->LoadTexture("../res/dashstart_strip2.png"));
+    anim->initFrames(2);
+    anim->setBaseSpeed(8);
+
+    anim = acid->addAnimation("dash_stop", app->LoadTexture("../res/dashstop_strip2.png"));
+    anim->initFrames(2);
+    anim->setBaseSpeed(1);
+
+    anim = acid->addAnimation("dash_turn", app->LoadTexture("../res/dashturn_strip3.png"));
+    anim->initFrames(3);
+    anim->setBaseSpeed(14);
+
     acid->initAnimations();
 }

@@ -6,7 +6,10 @@ namespace Debug {
     static const std::map<Fighter::State, std::string> state_name {
         {Fighter::State::IDLE, "Idle"},
         {Fighter::State::WALK, "Walk"},
-        {Fighter::State::JUMPSQUAT, "Jumpsquat"}
+        {Fighter::State::JUMPSQUAT, "Jumpsquat"},
+        {Fighter::State::DASH, "Dash"},
+        {Fighter::State::DASH_START, "Dash Start"},
+        {Fighter::State::DASH_STOP, "Dash Stop"}
     };
 };
 

@@ -14,7 +14,7 @@ class InputManager {
     public:
     InputManager(Fighter*);
 
-    void registerInput(Input input, Port* port, int element, ElementType element_type, int data);
+    void registerInput(Input input, Port* port, int element, ElementType element_type, int data = 0);
     void updateInputs();
 
     static void initInputHandlers(); 

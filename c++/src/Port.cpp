@@ -12,20 +12,6 @@ Port::Port(App* app_) :
     joystick_id(-1),
     active(false)
 {
-    int* buffer = (int*)malloc(CONTROL_STICK_FRAME_BUFFER * 4);
-
-    control_stick_buffer[0] = buffer;
-    control_stick_buffer[1] = buffer + 4;
-}
-
-Port::~Port(){
-    free(control_stick_buffer[0]);
-}
-
-void Port::swap_control_stick_buffers(){ 
-    int* buffer = control_stick_buffer[1];
-    control_stick_buffer[1] = control_stick_buffer[0];
-    control_stick_buffer[0] = buffer;
 }
 
 bool Port::isActive() const{
@@ -57,20 +43,24 @@ const Kuribrawl::Vector& Port::getControlStickState() const{
     return control_stick.current_state;
 }
 
+const Kuribrawl::Vector& Port::getControlStickPreviousState() const{
+    return control_stick.previous_state;
+}
+
 const Kuribrawl::Vector& Port::getSecondaryStickState() const{
     return secondary_stick.current_state;
 }
 
 void Port::readController(){
+    control_stick.updatePrevious();
+    secondary_stick.updatePrevious();
+
     control_stick.current_state.x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTX);
     control_stick.current_state.y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTY);
     secondary_stick.current_state.x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTX);
     secondary_stick.current_state.y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTY);
 
     //détection du passage de threshold
-
-    control_stick.updatePrevious();
-    secondary_stick.updatePrevious();
 }
 
 void Port::setJoystick_(int id){

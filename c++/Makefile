@@ -10,8 +10,10 @@ _OBJS= $(SRC:.cpp=.o)
 vpath %.h include
 vpath %.cpp src
 
-#_OBJS = Animation.o app.o Champion.o CurrentAnimation.o Fighter.o Game.o GameData.o KBException.o load.o main.o sdlHelper.o Test.o
 OBJS = $(patsubst src/%,bin/%,$(_OBJS))
+
+NB_FILES = $(words $(SRC))
+CURRENT_NB = 0
 
 all: clear $(EXEC)
 
@@ -25,12 +27,15 @@ clear:
 	clear
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 
-bin/%.o: %.cpp 
+bin/%.o: %.cpp #$(SRC)
+	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
+	@printf "\033[1;33m[$(CURRENT_NB)/$(NB_FILES)]\033[0m "
 	g++ $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -r bin/*
 
 $(EXEC): $(OBJS)
+	@printf "\033[1;33m[Linking]\033[0m "
 	g++ $^ -o $@ $(LDFLAGS) 
 	@printf "\033[0;32mCompilation finished successfully !"

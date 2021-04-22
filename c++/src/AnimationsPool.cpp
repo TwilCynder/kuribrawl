@@ -28,6 +28,9 @@ Animation* AnimationsPool::addAnimation(const std::string& name){
  */
 
 Animation* AnimationsPool::addAnimation(const std::string& name, SDL_Texture* spritesheet){
+    if (!spritesheet)
+        throw KBFatal("Tried to add animation with null spritesheet");
+
     auto [node, success] = animations.try_emplace(name, spritesheet);
 
     if (!success) {

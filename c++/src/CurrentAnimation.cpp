@@ -192,3 +192,11 @@ void CurrentAnimation::draw(SDL_Renderer* target, int x, int y){
 
     model->draw(target, x, y, current_frame);
 }
+
+void CurrentAnimation::draw(SDL_Renderer* target, int x, int y, int facing){
+    if (!model){
+        throw KBFatal("Tried to draw non-initalized CurrentAnimation");
+    }
+
+    model->draw(target, x, y, current_frame, facing);
+}
