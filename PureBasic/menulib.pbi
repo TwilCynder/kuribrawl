@@ -4,13 +4,13 @@
   #MENUCONTENT_OTHER
 EndEnumeration  
   
+Prototype.i menuEffect(*data)
 Prototype.i menuCallback(*menu, *menuData)
-Prototype.i menuElementCallback(*element, *menu, *data = 0)
-Prototype.i menuInputHandler(*menu, input.i)
+Prototype.i menuElementCallback(*element, *menu)
 
 Structure MenuElement
   id.l
-  *effect.menuElementCallback
+  *effect.menuEffect
   *nextelement.MenuElement[4]
   position.Vector
   contentType.b
@@ -28,11 +28,9 @@ Structure Menu
   *data
   *render.menuCallback  ;replaces the basic renderer
   *init.menuCallback
-  *inputHandler.menuInputHandler
   needRedraw.b
   *selectedElement.MenuElement
   *defaultElement.MenuElement
-  *app
 EndStructure  
 
 Procedure baseMenuRenderer(*menu.Menu, *data)
@@ -51,21 +49,11 @@ Procedure baseMenuRenderer(*menu.Menu, *data)
   EndIf 
 EndProcedure
 
-Procedure baseMenuInputHandler(*menu.Menu, input.i)
-  Debug input
-EndProcedure  
-
 Procedure renderMenu(*menu.Menu)
   If *menu\render
     *menu\render(*menu, *menu\data)
   EndIf 
   FlipBuffers()
-EndProcedure
-
-Procedure handleMenuInput(*menu.Menu, port.i, input.i)
-  If *menu\inputHandler
-    *menu\inputHandler(*menu.Menu, input.i)
-  EndIf 
 EndProcedure
 
 Procedure addMenuElement(*menu.Menu, x.l, y.l, contentType.b = #MENUCONTENT_OTHER, content.i = 0, *effect = 0, *renderer = 0)
@@ -91,7 +79,7 @@ EndProcedure
 Procedure menuOnInput(type.b, element.b)
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 12
-; FirstLine = 9
-; Folding = --
+; CursorPosition = 78
+; FirstLine = 28
+; Folding = -
 ; EnableXP
