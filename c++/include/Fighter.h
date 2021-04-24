@@ -64,6 +64,7 @@ class Fighter {
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);
     bool getGrounded() const;
+    int getFacing() const;
 
     void jump(jumpX x_type, jumpY y_type);
 

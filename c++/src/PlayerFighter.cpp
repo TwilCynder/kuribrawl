@@ -33,8 +33,8 @@ void PlayerFighter::swap_control_stick_buffer(){
 
 void PlayerFighter::init_control_stick_buffer(){
     for(int i = 0; i < CONTROL_STICK_FRAME_BUFFER; i++){
-        control_stick_buffer[i].x = false;
-        control_stick_buffer[i].y = false;
+        control_stick_buffer[i].x = 0;
+        control_stick_buffer[i].y = 0;
     }
 }
 
@@ -42,20 +42,26 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     //At this point we assume the buffer is actually containing the position of the stick 2 frames ago
     if (current_state.x > vals.analogStickSmashThreshold 
         && previous_state.x < vals.analogStickSmashThreshold 
-        && control_stick_buffer[0].x)
+        && control_stick_buffer[0].x != 1)
     {
         //Smash input right
         input_manager->registerInput(Input::RIGHT, port, -1, ElementType::STICK);
     } else if (current_state.x < -vals.analogStickSmashThreshold 
         && previous_state.x > -vals.analogStickSmashThreshold 
-        && control_stick_buffer[0].x)
+        && control_stick_buffer[0].x != -1)
     {
         //Smash input left
         input_manager->registerInput(Input::LEFT, port, -1, ElementType::STICK);
     }
 
-    control_stick_buffer[0].x = abs(previous_state.x < vals.analogStickThreshold);
-    control_stick_buffer[0].y = abs(previous_state.y < vals.analogStickThreshold);
+    if (current_state.x > vals.analogStickThreshold){
+        control_stick_buffer[0].x = 1;
+    } else if (current_state.x < -vals.analogStickThreshold) {
+        control_stick_buffer[0].x = -1;
+    } else {
+        control_stick_buffer[0].x = 0;
+    }
+
 }
 
 /**

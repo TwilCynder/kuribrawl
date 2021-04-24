@@ -68,6 +68,8 @@ void Fighter::applyPhysics(){
         case State::DASH_START:
             speed.x = model->val.dash_start_speed * facing;
             break;
+        case State::DASH_TURN:
+            speed.x += model->val.dash_turn_accel * facing;
         default:
             break;
     }

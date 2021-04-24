@@ -39,5 +39,5 @@ class PlayerFighter : public Fighter {
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
     bool valid_port;
     std::unique_ptr<InputManager> input_manager;    ///< InputManager ised to process the input made by the Port.
-    VectorT<bool> control_stick_buffer[CONTROL_STICK_FRAME_BUFFER];
+    Vector control_stick_buffer[CONTROL_STICK_FRAME_BUFFER];
 };

@@ -91,6 +91,10 @@ bool Fighter::getGrounded() const{
     return grounded;
 }
 
+int Fighter::getFacing() const{
+    return facing;
+}
+
 /**
  * @brief displays the Fighter.
  * Simply displays the CurrentAnimation.
@@ -155,6 +159,10 @@ void Fighter::updateState(){
                 setState(State::IDLE);
             }
             break;
+        case State::DASH_TURN:
+            if (isStateFinished(model->val.dash_start_duration)){
+                setState(State::DASH);
+            }
         default:
             break;
     }
@@ -197,7 +205,7 @@ Fighter::State Fighter::getState() const {
  */
 
 void Fighter::setState(const Fighter::State s, int facing_, int info, bool update_anim_){
-    Debug::log(s);
+    //Debug::log(s);
     state = s;
     state_info = info;
     update_anim = update_anim_;

@@ -9,7 +9,8 @@ namespace Debug {
         {Fighter::State::JUMPSQUAT, "Jumpsquat"},
         {Fighter::State::DASH, "Dash"},
         {Fighter::State::DASH_START, "Dash Start"},
-        {Fighter::State::DASH_STOP, "Dash Stop"}
+        {Fighter::State::DASH_STOP, "Dash Stop"},
+        {Fighter::State::DASH_TURN, "Dash turn"}
     };
 };
 

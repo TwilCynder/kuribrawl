@@ -16,10 +16,14 @@ Champion::Champion(const std::string& name_):
     this->val.gravity = DEFAULT_GRAVITY;
 }
 
+/**
+ * @brief Construct a new Champion::Values object
+ * Uses Acid Rainbows as default values.
+ */
 Champion::Values::Values() : 
-    walk_speed(2.0), dash_speed(4.0), dash_start_speed(7.0), dash_turn_accel(0), traction(0.2), 
+    walk_speed(4.5), dash_speed(8.0), dash_start_speed(10.0), dash_turn_accel(1.5), traction(0.7), 
     max_air_speed(0), air_acceleration(0), air_friction(0), jump_speed(8), short_hop_speed(4), air_jump_speed(6), gravity(DEFAULT_GRAVITY), max_fall_speed(0), fast_fall_speed(0),
-    jump_squat_duration(5), dash_start_duration(-1), dash_stop_duration(-1), dash_turn_duration(0), landing_duration(0), guard_start_duration(0), guard_stop_duration(0)
+    jump_squat_duration(5), dash_start_duration(-1), dash_stop_duration(-1), dash_turn_duration(-1), landing_duration(0), guard_start_duration(0), guard_stop_duration(0)
 {
 
 }
