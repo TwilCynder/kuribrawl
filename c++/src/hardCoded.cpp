@@ -7,14 +7,14 @@
 
 /**
  * @brief Initializes all hard-coded informations related to Controllers, updating and populating a given ControllersData in consequence.
- * 
+ *
  * @param data the ControllersData object that will contain the hard-coded data.
  */
 void HardCoded::initControllersData(ControllersData& data){
     ControllerType& c = data.addController("GC");
 
     c.control_stick = 0;
-    c.setControllerVals(10000, -16000, 25000);
+    c.setControllerVals(10000, -16000, 20000);
 
     c.default_binding->buttons[0] = Input::ATTACK;
     c.default_binding->buttons[1] = Input::SPECIAL;
@@ -42,7 +42,7 @@ void HardCoded::initGameData(App* app){
     anim = acid->addAnimation("walking", app->LoadTexture("../res/walk_strip6.png"));
     anim->initFrames(6);
     anim->setBaseSpeed(0.15);
-    
+
     anim = acid->addAnimation("jumpsquat", app->LoadTexture("../res/jumpstart.png"));
     anim->initFrames(1);
     anim->setBaseSpeed(-1);
@@ -50,7 +50,7 @@ void HardCoded::initGameData(App* app){
     anim = acid->addAnimation("dash", app->LoadTexture("../res/dash_strip4.png"));
     anim->initFrames(4);
     anim->setBaseSpeed(0.18);
-    
+
     anim = acid->addAnimation("dash_start", app->LoadTexture("../res/dashstart_strip2.png"));
     anim->initFrames(2);
     anim->setBaseSpeed(8);

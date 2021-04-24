@@ -4,7 +4,7 @@
 
 /**
  * @brief Returns the Champion associated with the given name.
- * 
+ *
  * @param name the string identifier of the wanted Champion
  * @return Champion* the Champion, or NULL if no Champion had this name.
  */
@@ -19,7 +19,7 @@ Champion* GameData::getChampion(const std::string& name){
 /**
  * @brief Adds a new Champion to the GameData.
  * Contructs the Champion in-place.
- * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Champion#name "name attribute". 
+ * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Champion#name "name attribute".
  * @return Champion* the created Champion (can't be NULL since the method throws if it could be created)
  */
 Champion* GameData::addChampion(const std::string& name) {
@@ -34,7 +34,7 @@ Champion* GameData::addChampion(const std::string& name) {
 
 /**
  * @brief Returns a Champion associated with the given name, creating it if there was none.
- * 
+ *
  * @param name the name of the wanted Champion.
  * @return Champion& a reference to the Champion.
  */

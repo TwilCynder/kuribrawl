@@ -6,22 +6,19 @@
 
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
-namespace {
-    void land(Fighter* fighter){
-
-    }
-    void applyAirAccel(Fighter* fighter, int direction){
-
-    }
-    void applyAirDrift(Fighter* fighter, int direction){
-        
-    }
-
+void Fighter::applyAirAccel(int direction){
+	if (!(sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
+		speed.x += model->val.air_acceleration * direction;
+		if (speed.x > model->val.max_air_speed)
+			speed.x = model->val.max_air_speed;
+		else if (speed.x < -model->val.max_air_speed)
+			speed.x = -model->val.max_air_speed;
+	}
 }
 
 /**
  * @brief Called when a Fighter touches the ground while being airborne.
- * 
+ *
  */
 void Fighter::groundCollision(){
     grounded = true;
@@ -29,7 +26,7 @@ void Fighter::groundCollision(){
 
 /**
  * @brief Called when a Fighter was grounded but is no longer on the ground.
- * 
+ *
  */
 void Fighter::groundToAir(){
     grounded = false;
@@ -37,7 +34,7 @@ void Fighter::groundToAir(){
 
 /**
  * @brief Apply physics-related mechanics.
- * 
+ *
  */
 void Fighter::applyPhysics(){
 

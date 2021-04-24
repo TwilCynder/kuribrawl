@@ -18,7 +18,7 @@ class Fighter {
     public:
 
     /**
-     * @brief The situation of a Fighter, definind the actions they can take and the behavior of the Fighter as an entity. 
+     * @brief The situation of a Fighter, definind the actions they can take and the behavior of the Fighter as an entity.
      * A Fighter can have only one State at a time.
      * A state being "started" means that the current state of a Fighter was set to this state.
      * @note States don't care about whether a Fighter is on the ground or not, certain states can very well be used no matter that ; what defines if a Fighter is grounded or not is
@@ -36,13 +36,13 @@ class Fighter {
         DASH_STOP,      ///< Started when a Fighter left the Dash state in certain ways. Transitions into Idle after a few frames, the fighter gradually loses speed.
         DASH_TURN,      ///< Changing direction during Dash.
         JUMPSQUAT,      ///< Started whan a Fighter attemps to Jump, transitions into Idle and boost vertical speed after a few frames.
-        LANDING,        ///< Started when a Fighter hits the ground after being previously airborne 
+        LANDING,        ///< Started when a Fighter hits the ground after being previously airborne
         ATTACK,         ///< Attacking (in the animation of an attack)
         HITSTUN,        ///< Unable to act after getting hit
         TUMBLE,         ///< Started after the hitstun from a strong hit ended, actions are a bit restrcited.
-        GUARD_STUN,     ///< Unable to act or to put down shield after getting their shield it. 
+        GUARD_STUN,     ///< Unable to act or to put down shield after getting their shield it.
         LANDING_LAG,    ///< Started when a Fighter hits the ground after being previously airborne and while the state was Attacking.
-        CROUCH,         
+        CROUCH,
         CROUCH_START,
         CROUCH_STOP,
         STATES          ///< Never used, is (because of how enums work) the total number of states.
@@ -73,19 +73,21 @@ class Fighter {
     /**
      * @brief Map associating each state with the name of the Animation that has to be used by a Champion as the default Animation for this State.
      */
-    static const std::map<State, std::string> state_default_animation_name; 
+    static const std::map<State, std::string> state_default_animation_name;
 
     protected:
     State state;        ///< Current State.
     int state_info;     ///< Additional data that can be set when a state is started.
     int state_timer;    ///< Number of frames this the current state was started.
     bool update_anim;   ///< Whether the animation should be updated according to the current state.
-    int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame. 
-    int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right. 
+    int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame.
+    int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
     bool grounded;      ///< true if the Fighter is on the ground.
-    
+
+    void applyAirAccel(int direction);
+
     private:
-    Champion* model;    ///<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)
+    const Champion* const model;    /**<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)*/
 
     CurrentAnimation current_animation; ///< CurrentAnimation used to display an Animation of the \ref Fighter#model "model Champion".
     std::string current_animation_name; ///< Never used.
@@ -94,8 +96,10 @@ class Fighter {
     Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
 
     bool isStateFinished(int stateDuration);
+	virtual jumpY decideGroundedJumpYType() const {return jumpY::Short;}
 
     //Physics
     void groundCollision();
     void groundToAir();
+	void land();
 };

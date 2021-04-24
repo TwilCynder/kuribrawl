@@ -5,10 +5,10 @@
 
 /**
  * @brief Construct a new Input Manager object
- * 
+ *
  * @param f the Fighter this InputManager will be linked to.
  */
-InputManager::InputManager(Fighter* f) : 
+InputManager::InputManager(Fighter* f) :
     fighter(f)
 {
 }
@@ -16,11 +16,11 @@ InputManager::InputManager(Fighter* f) :
 /**
  * @brief Registers an input.
  * See RegisterInput for an explanation of all paramaters.
- * @param input 
- * @param port 
- * @param element 
- * @param element_type 
- * @param data 
+ * @param input
+ * @param port
+ * @param element
+ * @param element_type
+ * @param data
  */
 void InputManager::registerInput(Input input, Port* port, int element, ElementType element_type, int data){
     inputQ.push_back(RegisteredInput(input, port, element, element_type, data));
@@ -34,7 +34,7 @@ void InputManager::updateInputs(){
     std::deque<RegisteredInput>::iterator it;
     for (it = inputQ.begin(); it != inputQ.end();){
         InputHandler handler = input_handlers[it->input];
-        
+
         if (!handler || !handler(fighter, it->port, *it)){
             it = inputQ.erase(it);
         } else {
@@ -45,8 +45,8 @@ void InputManager::updateInputs(){
 
 /**
  * @brief Returns the number of currently registered inputs
- * 
- * @return int 
+ *
+ * @return int
  */
 int InputManager::getInputsNumber() const {
     return inputQ.size();
@@ -55,7 +55,7 @@ int InputManager::getInputsNumber() const {
 namespace {
 int InputHandler_Jump(Fighter* fighter, Port* port, RegisteredInput& input){
     if (fighter->getGrounded()){
-        fighter->setState(Fighter::State::JUMPSQUAT);
+        fighter->setState(Fighter::State::JUMPSQUAT, 0, input.element);
     }
 
     return 0;
@@ -67,8 +67,8 @@ int InputHandler_SmashStickSide(Fighter* fighter, Port* port, RegisteredInput& i
     int facing = (input.input == Input::LEFT) ? -1 : 1;
 
     if (fighter->getGrounded()){
-        if (state == Fighter::State::WALK || 
-        state == Fighter::State::IDLE || 
+        if (state == Fighter::State::WALK ||
+        state == Fighter::State::IDLE ||
         (state == Fighter::State::DASH_START && fighter->getFacing() == -facing))
         {
             fighter->setState(Fighter::State::DASH_START, facing);

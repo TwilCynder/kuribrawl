@@ -6,7 +6,7 @@
 #include "Binding.h"
 #include <stdlib.h>
 
-Port::Port(App* app_) : 
+Port::Port(App* app_) :
     app(app_),
     input_binding(0),
     joystick_id(-1),
@@ -19,16 +19,16 @@ bool Port::isActive() const{
 }
 
 ControllerType* Port::getController() const {
-    return controller;
+    return controller_type;
 }
 
 void Port::setController(ControllerType* c){
-    controller = c;
+    controller_type = c;
 }
 
 //use only with active ports : controller can be null if the port is inactive
 Binding* Port::getInputBinding() const {
-    return (input_binding && input_binding->controller == controller) ? input_binding : controller->default_binding.get();
+    return (input_binding && input_binding->controller == controller_type) ? input_binding : controller_type->default_binding.get();
 }
 
 void Port::handleButtonPress(int button){
@@ -37,6 +37,10 @@ void Port::handleButtonPress(int button){
     Input input = getInputBinding()->buttons[button];
     InputManager* manager = fighter->getInputManager();
     manager->registerInput(input, this, button, ElementType::BUTTON, 0);
+}
+
+bool Port::isButtonPressed(int button){
+	return SDL_JoystickGetButton(joystick, button);
 }
 
 const Kuribrawl::Vector& Port::getControlStickState() const{
@@ -55,17 +59,18 @@ void Port::readController(){
     control_stick.updatePrevious();
     secondary_stick.updatePrevious();
 
-    control_stick.current_state.x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTX);
-    control_stick.current_state.y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_LEFTY);
-    secondary_stick.current_state.x = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTX);
-    secondary_stick.current_state.y = SDL_GameControllerGetAxis(joystick, SDL_CONTROLLER_AXIS_RIGHTY);
+    control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+    control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+    secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
+    secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
 
     //détection du passage de threshold
 }
 
 void Port::setJoystick_(int id){
-    joystick = SDL_GameControllerOpen(id);
-    SDL_JoystickID instance_id = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(joystick));
+    controller = SDL_GameControllerOpen(id);
+	joystick = SDL_GameControllerGetJoystick(controller);
+    SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
 
     if (active){
         app->joysticks[joystick_id] = nullptr;
@@ -90,7 +95,7 @@ void Port::setJoystick(int id, ControllerType* c){
 }
 
 void Port::setJoystick(int id){
-    if (!controller){
+    if (!controller_type){
         throw KBFatal("Trying to enable port with no controller");
     }
     setJoystick_(id);

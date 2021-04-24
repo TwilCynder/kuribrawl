@@ -9,9 +9,11 @@
 /**
  * @brief Construct a new Data File object from a file path.
  * The file is directly opened.
- * @param filename 
+ * @param filename
  */
-DataFile::DataFile(const char* filename){
+DataFile::DataFile(const char* filename):
+	sdl_stream(nullptr)
+{
     file = fopen(filename, "r");
     if (file){
         sdl_stream = SDL_RWFromFP(file, (SDL_bool)1);
@@ -19,7 +21,7 @@ DataFile::DataFile(const char* filename){
 }
 
 DataFile::~DataFile(){
-    free(sdl_stream);
+	if (sdl_stream)	free(sdl_stream);
 }
 
 /**
@@ -36,7 +38,7 @@ bool DataFile::checkSignature(){
 
 /**
  * @brief Reads a few bytes as the data file format version and prints it..
- * 
+ *
  */
 
 void DataFile::readVersion(){
@@ -52,8 +54,8 @@ void DataFile::readVersion(){
 
 /**
  * @brief Reads a \ref DataFile#DataType "DataType" from the file.
- * 
- * @return DataFile::DataType 
+ *
+ * @return DataFile::DataType
  */
 
 DataFile::DataType DataFile::readDataType(){
@@ -64,7 +66,7 @@ DataFile::DataType DataFile::readDataType(){
 
 /**
  * @brief Reads a Data Chunk tag (name) from the file.
- * 
+ *
  * @return const char* the string identifier (tag or name) of a data chunk.
  */
 
@@ -83,7 +85,7 @@ bool DataFile::eof(){
 
 /**
  * @brief Reads an Animation Data Chunk
- * 
+ *
  * @param anim the anim that was created or updated based on this Data Chunk
  */
 
@@ -93,7 +95,7 @@ void DataFile::readAnimationFile(Animation& anim){
 
 /**
  * @brief Reads the entirety of the file and populates or update the content of a GameData object based on the Data Chunks present in it.
- * 
+ *
  * @param data the GameData that will be updated and populated.
  */
 
@@ -110,7 +112,7 @@ void DataFile::read(GameData& data){
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
-                
+
                 //readAnimationFile(data.tryChampion(tag).tryAnimation(tag));
 
                 tag = readFileTag();
@@ -121,7 +123,7 @@ void DataFile::read(GameData& data){
                 break;
         }
     }
-}  
+}
 
 bool DataFile::ready(){
     return file != 0;

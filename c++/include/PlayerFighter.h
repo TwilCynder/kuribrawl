@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include "Fighter.h"
 #include "ControllerType.h"
 #include "util.h"
@@ -35,6 +35,8 @@ class PlayerFighter : public Fighter {
     void init_control_stick_buffer();
     void swap_control_stick_buffer();
     void update_control_stick_buffer(const Vector&, const Vector&, const ControllerType::ControllerVals&);
+
+	jumpY decideGroundedJumpYType() const override;
 
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
     bool valid_port;

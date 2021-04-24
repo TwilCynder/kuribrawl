@@ -12,7 +12,7 @@
 ; régler finalement la question du : substructure directement en field ou pointer vers heap
 ; transformer les données sous forme de nombre fragmenté (input) en structures
 
-#DEBUG = 0
+#DEBUG = 1
 
 Global shieldColor = RGBA(255, 0, 0, 96)
 Global testVar.b
@@ -49,7 +49,7 @@ Procedure startTestGame()
   EndIf 
   
   setPort(0, 0)
-  setPort(1, 2)
+  ;setPort(1, 2)
   
   *game = startGame(window, "Snowdin")
   addFighter(*game, "Acid", *game\currentStage\model\w / 2 -200, 300, 0, "TwilCynder")
@@ -152,9 +152,9 @@ CreateFile(0, "kuribrawl log.txt")
 totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")
 CloseFile(0)
-; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 80
-; FirstLine = 56
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 85
+; FirstLine = 66
 ; Folding = 8
 ; EnableXP
 ; EnableUnicode

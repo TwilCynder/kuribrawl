@@ -41,13 +41,14 @@ class Port {
 
     App* app;
 
-    ControllerType* controller;
+    ControllerType* controller_type;
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of it's normal functioning.
     Binding* input_binding;
 
     int id;
     int joystick_id;
-    SDL_GameController* joystick;
+    SDL_GameController* controller;
+	SDL_Joystick* joystick;
     bool active;
 
     //State;

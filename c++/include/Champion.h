@@ -16,7 +16,7 @@ class Champion : public AnimationsPool {
 
     /**
      * @brief Base position and size of this Charater's shield.
-     * 
+     *
      */
     struct ShieldInfo : Kuribrawl::Vector {
         int size;
@@ -24,7 +24,7 @@ class Champion : public AnimationsPool {
 
     /**
      * @brief Contains all the fixed (numerical) values of a Character (speeds, weight, lags ...)
-     * 
+     *
      */
     struct Values {
         double walk_speed;
@@ -56,15 +56,15 @@ class Champion : public AnimationsPool {
 
     Champion(const std::string& name_);
     const std::string& getName();
-    Animation* getStateAnimation(const Fighter::State state) const;
+    const Animation* getStateAnimation(const Fighter::State state) const;
     void initAnimations(void);
 
     Champion::Values val;
 
     private:
     std::string name;   ///< Internal identifier of this Champion.
-    std::string display_name;   ///< Name that will be displayed for this Champion.  
-    std::unique_ptr<Animation*[]> state_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation. 
+    std::string display_name;   ///< Name that will be displayed for this Champion.
+    std::unique_ptr<const Animation*[]> state_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
                                                     Pointer validity : can be invalidated if an Animation is moved or deleted*/
 };
 

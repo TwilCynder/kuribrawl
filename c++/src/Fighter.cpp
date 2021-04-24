@@ -18,7 +18,7 @@ Fighter::Fighter(Champion* model_):
 
 /**
  * @brief Construct a new Fighter object
- * 
+ *
  * @param model_ the Champion used as a model
  * @param x_ the x position on the stage thet Fighter will spawn at.
  * @param y_ the y position on the stage thet Fighter will spawn at.
@@ -30,7 +30,7 @@ Fighter::Fighter(Champion* model_, int x_, int y_):
     grounded(false),
     model(model_)
 {
-    Animation* idle_anim = model->getAnimation("idle");
+    const Animation* idle_anim = model->getAnimation("idle");
 
     if (!idle_anim){
         throw KBFatal("Tried to instanciate a champion with no idle animation");
@@ -46,7 +46,7 @@ Fighter::Fighter(Champion* model_, int x_, int y_):
 
 /**
  * @brief Returns whether the Fighter is correctly initialized and ready to use.
- * 
+ *
  * @return true is the CurrentAnimation is ready to use.
  * @return false otherwise.
  */
@@ -56,8 +56,8 @@ bool Fighter::is_initialized(){
 
 /**
  * @brief Return a vector representing the current position of this Fighter on the Stage.
- * 
- * @return Kuribrawl::VectorDouble& 
+ *
+ * @return Kuribrawl::VectorDouble&
  */
 Kuribrawl::VectorDouble& Fighter::getPosition() {
     return position;
@@ -65,7 +65,7 @@ Kuribrawl::VectorDouble& Fighter::getPosition() {
 
 /**
  * @brief Returns the Animation of the Champion that is being displayed currently.
- * 
+ *
  * @return CurrentAnimation* a pointer to the Animation the CurrentAnimation is currently playing.
  */
 CurrentAnimation* Fighter::getCurrentAnimation(){
@@ -106,7 +106,7 @@ void Fighter::draw(SDL_Renderer* target){
 
 /**
  * @brief Makes the Fighter jump.
- * 
+ *
  */
 void Fighter::jump(jumpX x_type, jumpY y_type){
     switch (y_type){
@@ -128,7 +128,7 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
 
 /**
  * @brief If the current state is limited in time, returns whether is has reached its end.
- * 
+ *
  * @param duration value used as the duration (usually one of the Champion's fixed value)
  * @return true if the duration is -1 and the current animation was finished, or if the timer state has reached the duration.
  */
@@ -138,7 +138,7 @@ bool Fighter::isStateFinished(int duration){
 
 /**
  * @brief Checks if any change of state should be made based on the current state and the \ref Fighter#state_time "state timer".
- * 
+ *
  */
 void Fighter::updateState(){
     if (paused) return;
@@ -146,7 +146,7 @@ void Fighter::updateState(){
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){
-                jump(jumpX::Normal, jumpY::Full);
+                jump(jumpX::Normal, decideGroundedJumpYType());
             }
             break;
         case State::DASH_START:
@@ -177,7 +177,7 @@ void Fighter::updateAnimation(){
         switch(state){
             case State::IDLE:
             default:
-                Animation* anim = model->getStateAnimation(state);
+                const Animation* anim = model->getStateAnimation(state);
                 if (anim){
                     current_animation.setAnimation(anim);
                 }
@@ -188,7 +188,7 @@ void Fighter::updateAnimation(){
 
 /**
  * @brief Returns the current \ref Fighter#State "state" of this Fighter.
- * 
+ *
  * @return Fighter::State
  */
 

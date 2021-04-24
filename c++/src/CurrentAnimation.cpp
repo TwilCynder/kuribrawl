@@ -16,7 +16,7 @@ CurrentAnimation::CurrentAnimation():
 
 /**
  * @brief Construct a new Current Animation object.
- * 
+ *
  * @param animation the Animation that will be ran at first.
  */
 
@@ -28,18 +28,18 @@ CurrentAnimation::CurrentAnimation(Animation* animation):
 
 /**
  * @brief Returns wether the animation is actually running and has an Animation to run.
- * 
+ *
  * @return true if there is an Animation to be ran.
  * @return false otherwise
  */
 
-bool CurrentAnimation::is_initialized(){
+bool CurrentAnimation::is_initialized()const{
     return model && model->is_initialized();
 }
 
 /**
  * @brief Retur whether the animation just finished (even if it looped).
- * 
+ *
  * @return finished or not.
  */
 bool CurrentAnimation::is_finished(){
@@ -49,21 +49,21 @@ bool CurrentAnimation::is_finished(){
 /**
  * @brief Sets the ran Animation.
  * Delegates to setAnimation(Animation*, double) with the Animation's default speed.
- * @param anim 
+ * @param anim
  */
 
-void CurrentAnimation::setAnimation(Animation* anim){
+void CurrentAnimation::setAnimation(const Animation* anim){
     setAnimation(anim, anim->base_speed);
 }
 
 /**
  * @brief Sets the ran Animation, and the \ref Animation#base_speed "speed" at which it will be ran.
- * 
- * @param anim 
+ *
+ * @param anim
  * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
  */
 
-void CurrentAnimation::setAnimation(Animation* anim, double speed_){
+void CurrentAnimation::setAnimation(const Animation* anim, double speed_){
     model = anim;
     init();
     setSpeed(speed_);
@@ -72,8 +72,8 @@ void CurrentAnimation::setAnimation(Animation* anim, double speed_){
 
 /**
  * @brief Sets the current \ref Animation#base_speed "speed".
- * 
- * @param speed_ the \ref Animation#base_speed "speed" that will be used from now on. 
+ *
+ * @param speed_ the \ref Animation#base_speed "speed" that will be used from now on.
  * For speeds that do not make each frame displayed the same amount of time, using this method while the animation has already advanced at least one frame will result in imprecisions.
  */
 
@@ -105,7 +105,7 @@ void CurrentAnimation::setSpeed(double speed_){
 
 /**
  * @brief Initializes this Current Animation, to make it ready to start if it has an Animation.
- * 
+ *
  */
 
 void CurrentAnimation::init(){
@@ -124,7 +124,7 @@ void CurrentAnimation::reset(){
 
 /**
  * @brief Function called when the Current Animation is started.
- * 
+ *
  */
 
 void CurrentAnimation::start(){
@@ -138,7 +138,7 @@ void CurrentAnimation::start(){
 
 /**
  * @brief Advances the animation, which means doing all that need to be done at each iteration of the main loop for the animation to progress (at the right speed)
- * 
+ *
  */
 
 void CurrentAnimation::advance(){
