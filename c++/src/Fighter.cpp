@@ -163,6 +163,11 @@ void Fighter::updateState(){
             if (isStateFinished(model->val.dash_start_duration)){
                 setState(State::DASH);
             }
+        case State::LANDING:
+            if (isStateFinished(model->val.landing_duration)){
+                setState(State::IDLE);
+            }
+            break;
         default:
             break;
     }
@@ -174,13 +179,19 @@ void Fighter::updateState(){
  */
 void Fighter::updateAnimation(){
     if (update_anim){
+        const Animation* anim;
         switch(state){
             case State::IDLE:
-            default:
-                const Animation* anim = model->getStateAnimation(state);
-                if (anim){
+                anim = (grounded) ? 
+                    model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
+                    (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
+                if (anim)
                     current_animation.setAnimation(anim);
-                }
+                break;
+            default:
+                anim = model->getDefaultAnimation((Champion::DefaultAnimation)state);
+                if (anim)
+                    current_animation.setAnimation(anim);
         }
         update_anim = false;
     }
@@ -213,15 +224,3 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
 
     state_timer = 0;
 }
-
-const std::map<Fighter::State, std::string> Fighter::state_default_animation_name = {
-    {Fighter::State::IDLE, "idle"},
-    {Fighter::State::WALK, "walking"},
-    {Fighter::State::WALK_TURN, "walk_turn"},
-    {Fighter::State::JUMPSQUAT, "jumpsquat"},
-    {Fighter::State::LANDING, "landing"},
-    {Fighter::State::DASH, "dash"},
-    {Fighter::State::DASH_START, "dash_start"},
-    {Fighter::State::DASH_STOP, "dash_stop"},
-    {Fighter::State::DASH_TURN, "dash_turn"}
-};

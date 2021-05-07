@@ -15,6 +15,16 @@ class Champion : public AnimationsPool {
     public:
 
     /**
+     * @brief Animations that are associated with a specific situation.
+     */
+    enum class DefaultAnimation {
+        #include "states.enum"
+        AIR_IDLE,
+        JUMP,
+        TOTAL
+    };
+
+    /**
      * @brief Base position and size of this Charater's shield.
      *
      */
@@ -56,15 +66,20 @@ class Champion : public AnimationsPool {
 
     Champion(const std::string& name_);
     const std::string& getName();
-    const Animation* getStateAnimation(const Fighter::State state) const;
+    const Animation* getDefaultAnimation(const DefaultAnimation state) const;
     void initAnimations(void);
 
     Champion::Values val;
 
     private:
+    /**
+     * @brief Map associating each DefaultAnimation with the name (=string key) is is supposed to have in the animation map.
+     */
+    static const std::map<DefaultAnimation, std::string> default_animation_name;
+
     std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
-    std::unique_ptr<const Animation*[]> state_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
+    std::unique_ptr<const Animation*[]> default_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
                                                     Pointer validity : can be invalidated if an Animation is moved or deleted*/
 };
 

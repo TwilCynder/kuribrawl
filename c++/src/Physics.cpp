@@ -21,6 +21,7 @@ void Fighter::applyAirAccel(int direction){
  *
  */
 void Fighter::groundCollision(){
+    setState(Fighter::State::LANDING);
     grounded = true;
 }
 

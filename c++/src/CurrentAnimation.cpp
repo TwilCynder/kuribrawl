@@ -162,7 +162,13 @@ void CurrentAnimation::nextFrame(){
 
     if (current_frame >= model->nb_frames){
         finished = true;
-        reset();
+        const Animation* next = model->getNextAnimation();
+        if (next != nullptr){
+            setAnimation(next);
+        } else {
+            reset();
+        }
+        return;
     }
 
     Frame* f = &(model->frames[current_frame]);

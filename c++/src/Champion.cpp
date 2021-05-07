@@ -11,7 +11,7 @@
  */
 Champion::Champion(const std::string& name_):
     name(name_),
-    state_animations(std::make_unique<const Animation*[]>((int)Fighter::State::STATES))
+    default_animations(std::make_unique<const Animation*[]>((int)DefaultAnimation::TOTAL))
 {
     this->val.gravity = DEFAULT_GRAVITY;
 }
@@ -23,7 +23,7 @@ Champion::Champion(const std::string& name_):
 Champion::Values::Values() :
     walk_speed(4.5), dash_speed(8.0), dash_start_speed(10.0), dash_turn_accel(1.5), traction(0.7),
     max_air_speed(5.0), air_acceleration(0.3), air_friction(0), jump_speed(16), short_hop_speed(8), air_jump_speed(6), gravity(DEFAULT_GRAVITY), max_fall_speed(0), fast_fall_speed(0),
-    jump_squat_duration(5), dash_start_duration(-1), dash_stop_duration(-1), dash_turn_duration(-1), landing_duration(0), guard_start_duration(0), guard_stop_duration(0)
+    jump_squat_duration(5), dash_start_duration(-1), dash_stop_duration(-1), dash_turn_duration(-1), landing_duration(-1), guard_start_duration(0), guard_stop_duration(0)
 {
 
 }
@@ -45,8 +45,8 @@ const std::string& Champion::getName(){
  * @return Animation* a pointer to the Animation. Can be NULL.
  */
 
-const Animation* Champion::getStateAnimation(const Fighter::State state) const {
-    return state_animations[(int)state];
+const Animation* Champion::getDefaultAnimation(const DefaultAnimation anim) const {
+    return default_animations[(int)anim];
 }
 
 /**
@@ -57,9 +57,23 @@ const Animation* Champion::getStateAnimation(const Fighter::State state) const {
 
 void Champion::initAnimations(){
     const Animation* anim;
-    for (auto const& [state, name] : Fighter::state_default_animation_name){
+    for (auto const& [state, name] : default_animation_name){
         if ((anim = getAnimation(name))){
-            state_animations[(int)state] = anim;
+            default_animations[(int)state] = anim;
         }
     }
 }
+
+const std::map<Champion::DefaultAnimation, std::string> Champion::default_animation_name = {
+    {Champion::DefaultAnimation::IDLE, "idle"},
+    {Champion::DefaultAnimation::WALK, "walking"},
+    {Champion::DefaultAnimation::WALK_TURN, "walk_turn"},
+    {Champion::DefaultAnimation::JUMPSQUAT, "jumpsquat"},
+    {Champion::DefaultAnimation::LANDING, "landing"},
+    {Champion::DefaultAnimation::DASH, "dash"},
+    {Champion::DefaultAnimation::DASH_START, "dash_start"},
+    {Champion::DefaultAnimation::DASH_STOP, "dash_stop"},
+    {Champion::DefaultAnimation::DASH_TURN, "dash_turn"},
+    {Champion::DefaultAnimation::JUMP, "jump"},
+    {Champion::DefaultAnimation::AIR_IDLE, "air_idle"}
+};

@@ -15,3 +15,8 @@ int main(int argc, char** argv) try {
     cerr << "Uncaught exception : \033[0;31m" << exception.what() << "\033[0m\n";
     exit (1);
 }
+
+/**
+ * \todo Extend the way state animations work (saving a pointer to the animation to avoid map acesses) to other fixed animation like jump
+ * 
+ */

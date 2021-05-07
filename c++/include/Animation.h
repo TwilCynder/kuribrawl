@@ -37,6 +37,8 @@ class Animation {
     void initFrames(int n);
     Hurtbox& addHurtbox();
     Hitbox& addHitbox();
+    void setNextAnimation(const Animation*);
+    const Animation* getNextAnimation() const;
 
     private:
     SDL_Texture* spritesheet; ///<SDL Texture used as the source image.
@@ -47,4 +49,7 @@ class Animation {
 
     double base_speed;  /**< Speed of this animation.
                         Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.*/
+
+    const Animation* next;    /**< Animation that will be started when this one finishes.
+                        Poiter Validity : can be invalidated if the target animation if moved or destroyed (normal behavior should not make this happen)*/
 };

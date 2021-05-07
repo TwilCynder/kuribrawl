@@ -25,26 +25,7 @@ class Fighter {
      * its \ref Fighter#grounded "grounded" attribute, which is updated each frame (based of course on terrain collision)
      */
     enum class State {
-        IDLE,   ///< Doing nothing, free.
-        GUARD,  ///< Protecting themselves (can only do a limited set of actions, shield is activated)
-        GUARD_START,    ///< Started when a Fighter attemps to Guard, automatically transitions into Guard after a few frames.
-        GUARD_STOP,     ///< Started when a Fighter left the Guard state in certain ways, transitionns into Idle after a few frames.
-        WALK,           ///< Moving slowly on ground.
-        WALK_TURN,      ///< Changing direction during Walk.
-        DASH,           ///< Moving rapidly on ground.
-        DASH_START,     ///< Started when a Fighter attemps to Dash, transitions into Dash after a few frames, the fighter moves (generally faster than during dash).
-        DASH_STOP,      ///< Started when a Fighter left the Dash state in certain ways. Transitions into Idle after a few frames, the fighter gradually loses speed.
-        DASH_TURN,      ///< Changing direction during Dash.
-        JUMPSQUAT,      ///< Started whan a Fighter attemps to Jump, transitions into Idle and boost vertical speed after a few frames.
-        LANDING,        ///< Started when a Fighter hits the ground after being previously airborne
-        ATTACK,         ///< Attacking (in the animation of an attack)
-        HITSTUN,        ///< Unable to act after getting hit
-        TUMBLE,         ///< Started after the hitstun from a strong hit ended, actions are a bit restrcited.
-        GUARD_STUN,     ///< Unable to act or to put down shield after getting their shield it.
-        LANDING_LAG,    ///< Started when a Fighter hits the ground after being previously airborne and while the state was Attacking.
-        CROUCH,
-        CROUCH_START,
-        CROUCH_STOP,
+        #include "states.enum"
         STATES          ///< Never used, is (because of how enums work) the total number of states.
     };
 
@@ -69,11 +50,6 @@ class Fighter {
     void jump(jumpX x_type, jumpY y_type);
 
     bool is_initialized();
-
-    /**
-     * @brief Map associating each state with the name of the Animation that has to be used by a Champion as the default Animation for this State.
-     */
-    static const std::map<State, std::string> state_default_animation_name;
 
     protected:
     State state;        ///< Current State.
