@@ -5,7 +5,15 @@
 #include "DebugInput.h"
 
 int main(int argc, char** argv) try {
-    App app;
+
+    int framerate = 0;
+
+    if (argc > 1){
+        framerate = atoi(argv[1]);
+    }
+    if (framerate == 0) framerate = 60;
+
+    App app(framerate);
     app.init();
     app.loop();
 

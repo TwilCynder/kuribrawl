@@ -68,12 +68,12 @@ int InputHandler_SmashStickSide(Fighter* fighter, Port* port, RegisteredInput& i
 
     if (fighter->getGrounded()){
         if (state == Fighter::State::WALK ||
-        state == Fighter::State::IDLE ||
-        (state == Fighter::State::DASH_START && fighter->getFacing() == -facing))
+            state == Fighter::State::IDLE ||
+            (state == Fighter::State::DASH_START && fighter->getFacing() == -facing))
         {
             fighter->setState(Fighter::State::DASH_START, facing);
         } else if ((state == Fighter::State::DASH || state == Fighter::State::DASH_STOP) &&
-        fighter->getFacing() == -facing)
+            fighter->getFacing() == -facing)
         {
             fighter->setState(Fighter::State::DASH_TURN, facing);
         }

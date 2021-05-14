@@ -9,6 +9,7 @@
 #include "gameActions.h"
 
 class Champion;
+class Game;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -29,8 +30,8 @@ class Fighter {
         STATES          ///< Never used, is (because of how enums work) the total number of states.
     };
 
-    Fighter(Champion* model_);
-    Fighter(Champion* model_, int x, int y);
+    Fighter(Game& game, Champion* model_);
+    Fighter(Game& game, Champion* model_, int x, int y);
 
     void draw(SDL_Renderer* target);
     //Physics
@@ -39,6 +40,7 @@ class Fighter {
     void updateState();
     void updateAnimation();
 
+    Game& getGame();
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
     CurrentAnimation* getCurrentAnimation();
@@ -64,6 +66,7 @@ class Fighter {
 
     private:
     const Champion* const model;    /**<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)*/
+    Game& game;               /**<Game this Fighter belongs to. Pointer validity : can be invalidated if a game is moved or deleted (should not happen during the lifetime of a Fighter)*/
 
     CurrentAnimation current_animation; ///< CurrentAnimation used to display an Animation of the \ref Fighter#model "model Champion".
     std::string current_animation_name; ///< Never used.

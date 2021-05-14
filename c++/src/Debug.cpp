@@ -1,5 +1,6 @@
 #include "Debug.h"
 
+
 void Debug::log(std::string s){
     cout << s << '\n';
     fflush(stdout);

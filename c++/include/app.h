@@ -28,6 +28,7 @@ class App
     public:
 
     App();
+    App(int framerate);
     ~App();
 
     void init();

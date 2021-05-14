@@ -21,12 +21,17 @@ using namespace std;
  *
  */
 App::App() :
+	App(60)
+{
+}
+
+App::App(int framerate):
 	game_data(std::make_unique<GameData>()),
 	controllers_data(std::make_unique<ControllersData>()),
 	ports{Port(this), Port(this), Port(this), Port(this)}
 {
 	current_game = NULL;
-	setFrameRate(60);
+	setFrameRate(framerate);
 }
 
 App::~App(){
@@ -272,12 +277,7 @@ void App::loop(){
 		readPorts();
 		SDLHelper::prepareRender(this->renderer);
 		if (current_game && current_game->is_running()){
-			current_game->updateStates();
-			current_game->updateInputs();
-			current_game->applyPhysics();
-			current_game->updateAnimations();
-			current_game->draw(renderer);
-			current_game->advanceAnimations();
+			current_game->step(this->renderer);
 		}
 		SDLHelper::render(this->renderer);
 

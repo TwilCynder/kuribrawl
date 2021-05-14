@@ -17,6 +17,8 @@ class Game {
 
     //main loop
 
+    void step(SDL_Renderer* render_target);
+
     void applyPhysics();
     void advanceAnimations();
     void draw(SDL_Renderer* target);
@@ -24,7 +26,10 @@ class Game {
     void updateStates();
     void updateAnimations();
 
+    int getFrame();
+
     private:
+    int frame;
     std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
     SDL_Rect camera;    ///< The area of the Stage that should be displayed.

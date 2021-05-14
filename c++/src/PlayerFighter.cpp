@@ -3,8 +3,8 @@
 #include "Port.h"
 #include "Debug.h"
 
-PlayerFighter::PlayerFighter(Champion* model):
-    Fighter(model),
+PlayerFighter::PlayerFighter(Game& game, Champion* model):
+    Fighter(game, model),
     port(nullptr),
     valid_port(false),
     input_manager(std::make_unique<InputManager>(this))
@@ -13,8 +13,8 @@ PlayerFighter::PlayerFighter(Champion* model):
 }
 
 
-PlayerFighter::PlayerFighter(Champion* model, int x, int y):
-    Fighter(model, x, y),
+PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
+    Fighter(game, model, x, y),
     port(nullptr),
     valid_port(false),
     input_manager(std::make_unique<InputManager>(this))

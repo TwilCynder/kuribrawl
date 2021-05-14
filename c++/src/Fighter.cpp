@@ -11,8 +11,8 @@
  * Creates a Fighter at position 0,0
  * @param model_ : the Champion used as a model
  */
-Fighter::Fighter(Champion* model_):
-    Fighter(model_, 0, 0)
+Fighter::Fighter(Game& game, Champion* model_):
+    Fighter(game, model_, 0, 0)
 {
 }
 
@@ -23,12 +23,13 @@ Fighter::Fighter(Champion* model_):
  * @param x_ the x position on the stage thet Fighter will spawn at.
  * @param y_ the y position on the stage thet Fighter will spawn at.
  */
-Fighter::Fighter(Champion* model_, int x_, int y_):
+Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     state(State::IDLE),
     paused(false),
     facing(1),
     grounded(false),
-    model(model_)
+    model(model_),
+    game(game_)
 {
     const Animation* idle_anim = model->getAnimation("idle");
 
@@ -163,6 +164,7 @@ void Fighter::updateState(){
             if (isStateFinished(model->val.dash_start_duration)){
                 setState(State::DASH);
             }
+            break;
         case State::LANDING:
             if (isStateFinished(model->val.landing_duration)){
                 setState(State::IDLE);
@@ -198,6 +200,15 @@ void Fighter::updateAnimation(){
 }
 
 /**
+ * @brief Returns the game
+ * 
+ */
+
+Game& Fighter::getGame(){
+    return game;
+}
+
+/**
  * @brief Returns the current \ref Fighter#State "state" of this Fighter.
  *
  * @return Fighter::State
@@ -216,7 +227,7 @@ Fighter::State Fighter::getState() const {
  */
 
 void Fighter::setState(const Fighter::State s, int facing_, int info, bool update_anim_){
-    //Debug::log(s);
+    Debug::log(s, *this);
     state = s;
     state_info = info;
     update_anim = update_anim_;

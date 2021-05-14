@@ -17,8 +17,8 @@ using namespace Kuribrawl;
 class PlayerFighter : public Fighter {
     public:
 
-    PlayerFighter(Champion* model_);
-    PlayerFighter(Champion* model_, int x, int y);
+    PlayerFighter(Game&, Champion* model_);
+    PlayerFighter(Game&, Champion* model_, int x, int y);
     ~PlayerFighter();
 
     //Inputs

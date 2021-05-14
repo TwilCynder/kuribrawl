@@ -3,6 +3,7 @@
 #include "util.h"
 #include "CurrentAnimation.h"
 #include "Champion.h"
+#include "Debug.h"
 
 using namespace std;
 
@@ -10,7 +11,8 @@ using namespace std;
  * @brief Construct a new Game object
  * 
  */
-Game::Game()
+Game::Game():
+    frame(0)
 {
 }
 
@@ -22,7 +24,7 @@ Game::Game()
  */
 PlayerFighter* Game::addFighter(Champion* model){
     Fighteriterator it = fighters.begin();
-    it = fighters.emplace_after(it, model);
+    it = fighters.emplace_after(it, *this, model);
     return &(*it);
 }
 
@@ -36,7 +38,7 @@ PlayerFighter* Game::addFighter(Champion* model){
  */
 PlayerFighter* Game::addFighter(Champion* model, int x, int y){
     Fighteriterator it = fighters.before_begin();
-    it = fighters.emplace_after(it, model, x, y);
+    it = fighters.emplace_after(it, *this, model, x, y);
     return &(*it);
 }
 
@@ -117,4 +119,23 @@ void Game::advanceAnimations(){
             anim->advance();
         }
     }
+}
+
+/**
+ * @brief Does everything a Game needs to do during one iteration of the main loop
+ * 
+ */
+
+void Game::step(SDL_Renderer* render_target){
+    updateStates();
+    updateInputs();
+    applyPhysics();
+    updateAnimations();
+    draw(render_target);
+    advanceAnimations();
+    frame++;
+}
+
+int Game::getFrame(){
+    return frame;
 }
