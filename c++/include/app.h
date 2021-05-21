@@ -16,7 +16,7 @@ class ControllersData;
 /**
  * @brief A number of miliseconds elapsed since SDL initialization
  */
-typedef double Date;
+typedef Uint32 Date;
 
 /**
  * @brief An instance of the program.
@@ -60,6 +60,7 @@ class App
     void update_frame_duration();
     void loop_timer();
     Date next_frame_date; ///< Date at which the next frame is supposed to start
+    Date start_time;
     int framerate; ///< Frames displayed per second
     double frame_duration; ///< Duration of a frame in miliseconds
 
@@ -76,6 +77,5 @@ class App
 
     //Performance test
     int frame; ///< Number of frames displayed since the loop was started.
-    Uint32 start_time;
     void print_report(std::ostream& out);
 };

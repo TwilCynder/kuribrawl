@@ -1,6 +1,6 @@
 #include <math.h>
 #include "CurrentAnimation.h"
-#include "Animation.h"
+#include "EntityAnimation.h"
 #include "Debug.h"
 #include "Frame.h"
 
@@ -20,7 +20,7 @@ CurrentAnimation::CurrentAnimation():
  * @param animation the Animation that will be ran at first.
  */
 
-CurrentAnimation::CurrentAnimation(Animation* animation):
+CurrentAnimation::CurrentAnimation(EntityAnimation* animation):
     CurrentAnimation()
 {
     setAnimation(animation);
@@ -52,7 +52,7 @@ bool CurrentAnimation::is_finished(){
  * @param anim
  */
 
-void CurrentAnimation::setAnimation(const Animation* anim){
+void CurrentAnimation::setAnimation(const EntityAnimation* anim){
     setAnimation(anim, anim->base_speed);
 }
 
@@ -63,7 +63,7 @@ void CurrentAnimation::setAnimation(const Animation* anim){
  * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
  */
 
-void CurrentAnimation::setAnimation(const Animation* anim, double speed_){
+void CurrentAnimation::setAnimation(const EntityAnimation* anim, double speed_){
     model = anim;
     init();
     setSpeed(speed_);
@@ -162,11 +162,12 @@ void CurrentAnimation::nextFrame(){
 
     if (current_frame >= model->nb_frames){
         finished = true;
-        const Animation* next = model->getNextAnimation();
+        const EntityAnimation* next = model->getNextAnimation();
         if (next != nullptr){
             setAnimation(next);
         } else {
             reset();
+            start();
         }
         return;
     }
@@ -205,4 +206,8 @@ void CurrentAnimation::draw(SDL_Renderer* target, int x, int y, int facing){
     }
 
     model->draw(target, x, y, current_frame, facing);
+}
+
+const std::vector<Hurtbox>& CurrentAnimation::getHurtboxes() const {
+    return model->getHurtboxes(current_frame);
 }

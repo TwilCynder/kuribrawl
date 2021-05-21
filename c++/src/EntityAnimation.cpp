@@ -1,0 +1,77 @@
+#include "EntityAnimation.h"
+#include "Debug.h"
+
+EntityAnimation::EntityAnimation():
+    Animation(),
+    entity_frames(nullptr)
+{
+}
+
+EntityAnimation::EntityAnimation(SDL_Texture* spritesheet_) : EntityAnimation(){
+    setSpritesheet(spritesheet_);
+}
+
+EntityAnimation::EntityAnimation(SDL_Texture* spritesheet, int nFrames) : EntityAnimation(spritesheet){
+    initFrames(nFrames);
+}
+
+EntityAnimation::~EntityAnimation(){
+}
+
+void EntityAnimation::initFrames(int n){
+    Animation::initFrames(n);
+
+    entity_frames = std::make_unique<EntityFrame[]>(n);
+}
+
+void EntityAnimation::setNextAnimation(const EntityAnimation* anim){
+    setNextAnimation((Animation*)anim);
+}
+
+const EntityAnimation* EntityAnimation::getNextAnimation() const{
+    return (EntityAnimation*) Animation::getNextAnimation();
+}
+
+const std::vector<Hitbox>&  EntityAnimation::getHitboxes(int frame) const {
+    if (frame > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+    return entity_frames[frame].hitboxes;
+}
+
+const std::vector<Hurtbox>& EntityAnimation::getHurtboxes(int frame) const {
+    if (frame > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+    return entity_frames[frame].hurtboxes;
+}
+
+Hitbox* EntityAnimation::addHitbox(int frame){
+    if (frame > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+    return &entity_frames[frame].hitboxes.emplace_back();
+}
+
+void EntityAnimation::addHitbox(int frame, int x, int y, int w, int h){
+    Hitbox* hb = addHitbox(frame);
+    hb->x = x;
+    hb->y = y;
+    hb->w = w;
+    hb->h = h;
+}
+
+Hurtbox* EntityAnimation::addHurtbox(int frame){
+    if (frame > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+    return &entity_frames[frame].hurtboxes.emplace_back();
+}
+
+void EntityAnimation::addHurtbox(int frame, int x, int y, int w, int h){
+    Hurtbox* hb = addHurtbox(frame);
+    hb->x = x;
+    hb->y = y;
+    hb->w = w;
+    hb->h = h;
+}

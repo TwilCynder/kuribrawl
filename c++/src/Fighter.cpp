@@ -4,6 +4,7 @@
 #include "defs.h"
 #include "util.h"
 #include "Champion.h"
+#include "CollisionBoxes.h"
 #include <math.h>
 
 /**
@@ -31,7 +32,7 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     model(model_),
     game(game_)
 {
-    const Animation* idle_anim = model->getAnimation("idle");
+    const EntityAnimation* idle_anim = model->getAnimation("idle");
 
     if (!idle_anim){
         throw KBFatal("Tried to instanciate a champion with no idle animation");
@@ -103,6 +104,16 @@ int Fighter::getFacing() const{
  */
 void Fighter::draw(SDL_Renderer* target){
     current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y, facing);
+    const std::vector<Hurtbox>& hurtboxes = current_animation.getHurtboxes();
+    SDL_Rect box;
+    SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
+    for (int i = 0; i < hurtboxes.size(); i++){
+        box.w = hurtboxes[i].w;
+        box.h = hurtboxes[i].h;
+        box.x = this->position.x + hurtboxes[i].x;
+        box.y = SCREEN_HEIGHT - this->position.y - box.h + hurtboxes[i].y;
+        SDL_RenderDrawRect(target, &box);
+    }
 }
 
 /**
@@ -181,7 +192,7 @@ void Fighter::updateState(){
  */
 void Fighter::updateAnimation(){
     if (update_anim){
-        const Animation* anim;
+        const EntityAnimation* anim;
         switch(state){
             case State::IDLE:
                 anim = (grounded) ? 

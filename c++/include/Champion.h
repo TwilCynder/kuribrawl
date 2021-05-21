@@ -5,13 +5,14 @@
 #include "util.h"
 #include "Fighter.h"
 #include "AnimationsPool.h"
+#include "EntityAnimation.h"
 
 /**
  * @brief A character of the game.
  * Contain purely static information about this character ; does not care about what happens in-game, which is the job of Fighter.
  */
 
-class Champion : public AnimationsPool {
+class Champion : public AnimationsPool<EntityAnimation> {
     public:
 
     /**
@@ -66,7 +67,7 @@ class Champion : public AnimationsPool {
 
     Champion(const std::string& name_);
     const std::string& getName();
-    const Animation* getDefaultAnimation(const DefaultAnimation state) const;
+    const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
     void initAnimations(void);
 
     Champion::Values val;
@@ -79,7 +80,7 @@ class Champion : public AnimationsPool {
 
     std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
-    std::unique_ptr<const Animation*[]> default_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
+    std::unique_ptr<const EntityAnimation*[]> default_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
                                                     Pointer validity : can be invalidated if an Animation is moved or deleted*/
 };
 

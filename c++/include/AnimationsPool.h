@@ -1,17 +1,19 @@
 #pragma once
 #include <map>
-#include "Animation.h"
+#include <string>
+#include "SDL2/SDL_render.h"
 
 /**
  * @brief Class containing any number of Animations, each associated with a name (string identifier)
  *
  */
+template <class A>
 class AnimationsPool {
     public:
-    Animation* addAnimation(const std::string& name);
-    Animation* addAnimation(const std::string& name, SDL_Texture* spritesheet);
-    const Animation* getAnimation(const std::string& name) const;
-    Animation& tryAnimation(const std::string& name);
+    A* addAnimation(const std::string& name);
+    A* addAnimation(const std::string& name, SDL_Texture* spritesheet);
+    const A* getAnimation(const std::string& name) const;
+    A& tryAnimation(const std::string& name);
     protected:
-    std::map<std::string, Animation> animations;    ///< Map containing all the Animations of this Champion.
+    std::map<std::string, A> animations;    ///< Map containing all the Animations of this Champion.
 };

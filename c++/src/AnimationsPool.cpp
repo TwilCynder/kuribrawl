@@ -1,5 +1,7 @@
 #include "AnimationsPool.h"
 #include "Debug.h"
+#include "Animation.h"
+#include "EntityAnimation.h"
 
 /**
  * @brief Adds an Animation.
@@ -7,15 +9,15 @@
  * @param name the name that will be used as the map key.
  * @return Animation* a pointer to the created Animation.
  */
-
-Animation* AnimationsPool::addAnimation(const std::string& name){
+template <class A>
+A* AnimationsPool<A>::addAnimation(const std::string& name){
     auto [node, success] = animations.try_emplace(name);
 
     if (!success) {
         throw KBFatal("Could not create champion");
     }
 
-    Animation& anim = node->second;
+    A& anim = node->second;
     return &anim;
 }
 
@@ -27,7 +29,8 @@ Animation* AnimationsPool::addAnimation(const std::string& name){
  * @return Animation* A pointer to the created Animation.
  */
 
-Animation* AnimationsPool::addAnimation(const std::string& name, SDL_Texture* spritesheet){
+template<class A>
+A* AnimationsPool<A>::addAnimation(const std::string& name, SDL_Texture* spritesheet){
     if (!spritesheet)
         throw KBFatal("Tried to add animation with null spritesheet");
 
@@ -37,7 +40,7 @@ Animation* AnimationsPool::addAnimation(const std::string& name, SDL_Texture* sp
         throw KBFatal("Could not create champion");
     }
 
-    Animation& anim = node->second;
+    A& anim = node->second;
     return &anim;
 }
 
@@ -47,8 +50,8 @@ Animation* AnimationsPool::addAnimation(const std::string& name, SDL_Texture* sp
  * @param name the internal name (which is also the map key) of the wanted Animation.
  * @return Animation* a pointer to the Animation if the specified name is an existing key, NULL otherwise.
  */
-
-const Animation* AnimationsPool::getAnimation(const std::string& name) const{
+template<class A>
+const A* AnimationsPool<A>::getAnimation(const std::string& name) const{
     auto it = animations.find(name);
     if (it == animations.end()){
         return NULL;
@@ -62,8 +65,11 @@ const Animation* AnimationsPool::getAnimation(const std::string& name) const{
  * @param name the name
  * @return Animation&
  */
-
-Animation& AnimationsPool::tryAnimation(const std::string& name){
+template<class A>
+A& AnimationsPool<A>::tryAnimation(const std::string& name){
     auto [node, success] = animations.try_emplace(name);
     return node->second;
 }
+
+template class AnimationsPool<Animation>;
+template class AnimationsPool<EntityAnimation>;

@@ -35,21 +35,21 @@ class Animation {
 
     //Construction
     void initFrames(int n);
-    Hurtbox& addHurtbox();
-    Hitbox& addHitbox();
     void setNextAnimation(const Animation*);
     const Animation* getNextAnimation() const;
 
+    protected:
+    int nb_frames;  ///< Number of frames in this animation.
+
     private:
-    SDL_Texture* spritesheet; ///<SDL Texture used as the source image.
-    SDL_Texture* spritesheet_left; ///< SDL Texture used as the alternative source image for entities that can be oriented in two different directions (typically Fighters)
+    SDL_Texture* spritesheet;       ///<SDL Texture used as the source image.
+    SDL_Texture* spritesheet_left;  ///< SDL Texture used as the alternative source image for entities that can be oriented in two different directions (typically Fighters)
     std::unique_ptr<Frame[]> frames; ///<Array (Basic array unique-pointed) containing the frames (= positions of the frames on the image) of this animation.
-    int nb_frames; ///< Number of frames in this animation.
     Vector display; ///< Size of the source image.
 
     double base_speed;  /**< Speed of this animation.
                         Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.*/
 
-    const Animation* next;    /**< Animation that will be started when this one finishes.
-                        Poiter Validity : can be invalidated if the target animation if moved or destroyed (normal behavior should not make this happen)*/
+    const Animation* next;  /**< Animation that will be started when this one finishes.
+                            Poiter Validity : can be invalidated if the target animation if moved or destroyed (normal behavior should not make this happen)*/
 };

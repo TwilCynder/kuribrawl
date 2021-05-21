@@ -1,5 +1,6 @@
 #include "hardCoded.h"
 #include "GameData.h"
+#include "CollisionBoxes.h"
 #include "inputs.h"
 #include "Debug.h"
 #include "SDL2/SDL_gamecontroller.h"
@@ -33,11 +34,16 @@ void HardCoded::initControllersData(ControllersData& data){
 void HardCoded::initGameData(App* app){
     GameData& data = app->gameData();
     Champion* acid = data.addChampion("Acid");
-    Animation* anim;
+    EntityAnimation* anim;
+    Hurtbox* hrt;
 
 	anim = acid->addAnimation("idle", app->LoadTexture("../res/idle_strip4.png"));
 	anim->initFrames(4);
     anim->setBaseSpeed(0.05);
+    anim->addHurtbox(0, -20, 0, 40, 50);
+    anim->addHurtbox(1, -20, 0, 40, 52);
+    anim->addHurtbox(2, -20, 0, 40, 54);
+    anim->addHurtbox(3, -20, 0, 40, 52);
 
     anim = acid->addAnimation("walking", app->LoadTexture("../res/walk_strip6.png"));
     anim->initFrames(6);

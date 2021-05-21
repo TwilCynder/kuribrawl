@@ -1,7 +1,9 @@
 #pragma once
 #include "SDL2/SDL.h"
+#include "CollisionBoxes.h"
+#include <vector>
 
-class Animation;
+class EntityAnimation;
 class Fighter;
 
 /**
@@ -10,26 +12,27 @@ class Fighter;
  * and can switch to another Animation completely at any time.
  */
 
-class CurrentAnimation{
+class CurrentAnimation {
     public:
 
     CurrentAnimation();
-    CurrentAnimation(Animation* animation);
+    CurrentAnimation(EntityAnimation* animation);
 
     void draw(SDL_Renderer* target, int x, int y);
     void draw(SDL_Renderer* target, int x, int y, int facing);
+    const std::vector<Hurtbox>& getHurtboxes() const;
 
     bool is_initialized()const;
     bool is_finished();
-    void setAnimation(const Animation* anim);
-    void setAnimation(const Animation* anim, double speed);
+    void setAnimation(const EntityAnimation* anim);
+    void setAnimation(const EntityAnimation* anim, double speed);
     void setSpeed(double speed);
     void advance();
 
     private:
-    const Animation* model;   ///< The Animation that is running.
-                        /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
-
+    const EntityAnimation* model;   ///< The Animation that is running.
+                                    /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
+    
     int current_frame; ///< Index of the current frame.
     int timeleft; ///<Time remaining *on the current frame*.
     double speed; ///<Current \ref Animation#base_speed "speed" at which the animation runs (will override the base speed of the Animation).

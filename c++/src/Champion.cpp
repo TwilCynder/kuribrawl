@@ -1,6 +1,6 @@
 #include "Champion.h"
 #include "Debug.h"
-#include "Animation.h"
+#include "EntityAnimation.h"
 
 #define DEFAULT_GRAVITY 0.6
 
@@ -11,7 +11,7 @@
  */
 Champion::Champion(const std::string& name_):
     name(name_),
-    default_animations(std::make_unique<const Animation*[]>((int)DefaultAnimation::TOTAL))
+    default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL))
 {
     this->val.gravity = DEFAULT_GRAVITY;
 }
@@ -45,7 +45,7 @@ const std::string& Champion::getName(){
  * @return Animation* a pointer to the Animation. Can be NULL.
  */
 
-const Animation* Champion::getDefaultAnimation(const DefaultAnimation anim) const {
+const EntityAnimation* Champion::getDefaultAnimation(const DefaultAnimation anim) const {
     return default_animations[(int)anim];
 }
 
@@ -56,7 +56,7 @@ const Animation* Champion::getDefaultAnimation(const DefaultAnimation anim) cons
  */
 
 void Champion::initAnimations(){
-    const Animation* anim;
+    const EntityAnimation* anim;
     for (auto const& [state, name] : default_animation_name){
         if ((anim = getAnimation(name))){
             default_animations[(int)state] = anim;

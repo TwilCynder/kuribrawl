@@ -114,6 +114,7 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
  *
  */
 void PlayerFighter::updateInputs(){
+    if (!port) return;
     checkStickState();
     input_manager->updateInputs();
 }

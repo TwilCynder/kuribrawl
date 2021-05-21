@@ -3,6 +3,8 @@
 #include "app.h"
 #include "Debug.h"
 #include "DebugInput.h"
+#include "Random.h"
+#include <ctime>
 
 int main(int argc, char** argv) try {
 
@@ -12,6 +14,8 @@ int main(int argc, char** argv) try {
         framerate = atoi(argv[1]);
     }
     if (framerate == 0) framerate = 60;
+
+    Random::setSeed(std::time(nullptr));
 
     App app(framerate);
     app.init();

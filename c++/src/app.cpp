@@ -267,12 +267,10 @@ void App::loop_timer(){
 void App::loop(){
 	frame = 0;
 	next_frame_date = System::now();
-
 	start_time = next_frame_date;
 
     while(1){
 		next_frame_date += frame_duration;
-
         this->handleEvents();
 		readPorts();
 		SDLHelper::prepareRender(this->renderer);
@@ -280,7 +278,6 @@ void App::loop(){
 			current_game->step(this->renderer);
 		}
 		SDLHelper::render(this->renderer);
-
 		frame++;
         loop_timer();
     }
