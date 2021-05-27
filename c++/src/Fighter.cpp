@@ -121,6 +121,7 @@ void Fighter::draw(SDL_Renderer* target){
  *
  */
 void Fighter::jump(jumpX x_type, jumpY y_type){
+    throw KBFatalDetailed("OH LE CON", "Oh le corniaud.");
 
     switch (y_type){
         case jumpY::Full:

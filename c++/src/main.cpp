@@ -36,7 +36,7 @@ int main(int argc, char** argv) try {
 } catch (KBFatal& exception){
     cerr << "Uncaught exception : \033[0;31m" << exception.what() << "\033[0m\n";
 
-    Kuribrawl::errorPopup(exception.getData(), "Kuribrawl - Erreur", (exception.informPlayer()) ? exception.what() : "Internal error. \nPlease contact the stupid ass developer who made this.");
+    Kuribrawl::errorPopup(exception.getData(), "Kuribrawl - Erreur", exception.userMessage());
     exit(1);
 }
 
