@@ -15,7 +15,9 @@ OBJS = $(patsubst src/%,bin/%,$(_OBJS))
 NB_FILES = $(words $(SRC))
 CURRENT_NB = 0
 
-all: clear $(EXEC)
+all: start $(EXEC)
+
+clean: clear all
 
 doc: doc_light
 	doxygen
@@ -23,7 +25,7 @@ doc: doc_light
 doc_light:
 	doxygen DoxyfileLight
 
-clear: 
+start: 
 	clear
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 
@@ -32,7 +34,7 @@ bin/%.o: %.cpp #$(SRC)
 	@printf "\033[1;33m[$(CURRENT_NB)/$(NB_FILES)]\033[0m "
 	g++ $(CFLAGS) -c $< -o $@
 
-clean:
+clear:
 	rm -r bin/*
 
 $(EXEC): $(OBJS)

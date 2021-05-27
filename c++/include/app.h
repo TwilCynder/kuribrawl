@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_syswm.h"
 #include "Animation.h"
 #include "GameData.h"
 
@@ -39,6 +40,7 @@ class App
     ControllersData& controllersData();
 
     void setFrameRate(int fr);
+    void viewPopupMessage(const char* title, const char* message);
 
     //SDL functions
     SDL_Texture* LoadTexture(const char *file);
@@ -69,6 +71,7 @@ class App
     std::unique_ptr<ControllersData> controllers_data; //*< the ControllersData (all the data related to reading controllers inputs) that will be used by this App.
 
     SDL_Window* window; ///< The window this app is running in.
+    SDL_SysWMinfo win_info; ///< Structure containing info about the main window.
     SDL_Renderer* renderer; ///< The SDL renderer used to render this app.
 
     Game* current_game; ///< The Game that is currently running, if there is any. Pointer validity : is invalitated when the game is destroyed (everytime a game ends) .*/

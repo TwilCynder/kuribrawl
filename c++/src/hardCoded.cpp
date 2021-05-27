@@ -35,7 +35,6 @@ void HardCoded::initGameData(App* app){
     GameData& data = app->gameData();
     Champion* acid = data.addChampion("Acid");
     EntityAnimation* anim;
-    Hurtbox* hrt;
 
 	anim = acid->addAnimation("idle", app->LoadTexture("../res/idle_strip4.png"));
 	anim->initFrames(4);

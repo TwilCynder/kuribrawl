@@ -13,6 +13,7 @@
 #include "load.h"
 #include "ControllersData.h"
 #include "System.h"
+#include "messageBox.h"
 
 using namespace std;
 
@@ -78,6 +79,11 @@ void App::initSDL(){
 		printf("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
 		exit(1);
 	}
+
+	SDL_VERSION(&win_info.version);
+	SDL_GetWindowWMInfo(window, &win_info);
+
+	Debug::log(win_info.info.win.window);
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
@@ -238,6 +244,14 @@ void App::setFrameRate(int fr){
 }
 
 /**
+ * @brief On OSes that support it, show an OS-native popup message.
+ * App::InitSDL must have been successfully called before calling this method.
+ */
+void App::viewPopupMessage(LPCSTR title, LPCSTR message){
+	Kuribrawl::errorPopup(win_info.info.win.window, title, message);
+}
+
+/**
  * @brief Update the duration of a a frame based on the framerate.
  */
 void App::update_frame_duration(){
@@ -264,7 +278,7 @@ void App::loop_timer(){
  * Never returns ; the loop is infinite and stops only when exit() is called.
  */
 
-void App::loop(){
+void App::loop() try {
 	frame = 0;
 	next_frame_date = System::now();
 	start_time = next_frame_date;
@@ -281,4 +295,7 @@ void App::loop(){
 		frame++;
         loop_timer();
     }
+} catch (KBFatal& exception){
+	exception.setData(win_info.info.win.window);
+	throw;
 }

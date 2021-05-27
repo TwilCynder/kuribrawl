@@ -107,7 +107,7 @@ void Fighter::draw(SDL_Renderer* target){
     const std::vector<Hurtbox>& hurtboxes = current_animation.getHurtboxes();
     SDL_Rect box;
     SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
-    for (int i = 0; i < hurtboxes.size(); i++){
+    for (unsigned int i = 0; i < hurtboxes.size(); i++){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;
         box.x = this->position.x + hurtboxes[i].x;
@@ -121,6 +121,7 @@ void Fighter::draw(SDL_Renderer* target){
  *
  */
 void Fighter::jump(jumpX x_type, jumpY y_type){
+
     switch (y_type){
         case jumpY::Full:
             speed.y += model->val.jump_speed;

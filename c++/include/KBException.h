@@ -11,8 +11,17 @@ class KBFatal : public std::exception {
 
     explicit KBFatal(const std::string& error_message);
     virtual const char* what() const noexcept override;
+    void setData(void*);
+    void* getData();
+    virtual bool informPlayer();
 
   private:
-
+    void* data;
     const std::string error_message;
+};
+
+class KBFatalExplicit : public KBFatal {
+  public:
+    explicit KBFatalExplicit(const std::string& error_message);
+    bool informPlayer();
 };

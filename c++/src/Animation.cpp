@@ -8,8 +8,8 @@
  */
 
 Animation::Animation():
-    frames(NULL),
     nb_frames(0),
+    frames(NULL),
     base_speed(1),
     next(nullptr)
 {
