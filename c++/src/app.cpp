@@ -27,6 +27,8 @@ App::App() :
 }
 
 App::App(int framerate):
+	paused(false),
+	advance(false),
 	game_data(std::make_unique<GameData>()),
 	controllers_data(std::make_unique<ControllersData>()),
 	ports{Port(this), Port(this), Port(this), Port(this)}
@@ -82,8 +84,6 @@ void App::initSDL(){
 
 	SDL_VERSION(&win_info.version);
 	SDL_GetWindowWMInfo(window, &win_info);
-
-	Debug::log(win_info.info.win.window);
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
@@ -225,8 +225,19 @@ void App::handleEvents(){
 				handleButtonEvent(&event.jbutton);
 				break;
 			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-					stop(0);
+				switch (event.key.keysym.scancode){
+					case SDL_SCANCODE_ESCAPE:
+						stop(0);
+						break;
+					case SDL_SCANCODE_RETURN:
+						paused = !paused;
+						break;
+					case SDL_SCANCODE_SPACE:
+						advance = true;
+						break;
+					default:
+						break;
+				}
 				break;
 			default:
 				break;
@@ -239,6 +250,9 @@ void App::handleEvents(){
  * @param fr
  */
 void App::setFrameRate(int fr){
+	if (fr < 0 && fr != -1){
+		throw KBFatal("Attemp to use invalid framerate");
+	}
 	framerate = fr;
 	update_frame_duration();
 }
@@ -286,13 +300,18 @@ void App::loop() try {
     while(1){
 		next_frame_date += frame_duration;
         this->handleEvents();
-		readPorts();
-		SDLHelper::prepareRender(this->renderer);
-		if (current_game && current_game->is_running()){
-			current_game->step(this->renderer);
+
+		if (!paused || advance){
+			advance = false;
+			readPorts();
+			SDLHelper::prepareRender(this->renderer);
+			if (current_game && current_game->is_running()){
+				current_game->step(this->renderer);
+			}
+			SDLHelper::render(this->renderer);
+			frame++;
 		}
-		SDLHelper::render(this->renderer);
-		frame++;
+
         loop_timer();
     }
 } catch (KBFatal& exception){

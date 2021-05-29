@@ -65,6 +65,8 @@ class App
     Date start_time;
     int framerate; ///< Frames displayed per second
     double frame_duration; ///< Duration of a frame in miliseconds
+    bool paused;
+    bool advance;
 
     //Data singletons
     std::unique_ptr<GameData> game_data; //*< the GameData (all the data related to gameplay) that will be used for games ran by this App.

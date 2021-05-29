@@ -8,16 +8,6 @@
 
 int main(int argc, char** argv) try {
 
-    #ifdef _WIN32
-        Debug::log("_WIN32");
-    #endif
-    #ifdef __WIN32__
-        Debug::log("__WIN32__");
-    #endif
-    #ifdef __MINGW32__
-        Debug::log("__MINGW32__");
-    #endif
-
     int framerate = 0;
 
     if (argc > 1){

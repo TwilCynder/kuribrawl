@@ -455,8 +455,8 @@ EndIf
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 365
-; FirstLine = 346
+; CursorPosition = 80
+; FirstLine = 57
 ; Folding = ---
 ; EnableXP
 ; UseIcon = ..\GraphicDesignIsMyPassion\iconDev.ico
