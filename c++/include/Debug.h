@@ -7,11 +7,6 @@
 #define cout std::cout
 
 namespace Debug {
-    void log(std::string s);
-    void log (const char* c);
-    void log(int i);
-    void log(double d);
-    void log(void* p);
-    void log(bool b);
-    void log(long l);
+    template<typename T>
+    void log(T value);
 }

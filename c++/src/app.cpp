@@ -10,8 +10,8 @@
 #include "InputManager.h"
 #include "Port.h"
 #include "hardCoded.h"
-#include "load.h"
 #include "ControllersData.h"
+#include "DataFile.h"
 #include "System.h"
 #include "messageBox.h"
 
@@ -117,14 +117,23 @@ void App::initGameData(){
 	HardCoded::initGameData(this);
 }
 
+bool App::loadGameFile(const char* name){
+    DataFile data_file(name, renderer);
+    if (data_file.ready()) {
+        data_file.read(*game_data);
+        return true;
+    }
+    return false;
+}
+
 /**
  * @brief Loads game data from a data file (data.twl).
  * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
-	if (!Load::loadGameFile("data.twl", *game_data))
-	if (!Load::loadGameFile("../res/data.twl", *game_data))
-	throw KBFatal("Can't find data file");
+	if (!loadGameFile("data.twl"))
+	if (!loadGameFile("../gamefile manager/data.twl"))
+	throw KBFatalExplicit("Can't find data file");
 }
 
 /**

@@ -17,6 +17,9 @@ CURRENT_NB = 0
 
 all: start $(EXEC)
 
+launch: all 
+	./kuribrawl.exe
+
 clean: clear all
 
 doc: doc_light
@@ -40,4 +43,4 @@ clear:
 $(EXEC): $(OBJS)
 	@printf "\033[1;33m[Linking]\033[0m "
 	g++ $^ -o $@ $(LDFLAGS) 
-	@printf "\033[0;32mCompilation finished successfully !"
+	@printf "\033[0;32mCompilation finished successfully !\n\033[0m"

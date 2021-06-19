@@ -1,20 +1,29 @@
+#include <string.h>
 #include "SDL2/SDL_error.h"
 #include "DataFile.h"
 #include "Debug.h"
-#include "Animation.h"
+#include "AnimationsPool.h"
+#include "EntityAnimation.h"
 #include "GameData.h"
 
 #define FILE_SIGNATURE 0x54545454
+#include "fileMarkers.h"
+
+template <typename T>
+void DataFile::readData(T* res){
+    SDL_RWread(sdl_stream, res, sizeof(T), 1);
+}
 
 /**
  * @brief Construct a new Data File object from a file path.
  * The file is directly opened.
  * @param filename
  */
-DataFile::DataFile(const char* filename):
-	sdl_stream(nullptr)
+DataFile::DataFile(const char* filename, SDL_Renderer* renderer_):
+	sdl_stream(nullptr),
+    renderer(renderer_)
 {
-    file = fopen(filename, "r");
+    file = fopen(filename, "rb");
     if (file){
         sdl_stream = SDL_RWFromFP(file, (SDL_bool)1);
     }
@@ -70,7 +79,7 @@ DataFile::DataType DataFile::readDataType(){
  * @return const char* the string identifier (tag or name) of a data chunk.
  */
 
-const char* DataFile::readFileTag(){
+char* DataFile::readFileTag(){
     fgets(readBuffer, BUFFER_SIZE, file);
     return readBuffer;
 }
@@ -83,14 +92,144 @@ bool DataFile::eof(){
     return feof(file);
 }
 
+void DataFile::readByte(void* res){
+    SDL_RWread(sdl_stream, res, 1, 1);
+}
+
+void DataFile::readWord(void* res){
+    SDL_RWread(sdl_stream, res, 2, 1);
+}
+
+void DataFile::readLong (void* res){
+    SDL_RWread(sdl_stream, res, 4, 1);
+}
+
+void DataFile::readDouble (void* res){
+    SDL_RWread(sdl_stream, res, 8, 1);
+}
+
 /**
  * @brief Reads an Animation Data Chunk
  *
  * @param anim the anim that was created or updated based on this Data Chunk
  */
 
-void DataFile::readAnimationFile(Animation& anim){
+void DataFile::readEntityAnimationFile(EntityAnimation& anim){
+    int value;
+    Uint8 byte, current_frame_id;
+    Uint16 word;
+    double valueD;
+    bool leave_loop;
+    Frame* current_frame;
+    EntityFrame* current_entity_frame;
+    Hurtbox* hurtbox = nullptr;
+    Hitbox* hitbox = nullptr;
 
+
+    readLong(&value);    //Image size
+
+    long before = ftell(file);
+    anim.setSpritesheet(IMG_LoadTexture_RW(renderer, sdl_stream, 0));
+    fseek(file, 12, SEEK_CUR);
+    readByte(&byte);
+    switch (byte){
+        case FILEMARKER_INTERFILE:
+            return;
+        case FILEMARKER_DESCRIPTORSTART:
+            readByte(&byte);
+            anim.initFrames(byte);
+            
+            leave_loop = false;
+            do {
+                readByte(&byte);
+                switch (byte){
+                    case FILEMARKER_ANIMSPEED:
+                        readData(&valueD);
+                        anim.setBaseSpeed(valueD);
+                        break;
+                    case FILEMARKER_FRAMEINFO:
+                        readByte(&byte);
+                        current_frame_id = byte;
+                        current_frame = anim.getFrame(byte);
+                        current_entity_frame = anim.getEntityFrame(byte);
+                        break;
+                    case FILEMARKER_FRAMEDURATION:
+                        readWord(&word);
+                        current_frame->duration = word;
+                        break;
+                    case FILEMARKER_FRAMEORIGIN:
+                        readLong(&value);
+                        current_frame->origin.x = value;
+                        readLong(&value);
+                        current_frame->origin.x = value;
+                        break;
+                    case FILEMARKER_FRAMEMOVEMENT:
+                        readByte(&byte);
+                        current_entity_frame->movement_type.x = byte & 0b111;
+                        current_entity_frame->movement_type.y = (byte & 0b111000) >> 3;
+                        readData(&valueD);
+                        current_entity_frame->movement.x = valueD;
+                        readData(&valueD);
+                        current_entity_frame->movement.y = valueD;
+                        break;
+                    case FILEMARKER_HURTBOXINFO:      
+                        hurtbox = &current_entity_frame->hurtboxes.emplace_back();
+                        
+                        readWord(&word);
+                        hurtbox->x = word;
+                        readWord(&word);
+                        hurtbox->y = word;
+                        readWord(&word);
+                        hurtbox->w = word;
+                        readWord(&word);
+                        hurtbox->h = word;
+                        readByte(&byte);
+                        hurtbox->type = byte;
+                        break;
+                    case FILEMARKER_HITBOXINFO:      
+                        hurtbox = &current_entity_frame->hurtboxes.emplace_back();
+                        
+                        readWord(&word);
+                        hurtbox->x = word;
+                        readWord(&word);
+                        hurtbox->y = word;
+                        readWord(&word);
+                        hurtbox->w = word;
+                        readWord(&word);
+                        hurtbox->h = word;
+                        readByte(&byte);
+                        hurtbox->type = byte;
+                        break;
+                    case FILEMARKER_INTERFILE:
+                        leave_loop = true;
+                        break;
+                    default:
+                        cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " expected animation information type identifier.\n";
+                        throw KBFatalExplicit("File read : invalid data file content");
+                }
+            } while (!leave_loop);
+
+
+            break;
+        default:
+            cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
+            throw KBFatalExplicit("File read : invalid data file content");
+    }
+}
+
+/**
+ * @brief Transforms a string containing a '/' into two strings.
+ * The input string is now the first string.
+ * @return const char* The second string.
+ */
+const char* DataFile::separateTag(char* tag){
+    char* res = strchr(tag, '/');
+    if (!res){
+        throw KBFatal("Data chunk tag doesn't contain a '/'");
+    }
+
+    *res = '\0';
+    return res + 1;
 }
 
 /**
@@ -100,29 +239,34 @@ void DataFile::readAnimationFile(Animation& anim){
  */
 
 void DataFile::read(GameData& data){
-    Debug::log("Reading data file==============");
+    Debug::log("Reading data file ==============");
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
-
     readVersion();
-
-    const char *tag, *entity, *element;
+    char* tag;
+    const char *entity, *element;
 
     (void)entity; (void)element;
 
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
-
-                //readAnimationFile(data.tryChampion(tag).tryAnimation(tag));
-
                 tag = readFileTag();
-                Debug::log(tag);
+                entity = tag;
+                element = separateTag(tag);
+                Debug::log(entity);
+                Debug::log(element);
+                switch(entity[0]){
+                    default:
+                        readEntityAnimationFile(data.tryChampion(entity).tryAnimation(element));
+                }
+                
                 return;
                 break;
             default:
                 break;
         }
     }
+    Debug::log("Data file loading finished ==============");
 }
 
 bool DataFile::ready(){

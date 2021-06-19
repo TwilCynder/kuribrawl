@@ -8,7 +8,7 @@ struct CollisionBox {
     };
 
 struct Hurtbox : CollisionBox {
-    bool invincible;
+    unsigned char type;
 };
 
 struct Hitbox : CollisionBox {

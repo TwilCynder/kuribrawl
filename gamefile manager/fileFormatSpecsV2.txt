@@ -25,20 +25,21 @@ Structure des fichiers de données de jeu (twl) :
 - - - [0x21
 - - - 4 octets : x origine
 - - - 4 octets : y origine]
-- - - 0x52
 - infos de hurtbox (facultatif) : 
 - - - 0x03
-- - - 1 octet n° de frame
+- - - [0x31
+- - - 1 octet n° de frame]
 - - - 2 octets x
 - - - 2 octets y
 - - - 2 octets w
 - - - 2 octets h
 - - - [0x30
-- - - 1 octet : invincible ?]
-- - - 0x52
+- - - 1 octet : hurtbox type]
+- - - 0xFD
 - infos d'hitbox (facultatif) : 
 - - - 0x04
-- - - 1 octet n° de frame
+- - - [0x41
+- - - 1 octet n° de frame]
 - - - 2 octets x
 - - - 2 octets y
 - - - 2 octets w

@@ -10,7 +10,7 @@
  * @return Animation* a pointer to the created Animation.
  */
 template <class A>
-A* AnimationsPool<A>::addAnimation(const std::string& name){
+A* AnimationsPool<A>::addAnimation(const char* name){
     auto [node, success] = animations.try_emplace(name);
 
     if (!success) {
@@ -30,7 +30,7 @@ A* AnimationsPool<A>::addAnimation(const std::string& name){
  */
 
 template<class A>
-A* AnimationsPool<A>::addAnimation(const std::string& name, SDL_Texture* spritesheet){
+A* AnimationsPool<A>::addAnimation(const char* name, SDL_Texture* spritesheet){
     if (!spritesheet)
         throw KBFatal("Tried to add animation with null spritesheet");
 
@@ -60,13 +60,28 @@ const A* AnimationsPool<A>::getAnimation(const std::string& name) const{
 }
 
 /**
+ * @brief Returns an Animation of this Champion.
+ *
+ * @param name the internal name (which is also the map key) of the wanted Animation.
+ * @return Animation* a pointer to the Animation if the specified name is an existing key, NULL otherwise.
+ */
+template<class A>
+const A* AnimationsPool<A>::getAnimation(const char* name) const{
+    auto it = animations.find(name);
+    if (it == animations.end()){
+        return NULL;
+    }
+    return &(it->second);
+}
+
+/**
  * @brief Returns an Animation, or create it if it doesn't exist yet.
  * Unlike getAnimation, always returns a valid Animation. If the Animation didn't exist, it is \ref Animation::Animation() "default constructed", so it won't have any frames or spritesheet.
  * @param name the name
  * @return Animation&
  */
 template<class A>
-A& AnimationsPool<A>::tryAnimation(const std::string& name){
+A& AnimationsPool<A>::tryAnimation(const char* name){
     auto [node, success] = animations.try_emplace(name);
     return node->second;
 }

@@ -1,39 +1,20 @@
 #include "Debug.h"
 
-
-void Debug::log(std::string s){
-    cout << s << '\n';
-    fflush(stdout);
+template <typename T>
+void Debug::log(T value){
+    cout << value << '\n' << std::flush;
 }
 
-void Debug::log(const char* s){
-    cout << s << '\n' << std::flush;
-}
+template void Debug::log(std::string value);
+template void Debug::log(const char* value);
+template void Debug::log(int value);
+template void Debug::log(double value);
+template void Debug::log(void* value);
+template void Debug::log(long value);
+template void Debug::log(long long value);
+template void Debug::log(Uint64 value);
 
-void Debug::log(int i){
-    cout << i << '\n';
-    fflush(stdout);
-}
-
-void Debug::log(double d){
-    cout << d << '\n';
-    fflush(stdout);
-}
-
-void Debug::log(void * p){
-    cout << p << '\n';
-    fflush(stdout);
-}
-
-void Debug::log(long i){
-    cout << i << '\n';
-    fflush(stdout);
-}
-
+template<>
 void Debug::log(bool b){
-    if (b)
-        cout << "True\n" << std::flush;
-    else 
-        cout << "False\n" << std::flush;
-    fflush(stdout);
+    cout << ((b) ? "True" : "False") << std::flush;
 }

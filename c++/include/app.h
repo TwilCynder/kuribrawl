@@ -52,6 +52,7 @@ class App
     void initControllersData();
     void initGameData();
     void loadRessources();
+    bool loadGameFile(const char* name);
     void handleEvents();
     void handleButtonEvent(const SDL_JoyButtonEvent* evt);
     void readPorts();

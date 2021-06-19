@@ -1,6 +1,6 @@
 ;TODO Modifs in the file format
-;- Change the $5x filemarkers to a more meaningful value
-;- Animation speed : float->double (DONE)
+;  Change the $5x filemarkers to a more meaningful value
+;  Animation speed : float >double (DONE)
 
 Structure File
     path.s
@@ -21,52 +21,74 @@ Enumeration
     #FILETYPES
 EndEnumeration
 
-#FILEMARKER_404 = $FD
+Enumeration
+    #HITBOXTYPE_DAMAGE
+    #HITBOXTYPE_GRAB
+    #HITBOXTYPE_SPECIAL
+EndEnumeration
+
+;General
+#FILEMARKER_404 = $F0
 #FILEMARKER_INTERFILE = $FF
 #FILEMARKER_DESCRIPTORSTART = $FE
+#FILEMARKER_GENERICSEPARATOR = $FD
+
+;Animations
 #FILEMARKER_ANIMSPEED = 1
 #FILEMARKER_FRAMEINFO = 2
 #FILEMARKER_FRAMEDURATION = $20
 #FILEMARKER_FRAMEORIGIN = $21
 #FILEMARKER_FRAMEMOVEMENT = $22
 #FILEMARKER_HURTBOXINFO = 3
+#FILEMARKER_HURTBOXFRAMEINDEX = $31
 #FILEMARKER_HITBOXINFO = 4
+#FILEMARKER_HITBOXFRAMEINDEX = $41
+;Champions
 #FILEMARKER_MOVEINFO = 2
 #FILEMARKER_LANDINGLAG = $20
 #FILEMARKER_MULTIMOVE = 3
 #FILEMARKER_MULTIMOVEEND = $30
+;Stage
 #FILEMARKER_PLATFORMINFO = 1
 
-Dim filetypeNames.s(#FILETYPES - 1)
-
-filetypeNames(#FILETYPE_ANIMATION) = "Animation"
-filetypeNames(#FILETYPE_CHAMPION) = "Champion"
-filetypeNames(#FILETYPE_LEFTANIM) = "Left Animation"
-filetypeNames(#FILETYPE_IMAGE) = "Simple image"
-filetypeNames(#FILETYPE_STAGE) = "Stage"
+XIncludeFile "dataFileMarkerDebugValues.pbi"
 
 NewList files.File()
 
-Define enableMessageBox.b = #False, logging.b = #True
+Global *debugValues.DebugValues = #Null
+Global enableMessageBox.b = #True, logging.b = 0, verbose = 0
+;EnableMessageBox : windows popup on error
+;Logging : console output will be used (opening one if not started from a terminal), at least for warnings
+;Verbose : all kind of stuff will be displayed (implies logging)
 
-If Not logging
-    enableMessageBox = #True
-EndIf 
-
-Procedure printLog(text.s)
-    Shared logging
+Macro printLogForce(text)
     If logging
         PrintN(text)
     EndIf 
-EndProcedure
+EndMacro
 
-Procedure errorPopup(text.s)
-    Shared enableMessageBox
-    printLog("Error : " + text)
+Macro printLog(text)
+    If verbose
+        PrintN(text)
+    EndIf 
+EndMacro
+
+Macro warning(text)
+    If logging
+        printLogForce("WARNING : " + text)
+    EndIf      
+EndMacro
+
+Procedure error(text.s)
+    Shared enableMessageBox, logging
+    printLog("ERROR : " + text)
     If enableMessageBox
         MessageBox_(0, "Kuribrawl Data File Maker error : " + Chr(13) + text, "Error", #MB_OK | #MB_ICONERROR)
     EndIf 
-    EnableASM
+    If logging
+        Input()
+    EndIf 
+    End
 EndProcedure
 
 Procedure writeSignature(datafile.l)
@@ -84,7 +106,7 @@ Procedure readFileList()
     
     file.l = ReadFile(#PB_Any, "project_db.txt")
     If Not file
-        errorPopup("Could Not file project DB.")
+        error("Could Not file project DB.")
         End
     EndIf
     
@@ -125,51 +147,320 @@ EndProcedure
 
 Procedure writeFileTag(datafile.l, tag.s)
     WriteString(datafile, tag)
-    WriteAsciiCharacter(datafile, 0)
+    WriteAsciiCharacter(datafile, $A)
+EndProcedure
+
+Macro errorLocationInfo(text)
+    info + " (line " + lineN + ") : " + text
+EndMacro
+
+Procedure startsWithNumber(text.s)
+    charCode.b = Asc(Left(text, 1))
+    If charCode < 48 Or charCode > 57
+        ProcedureReturn 0
+    Else 
+        ProcedureReturn 1
+    EndIf 
 EndProcedure
 
 Procedure writeAnimationDescriptor(datafile.l, info.s)
-    Define value.l, line.s, value$
+    Define value.l, line.s, value$, valueD.d, frameNumber.a, lastModifiedFrame.a = -1, i.b
     
+    lineN.l = 1
+    
+    printLog("---")
+    printLog("Writing Animation descriptor at offset " + Hex(Loc(datafile)))
     WriteAsciiCharacter(datafile, #FILEMARKER_DESCRIPTORSTART)
-    printLog("Writing descriptor (format : animation)")
+    
     If Right(info, 4) = ".dat"
-        printLog("- Uses a descriptor file : " + info)
+        ;- The info string is supposedly a file name (opening it) ---------------------------------
+        printLog("  Uses a descriptor file : " + info)
         descriptorFile.l = ReadFile(#PB_Any, info)
         If Not descriptorFile
-            errorPopup("Could not open descriptor file " + info)
+            error("Could not open descriptor file " + info)
         EndIf 
+        
+        ;- Reading frame number -------------------------------------------------------------------
+        line = ReadString(descriptorFile)
+        value = Val(line)
+        If value < 1 
+            If line = ""
+                error("Missing frame number in descriptor file")
+            Else
+                If Not startsWithNumber(line)
+                    error("The descriptor file does not start with a frame number")
+                Else 
+                    error("Null or nagative frame number")
+                EndIf 
+            EndIf
+        EndIf
+        If value > 255
+            error("Frame number must be between 0 and 255")
+        EndIf 
+        printLog("  Frame number : " + value)
+        WriteAsciiCharacter(datafile, value)
+        frameNumber = value
+        
+        ;- Reading other lines --------------------------------------------------------------------
+        lineN = 2
+        
+        While Not Eof(descriptorFile)
+            line = ReadString(descriptorFile)
+            
+            Select Left(line, 1)
+                Case "s"
+                    ;- - Animation speed line -----------------------------------------------------
+                    value$ = Mid(line, 2)
+                    valueD = ValD(value$)
+                    If valueD <= 0
+                        warning(errorLocationInfo(" : Null or negative speed   using 1 instead"))
+                    Else
+                        WriteAsciiCharacter(datafile, #FILEMARKER_ANIMSPEED)
+                        WriteDouble(datafile, valueD)
+                        Debug "Loc : " + Loc(datafile)
+                        printLog("  Speed : " + StrD(valueD))
+                    EndIf
+                Case "f"
+                    ;- - Frame info line ----------------------------------------------------------
+                    value$ = Mid(line, 2)
+                    If value$ = ""
+                        warning(errorLocationInfo(" : No frame index specified after 'f' indicator : skipping line"))
+                    EndIf 
+                    value = Val(value$)
+                    If value < 0 Or value > frameNumber
+                        error(errorLocationInfo(" : frame index must be between 0 and the frame number (" + frameNumber + ")"))
+                    EndIf 
+                    
+                    WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
+                    WriteAsciiCharacter(datafile, value)
+                    printLog("  Info on frame " + value)
+                    lastModifiedFrame = value
+                    ;- - - Reading all values
+                    i = 2
+                    value$ = StringField(line, i, " ")
+                    While Not value$ = ""
+                        Select Left(value$, 1)
+                            Case "d"
+                                ;- - - Frame duration ---------------------------------------------
+                                value = Val(Mid(value$, 2))
+                                If value < 1
+                                    error(errorLocationInfo("frame duration must be positive"))
+                                EndIf
+                                
+                                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEDURATION)
+                                WriteUnicodeCharacter(datafile, value)
+                                printLog("    Frame duration : " + value)
+                            Case "o"
+                                ;- - - Origin coordinates -----------------------------------------
+                                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEORIGIN)
+                                value$ = Mid(value$, 2)
+                                If value$ = ""
+                                    error(errorLocationInfo("Missing origin X coordinate"))
+                                EndIf 
+                                WriteLong(datafile, Val(value$))
+                                printLog("    Frame origin x : " + value$)
+                                i + 1
+                                value$ = StringField(line, i, " ")
+                                If value$ = ""
+                                    error(errorLocationInfo("Missing origin Y coordinate"))
+                                EndIf 
+                                WriteLong(datafile, Val(value$))
+                                printlog("    Frame origin y : " + value$)
+                            Case "m"
+                                ;- - - Frame movement ---------------------------------------------
+                                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEMOVEMENT)
+                                value$ = Mid(value$, 2)
+                                If value$ = ""
+                                    error(errorLocationInfo("Missing frame movement mode"))
+                                EndIf
+                                value = Val(value$)
+                                WriteByte(datafile, value)
+                                PrintN("      Movement mode : " + Bin(value))
+                                i + 1 
+                                value$ = StringField(line, i, " ")
+                                If value$ = ""
+                                    error(errorLocationInfo("Missing frame movement x speed"))
+                                EndIf
+                                valueD = ValD(value$)
+                                WriteDouble(datafile, valueD)
+                                PrintN("      Frame movement x speed : " + value$)  
+                                i + 1 
+                                value$ = StringField(line, i, " ")
+                                If value$ = ""
+                                    error(errorLocationInfo("Missing frame movement y speed"))
+                                EndIf
+                                valueD = ValD(value$)
+                                WriteDouble(datafile, valueD)
+                                PrintN("      Frame movement y speed : " + value$)  
+                        EndSelect
+                        i + 1
+                        value$ = StringField(line, i, " ")
+                    Wend  
+                Case "c"
+                    ;- - Hurtbox line -------------------------------------------------------------
+                    
+                    value$ = StringField(line, 1, " ")
+                    ;- - Checking for a frame index
+                    If Len(value$) > 1
+                        value$ = Mid(value$, 2)
+                        If Not startsWithNumber(value$)
+                            warning(errorLocationInfo("non-numeric characters after 'c' indicator - can't be interpreted as frame index, ignoring"))
+                        Else
+                            value = Val(value$)
+                            If value <> lastModifiedFrame
+                                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
+                                WriteAsciiCharacter(datafile, value)
+                                printlog("    Hurtbox is on frame " + Str(value) + " instead of the last modified frame")
+                            EndIf 
+                        EndIf 
+                    EndIf 
+                    
+                    WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
+                    printLog("  Writing hurtbox info")
+                    
+                    
+                    ;- - - Reading coordinates
+                    For i = 2 To 5
+                        value$ = StringField(line, i, " ")
+                        If value$ = ""
+                            error(errorLocationInfo("missing value."))
+                        EndIf 
+                        If Not startsWithNumber(value$)
+                            warning(errorLocationInfo("One of the values is not a number - using 0"))
+                        EndIf 
+                        WriteUnicodeCharacter(datafile, Val(value$))
+                        printLog("    " + *debugValues\hurtboxValues[i - 2] + " : " + value$)
+                    Next
+                    
+                    ;- - - Optional hurtbox type
+                    value = Val(StringField(line, 6, " "))
+                    If value < 0 Or value > 2
+                        warning(errorLocationInfo("Invalid hurtbox type : should be between 0 and 2. Using 0 instead."))
+                    EndIf 
+                    WriteAsciiCharacter(datafile, Val(value$))
+                    printLog("    Hurtbox type : " + value$)
+                    
+                    WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
+                    printLog("    Writing end marker")
+                    
+                Case "h"
+                    ;- - Hitbox line -------------------------------------------------------------
+                    
+                    value$ = StringField(line, 1, " ")
+                    ;- - Checking for a frame index
+                    If Len(value$) > 1
+                        value$ = Mid(value$, 2)
+                        If Not startsWithNumber(value$)
+                            warning(errorLocationInfo("non-numeric characters after 'c' indicator - can't be interpreted as frame index, ignoring"))
+                        Else
+                            value = Val(value$)
+                            If value <> lastModifiedFrame
+                                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
+                                WriteAsciiCharacter(datafile, value)
+                                printlog("    Hitbox is on frame " + Str(value) + " instead of the last modified frame")
+                            EndIf 
+                        EndIf 
+                    EndIf 
+                    
+                    WriteAsciiCharacter(datafile, #FILEMARKER_HITBOXINFO)
+                    printLog("  Writing hitbox info")
+                    
+                    
+                    ;- - - Reading coordinates
+                    For i = 2 To 5
+                        value$ = StringField(line, i, " ")
+                        If value$ = ""
+                            error(errorLocationInfo("missing value."))
+                        EndIf 
+                        
+                        If Not startsWithNumber(value$)
+                            warning(errorLocationInfo("One of the values is not a number - using 0"))
+                        EndIf 
+                        WriteUnicodeCharacter(datafile, Val(value$))
+                        printLog("    " + *debugValues\hitboxValues[i - 2] + " : " + value$)
+                    Next
+                    
+                    value = Val(StringField(line, 6, " "))
+                    WriteByte(datafile, value)
+                    If value < 0 Or value > 2
+                        error(errorLocationInfo("Invalid hitbox type : should be between 0 and 2"))
+                    EndIf 
+                    printLog("    Hitbox type : " + *debugValues\hitboxTypes[value])
+                    
+                    Select value
+                        Case #HITBOXTYPE_DAMAGE
+                            value$ = StringField(line, 7, " ")
+                            WriteDouble(datafile, ValD(value$))
+                            printLog("    Damage : " + value$)
+                            
+                            value$ = StringField(line, 8, " ")
+                            WriteUnicodeCharacter(datafile, Val(value$))
+                            printLog("    Angle : " + value$)
+                            
+                            value$ = StringField(line, 9, " ")
+                            WriteDouble(datafile, ValD(value$))
+                            printLog("    Base knockback : " + value$)
+                            
+                            value$ = StringField(line, 10, " ")
+                            WriteDouble(datafile, ValD(value$))
+                            printLog("    Scaling knockback : " + value$)
+                            
+                            value$ = StringField(line, 11, " ")
+                            WriteAsciiCharacter(datafile, Val(value$))
+                            printLog("    Hit ID : " + value$)
+                            
+                            value$ = StringField(line, 12, " ")
+                            WriteAsciiCharacter(datafile, Val(value$))
+                            printLog("    Priority : " + value$)
+                            
+                        Case #HITBOXTYPE_GRAB
+                            error(errorLocationInfo("Hitbox type is not supported yet"))
+                        Case #HITBOXTYPE_SPECIAL    
+                            error(errorLocationInfo("Hitbox type is not supported yet"))
+                        Default
+                            error(errorLocationInfo("Invalid hitbox type : " + value))
+                    EndSelect
+                    
+                    WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
+                    printLog("    Writing end marker")
+                Case "#"
+                    ;it's a comment
+                Default
+                    warning(errorLocationInfo("Start of the line doesn't match with any information type identifier (s, f, c or h) : " + Left(line, 1)))   
+            EndSelect
+            lineN + 1
+        Wend
         
         
     Else 
+        ;- The info string is supposedly the values directly
         value$ = StringField(info, 1, " ")
-        If Not value
-            errorPopup("Missing frame number")
+        If value$ = ""
+            error("Missing frame number")
         EndIf 
         
         value = Val(value$)
         If value < 1  
-            errorPopup("Null or negative frame number")
+            error("Null or negative frame number")
         EndIf 
         WriteByte(datafile, value)
-        printLog("- Frames number : " + value$)
+        printLog("  Frames number : " + value$)
         
         value$ = StringField(info, 2, " ")
-        value = ValD(value$)
-        If value
+        valueD = ValD(value$)
+        If valueD
           WriteAsciiCharacter(1, #FILEMARKER_ANIMSPEED)
-          WriteDouble(1, value)
-          printLog("- Speed" + value$)
+          WriteDouble(1, valueD)
+          printLog("  Speed" + value$)
         EndIf 
     EndIf 
 EndProcedure
 
 Procedure addFile(datafile.l, *inputFile.File)
-    Shared filetypeNames()
     Define type.b
         
     printLog("===================")
-    printLog("Filename : " + *inputFile\path)
+    printLogForce("Filename : " + *inputFile\path)
     printLog("Content  : " + *inputFile\content)
     
     Select StringField(*inputFile\content, 1, ":")
@@ -183,27 +474,31 @@ Procedure addFile(datafile.l, *inputFile.File)
             type = #FILETYPE_STAGE
         Case "I"
             type = #FILETYPE_IMAGE
+        Default
+            error(*inputFile\content + " : unknown file type")
     EndSelect
     
-    printLog("Type : " + filetypeNames(type))
-    
     Define tag.s, info.s
-    tag  = StringField(*inputFile\content, 1, " ")
-    info = StringField(*inputFile\content, 2, " ")
+    tag = StringField(*inputFile\content, 2, ":")
+    info = StringField(tag, 2, " ")
+    tag  = StringField(tag, 1, " ")
     
-    printLog("Tag  : " + tag)
-    printLog("Info : " + info)
+    printLog("---")
+    printLog("Writing at offset " + Hex(Loc(datafile)))
     
     writeFileType(datafile, type)
+    printLog("Type : " + *debugValues\fileTypeNames[type])
     writeFileTag(datafile, tag)
+    printLog("Tag : " + tag)
     
     If type = #FILETYPE_ANIMATION Or type = #FILETYPE_LEFTANIM Or type = #FILETYPE_IMAGE
         size.l = readFileToMemory(*inputFile\path)
         If Not size
-            errorPopup("Could not load file " + *inputFile\path)
+            error("Could not load file " + *inputFile\path)
             End
         EndIf 
-        WriteInteger(datafile, size)
+        WriteLong(datafile, size)
+        before.l = Loc(datafile)
         writeMemoryToFile(datafile)
         If type = #FILETYPE_ANIMATION
             writeAnimationDescriptor(datafile, info)
@@ -211,19 +506,57 @@ Procedure addFile(datafile.l, *inputFile.File)
     EndIf 
 EndProcedure
 
-buildpath.s = "data.twl"
+buildpath.s = ""
+source.s = ""
 
-If Not CreateFile(0, buildpath)
-    errorPopup("Could not create the Data File.")
-    End
-EndIf
+Define parameter.s
+
+While 1
+    parameter = ProgramParameter()
+    If parameter = ""
+        Break
+    EndIf 
+    Select parameter
+        Case "-v"
+            verbose = #True
+            logging = #True
+        Case "-l"
+            logging = #True
+        Case "-o"
+            buildpath = ProgramParameter()
+        Default
+            source = parameter
+    EndSelect
+Wend        
+
+If Right(source, 1) <> "/" And Len(source) > 0
+    source = "/"
+EndIf 
+
+If buildpath = ""
+    buildpath = source + "data.twl"
+EndIf 
+
+SetCurrentDirectory(source)
+
+If logging
+    *debugValues = initDebugValues()
+Else
+    enableMessageBox = #True
+EndIf 
 
 If logging
     OpenConsole()
-EndIf     
+EndIf 
+
+If Not CreateFile(0, buildpath)
+    Debug buildpath
+    error("Could not create the Data File.")
+    End
+EndIf    
     
 writeSignature(0)
-writeVersion(0, 0, 2, 0)
+writeVersion(0, 0, 3, 0)
 
 readFileList()
 
@@ -231,12 +564,19 @@ ForEach files()
     addFile(0, @files())
 Next 
 
+size.l = Loc(0)
+CloseFile(0)
+
 If logging
+    PrintN("===============================")
+    PrintN("FINISHED. File size : " + size)
     Input()
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 142
-; FirstLine = 123
-; Folding = --
+; CursorPosition = 166
+; FirstLine = 143
+; Folding = ---
 ; EnableXP
+; Executable = dataFileMaker.exe
+; CommandLine = -v

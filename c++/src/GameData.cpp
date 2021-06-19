@@ -8,7 +8,7 @@
  * @param name the string identifier of the wanted Champion
  * @return Champion* the Champion, or NULL if no Champion had this name.
  */
-Champion* GameData::getChampion(const std::string& name){
+Champion* GameData::getChampion(const char* name){
     auto it = champions.find(name);
     if (it == champions.end()){
       return NULL;
@@ -22,7 +22,7 @@ Champion* GameData::getChampion(const std::string& name){
  * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Champion#name "name attribute".
  * @return Champion* the created Champion (can't be NULL since the method throws if it could be created)
  */
-Champion* GameData::addChampion(const std::string& name) {
+Champion* GameData::addChampion(const char* name) {
     auto [node, success] = champions.try_emplace(name, name);
     if (!success) {
         throw KBFatal("Could not create champion");
@@ -38,7 +38,7 @@ Champion* GameData::addChampion(const std::string& name) {
  * @param name the name of the wanted Champion.
  * @return Champion& a reference to the Champion.
  */
-Champion& GameData::tryChampion(const std::string& name){
+Champion& GameData::tryChampion(const char* name){
     auto [node, success] = champions.try_emplace(name, name);
     return node->second;
 }

@@ -53,7 +53,7 @@ Animation::~Animation(){
 
 void Animation::setSpritesheet(SDL_Texture* spritesheet_){
     if (!spritesheet_){
-        throw KBFatal("Animation constructor : spritesheet texture pointer is null");
+        throw KBFatal("SetSpritesheet : spritesheet texture pointer is null");
     }
     this->spritesheet = spritesheet_;
     SDL_QueryTexture(spritesheet, NULL, NULL, &this->display.x, &this->display.y);
@@ -155,6 +155,19 @@ Frame* Animation::getFrame(int n){
 void Animation::setBaseSpeed(double speed){
     base_speed = speed;
 }
+
+/**
+ * @brief Returns the base speed of this animtion.
+ * Can be < 1, in which case it will be used as a multiplier, or an integer, in which case it will
+ * be the total duration of the Animation.
+ * Any value that isn't either of those (a non-integer > 1) is invalid and will cause **undefined behavior**
+ * @return the speed
+ */
+
+double Animation::getBaseSpeed(){
+    return base_speed;
+}
+
 
 /**
  * @brief Draws a certain frame of this Animation.

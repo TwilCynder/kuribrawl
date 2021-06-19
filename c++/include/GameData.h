@@ -12,9 +12,9 @@ class App;
 class GameData {
     public:
 
-    Champion* getChampion(const std::string& name);
-    Champion* addChampion(const std::string& name);
-    Champion& tryChampion(const std::string& name);
+    Champion* getChampion(const char* name);
+    Champion* addChampion(const char* name);
+    Champion& tryChampion(const char* name);
 
     void readDataFile();
     void finalizeChampionsInitialization();

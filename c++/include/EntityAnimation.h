@@ -11,6 +11,7 @@ class EntityAnimation : public Animation {
     ~EntityAnimation();
 
     void initFrames(int n);
+    EntityFrame* getEntityFrame (int n);
     void setNextAnimation(const EntityAnimation*);
     const EntityAnimation* getNextAnimation() const;
 

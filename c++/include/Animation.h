@@ -29,6 +29,7 @@ class Animation {
     int getNbFrames();
     Frame* getFrame(int n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
     void setBaseSpeed(double speed);
+    double getBaseSpeed();
 
     void draw(SDL_Renderer* target, int x, int y, int frame)const;
     void draw(SDL_Renderer* target, int x, int y, int frame, int facing)const;

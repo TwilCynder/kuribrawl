@@ -10,10 +10,11 @@
 template <class A>
 class AnimationsPool {
     public:
-    A* addAnimation(const std::string& name);
-    A* addAnimation(const std::string& name, SDL_Texture* spritesheet);
+    A* addAnimation(const char* name);
+    A* addAnimation(const char* name, SDL_Texture* spritesheet);
     const A* getAnimation(const std::string& name) const;
-    A& tryAnimation(const std::string& name);
+    const A* getAnimation(const char* name) const;
+    A& tryAnimation(const char* name);
     protected:
     std::map<std::string, A> animations;    ///< Map containing all the Animations of this Champion.
 };

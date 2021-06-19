@@ -1,6 +1,4 @@
-jumpstart.png
-A:Acid/Jumpsquat 1
-jumpstartL.png
-A:Acid/JumpsquatL 2
+idle_strip4.png
+A:Acid/idle idle.dat
 nair_strip6.png
-A:Acid/nair nair_hhhacid.dat
+A:Acid/nair nair_acid.dat

@@ -24,6 +24,17 @@ void EntityAnimation::initFrames(int n){
     entity_frames = std::make_unique<EntityFrame[]>(n);
 }
 
+/**
+ * @brief Returns an entity frame of this EntityAnimation.
+ * EntityFrames contain game-related informations about a frame (hitboxes, influence on movement)
+ * @param n the id of the frame. Frame ids are just array indexes, thus start at 0.
+ * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the Animation exists.
+ */
+
+EntityFrame* EntityAnimation::getEntityFrame(int n){
+    return &entity_frames[n];
+}
+
 void EntityAnimation::setNextAnimation(const EntityAnimation* anim){
     setNextAnimation((Animation*)anim);
 }
