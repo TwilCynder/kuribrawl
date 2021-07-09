@@ -5,6 +5,8 @@ void Debug::log(T value){
     cout << value << '\n' << std::flush;
 }
 
+template void Debug::log(char value);
+template void Debug::log(char* value);
 template void Debug::log(std::string value);
 template void Debug::log(const char* value);
 template void Debug::log(int value);

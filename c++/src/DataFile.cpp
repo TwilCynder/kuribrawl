@@ -121,7 +121,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     double valueD;
     bool leave_loop;
     Frame* current_frame;
-    EntityFrame* current_entity_frame;
+    EntityFrame* current_entity_frame = nullptr;
     Hurtbox* hurtbox = nullptr;
     Hitbox* hitbox = nullptr;
 
@@ -172,17 +172,28 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         readData(&valueD);
                         current_entity_frame->movement.y = valueD;
                         break;
-                    case FILEMARKER_HURTBOXINFO:      
-                        hurtbox = &current_entity_frame->hurtboxes.emplace_back();
+                    case FILEMARKER_HURTBOXINFO:   
+                        if (!current_entity_frame){
+                            throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
+                        }
+                        hurtbox = &(current_entity_frame->hurtboxes.emplace_back());
                         
                         readWord(&word);
                         hurtbox->x = word;
-                        readWord(&word);
-                        hurtbox->y = word;
-                        readWord(&word);
-                        hurtbox->w = word;
-                        readWord(&word);
-                        hurtbox->h = word;
+                        if (hurtbox->x == MAX_VALUE_SHORT){  
+                            hurtbox->x = -(current_frame->origin.x);
+                            hurtbox->y = -(current_frame->origin.y);
+                            hurtbox->w = current_frame->display.w;
+                            hurtbox->h = current_frame->display.h;
+                        } else {
+                            readWord(&word);
+                            hurtbox->y = word;
+                            readWord(&word);
+                            hurtbox->w = word;
+                            readWord(&word);
+                            hurtbox->h = word;
+                        }
+
                         readByte(&byte);
                         hurtbox->type = byte;
                         break;
@@ -204,11 +215,10 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         leave_loop = true;
                         break;
                     default:
-                        cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " expected animation information type identifier.\n";
+                        cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
                         throw KBFatalExplicit("File read : invalid data file content");
                 }
             } while (!leave_loop);
-
 
             break;
         default:
@@ -222,7 +232,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
  * The input string is now the first string.
  * @return const char* The second string.
  */
-const char* DataFile::separateTag(char* tag){
+char* DataFile::separateTag(char* tag){
     char* res = strchr(tag, '/');
     if (!res){
         throw KBFatal("Data chunk tag doesn't contain a '/'");
@@ -243,7 +253,7 @@ void DataFile::read(GameData& data){
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
     char* tag;
-    const char *entity, *element;
+    char *entity, *element, *endChar;
 
     (void)entity; (void)element;
 
@@ -255,6 +265,8 @@ void DataFile::read(GameData& data){
                 element = separateTag(tag);
                 Debug::log(entity);
                 Debug::log(element);
+                endChar = element + strlen(element) - 1;
+                *endChar = 0;
                 switch(entity[0]){
                     default:
                         readEntityAnimationFile(data.tryChampion(entity).tryAnimation(element));

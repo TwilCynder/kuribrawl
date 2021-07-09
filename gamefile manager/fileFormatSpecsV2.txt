@@ -33,9 +33,7 @@ Structure des fichiers de données de jeu (twl) :
 - - - 2 octets y
 - - - 2 octets w
 - - - 2 octets h
-- - - [0x30
-- - - 1 octet : hurtbox type]
-- - - 0xFD
+- - - 1 octet : hurtbox type
 - infos d'hitbox (facultatif) : 
 - - - 0x04
 - - - [0x41
@@ -46,7 +44,6 @@ Structure des fichiers de données de jeu (twl) :
 - - - 2 octets h
 - - - 2 octets damages
 - - - 2 octets angle
-- - - 0x52
 
 >Données de champion
 - Nom (UTF-8 String)

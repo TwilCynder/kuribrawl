@@ -51,6 +51,9 @@ EndEnumeration
 ;Stage
 #FILEMARKER_PLATFORMINFO = 1
 
+#MAX_VALUE_BYTE  = 255
+#MAX_VALUE_SHORT = 65535
+
 XIncludeFile "dataFileMarkerDebugValues.pbi"
 
 NewList files.File()
@@ -156,6 +159,11 @@ EndMacro
 
 Procedure startsWithNumber(text.s)
     charCode.b = Asc(Left(text, 1))
+    If Left(text, 1) = "-"
+        charCode = Asc(Mid(text, 2, 1))
+    Else 
+        charCode.b = Asc(Left(text, 1))
+    EndIf 
     If charCode < 48 Or charCode > 57
         ProcedureReturn 0
     Else 
@@ -164,7 +172,7 @@ Procedure startsWithNumber(text.s)
 EndProcedure
 
 Procedure writeAnimationDescriptor(datafile.l, info.s)
-    Define value.l, line.s, value$, valueD.d, frameNumber.a, lastModifiedFrame.a = -1, i.b
+    Define value.l, line.s, value$, valueD.d, frameNumber.a, lastModifiedFrame.b = -1, i.b
     
     lineN.l = 1
     
@@ -307,6 +315,9 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                             warning(errorLocationInfo("non-numeric characters after 'c' indicator - can't be interpreted as frame index, ignoring"))
                         Else
                             value = Val(value$)
+                            If value < 0 Or value >= frameNumber
+                                error(errorLocationInfo("frame number must be between 0 and the number of frames"))
+                            EndIf 
                             If value <> lastModifiedFrame
                                 WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
                                 WriteAsciiCharacter(datafile, value)
@@ -318,19 +329,31 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
                     printLog("  Writing hurtbox info")
                     
-                    
-                    ;- - - Reading coordinates
-                    For i = 2 To 5
-                        value$ = StringField(line, i, " ")
-                        If value$ = ""
-                            error(errorLocationInfo("missing value."))
-                        EndIf 
-                        If Not startsWithNumber(value$)
+                    value$ = StringField(line, 2, " ")
+                    If value$ = ""
+                        WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                        printLog("    No value ; this hurtbx will cover all the frame.")
+                    Else 
+                        If verbose And Not startsWithNumber(value$)
                             warning(errorLocationInfo("One of the values is not a number - using 0"))
                         EndIf 
                         WriteUnicodeCharacter(datafile, Val(value$))
-                        printLog("    " + *debugValues\hurtboxValues[i - 2] + " : " + value$)
-                    Next
+                        printLog("    " + *debugValues\hurtboxValues[2] + " : " + value$)
+                        
+                        ;- - - Reading coordinates
+                        For i = 3 To 5
+                            value$ = StringField(line, i, " ")
+                            If value$ = ""
+                                error(errorLocationInfo("missing value."))
+                            EndIf 
+                            If verbose And Not startsWithNumber(value$)
+                                warning(errorLocationInfo("One of the values is not a number - using 0"))
+                            EndIf 
+                            WriteUnicodeCharacter(datafile, Val(value$))
+                            printLog("    " + *debugValues\hurtboxValues[i - 2] + " : " + value$)
+                        Next
+                        
+                    EndIf 
                     
                     ;- - - Optional hurtbox type
                     value = Val(StringField(line, 6, " "))
@@ -340,8 +363,8 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     WriteAsciiCharacter(datafile, Val(value$))
                     printLog("    Hurtbox type : " + value$)
                     
-                    WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
-                    printLog("    Writing end marker")
+                    ;WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
+                    ;printLog("    Writing end marker")
                     
                 Case "h"
                     ;- - Hitbox line -------------------------------------------------------------
@@ -352,6 +375,9 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                         value$ = Mid(value$, 2)
                         If Not startsWithNumber(value$)
                             warning(errorLocationInfo("non-numeric characters after 'c' indicator - can't be interpreted as frame index, ignoring"))
+                            If value < 0 Or value >= frameNumber
+                                error(errorLocationInfo("frame number must be between 0 and the number of frames"))
+                            EndIf 
                         Else
                             value = Val(value$)
                             If value <> lastModifiedFrame
@@ -373,7 +399,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                             error(errorLocationInfo("missing value."))
                         EndIf 
                         
-                        If Not startsWithNumber(value$)
+                        If verbose And Not startsWithNumber(value$)
                             warning(errorLocationInfo("One of the values is not a number - using 0"))
                         EndIf 
                         WriteUnicodeCharacter(datafile, Val(value$))
@@ -421,8 +447,8 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                             error(errorLocationInfo("Invalid hitbox type : " + value))
                     EndSelect
                     
-                    WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
-                    printLog("    Writing end marker")
+                    ;WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
+                    ;printLog("    Writing end marker")
                 Case "#"
                     ;it's a comment
                 Default
@@ -504,6 +530,7 @@ Procedure addFile(datafile.l, *inputFile.File)
             writeAnimationDescriptor(datafile, info)
         EndIf
     EndIf 
+    WriteByte(datafile, #FILEMARKER_INTERFILE)
 EndProcedure
 
 buildpath.s = ""
@@ -574,8 +601,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 166
-; FirstLine = 143
+; CursorPosition = 357
+; FirstLine = 322
 ; Folding = ---
 ; EnableXP
 ; Executable = dataFileMaker.exe

@@ -1,5 +1,5 @@
 {
-    "hexdump.littleEndian": false,
+    "hexdump.littleEndian": true,
     "files.associations": {
         "list": "cpp",
         "array": "cpp",

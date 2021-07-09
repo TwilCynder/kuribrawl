@@ -33,16 +33,8 @@ void HardCoded::initControllersData(ControllersData& data){
  */
 void HardCoded::initGameData(App* app){
     GameData& data = app->gameData();
-    Champion* acid = data.addChampion("Acid");
+    Champion* acid = &data.tryChampion("Acid");
     EntityAnimation* anim;
-
-	anim = acid->addAnimation("idle", app->LoadTexture("../res/idle_strip4.png"));
-	anim->initFrames(4);
-    anim->setBaseSpeed(0.05);
-    anim->addHurtbox(0, -20, 0, 40, 50);
-    anim->addHurtbox(1, -20, 0, 40, 52);
-    anim->addHurtbox(2, -20, 0, 40, 54);
-    anim->addHurtbox(3, -20, 0, 40, 52);
 
     anim = acid->addAnimation("walking", app->LoadTexture("../res/walk_strip6.png"));
     anim->initFrames(6);
@@ -80,6 +72,4 @@ void HardCoded::initGameData(App* app){
     anim = acid->addAnimation("landing", app->LoadTexture("../res/land_strip2.png"));
     anim->initFrames(2);
     anim->setBaseSpeed(5);
-
-    acid->initAnimations();
 }

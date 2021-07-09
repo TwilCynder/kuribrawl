@@ -57,6 +57,10 @@ const EntityAnimation* Champion::getDefaultAnimation(const DefaultAnimation anim
 
 void Champion::initAnimations(){
     const EntityAnimation* anim;
+    for (auto const& [name, Animation] : animations){
+        Debug::log(name);
+    }
+
     for (auto const& [state, name] : default_animation_name){
         if ((anim = getAnimation(name))){
             default_animations[(int)state] = anim;

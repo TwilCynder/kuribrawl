@@ -20,5 +20,6 @@ class GameData {
     void finalizeChampionsInitialization();
 
     private:
-    std::map<std::string, Champion> champions; ///< Map containing all Champions and associating them with a string ID (= name).
+    using ChampionsMap = std::map<std::string, Champion>;
+    ChampionsMap champions; ///< Map containing all Champions and associating them with a string ID (= name).
 };

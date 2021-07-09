@@ -115,6 +115,7 @@ SDL_Texture* App::LoadTexture(const char *file){
 
 void App::initGameData(){
 	HardCoded::initGameData(this);
+	game_data->finalizeChampionsInitialization();
 }
 
 bool App::loadGameFile(const char* name){
@@ -154,9 +155,9 @@ void App::initControllersData(){
 void App::init(){
 	initSDL();
 	InputManager::initInputHandlers();
-	initGameData();
 	initControllersData();
 	loadRessources();
+	initGameData();
 	startTestGame();
 }
 

@@ -42,3 +42,11 @@ Champion& GameData::tryChampion(const char* name){
     auto [node, success] = champions.try_emplace(name, name);
     return node->second;
 }
+
+void GameData::finalizeChampionsInitialization(){
+    ChampionsMap::iterator it;
+    for (it = champions.begin(); it != champions.end(); it++)
+    {
+        it->second.initAnimations();
+    }
+}

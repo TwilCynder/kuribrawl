@@ -45,7 +45,7 @@ class DataFile {
     void readVersion();
     DataType readDataType();
     char* readFileTag();
-    const char* separateTag(char* tag);
+    char* separateTag(char* tag);
     SDL_Texture* LoadImageFromDatafile();
 
     void readEntityAnimationFile(EntityAnimation& anim);

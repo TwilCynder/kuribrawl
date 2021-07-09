@@ -30,16 +30,9 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     facing(1),
     grounded(false),
     model(model_),
-    game(game_)
+    game(game_),
+    update_anim(true)
 {
-    const EntityAnimation* idle_anim = model->getAnimation("idle");
-
-    if (!idle_anim){
-        throw KBFatal("Tried to instanciate a champion with no idle animation");
-    }
-
-    current_animation.setAnimation(idle_anim);
-
     position.x = x_;
     position.y = y_;
     speed.x = 0.0;
@@ -111,7 +104,7 @@ void Fighter::draw(SDL_Renderer* target){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;
         box.x = this->position.x + hurtboxes[i].x;
-        box.y = SCREEN_HEIGHT - this->position.y - box.h + hurtboxes[i].y;
+        box.y = SCREEN_HEIGHT - this->position.y + hurtboxes[i].y;
         SDL_RenderDrawRect(target, &box);
     }
 }

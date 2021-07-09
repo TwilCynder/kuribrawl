@@ -11,7 +11,7 @@ void App::startTestGame(){
 	current_game = new Game();
 
 	Champion* acid = game_data->getChampion("Acid");
-	PlayerFighter* f1 = current_game->addFighter(acid, 100, 50);
+	PlayerFighter* f1 = current_game->addFighter(acid, 100, 300);
 	//current_game->addFighter(acid, 550, 50);
 
 	ports[0].setJoystick(0, this->controllersData().getController("GC"));
