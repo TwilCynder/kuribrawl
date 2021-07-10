@@ -28,13 +28,14 @@ class CurrentAnimation {
     void setAnimation(const EntityAnimation* anim, double speed);
     void setSpeed(double speed);
     void advance();
+    void advance(Uint8 slowness);
 
     private:
     const EntityAnimation* model;   ///< The Animation that is running.
                                     /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
     
     int current_frame; ///< Index of the current frame.
-    int timeleft; ///<Time remaining *on the current frame*.
+    float timeleft; ///<Time remaining *on the current frame*.
     double speed; ///<Current \ref Animation#base_speed "speed" at which the animation runs (will override the base speed of the Animation).
 
     int frame_multiplier; ///< Time each frame will be displayed for.

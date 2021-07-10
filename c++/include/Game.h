@@ -11,6 +11,7 @@ class Champion;
 class Game {
     public:
     Game();
+    Game(Uint8 slowness);
     PlayerFighter* addFighter(Champion* model);
     PlayerFighter* addFighter(Champion* model, int x, int y);
     bool is_running();
@@ -34,4 +35,7 @@ class Game {
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
     SDL_Rect camera;    ///< The area of the Stage that should be displayed.
     bool running;       ///Indicates if the game is actually running or not.
+
+    Uint8 slowness;
+    Uint8 since_last_update;
 };

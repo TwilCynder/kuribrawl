@@ -12,7 +12,20 @@ using namespace std;
  * 
  */
 Game::Game():
-    frame(0)
+    frame(0),
+    slowness(1),
+    since_last_update(1)
+{
+}
+
+/**
+ * @brief Construct a new Game object
+ * 
+ */
+Game::Game(Uint8 slowness_):
+    frame(0),
+    slowness(slowness_),
+    since_last_update(slowness_)
 {
 }
 
@@ -102,7 +115,7 @@ void Game::updateAnimations(){
 void Game::applyPhysics(){
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->applyPhysics();
+        it->applyPhysics(slowness);
     }
 }
 
@@ -116,7 +129,7 @@ void Game::advanceAnimations(){
     for (it = fighters.begin(); it != fighters.end(); ++it){
         anim = it->getCurrentAnimation();
         if (anim->is_initialized()){
-            anim->advance();
+            anim->advance(slowness);
         }
     }
 }
@@ -134,6 +147,10 @@ void Game::step(SDL_Renderer* render_target){
     draw(render_target);
     advanceAnimations();
     frame++;
+    since_last_update++;
+    if (since_last_update > slowness){
+        since_last_update = slowness;
+    }
 }
 
 int Game::getFrame(){

@@ -7,8 +7,10 @@
 #include "Port.h"
 #include "ControllersData.h"
 
+extern Parameters global_parameters;
+
 void App::startTestGame(){
-	current_game = new Game();
+	current_game = new Game(global_parameters.slowness);
 
 	Champion* acid = game_data->getChampion("Acid");
 	PlayerFighter* f1 = current_game->addFighter(acid, 100, 300);

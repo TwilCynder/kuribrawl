@@ -36,8 +36,10 @@ class Fighter {
     void draw(SDL_Renderer* target);
     //Physics
     void applyPhysics();
+    void applyPhysics(Uint8 slowness);
     //States
     void updateState();
+    void updateState(Uint8 slowness);
     void updateAnimation();
 
     Game& getGame();
@@ -56,7 +58,7 @@ class Fighter {
     protected:
     State state;        ///< Current State.
     int state_info;     ///< Additional data that can be set when a state is started.
-    int state_timer;    ///< Number of frames this the current state was started.
+    float state_timer;  ///< Number of frames this the current state was started.
     bool update_anim;   ///< Whether the animation should be updated according to the current state.
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame.
     int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.

@@ -136,14 +136,17 @@ void CurrentAnimation::start(){
     }
 }
 
+void CurrentAnimation::advance(){
+    advance(1);
+}
 /**
  * @brief Advances the animation, which means doing all that need to be done at each iteration of the main loop for the animation to progress (at the right speed)
  *
  */
 
-void CurrentAnimation::advance(){
+void CurrentAnimation::advance(Uint8 slowness){
     if (speed != -1 && is_initialized()){
-        timeleft--;
+        timeleft -= 1.0f / slowness;
         if (timeleft <= 0){
             current_carry += base_carry;
             nextFrame();

@@ -5,6 +5,7 @@
 #include "util.h"
 
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
+#define slowed(value) value / slowness
 
 void Fighter::applyAirAccel(int direction){
 	if (!(sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
@@ -38,6 +39,14 @@ void Fighter::groundToAir(){
  *
  */
 void Fighter::applyPhysics(){
+    applyPhysics(1);
+}
+
+/**
+ * @brief Apply physics-related mechanics.
+ *
+ */
+void Fighter::applyPhysics(Uint8 slowness){
 
     if (paused) return;
 
@@ -48,11 +57,11 @@ void Fighter::applyPhysics(){
     if (abs(speed.x) < MAX_SPEED_PRECISION) speed.x = 0;
     if (abs(speed.y) < MAX_SPEED_PRECISION) speed.y = 0;
 
-    speed.y -= model->val.gravity;
+    speed.y -= slowed(model->val.gravity);
 
     //Application des frictions
 
-    if (grounded) Kuribrawl::substractValue(&speed.x, model->val.traction);
+    if (grounded) Kuribrawl::substractValue(&speed.x, slowed(model->val.traction));
 
     //Applications des vitesses dues aux states
 
@@ -67,13 +76,13 @@ void Fighter::applyPhysics(){
             speed.x = model->val.dash_start_speed * facing;
             break;
         case State::DASH_TURN:
-            speed.x += model->val.dash_turn_accel * facing;
+            speed.x += slowed(model->val.dash_turn_accel) * facing;
         default:
             break;
     }
 
-    new_pos.x = position.x + speed.x;
-    new_pos.y = position.y + speed.y;
+    new_pos.x = position.x + slowed(speed.x);
+    new_pos.y = position.y + slowed(speed.y);
 
     if (new_pos.y <= 0){
         new_pos.y = 0;

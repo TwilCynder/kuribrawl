@@ -147,8 +147,16 @@ bool Fighter::isStateFinished(int duration){
  *
  */
 void Fighter::updateState(){
+    updateState(1);
+}
+
+/**
+ * @brief Checks if any change of state should be made based on the current state and the \ref Fighter#state_time "state timer".
+ *
+ */
+void Fighter::updateState(Uint8 slowness){
     if (paused) return;
-    ++state_timer;
+    state_timer += 1 / slowness;
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){

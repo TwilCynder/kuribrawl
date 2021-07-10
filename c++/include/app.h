@@ -20,6 +20,14 @@ class ControllersData;
 typedef Uint32 Date;
 
 /**
+ * @brief Struct containing the parameters passed to the executable
+ * 
+ */
+struct Parameters {
+    Uint8 slowness;
+};
+
+/**
  * @brief An instance of the program.
  * Contains absolutely every persistent data needed by the program (static data like configurations, and current game data).
  */
@@ -47,6 +55,9 @@ class App
 
     Port* joysticks[16];    ///<An array associating each joystick numerical id with a Port. 
                             /**<Pointer validity : can be invalidated if a Port is deleted or moved */
+
+    void startTestGame();
+
     private:
     void initSDL();
     void initControllersData();
@@ -57,8 +68,6 @@ class App
     void handleButtonEvent(const SDL_JoyButtonEvent* evt);
     void readPorts();
     void render();
-
-    void startTestGame();
 
     void update_frame_duration();
     void loop_timer();
