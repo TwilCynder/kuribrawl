@@ -211,3 +211,7 @@ void CurrentAnimation::draw(SDL_Renderer* target, int x, int y, int facing){
 const std::vector<Hurtbox>& CurrentAnimation::getHurtboxes() const {
     return model->getHurtboxes(current_frame);
 }
+
+const std::vector<Hitbox>& CurrentAnimation::getHitboxes() const {
+    return model->getHitboxes(current_frame);
+}

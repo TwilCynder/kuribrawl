@@ -22,8 +22,16 @@ Enumeration
 EndEnumeration
 
 Enumeration
+    #HURTBOXTYPE_NORMAL
+    #HURTBOXTYPE_PROTECTED
+    #HURTBOXTYPE_INVINCIBLE
+    #HURTBOXTYPE_INTANGIBLE
+EndEnumeration
+
+Enumeration
     #HITBOXTYPE_DAMAGE
     #HITBOXTYPE_GRAB
+    #HITBOXTYPE_WIND
     #HITBOXTYPE_SPECIAL
 EndEnumeration
 
@@ -149,13 +157,9 @@ Procedure writeFileType(datafile.l, type.b)
 EndProcedure
 
 Procedure writeFileTag(datafile.l, tag.s)
-    WriteString(datafile, tag)
+    WriteString(datafile, tag, #PB_Ascii)
     WriteAsciiCharacter(datafile, $A)
 EndProcedure
-
-Macro errorLocationInfo(text)
-    info + " (line " + lineN + ") : " + text
-EndMacro
 
 Procedure startsWithNumber(text.s)
     charCode.b = Asc(Left(text, 1))
@@ -170,6 +174,10 @@ Procedure startsWithNumber(text.s)
         ProcedureReturn 1
     EndIf 
 EndProcedure
+
+Macro errorLocationInfo(text)
+    info + " (line " + lineN + ") : " + text
+EndMacro
 
 Procedure writeAnimationDescriptor(datafile.l, info.s)
     Define value.l, line.s, value$, valueD.d, frameNumber.a, lastModifiedFrame.b = -1, i.b
@@ -337,7 +345,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                         If verbose And Not startsWithNumber(value$)
                             warning(errorLocationInfo("One of the values is not a number - using 0"))
                         EndIf 
-                        WriteUnicodeCharacter(datafile, Val(value$))
+                        WriteWord(datafile, Val(value$))
                         printLog("    " + *debugValues\hurtboxValues[2] + " : " + value$)
                         
                         ;- - - Reading coordinates
@@ -349,7 +357,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                             If verbose And Not startsWithNumber(value$)
                                 warning(errorLocationInfo("One of the values is not a number - using 0"))
                             EndIf 
-                            WriteUnicodeCharacter(datafile, Val(value$))
+                            WriteWord(datafile, Val(value$))
                             printLog("    " + *debugValues\hurtboxValues[i - 2] + " : " + value$)
                         Next
                         
@@ -402,7 +410,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                         If verbose And Not startsWithNumber(value$)
                             warning(errorLocationInfo("One of the values is not a number - using 0"))
                         EndIf 
-                        WriteUnicodeCharacter(datafile, Val(value$))
+                        WriteWord(datafile, Val(value$))
                         printLog("    " + *debugValues\hitboxValues[i - 2] + " : " + value$)
                     Next
                     
@@ -457,6 +465,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
             lineN + 1
         Wend
         
+        CloseFile(descriptorFile)
         
     Else 
         ;- The info string is supposedly the values directly
@@ -480,6 +489,31 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
           printLog("  Speed" + value$)
         EndIf 
     EndIf 
+EndProcedure
+
+UndefineMacro errorLocationInfo
+Macro errorLocationInfo(text)
+    sourceFileName + " (line " + lineN + ") : " + text
+EndMacro
+
+Procedure writeChampionFile(datafile.l, sourceFileName.s)
+    Define value.l, line.s, value$, valueD.d, frameNumber.a, lastModifiedFrame.b = -1, i.b
+    
+    printLog("---")
+    printLog("Writing Champion descriptor file at offset " + Hex(Loc(datafile)))
+    
+    sourceFile.l = OpenFile(#PB_Any, sourceFileName)
+    If Not sourceFile
+        error("Could not open the sourcefile")
+    EndIf
+    
+    lineN = 1
+    
+    line = ReadString(sourceFile, #PB_UTF8)
+    WriteString(datafile, line, #PB_UTF8)
+    WriteAsciiCharacter(datafile, $A)
+    
+    CloseFile(sourceFile)
 EndProcedure
 
 Procedure addFile(datafile.l, *inputFile.File)
@@ -518,17 +552,26 @@ Procedure addFile(datafile.l, *inputFile.File)
     printLog("Tag : " + tag)
     
     If type = #FILETYPE_ANIMATION Or type = #FILETYPE_LEFTANIM Or type = #FILETYPE_IMAGE
+        ;these files are data that isn't going to be parsed (image, sound)
         size.l = readFileToMemory(*inputFile\path)
         If Not size
             error("Could not load file " + *inputFile\path)
             End
         EndIf 
         WriteLong(datafile, size)
+        printLog("File size : " + size)
         before.l = Loc(datafile)
         writeMemoryToFile(datafile)
         If type = #FILETYPE_ANIMATION
             writeAnimationDescriptor(datafile, info)
         EndIf
+    Else
+        ;these files are kuribrawl data, that will be parsed
+        Select type
+            Case #FILETYPE_CHAMPION
+                writeChampionFile(datafile, info)
+        EndSelect
+        
     EndIf 
     WriteByte(datafile, #FILEMARKER_INTERFILE)
 EndProcedure
@@ -601,8 +644,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 357
-; FirstLine = 322
+; CursorPosition = 512
+; FirstLine = 480
 ; Folding = ---
 ; EnableXP
 ; Executable = dataFileMaker.exe

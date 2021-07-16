@@ -70,6 +70,9 @@ class Champion : public AnimationsPool<EntityAnimation> {
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
     void initAnimations(void);
 
+    void setDisplayName(const char* display_name);
+    const std::string& getDisplayName() const;
+
     Champion::Values val;
 
     private:
@@ -78,7 +81,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
      */
     static const std::map<DefaultAnimation, std::string> default_animation_name;
 
-    std::string name;   ///< Internal identifier of this Champion.
+    const std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
     std::unique_ptr<const EntityAnimation*[]> default_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
                                                     Pointer validity : can be invalidated if an Animation is moved or deleted*/

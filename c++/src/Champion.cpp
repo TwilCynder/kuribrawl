@@ -38,6 +38,14 @@ const std::string& Champion::getName(){
     return name;
 }
 
+void Champion::setDisplayName(const char* name){
+    display_name.assign(name);
+}
+
+const std::string& Champion::getDisplayName() const {
+    return display_name;
+}
+
 /**
  * @brief Returns the Animation associated with a certain \ref Fighter#State "fighter state", if there is any.
  *

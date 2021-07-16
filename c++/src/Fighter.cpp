@@ -97,14 +97,28 @@ int Fighter::getFacing() const{
  */
 void Fighter::draw(SDL_Renderer* target){
     current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y, facing);
-    const std::vector<Hurtbox>& hurtboxes = current_animation.getHurtboxes();
+
     SDL_Rect box;
+
+    //Drawing hurtboxes
+    const std::vector<Hurtbox>& hurtboxes = current_animation.getHurtboxes();
     SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
     for (unsigned int i = 0; i < hurtboxes.size(); i++){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;
         box.x = this->position.x + hurtboxes[i].x;
-        box.y = SCREEN_HEIGHT - this->position.y + hurtboxes[i].y;
+        box.y = SCREEN_HEIGHT - (this->position.y + hurtboxes[i].y);
+        SDL_RenderDrawRect(target, &box);
+    }
+
+    //Drawing hitboxes
+    const std::vector<Hitbox>& hitboxes = current_animation.getHitboxes();
+    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    for (unsigned int i = 0; i < hitboxes.size(); i++){
+        box.w = hitboxes[i].w;
+        box.h = hitboxes[i].h;
+        box.x = this->position.x + hitboxes[i].x;
+        box.y = SCREEN_HEIGHT - (this->position.y + hitboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
 }

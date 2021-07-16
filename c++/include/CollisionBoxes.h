@@ -8,10 +8,21 @@ struct CollisionBox {
     };
 
 struct Hurtbox : CollisionBox {
-    unsigned char type;
+    enum Type {
+        NORMAL,
+        PROTECTED,
+        INVINCIBLE,
+        INTANGIBLE
+    } type;
 };
 
 struct Hitbox : CollisionBox {
+    enum Type{
+        DAMAGE,
+        GRAB,
+        WIND,
+        SPECIAL
+    } type;
     double damage;
     double base_knockback;
     double scalink_knockback;
