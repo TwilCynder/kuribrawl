@@ -7,6 +7,7 @@
 
 class Port;
 class InputManager;
+class Binding;
 
 using namespace Kuribrawl;
 
@@ -19,15 +20,19 @@ class PlayerFighter : public Fighter {
 
     PlayerFighter(Game&, Champion* model_);
     PlayerFighter(Game&, Champion* model_, int x, int y);
+    PlayerFighter(Game&, Champion* model_, int x, int y, Port* port);
     ~PlayerFighter();
 
     //Inputs
     void updateInputs();
     void updateSticks();
+    void handleButtonPress(int button);
 
     InputManager* getInputManager() const;
     Port* getPort() const;
     void setPort(Port* port);
+    void unsetPort();
+    Binding* getInputBinding() const;
 
     private:
     //Inputs
@@ -35,11 +40,14 @@ class PlayerFighter : public Fighter {
     void init_control_stick_buffer();
     void swap_control_stick_buffer();
     void update_control_stick_buffer(const Vector&, const Vector&, const ControllerType::ControllerVals&);
+    void updateDirectionControlState(ControllerType::ControllerVals controller_vals);
 
 	jumpY decideGroundedJumpYType() const override;
 
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
+    Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port;
-    std::unique_ptr<InputManager> input_manager;    ///< InputManager ised to process the input made by the Port.
+    std::unique_ptr<InputManager> input_manager;    ///< InputManager used to process the input made by the Port.
     Vector control_stick_buffer[CONTROL_STICK_FRAME_BUFFER];
+    Vector current_direction_control_state;
 };

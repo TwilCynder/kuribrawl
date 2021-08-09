@@ -87,19 +87,21 @@ void CurrentAnimation::setSpeed(double speed_){
     if (speed == 0){
         throw KBFatal("Animation set with a null speed");
     }
-
+    
     double ratio;
     int cutFrames;
-
     if (speed > 1){ //the speed must be understood as a total number of frame
         ratio = speed / model->nb_frames;
         frame_multiplier = ceil(ratio);
         if (model->nb_frames > 1 && (double)frame_multiplier != ratio){
             cutFrames = (frame_multiplier * model->nb_frames) - speed;
-            base_carry = (1 / (model->nb_frames - 1)) * cutFrames;
+            base_carry = (1.0 / (model->nb_frames - 1)) * cutFrames;
+        } else {
+            base_carry = 0;
         }
     } else {
         frame_multiplier = 1 / speed;
+        base_carry = 0;
     }
 }
 
@@ -131,7 +133,7 @@ void CurrentAnimation::start(){
     Frame* f = &(model->frames[current_frame]);
     if (f->duration){
         timeleft = f->duration;
-    } else if (speed != 1 && speed != -1){
+    } else if (speed != -1){
         timeleft = frame_multiplier;
     }
 }

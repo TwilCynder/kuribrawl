@@ -15,8 +15,9 @@ template void Debug::log(void* value);
 template void Debug::log(long value);
 template void Debug::log(long long value);
 template void Debug::log(Uint64 value);
+template void Debug::log(signed char value);
 
 template<>
 void Debug::log(bool b){
-    cout << ((b) ? "True" : "False") << std::flush;
+    cout << ((b) ? "True" : "False") << '\n' << std::flush;
 }

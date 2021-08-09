@@ -1,14 +1,14 @@
 #include "InputManager.h"
 #include "Debug.h"
 #include "DebugInput.h"
-#include "Fighter.h"
+#include "PlayerFighter.h"
 
 /**
  * @brief Construct a new Input Manager object
  *
  * @param f the Fighter this InputManager will be linked to.
  */
-InputManager::InputManager(Fighter* f) :
+InputManager::InputManager(PlayerFighter* f) :
     fighter(f)
 {
 }
@@ -53,7 +53,7 @@ int InputManager::getInputsNumber() const {
 }
 
 namespace {
-int InputHandler_Jump(Fighter* fighter, Port* port, RegisteredInput& input){
+int InputHandler_Jump(PlayerFighter* fighter, Port* port, RegisteredInput& input){
     if (fighter->getGrounded()){
         fighter->setState(Fighter::State::JUMPSQUAT, 0, input.element);
     }
@@ -61,7 +61,7 @@ int InputHandler_Jump(Fighter* fighter, Port* port, RegisteredInput& input){
     return 0;
 }
 
-int InputHandler_SmashStickSide(Fighter* fighter, Port* port, RegisteredInput& input){
+int InputHandler_SmashStickSide(PlayerFighter* fighter, Port* port, RegisteredInput& input){
     Fighter::State state = fighter->getState();
 
     int facing = (input.input == Input::LEFT) ? -1 : 1;

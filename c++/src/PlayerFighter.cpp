@@ -22,8 +22,22 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     init_control_stick_buffer();
 }
 
+PlayerFighter::PlayerFighter(Game& game, Champion* model_, int x, int y, Port* port):
+    PlayerFighter(game, model_, x, y)
+{
+    setPort(port);
+}
+
 PlayerFighter::~PlayerFighter(){
 }
+
+/*Deleted, kept here for when such a conditional assignment will be necessary (when custom bindings will be implemented)
+//use only with active ports : controller can be null if the port is inactive
+Binding* PlayerFighter::getInputBinding() const {
+    ControllerType* controller_type = port->getController();
+    return (input_binding && input_binding->controller == controller_type) ? input_binding : controller_type->default_binding.get();
+}
+*/
 
 void PlayerFighter::swap_control_stick_buffer(){
     /*int* buffer = control_stick_buffer[1];
@@ -36,6 +50,12 @@ void PlayerFighter::init_control_stick_buffer(){
         control_stick_buffer[i].x = 0;
         control_stick_buffer[i].y = 0;
     }
+}
+
+
+void PlayerFighter::handleButtonPress(int button){
+    Input input = input_binding->buttons[button];
+    input_manager->registerInput(input, port, button, ElementType::BUTTON, 0);
 }
 
 void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state, const ControllerType::ControllerVals& vals){
@@ -67,40 +87,62 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
 }
 
 /**
+ * @brief Updates the state of the direction control of the controller
+ * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
+ */
+void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals controller_vals){
+    
+    if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
+        current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
+        current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
+    } else {
+        current_direction_control_state = port->getControlStickState();
+        if (
+            input_binding->direction_control_mode == Binding::DirectionControlMode::BOTH &&
+            (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < controller_vals.analogStickThreshold)
+        )
+        {
+            current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
+            current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
+        }
+    }
+}
+
+/**
  * @brief Check is the sticks of the controller used by this Fighter's Port are in a position that should lead to an action (according to the current state) and takes it.
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
-
-    const Vector& control_stick_state = port->getControlStickState();
     const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
 
-    update_control_stick_buffer(control_stick_state, port->getControlStickPreviousState(), controller_vals);
+    updateDirectionControlState(controller_vals);
+
+    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState(), controller_vals);
 
     switch (state){
         case State::IDLE:
-            if (abs(control_stick_state.x) > controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) > controller_vals.analogStickThreshold){
                 if (grounded){
-                    setState(State::WALK, sign(control_stick_state.x));
+                    setState(State::WALK, sign(current_direction_control_state.x));
                 } else {
-					applyAirAccel(sign(control_stick_state.x));
+					applyAirAccel(sign(current_direction_control_state.x));
 				}
             }
             break;
         case State::WALK:
-            if (abs(control_stick_state.x) < controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
                 setState(State::IDLE);
-            } else if (sign(control_stick_state.x) != facing){
+            } else if (sign(current_direction_control_state.x) != facing){
 
                 setState(State::WALK, -facing, 0, false);
             }
             break;
         case State::DASH:
-            if (control_stick_state.x * facing < controller_vals.analogStickThreshold){
+            if (current_direction_control_state.x * facing < controller_vals.analogStickThreshold){
                 setState(State::DASH_STOP);
             }
             break;
         case State::DASH_START:
-            if (abs(control_stick_state.x) < controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
                 setState(State::IDLE);
             }
             break;
@@ -144,6 +186,17 @@ Port* PlayerFighter::getPort() const {
 void PlayerFighter::setPort(Port* port_){
     valid_port = true;
     port = port_;
+
+    input_binding = port->getController()->default_binding.get();
+}
+
+/**
+ * @brief Unsets the current port, indicating that this PlayerFighter no longer has a port.
+ * Not sure if this will be ever used but it kinda made sense to make it idk 
+ */
+void PlayerFighter::unsetPort(){
+    valid_port = false;
+    port = nullptr;
 }
 
 /**

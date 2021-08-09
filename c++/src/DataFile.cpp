@@ -31,7 +31,7 @@ DataFile::DataFile(const char* filename, SDL_Renderer* renderer_):
 }
 
 DataFile::~DataFile(){
-	if (sdl_stream)	free(sdl_stream);
+	if (sdl_stream)	SDL_RWclose(sdl_stream);
 }
 
 /**
@@ -115,17 +115,48 @@ void DataFile::readDouble (void* res){
  */
 void DataFile::readString(){
     fgets(readBuffer, BUFFER_SIZE, file);
+    readBuffer[strlen(readBuffer) - 1] = '\0';
+}
+
+void DataFile::readChampionValues(Champion& champion){
+    readData(&champion.val.walk_speed);
+    readData(&champion.val.dash_speed);
+    readData(&champion.val.dash_start_speed);
+    readData(&champion.val.dash_turn_accel);
+    readData(&champion.val.traction);
+    readData(&champion.val.max_air_speed);
+    readData(&champion.val.air_acceleration);
+    readData(&champion.val.air_friction);
+    readData(&champion.val.jump_speed);
+    readData(&champion.val.short_hop_speed);
+    readData(&champion.val.air_jump_speed);
+    readData(&champion.val.gravity);
+    readData(&champion.val.max_fall_speed);
+    readData(&champion.val.fast_fall_speed);
+    readData(&champion.val.weight);
+    readData(&champion.val.jump_squat_duration);
+    readData(&champion.val.dash_start_duration);
+    readData(&champion.val.dash_stop_duration);
+    readData(&champion.val.dash_turn_duration);
+    readData(&champion.val.landing_duration);
+    readData(&champion.val.guard_start_duration);
+    readData(&champion.val.guard_stop_duration);
+    readData(&champion.val.shield_info.size);
+    readData(&champion.val.shield_info.x);
+    readData(&champion.val.shield_info.y);
 }
 
 void DataFile::readChampionFile(Champion& champion){
-    int value;
-    Uint8 byte;
-    Uint16 word;
-    double valueD;
-
     readString();
     champion.setDisplayName(readBuffer);
-    Debug::log(champion.getDisplayName());
+    cout << "Display name" << (champion.getDisplayName()) << '\n';
+
+    readChampionValues(champion);
+
+    cout << "Jsquat dur " << (int)champion.val.jump_squat_duration << '\n';
+    cout << "dstart dur " << (int)champion.val.dash_start_duration << '\n';
+    cout << "dstop dur " << (int)champion.val.dash_stop_duration << '\n';
+    cout << "dturn dur " << (int)champion.val.dash_turn_duration << '\n';
 }
 
 /**
@@ -190,7 +221,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         readData(&valueD);
                         current_entity_frame->movement.y = valueD;
                         break;
-                    case FILEMARKER_HURTBOXINFO:   
+                    case FILEMARKER_HURTBOXINFO:
                         if (!current_entity_frame){
                             throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
                         }
@@ -203,6 +234,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                             hurtbox->y =  (current_frame->origin.y);
                             hurtbox->w = current_frame->display.w;
                             hurtbox->h = current_frame->display.h;
+                            hurtbox->type = Hurtbox::Type::NORMAL;
                         } else {
                             readWord(&word);
                             hurtbox->y = word;
@@ -210,10 +242,10 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                             hurtbox->w = word;
                             readWord(&word);
                             hurtbox->h = word;
+                            readByte(&byte);
+                            hurtbox->type = (Hurtbox::Type)byte;
                         }
 
-                        readByte(&byte);
-                        hurtbox->type = (Hurtbox::Type)byte;
                         break;
                     case FILEMARKER_HITBOXINFO:      
                         hitbox = &current_entity_frame->hitboxes.emplace_back();
@@ -291,13 +323,11 @@ char* DataFile::separateTag(char* tag){
  */
 
 void DataFile::read(GameData& data){
-    Debug::log("Reading data file ==============");
+    Debug::log("====== Reading data file ==============");
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
     char* tag;
-    char *entity, *element, *endChar;
-
-    (void)entity; (void)element;
+    char *entity, *element;
 
     while (!eof()){
         switch (readDataType()){
@@ -305,22 +335,25 @@ void DataFile::read(GameData& data){
                 tag = readFileTag();
                 entity = tag;
                 element = separateTag(tag);
+                Debug::log("-Reading animation");
                 Debug::log(entity);
                 Debug::log(element);
-                endChar = element + strlen(element) - 1;
-                *endChar = 0;
+
                 switch(entity[0]){
                     default:
                         readEntityAnimationFile(data.tryChampion(entity).tryAnimation(element));
                 }
-                
-                return;
                 break;
+            case DataFile::DataType::CHAMPION:
+                tag = readFileTag();
+                Debug::log("-Reading CHampion");
+                Debug::log(tag);
+                readChampionFile(data.tryChampion(tag));
             default:
                 break;
         }
     }
-    Debug::log("Data file loading finished ==============");
+    Debug::log("====== Data file loading finished ==============");
 }
 
 bool DataFile::ready(){

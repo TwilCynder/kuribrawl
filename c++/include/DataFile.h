@@ -50,6 +50,7 @@ class DataFile {
     SDL_Texture* LoadImageFromDatafile();
 
     void readEntityAnimationFile(EntityAnimation& anim);
+    void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
 
     void readByte(void* res);

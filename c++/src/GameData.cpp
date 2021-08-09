@@ -9,6 +9,13 @@
  * @return Champion* the Champion, or NULL if no Champion had this name.
  */
 Champion* GameData::getChampion(const char* name){
+    Debug::log("Champions available : ");
+	for (auto const& [key, val] : champions)
+	{
+        Debug::log(key);
+	}
+
+
     auto it = champions.find(name);
     if (it == champions.end()){
       return NULL;

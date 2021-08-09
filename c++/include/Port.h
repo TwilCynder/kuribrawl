@@ -28,13 +28,14 @@ class Port {
     void deactivate();
     void setController(ControllerType* c);
     ControllerType* getController() const;
-    Binding* getInputBinding() const;
     void handleButtonPress(int button);
     bool isButtonPressed(int button);
     void readController();
     const Kuribrawl::Vector& getControlStickState() const;
     const Kuribrawl::Vector& getControlStickPreviousState() const;
     const Kuribrawl::Vector& getSecondaryStickState() const;
+    signed char getDpadStateX() const;
+    signed char getDpadStateY() const;
 
     private:
     void setJoystick_(int id);
@@ -43,7 +44,6 @@ class Port {
 
     ControllerType* controller_type;
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of it's normal functioning.
-    Binding* input_binding;
 
     int id;
     int joystick_id;

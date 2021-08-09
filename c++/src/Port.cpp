@@ -8,7 +8,6 @@
 
 Port::Port(App* app_) :
     app(app_),
-    input_binding(0),
     joystick_id(-1),
     active(false)
 {
@@ -26,17 +25,11 @@ void Port::setController(ControllerType* c){
     controller_type = c;
 }
 
-//use only with active ports : controller can be null if the port is inactive
-Binding* Port::getInputBinding() const {
-    return (input_binding && input_binding->controller == controller_type) ? input_binding : controller_type->default_binding.get();
-}
 
 void Port::handleButtonPress(int button){
     if (!fighter) return;
 
-    Input input = getInputBinding()->buttons[button];
-    InputManager* manager = fighter->getInputManager();
-    manager->registerInput(input, this, button, ElementType::BUTTON, 0);
+    fighter->handleButtonPress(button);
 }
 
 bool Port::isButtonPressed(int button){
@@ -65,6 +58,26 @@ void Port::readController(){
     secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
 
     //détection du passage de threshold
+}
+
+/**
+ * @brief Returns the the horizontal state of the dpad
+ * -1 for left, 0 for neutral, 1 for right
+ * @return Uint8 
+ */
+signed char Port::getDpadStateX() const{
+    return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) ? -1 : 
+        (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) ? 1 : 0);
+}
+
+/**
+ * @brief Returns the the vertical state of the dpad
+ * -1 for up, 0 for neutral, 1 for down
+ * @return Uint8 
+ */
+signed char Port::getDpadStateY() const{
+    return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) ? 1 : 
+        (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
 }
 
 void Port::setJoystick_(int id){

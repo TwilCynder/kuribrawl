@@ -52,13 +52,13 @@ class Champion : public AnimationsPool<EntityAnimation> {
         double gravity;
         double max_fall_speed;
         double fast_fall_speed;
-        int jump_squat_duration;
-        int dash_start_duration;
-        int dash_stop_duration;
-        int dash_turn_duration;
-        int landing_duration;
-        int guard_start_duration;
-        int guard_stop_duration;
+        int8_t jump_squat_duration;
+        int8_t dash_start_duration;
+        int8_t dash_stop_duration;
+        int8_t dash_turn_duration;
+        int8_t landing_duration;
+        int8_t guard_start_duration;
+        int8_t guard_stop_duration;     
         Champion::ShieldInfo shield_info;
         double weight;
 
