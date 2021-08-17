@@ -75,7 +75,7 @@ class Fighter {
     Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
 
     bool isStateFinished(int stateDuration);
-	virtual jumpY decideGroundedJumpYType() const {return jumpY::Short;}
+	virtual jumpY decideGroundedJumpYType() const;
 
     //Physics
     void groundCollision();
