@@ -205,5 +205,5 @@ void PlayerFighter::unsetPort(){
  * @return jumpY
  */
 jumpY PlayerFighter::decideGroundedJumpYType() const {
-	return (port->isButtonPressed(state_info)) ? jumpY::Full : jumpY::Short;
+	return ( ((state_info >> 2) & 1) == jumpY::Full && port->isButtonPressed(state_info >> 5)) ? jumpY::Full : jumpY::Short;
 }

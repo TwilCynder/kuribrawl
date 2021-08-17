@@ -2,6 +2,7 @@
 #include "Debug.h"
 #include "DebugInput.h"
 #include "PlayerFighter.h"
+#include "macros.h"
 
 /**
  * @brief Construct a new Input Manager object
@@ -53,13 +54,23 @@ int InputManager::getInputsNumber() const {
 }
 
 namespace {
-int InputHandler_Jump(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+
+int jump_manager(PlayerFighter* fighter, Port* port, RegisteredInput& input, jumpY type){
     if (fighter->getGrounded()){
-        fighter->setState(Fighter::State::JUMPSQUAT, 0, input.element);
+        fighter->setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
     }
 
     return 0;
 }
+
+int InputHandler_Jump(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+    return jump_manager(fighter, port, input, jumpY::Full);
+}
+
+int InputHandler_ShortHop(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+    return jump_manager(fighter, port, input, jumpY::Short);
+}
+
 
 int InputHandler_SmashStickSide(PlayerFighter* fighter, Port* port, RegisteredInput& input){
     Fighter::State state = fighter->getState();
@@ -87,6 +98,7 @@ InputManager::InputHandler InputManager::input_handlers[Input::TOTAL];
 
 void InputManager::initInputHandlers(){
     input_handlers[Input::JUMP] = &InputHandler_Jump;
+    input_handlers[Input::SHORTHOP] = &InputHandler_ShortHop;
     input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
     input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
 }
