@@ -83,5 +83,6 @@ class App
 
     //Performance test
     int frame; ///< Number of frames displayed since the loop was started.
+    int total_frame_wait;
     void print_report(std::ostream& out);
 };

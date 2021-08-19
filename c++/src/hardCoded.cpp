@@ -6,12 +6,19 @@
 #include "SDL2/SDL_gamecontroller.h"
 #include "SDL2/SDL_image.h"
 
+#include "controllerElements.h"
+
 /**
  * @brief Initializes all hard-coded informations related to Controllers, updating and populating a given ControllersData in consequence.
  *
  * @param data the ControllersData object that will contain the hard-coded data.
  */
 void HardCoded::initControllersData(ControllersData& data){
+    const char * mapping_string;
+
+    mapping_string = "0300000034120000adbe000000000000,vJoy Device,a:b0,b:b1,back:b15,dpdown:b6,dpleft:b7,dpright:b8,dpup:b5,guide:b16,leftshoulder:b9,leftstick:b13,lefttrigger:b11,leftx:a0,lefty:a1,rightshoulder:b10,rightstick:b14,righttrigger:b12,rightx:a3,righty:a4,start:b4,x:b2,y:b3,platform:Windows";
+    SDL_GameControllerAddMapping(mapping_string);
+
     ControllerType* c = &data.addController("GC");
 
     c->control_stick = 0;
@@ -22,12 +29,12 @@ void HardCoded::initControllersData(ControllersData& data){
     c->default_binding->buttons[1] = Input::SPECIAL;
     c->default_binding->buttons[2] = Input::SHORTHOP;
     c->default_binding->buttons[3] = Input::JUMP;
-    SDL_GameControllerAddMapping("0300000034120000adbe000000000000,vJoy Device,a:b0,b:b1,back:b15,dpdown:b6,dpleft:b7,dpright:b8,dpup:b5,guide:b16,leftshoulder:b9,leftstick:b13,lefttrigger:b11,leftx:a0,lefty:a1,rightshoulder:b10,rightstick:b14,righttrigger:b12,rightx:a3,righty:a4,start:b4,x:b2,y:b3,platform:Windows");
+    
 
     c = &data.addController("PS4");
     c->control_stick = 0;
     c->secondary_stick = 1;
-    c->setControllerVals(10000, -16000, 20000);
+    c->setControllerVals(10000, 18000, 20000);
     c->default_binding->buttons[0] = Input::ATTACK;
     c->default_binding->buttons[1] = Input::SPECIAL;
     c->default_binding->buttons[2] = Input::SHORTHOP;
@@ -36,6 +43,7 @@ void HardCoded::initControllersData(ControllersData& data){
     c->default_binding->buttons[12] = Input::DOWN;
     c->default_binding->buttons[13] = Input::LEFT;
     c->default_binding->buttons[14] = Input::RIGHT;
+    c->default_binding->triggers[TRIGGER_RIGHT] = Input::JUMP;
     c->default_binding->dpadAnalogValue = 32000;
     c->default_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
     SDL_GameControllerAddMapping("030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,");

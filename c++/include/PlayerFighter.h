@@ -8,6 +8,7 @@
 class Port;
 class InputManager;
 class Binding;
+class PortOptimizationData;
 
 using namespace Kuribrawl;
 
@@ -20,21 +21,23 @@ class PlayerFighter : public Fighter {
 
     PlayerFighter(Game&, Champion* model_);
     PlayerFighter(Game&, Champion* model_, int x, int y);
-    PlayerFighter(Game&, Champion* model_, int x, int y, Port* port);
+    PlayerFighter(Game&, Champion* model_, int x, int y, Port& port);
     ~PlayerFighter();
 
     //Inputs
     void updateInputs();
     void updateSticks();
-    void handleButtonPress(int button);
-
-    InputManager* getInputManager() const;
+    void handleButtonPress (int button );
+    void handleTriggerPress(int trigger);
+    
     Port* getPort() const;
     void setPort(Port* port);
     void unsetPort();
     Binding* getInputBinding() const;
+    void initPortOptimizationData(PortOptimizationData& pod) const;
 
     private:
+    InputManager* getInputManager() const;
     //Inputs
     void checkStickState();
     void init_control_stick_buffer();

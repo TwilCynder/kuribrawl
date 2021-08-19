@@ -1,10 +1,12 @@
 #include "ControllersData.h"
 #include "Debug.h"
 
+
 /**
  * @brief Returns a ControllerType.
  * @param name the identifier of a controller type.
  * @return ControllerType* a pointer to the ControllerType or NULL if the specified identifier doesn't match with any known ControllerType.
+ * \todo Replace pointers returned by getController with a reference
  */
 
 ControllerType* ControllersData::getController(const std::string& name){
@@ -31,4 +33,8 @@ ControllerType& ControllersData::addController(const std::string& name){
     } else {
         return node->second;
     }
+}
+
+void ControllersData::mapSDLMappingToControllerType(const char* mapping_string, ControllerType* ct){
+    SDL_mapping_to_controllerType.emplace(std::string(mapping_string, MAPPING_ID_LENGTH), ct);
 }
