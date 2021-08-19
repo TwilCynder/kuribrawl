@@ -4,6 +4,7 @@
 
 #define MAX_NB_BUTTONS 32
 #define MAX_NB_STICKS 4
+#define MAX_NB_TRIGGERS 2
 
 class ControllerType;
 
@@ -23,6 +24,8 @@ struct Binding {
     Binding(ControllerType*);
 
     Input buttons[MAX_NB_BUTTONS]; ///< Array containing the input associated with each button (each button correspondig to an index of the array).
+
+    Input triggers[2];
 
     DirectionControlMode direction_control_mode;
     int dpadAnalogValue;

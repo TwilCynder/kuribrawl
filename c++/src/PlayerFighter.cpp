@@ -1,6 +1,7 @@
 #include "PlayerFighter.h"
 #include "InputManager.h"
 #include "Port.h"
+#include "PortOptimizationData.h"
 #include "Debug.h"
 
 PlayerFighter::PlayerFighter(Game& game, Champion* model):
@@ -22,10 +23,10 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     init_control_stick_buffer();
 }
 
-PlayerFighter::PlayerFighter(Game& game, Champion* model_, int x, int y, Port* port):
+PlayerFighter::PlayerFighter(Game& game, Champion* model_, int x, int y, Port& port):
     PlayerFighter(game, model_, x, y)
 {
-    setPort(port);
+    port.setFighter(this);
 }
 
 PlayerFighter::~PlayerFighter(){
@@ -52,10 +53,16 @@ void PlayerFighter::init_control_stick_buffer(){
     }
 }
 
-
 void PlayerFighter::handleButtonPress(int button){
     Input input = input_binding->buttons[button];
+    if (input != Input::NONE)
     input_manager->registerInput(input, port, button, ElementType::BUTTON, 0);
+}
+
+void PlayerFighter::handleTriggerPress(int trigger){
+    Input input = input_binding->triggers[trigger];
+    if (input != Input::NONE)
+    input_manager->registerInput(input, port, trigger, ElementType::TRIGGER, 0);
 }
 
 void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state, const ControllerType::ControllerVals& vals){
@@ -91,7 +98,7 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
  * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
  */
 void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals controller_vals){
-    
+
     if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
         current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
         current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
@@ -170,6 +177,21 @@ InputManager* PlayerFighter::getInputManager() const{
 }
 
 /**
+ * @brief returns the input binding this PlayerFighter is currently using
+ * 
+ */
+
+Binding* PlayerFighter::getInputBinding()const{
+    return input_binding;
+}
+
+void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
+
+    pod.is_left_trigger_binding  = input_binding->triggers[0]  != Input::NONE;
+    pod.is_right_trigger_binding = input_binding->triggers[1] != Input::NONE;
+}
+
+/**
  * @brief Returns the Port controlling this Fighter.
  *
  * @return Port*
@@ -205,5 +227,8 @@ void PlayerFighter::unsetPort(){
  * @return jumpY
  */
 jumpY PlayerFighter::decideGroundedJumpYType() const {
-	return ( ((state_info >> 2) & 1) == jumpY::Full && port->isButtonPressed(state_info >> 5)) ? jumpY::Full : jumpY::Short;
+	return ( 
+        ((state_info >> 2) & 1) == jumpY::Full && 
+        port->isElementPressed((ElementType)((state_info >> 3) & 0b11),  state_info >> 5)
+    ) ? jumpY::Full : jumpY::Short;
 }
