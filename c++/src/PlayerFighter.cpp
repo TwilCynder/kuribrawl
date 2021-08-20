@@ -3,6 +3,8 @@
 #include "Port.h"
 #include "PortOptimizationData.h"
 #include "Debug.h"
+#include "macros.h"
+#include "Champion.h"
 
 PlayerFighter::PlayerFighter(Game& game, Champion* model):
     Fighter(game, model),
@@ -231,4 +233,65 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
         ((state_info >> 2) & 1) == jumpY::Full && 
         port->isElementPressed((ElementType)((state_info >> 3) & 0b11),  state_info >> 5)
     ) ? jumpY::Full : jumpY::Short;
+}
+
+int PlayerFighter::handleInput(RegisteredInput& input){
+    InputHandler handler = input_handlers[input.input];
+    return (handler) ? !(this->*handler)(input) : 0;
+}
+
+int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
+    if (state == Fighter::State::JUMPSQUAT){
+        state_info |= 0b100;
+    } else {
+        setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+    }
+
+    return 0;
+}
+
+int PlayerFighter::InputHandler_Jump(RegisteredInput& input){
+    return jump_manager(input, jumpY::Full);
+}
+
+int PlayerFighter::InputHandler_ShortHop(RegisteredInput& input){
+    return jump_manager(input, jumpY::Short);
+}
+
+
+int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
+
+    int facing = (input.input == Input::LEFT) ? -1 : 1;
+
+    if (grounded){
+        if (state == Fighter::State::WALK ||
+            state == Fighter::State::IDLE ||
+            (state == Fighter::State::DASH_START && facing == -facing))
+        {
+            setState(Fighter::State::DASH_START, facing);
+        } else if ((state == Fighter::State::DASH || state == Fighter::State::DASH_STOP) &&
+            facing == -facing)
+        {
+            setState(Fighter::State::DASH_TURN, facing);
+        }
+    }
+
+    return 0;
+}
+
+int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
+    if (!grounded && speed.y < 0.0){
+        speed.y = - (getChampion().val.fast_fall_speed);
+    }
+    return 0;
+}
+
+PlayerFighter::InputHandler PlayerFighter::input_handlers[Input::TOTAL];
+
+void PlayerFighter::initInputHandlers(){
+    input_handlers[Input::JUMP] = &InputHandler_Jump;
+    input_handlers[Input::SHORTHOP] = &InputHandler_ShortHop;
+    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
+    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
+    input_handlers[Input::DOWN] = &InputHandler_SmashStickDown;
 }

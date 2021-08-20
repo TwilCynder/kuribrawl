@@ -228,6 +228,15 @@ Game& Fighter::getGame(){
 }
 
 /**
+ * @brief Returns the Champions this Fighter is an instance of
+ * 
+ * @return Champion& 
+ */
+const Champion& Fighter::getChampion(){
+    return *model;
+}
+
+/**
  * @brief Returns the current \ref Fighter#State "state" of this Fighter.
  *
  * @return Fighter::State
