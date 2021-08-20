@@ -1,7 +1,10 @@
 #include "PlayerFighter.h"
 #include "InputManager.h"
 #include "Port.h"
+#include "PortOptimizationData.h"
 #include "Debug.h"
+#include "macros.h"
+#include "Champion.h"
 
 PlayerFighter::PlayerFighter(Game& game, Champion* model):
     Fighter(game, model),
@@ -22,8 +25,22 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     init_control_stick_buffer();
 }
 
+PlayerFighter::PlayerFighter(Game& game, Champion* model_, int x, int y, Port& port):
+    PlayerFighter(game, model_, x, y)
+{
+    port.setFighter(this);
+}
+
 PlayerFighter::~PlayerFighter(){
 }
+
+/*Deleted, kept here for when such a conditional assignment will be necessary (when custom bindings will be implemented)
+//use only with active ports : controller can be null if the port is inactive
+Binding* PlayerFighter::getInputBinding() const {
+    ControllerType* controller_type = port->getController();
+    return (input_binding && input_binding->controller == controller_type) ? input_binding : controller_type->default_binding.get();
+}
+*/
 
 void PlayerFighter::swap_control_stick_buffer(){
     /*int* buffer = control_stick_buffer[1];
@@ -36,6 +53,18 @@ void PlayerFighter::init_control_stick_buffer(){
         control_stick_buffer[i].x = 0;
         control_stick_buffer[i].y = 0;
     }
+}
+
+void PlayerFighter::handleButtonPress(int button){
+    Input input = input_binding->buttons[button];
+    if (input != Input::NONE)
+    input_manager->registerInput(input, port, button, ElementType::BUTTON, 0);
+}
+
+void PlayerFighter::handleTriggerPress(int trigger){
+    Input input = input_binding->triggers[trigger];
+    if (input != Input::NONE)
+    input_manager->registerInput(input, port, trigger, ElementType::TRIGGER, 0);
 }
 
 void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state, const ControllerType::ControllerVals& vals){
@@ -67,40 +96,62 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
 }
 
 /**
+ * @brief Updates the state of the direction control of the controller
+ * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
+ */
+void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals controller_vals){
+
+    if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
+        current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
+        current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
+    } else {
+        current_direction_control_state = port->getControlStickState();
+        if (
+            input_binding->direction_control_mode == Binding::DirectionControlMode::BOTH &&
+            (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < controller_vals.analogStickThreshold)
+        )
+        {
+            current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
+            current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
+        }
+    }
+}
+
+/**
  * @brief Check is the sticks of the controller used by this Fighter's Port are in a position that should lead to an action (according to the current state) and takes it.
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
-
-    const Vector& control_stick_state = port->getControlStickState();
     const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
 
-    update_control_stick_buffer(control_stick_state, port->getControlStickPreviousState(), controller_vals);
+    updateDirectionControlState(controller_vals);
+
+    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState(), controller_vals);
 
     switch (state){
         case State::IDLE:
-            if (abs(control_stick_state.x) > controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) > controller_vals.analogStickThreshold){
                 if (grounded){
-                    setState(State::WALK, sign(control_stick_state.x));
+                    setState(State::WALK, sign(current_direction_control_state.x));
                 } else {
-					applyAirAccel(sign(control_stick_state.x));
+					applyAirAccel(sign(current_direction_control_state.x));
 				}
             }
             break;
         case State::WALK:
-            if (abs(control_stick_state.x) < controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
                 setState(State::IDLE);
-            } else if (sign(control_stick_state.x) != facing){
+            } else if (sign(current_direction_control_state.x) != facing){
 
                 setState(State::WALK, -facing, 0, false);
             }
             break;
         case State::DASH:
-            if (control_stick_state.x * facing < controller_vals.analogStickThreshold){
+            if (current_direction_control_state.x * facing < controller_vals.analogStickThreshold){
                 setState(State::DASH_STOP);
             }
             break;
         case State::DASH_START:
-            if (abs(control_stick_state.x) < controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
                 setState(State::IDLE);
             }
             break;
@@ -128,6 +179,21 @@ InputManager* PlayerFighter::getInputManager() const{
 }
 
 /**
+ * @brief returns the input binding this PlayerFighter is currently using
+ * 
+ */
+
+Binding* PlayerFighter::getInputBinding()const{
+    return input_binding;
+}
+
+void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
+
+    pod.is_left_trigger_binding  = input_binding->triggers[0]  != Input::NONE;
+    pod.is_right_trigger_binding = input_binding->triggers[1] != Input::NONE;
+}
+
+/**
  * @brief Returns the Port controlling this Fighter.
  *
  * @return Port*
@@ -144,6 +210,17 @@ Port* PlayerFighter::getPort() const {
 void PlayerFighter::setPort(Port* port_){
     valid_port = true;
     port = port_;
+
+    input_binding = port->getController()->default_binding.get();
+}
+
+/**
+ * @brief Unsets the current port, indicating that this PlayerFighter no longer has a port.
+ * Not sure if this will be ever used but it kinda made sense to make it idk 
+ */
+void PlayerFighter::unsetPort(){
+    valid_port = false;
+    port = nullptr;
 }
 
 /**
@@ -152,5 +229,69 @@ void PlayerFighter::setPort(Port* port_){
  * @return jumpY
  */
 jumpY PlayerFighter::decideGroundedJumpYType() const {
-	return (port->isButtonPressed(state_info)) ? jumpY::Full : jumpY::Short;
+	return ( 
+        ((state_info >> 2) & 1) == jumpY::Full && 
+        port->isElementPressed((ElementType)((state_info >> 3) & 0b11),  state_info >> 5)
+    ) ? jumpY::Full : jumpY::Short;
+}
+
+int PlayerFighter::handleInput(RegisteredInput& input){
+    InputHandler handler = input_handlers[input.input];
+    return (handler) ? !(this->*handler)(input) : 0;
+}
+
+int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
+    if (state == Fighter::State::JUMPSQUAT){
+        state_info |= 0b100;
+    } else {
+        setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+    }
+
+    return 0;
+}
+
+int PlayerFighter::InputHandler_Jump(RegisteredInput& input){
+    return jump_manager(input, jumpY::Full);
+}
+
+int PlayerFighter::InputHandler_ShortHop(RegisteredInput& input){
+    return jump_manager(input, jumpY::Short);
+}
+
+
+int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
+
+    int facing = (input.input == Input::LEFT) ? -1 : 1;
+
+    if (grounded){
+        if (state == Fighter::State::WALK ||
+            state == Fighter::State::IDLE ||
+            (state == Fighter::State::DASH_START && facing == -facing))
+        {
+            setState(Fighter::State::DASH_START, facing);
+        } else if ((state == Fighter::State::DASH || state == Fighter::State::DASH_STOP) &&
+            facing == -facing)
+        {
+            setState(Fighter::State::DASH_TURN, facing);
+        }
+    }
+
+    return 0;
+}
+
+int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
+    if (!grounded && speed.y < 0.0){
+        speed.y = - (getChampion().val.fast_fall_speed);
+    }
+    return 0;
+}
+
+PlayerFighter::InputHandler PlayerFighter::input_handlers[Input::TOTAL];
+
+void PlayerFighter::initInputHandlers(){
+    input_handlers[Input::JUMP] = &InputHandler_Jump;
+    input_handlers[Input::SHORTHOP] = &InputHandler_ShortHop;
+    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
+    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
+    input_handlers[Input::DOWN] = &InputHandler_SmashStickDown;
 }

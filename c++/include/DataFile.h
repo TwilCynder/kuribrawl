@@ -8,6 +8,7 @@
 #define BUFFER_SIZE 64
 
 class EntityAnimation;
+class Champion;
 class GameData;
 
 /**
@@ -49,11 +50,14 @@ class DataFile {
     SDL_Texture* LoadImageFromDatafile();
 
     void readEntityAnimationFile(EntityAnimation& anim);
+    void readChampionValues(Champion& champion);
+    void readChampionFile(Champion& champion);
 
     void readByte(void* res);
     void readWord(void* res);
     void readLong(void* res);
     void readDouble(void* res);
+    void readString();
 
     template<typename T>
     void readData(T* res);

@@ -56,6 +56,21 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y){
 }
 
 /**
+ * @brief Adds a new Fighter to the Game.
+ * Constructs the Fighter in-place.
+ * @param model the Champion the new Fighter will be based on.
+ * @param x the x position of the new Fighter.
+ * @param y the y position of the new Fighter
+ * @param port the port being used to control this PlayerFighter.
+ * @return Fighter* the Fighter created (and added).
+ */
+PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
+    Fighteriterator it = fighters.before_begin();
+    it = fighters.emplace_after(it, *this, model, x, y, port);
+    return &(*it);
+}
+
+/**
  * @brief Returns whether the Game is actually running
  * @return bool
  */

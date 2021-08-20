@@ -38,6 +38,14 @@ const std::string& Champion::getName(){
     return name;
 }
 
+void Champion::setDisplayName(const char* name){
+    display_name.assign(name);
+}
+
+const std::string& Champion::getDisplayName() const {
+    return display_name;
+}
+
 /**
  * @brief Returns the Animation associated with a certain \ref Fighter#State "fighter state", if there is any.
  *
@@ -57,9 +65,6 @@ const EntityAnimation* Champion::getDefaultAnimation(const DefaultAnimation anim
 
 void Champion::initAnimations(){
     const EntityAnimation* anim;
-    for (auto const& [name, Animation] : animations){
-        Debug::log(name);
-    }
 
     for (auto const& [state, name] : default_animation_name){
         if ((anim = getAnimation(name))){

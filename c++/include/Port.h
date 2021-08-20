@@ -5,6 +5,7 @@
 #include "ControllerType.h"
 #include "inputs.h"
 #include "util.h"
+#include "PortOptimizationData.h"
 
 class App;
 class Binding;
@@ -17,6 +18,13 @@ class Port {
         void updatePrevious();
     };
 
+    struct Trigger {
+        int previous_state;
+        int current_state;
+
+        void updatePrevious();
+    };
+
     public:
 
     Port(App* app_);
@@ -25,16 +33,20 @@ class Port {
     void setJoystick(int id);
     void setJoystick(int id, ControllerType* controller);
     void setFighter(PlayerFighter*);
+    void initOptimizationData();
     void deactivate();
     void setController(ControllerType* c);
     ControllerType* getController() const;
-    Binding* getInputBinding() const;
     void handleButtonPress(int button);
-    bool isButtonPressed(int button);
+    bool isButtonPressed(int button) const;
+    bool isTriggerPressed(int trigger) const;
+    bool isElementPressed(ElementType type, int element) const;
     void readController();
     const Kuribrawl::Vector& getControlStickState() const;
     const Kuribrawl::Vector& getControlStickPreviousState() const;
     const Kuribrawl::Vector& getSecondaryStickState() const;
+    signed char getDpadStateX() const;
+    signed char getDpadStateY() const;
 
     private:
     void setJoystick_(int id);
@@ -43,7 +55,6 @@ class Port {
 
     ControllerType* controller_type;
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of it's normal functioning.
-    Binding* input_binding;
 
     int id;
     int joystick_id;
@@ -51,7 +62,11 @@ class Port {
 	SDL_Joystick* joystick;
     bool active;
 
+    PortOptimizationData pod;
+
     //State;
     Stick control_stick;
     Stick secondary_stick; //TODO supporter plusieurs sticks secondaires ?
+    Trigger left_trigger;
+    Trigger right_trigger; /** TODO Supporter un nombre dynamique de triggers ? */
 };

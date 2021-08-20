@@ -5,6 +5,7 @@
 
 class Champion;
 
+
 /**
  * @brief Contains all information needed to run a game, like the Stage and all in-game Entities.
  */
@@ -14,6 +15,7 @@ class Game {
     Game(Uint8 slowness);
     PlayerFighter* addFighter(Champion* model);
     PlayerFighter* addFighter(Champion* model, int x, int y);
+    PlayerFighter* addFighter(Champion* model, int x, int y, Port& port);
     bool is_running();
 
     //main loop

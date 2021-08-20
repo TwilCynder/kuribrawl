@@ -22,10 +22,21 @@ Enumeration
 EndEnumeration
 
 Enumeration
+    #HURTBOXTYPE_NORMAL
+    #HURTBOXTYPE_PROTECTED
+    #HURTBOXTYPE_INVINCIBLE
+    #HURTBOXTYPE_INTANGIBLE
+EndEnumeration
+
+Enumeration
     #HITBOXTYPE_DAMAGE
     #HITBOXTYPE_GRAB
+    #HITBOXTYPE_WIND
     #HITBOXTYPE_SPECIAL
 EndEnumeration
+
+#MAX_VALUE_BYTE  = 255
+#MAX_VALUE_SHORT = 65535
 
 ;General
 #FILEMARKER_404 = $F0
@@ -51,18 +62,26 @@ EndEnumeration
 ;Stage
 #FILEMARKER_PLATFORMINFO = 1
 
-#MAX_VALUE_BYTE  = 255
-#MAX_VALUE_SHORT = 65535
+Enumeration
+    #TYPE_BYTE
+    #TYPE_DOUBLE
+EndEnumeration
 
-XIncludeFile "dataFileMarkerDebugValues.pbi"
+#CHAMPION_VALUES_NB = 25
+Dim championValues.b(#CHAMPION_VALUES_NB)
+XIncludeFile "dataFileMarkerData.pbi"
 
 NewList files.File()
 
-Global *debugValues.DebugValues = #Null
 Global enableMessageBox.b = #True, logging.b = 0, verbose = 0
 ;EnableMessageBox : windows popup on error
 ;Logging : console output will be used (opening one if not started from a terminal), at least for warnings
 ;Verbose : all kind of stuff will be displayed (implies logging)
+
+XIncludeFile "GMBPBStringLib.pbi"
+
+XIncludeFile "dataFileMarkerDebugValues.pbi"
+Global *debugValues.DebugValues = #Null
 
 Macro printLogForce(text)
     If logging
@@ -149,13 +168,9 @@ Procedure writeFileType(datafile.l, type.b)
 EndProcedure
 
 Procedure writeFileTag(datafile.l, tag.s)
-    WriteString(datafile, tag)
+    WriteString(datafile, tag, #PB_Ascii)
     WriteAsciiCharacter(datafile, $A)
 EndProcedure
-
-Macro errorLocationInfo(text)
-    info + " (line " + lineN + ") : " + text
-EndMacro
 
 Procedure startsWithNumber(text.s)
     charCode.b = Asc(Left(text, 1))
@@ -169,6 +184,19 @@ Procedure startsWithNumber(text.s)
     Else 
         ProcedureReturn 1
     EndIf 
+EndProcedure
+
+Macro errorLocationInfo(text)
+    info + " (line " + lineN + ") : " + text
+EndMacro
+
+Procedure.s getDescriptorLine(file.l, *lineN.Long)
+    Define line.s
+    Repeat
+        line = StringField(ReadString(file), 1, "#")
+        *lineN\l + 1
+    Until Not line = ""
+    ProcedureReturn line
 EndProcedure
 
 Procedure writeAnimationDescriptor(datafile.l, info.s)
@@ -210,10 +238,9 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
         frameNumber = value
         
         ;- Reading other lines --------------------------------------------------------------------
-        lineN = 2
         
         While Not Eof(descriptorFile)
-            line = ReadString(descriptorFile)
+            line = getDescriptorLine(descriptorFile, @lineN)
             
             Select Left(line, 1)
                 Case "s"
@@ -245,7 +272,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     lastModifiedFrame = value
                     ;- - - Reading all values
                     i = 2
-                    value$ = StringField(line, i, " ")
+                    value$ = GMB_StringField(line, i, " ")
                     While Not value$ = ""
                         Select Left(value$, 1)
                             Case "d"
@@ -268,7 +295,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                                 WriteLong(datafile, Val(value$))
                                 printLog("    Frame origin x : " + value$)
                                 i + 1
-                                value$ = StringField(line, i, " ")
+                                value$ = GMB_StringField(line, i, " ")
                                 If value$ = ""
                                     error(errorLocationInfo("Missing origin Y coordinate"))
                                 EndIf 
@@ -285,7 +312,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                                 WriteByte(datafile, value)
                                 PrintN("      Movement mode : " + Bin(value))
                                 i + 1 
-                                value$ = StringField(line, i, " ")
+                                value$ = GMB_StringField(line, i, " ")
                                 If value$ = ""
                                     error(errorLocationInfo("Missing frame movement x speed"))
                                 EndIf
@@ -293,7 +320,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                                 WriteDouble(datafile, valueD)
                                 PrintN("      Frame movement x speed : " + value$)  
                                 i + 1 
-                                value$ = StringField(line, i, " ")
+                                value$ = GMB_StringField(line, i, " ")
                                 If value$ = ""
                                     error(errorLocationInfo("Missing frame movement y speed"))
                                 EndIf
@@ -302,12 +329,25 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                                 PrintN("      Frame movement y speed : " + value$)  
                         EndSelect
                         i + 1
-                        value$ = StringField(line, i, " ")
+                        value$ = GMB_StringField(line, i, " ")
                     Wend  
                 Case "c"
                     ;- - Hurtbox line -------------------------------------------------------------
                     
-                    value$ = StringField(line, 1, " ")
+                    If line = "c all"
+                        printLog(~"  Writing full-frame hurtbowes for each frame (\"c all\" found)")
+                        For i = 0 To frameNumber - 1
+                            printLog(~"    Writing full-frame hurtox on frame " + Str(i))
+                            WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
+                            WriteAsciiCharacter(datafile, i)
+                            WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
+                            WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                        Next
+                        Continue
+                    EndIf 
+                    
+                    value$ = GMB_StringField(line, 1, " ")
+                    
                     ;- - Checking for a frame index
                     If Len(value$) > 1
                         value$ = Mid(value$, 2)
@@ -329,39 +369,39 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
                     printLog("  Writing hurtbox info")
                     
-                    value$ = StringField(line, 2, " ")
+                    value$ = GMB_StringField(line, 2, " ")
                     If value$ = ""
                         WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
-                        printLog("    No value ; this hurtbx will cover all the frame.")
-                    Else 
+                        printLog("    No value ; this hurtbox will cover all the frame and use the default type.")
+                        Continue
+                    EndIf 
+                    
+                    If verbose And Not startsWithNumber(value$)
+                        warning(errorLocationInfo("One of the values is not a number - using 0"))
+                    EndIf 
+                    WriteWord(datafile, Val(value$))
+                    printLog("    " + *debugValues\hurtboxValues[2] + " : " + value$)
+                    
+                    ;- - - Reading coordinates
+                    For i = 3 To 5
+                        value$ = GMB_StringField(line, i, " ")
+                        If value$ = ""
+                            error(errorLocationInfo("missing value."))
+                        EndIf 
                         If verbose And Not startsWithNumber(value$)
                             warning(errorLocationInfo("One of the values is not a number - using 0"))
                         EndIf 
-                        WriteUnicodeCharacter(datafile, Val(value$))
-                        printLog("    " + *debugValues\hurtboxValues[2] + " : " + value$)
-                        
-                        ;- - - Reading coordinates
-                        For i = 3 To 5
-                            value$ = StringField(line, i, " ")
-                            If value$ = ""
-                                error(errorLocationInfo("missing value."))
-                            EndIf 
-                            If verbose And Not startsWithNumber(value$)
-                                warning(errorLocationInfo("One of the values is not a number - using 0"))
-                            EndIf 
-                            WriteUnicodeCharacter(datafile, Val(value$))
-                            printLog("    " + *debugValues\hurtboxValues[i - 2] + " : " + value$)
-                        Next
-                        
-                    EndIf 
+                        WriteWord(datafile, Val(value$))
+                        printLog("    " + *debugValues\hurtboxValues[i - 2] + " : " + value$)
+                    Next
                     
                     ;- - - Optional hurtbox type
-                    value = Val(StringField(line, 6, " "))
+                    value = Val(GMB_StringField(line, 6, " "))
                     If value < 0 Or value > 2
-                        warning(errorLocationInfo("Invalid hurtbox type : should be between 0 and 2. Using 0 instead."))
+                        error(errorLocationInfo("Invalid hurtbox type : should be between 0 and 2. Using 0 instead."))
                     EndIf 
                     WriteAsciiCharacter(datafile, Val(value$))
-                    printLog("    Hurtbox type : " + value$)
+                    printLog("    Hurtbox type : " + *debugValues\hurtboxTypes[value])
                     
                     ;WriteAsciiCharacter(datafile, #FILEMARKER_GENERICSEPARATOR)
                     ;printLog("    Writing end marker")
@@ -369,7 +409,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                 Case "h"
                     ;- - Hitbox line -------------------------------------------------------------
                     
-                    value$ = StringField(line, 1, " ")
+                    value$ = GMB_StringField(line, 1, " ")
                     ;- - Checking for a frame index
                     If Len(value$) > 1
                         value$ = Mid(value$, 2)
@@ -394,7 +434,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     
                     ;- - - Reading coordinates
                     For i = 2 To 5
-                        value$ = StringField(line, i, " ")
+                        value$ = GMB_StringField(line, i, " ")
                         If value$ = ""
                             error(errorLocationInfo("missing value."))
                         EndIf 
@@ -402,11 +442,11 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                         If verbose And Not startsWithNumber(value$)
                             warning(errorLocationInfo("One of the values is not a number - using 0"))
                         EndIf 
-                        WriteUnicodeCharacter(datafile, Val(value$))
+                        WriteWord(datafile, Val(value$))
                         printLog("    " + *debugValues\hitboxValues[i - 2] + " : " + value$)
                     Next
                     
-                    value = Val(StringField(line, 6, " "))
+                    value = Val(GMB_StringField(line, 6, " "))
                     WriteByte(datafile, value)
                     If value < 0 Or value > 2
                         error(errorLocationInfo("Invalid hitbox type : should be between 0 and 2"))
@@ -415,27 +455,27 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     
                     Select value
                         Case #HITBOXTYPE_DAMAGE
-                            value$ = StringField(line, 7, " ")
+                            value$ = GMB_StringField(line, 7, " ")
                             WriteDouble(datafile, ValD(value$))
                             printLog("    Damage : " + value$)
                             
-                            value$ = StringField(line, 8, " ")
+                            value$ = GMB_StringField(line, 8, " ")
                             WriteUnicodeCharacter(datafile, Val(value$))
                             printLog("    Angle : " + value$)
                             
-                            value$ = StringField(line, 9, " ")
+                            value$ = GMB_StringField(line, 9, " ")
                             WriteDouble(datafile, ValD(value$))
                             printLog("    Base knockback : " + value$)
                             
-                            value$ = StringField(line, 10, " ")
+                            value$ = GMB_StringField(line, 10, " ")
                             WriteDouble(datafile, ValD(value$))
                             printLog("    Scaling knockback : " + value$)
                             
-                            value$ = StringField(line, 11, " ")
+                            value$ = GMB_StringField(line, 11, " ")
                             WriteAsciiCharacter(datafile, Val(value$))
                             printLog("    Hit ID : " + value$)
                             
-                            value$ = StringField(line, 12, " ")
+                            value$ = GMB_StringField(line, 12, " ")
                             WriteAsciiCharacter(datafile, Val(value$))
                             printLog("    Priority : " + value$)
                             
@@ -454,13 +494,13 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                 Default
                     warning(errorLocationInfo("Start of the line doesn't match with any information type identifier (s, f, c or h) : " + Left(line, 1)))   
             EndSelect
-            lineN + 1
         Wend
         
+        CloseFile(descriptorFile)
         
     Else 
         ;- The info string is supposedly the values directly
-        value$ = StringField(info, 1, " ")
+        value$ = GMB_StringField(info, 1, " ")
         If value$ = ""
             error("Missing frame number")
         EndIf 
@@ -472,7 +512,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
         WriteByte(datafile, value)
         printLog("  Frames number : " + value$)
         
-        value$ = StringField(info, 2, " ")
+        value$ = GMB_StringField(info, 2, " ")
         valueD = ValD(value$)
         If valueD
           WriteAsciiCharacter(1, #FILEMARKER_ANIMSPEED)
@@ -482,6 +522,74 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
     EndIf 
 EndProcedure
 
+UndefineMacro errorLocationInfo
+Macro errorLocationInfo(text)
+    sourceFileName + " (line " + lineN + ") : " + text
+EndMacro
+    
+
+Procedure writeChampionFile(datafile.l, sourceFileName.s)
+    Define value.l, line.s, value$, valueD.d, frameNumber.a, lastModifiedFrame.b = -1, i.b
+    Shared championValues()
+    
+    printLog("---")
+    printLog("Writing Champion descriptor file at offset " + Hex(Loc(datafile)))
+    
+    sourceFile.l = OpenFile(#PB_Any, sourceFileName)
+    If Not sourceFile
+        error("Could not open the source file (" + sourceFileName + ")")
+    EndIf
+    
+    lineN.l = 1
+    
+    line = getDescriptorLine(sourceFile, @lineN)
+    WriteString(datafile, line, #PB_UTF8)
+    WriteAsciiCharacter(datafile, $A)
+    
+    valuesRead.b = 0
+    
+    printLog("  Writing Champion values")
+    
+    If Eof(sourceFile)
+        Goto champion_values_loop_end
+    EndIf 
+    
+    line = getDescriptorLine(sourceFile, @lineN)
+    
+    Debug Hex(Loc(datafile))
+    While startsWithNumber(line)
+        For i = 1 To GMB_CountFields(line, " ")
+            If valuesRead >= #CHAMPION_VALUES_NB
+                warning("Too many champion values - Ignoring the last ones")
+                Goto champion_values_loop_end
+            EndIf 
+            value$ = GMB_StringField(line, i, " ")
+            If (championValues(valuesRead + 1) = #TYPE_BYTE)
+                Debug "byte"
+                WriteByte(datafile, Val(value$))
+                Debug Val(value$)
+            Else 
+                WriteDouble(datafile, ValD(value$))
+            EndIf 
+            printLog("  -" + *debugValues\championValues[valuesRead] + " : " + value$ + " ("+ *debugValues\championValueTypes[championValues(valuesRead + 1)] +")")
+            valuesRead + 1
+            
+        Next
+        If Eof(sourceFile)
+            Break
+        EndIf 
+        line = getDescriptorLine(sourceFile, @lineN)
+    Wend
+    champion_values_loop_end:
+    
+    If valuesRead < #CHAMPION_VALUES_NB
+        Debug valuesRead
+        error("Missing champion values")
+    EndIf 
+    
+    CloseFile(sourceFile)
+EndProcedure
+
 Procedure addFile(datafile.l, *inputFile.File)
     Define type.b
         
@@ -489,7 +597,7 @@ Procedure addFile(datafile.l, *inputFile.File)
     printLogForce("Filename : " + *inputFile\path)
     printLog("Content  : " + *inputFile\content)
     
-    Select StringField(*inputFile\content, 1, ":")
+    Select GMB_StringField(*inputFile\content, 1, ":")
         Case "A"
             type = #FILETYPE_ANIMATION
         Case "AL"
@@ -505,9 +613,9 @@ Procedure addFile(datafile.l, *inputFile.File)
     EndSelect
     
     Define tag.s, info.s
-    tag = StringField(*inputFile\content, 2, ":")
-    info = StringField(tag, 2, " ")
-    tag  = StringField(tag, 1, " ")
+    tag = GMB_StringField(*inputFile\content, 2, ":")
+    info = GMB_StringField(tag, 2, " ")
+    tag  = GMB_StringField(tag, 1, " ")
     
     printLog("---")
     printLog("Writing at offset " + Hex(Loc(datafile)))
@@ -518,17 +626,26 @@ Procedure addFile(datafile.l, *inputFile.File)
     printLog("Tag : " + tag)
     
     If type = #FILETYPE_ANIMATION Or type = #FILETYPE_LEFTANIM Or type = #FILETYPE_IMAGE
+        ;these files are data that isn't going to be parsed (image, sound)
         size.l = readFileToMemory(*inputFile\path)
         If Not size
             error("Could not load file " + *inputFile\path)
             End
         EndIf 
         WriteLong(datafile, size)
+        printLog("File size : " + size)
         before.l = Loc(datafile)
         writeMemoryToFile(datafile)
         If type = #FILETYPE_ANIMATION
             writeAnimationDescriptor(datafile, info)
         EndIf
+    Else
+        ;these files are kuribrawl data, that will be parsed
+        Select type
+            Case #FILETYPE_CHAMPION
+                writeChampionFile(datafile, *inputFile\path)
+        EndSelect
+        
     EndIf 
     WriteByte(datafile, #FILEMARKER_INTERFILE)
 EndProcedure
@@ -601,9 +718,9 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 357
-; FirstLine = 322
-; Folding = ---
+; CursorPosition = 558
+; FirstLine = 541
+; Folding = ----
 ; EnableXP
 ; Executable = dataFileMaker.exe
 ; CommandLine = -v

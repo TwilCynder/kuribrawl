@@ -21,6 +21,7 @@ class CurrentAnimation {
     void draw(SDL_Renderer* target, int x, int y);
     void draw(SDL_Renderer* target, int x, int y, int facing);
     const std::vector<Hurtbox>& getHurtboxes() const;
+    const std::vector<Hitbox>&  getHitboxes() const;
 
     bool is_initialized()const;
     bool is_finished();

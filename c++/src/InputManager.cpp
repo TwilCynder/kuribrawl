@@ -1,14 +1,15 @@
 #include "InputManager.h"
 #include "Debug.h"
 #include "DebugInput.h"
-#include "Fighter.h"
+#include "PlayerFighter.h"
+#include "macros.h"
 
 /**
  * @brief Construct a new Input Manager object
  *
  * @param f the Fighter this InputManager will be linked to.
  */
-InputManager::InputManager(Fighter* f) :
+InputManager::InputManager(PlayerFighter* f) :
     fighter(f)
 {
 }
@@ -33,9 +34,7 @@ void InputManager::registerInput(Input input, Port* port, int element, ElementTy
 void InputManager::updateInputs(){
     std::deque<RegisteredInput>::iterator it;
     for (it = inputQ.begin(); it != inputQ.end();){
-        InputHandler handler = input_handlers[it->input];
-
-        if (!handler || !handler(fighter, it->port, *it)){
+        if (fighter->handleInput(*it)){
             it = inputQ.erase(it);
         } else {
             ++it;
@@ -53,15 +52,29 @@ int InputManager::getInputsNumber() const {
 }
 
 namespace {
-int InputHandler_Jump(Fighter* fighter, Port* port, RegisteredInput& input){
-    if (fighter->getGrounded()){
-        fighter->setState(Fighter::State::JUMPSQUAT, 0, input.element);
+
+int jump_manager(PlayerFighter* fighter, Port* port, RegisteredInput& input, jumpY type){
+    Fighter::State state = fighter->getState();
+
+    if (state == Fighter::State::JUMPSQUAT){
+
+    } else {
+        fighter->setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
     }
 
     return 0;
 }
 
-int InputHandler_SmashStickSide(Fighter* fighter, Port* port, RegisteredInput& input){
+int InputHandler_Jump(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+    return jump_manager(fighter, port, input, jumpY::Full);
+}
+
+int InputHandler_ShortHop(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+    return jump_manager(fighter, port, input, jumpY::Short);
+}
+
+
+int InputHandler_SmashStickSide(PlayerFighter* fighter, Port* port, RegisteredInput& input){
     Fighter::State state = fighter->getState();
 
     int facing = (input.input == Input::LEFT) ? -1 : 1;
@@ -81,12 +94,14 @@ int InputHandler_SmashStickSide(Fighter* fighter, Port* port, RegisteredInput& i
 
     return 0;
 }
+
+int InputHandler_SmashStickDown(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+
+
+    if (!fighter->getGrounded()){
+
+    }
+
+    return 1;
 }
-
-InputManager::InputHandler InputManager::input_handlers[Input::TOTAL];
-
-void InputManager::initInputHandlers(){
-    input_handlers[Input::JUMP] = &InputHandler_Jump;
-    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
-    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
 }

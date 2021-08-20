@@ -4,6 +4,7 @@
 
 #define MAX_NB_BUTTONS 32
 #define MAX_NB_STICKS 4
+#define MAX_NB_TRIGGERS 2
 
 class ControllerType;
 
@@ -13,7 +14,21 @@ class ControllerType;
  */
 
 struct Binding {
+    enum class DirectionControlMode {
+        BOTH,
+        STICK_ONLY,
+        DPAD_ONLY
+    };
+
+    Binding();
+    Binding(ControllerType*);
+
     Input buttons[MAX_NB_BUTTONS]; ///< Array containing the input associated with each button (each button correspondig to an index of the array).
-    int tilt_stick; ///< The stick that will be used as the secondary stick.
+
+    Input triggers[2];
+
+    DirectionControlMode direction_control_mode;
+    int dpadAnalogValue;
+
     ControllerType* controller; /**< The Controller this binding refers to. Pointer validity : can be invalidated if a controllerType is deleted (not supposed to happen) */
 };

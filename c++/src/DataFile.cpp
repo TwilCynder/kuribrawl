@@ -4,6 +4,7 @@
 #include "Debug.h"
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
+#include "Champion.h"
 #include "GameData.h"
 
 #define FILE_SIGNATURE 0x54545454
@@ -30,7 +31,7 @@ DataFile::DataFile(const char* filename, SDL_Renderer* renderer_):
 }
 
 DataFile::~DataFile(){
-	if (sdl_stream)	free(sdl_stream);
+	if (sdl_stream)	SDL_RWclose(sdl_stream);
 }
 
 /**
@@ -80,7 +81,7 @@ DataFile::DataType DataFile::readDataType(){
  */
 
 char* DataFile::readFileTag(){
-    fgets(readBuffer, BUFFER_SIZE, file);
+    readString();
     return readBuffer;
 }
 
@@ -109,6 +110,56 @@ void DataFile::readDouble (void* res){
 }
 
 /**
+ * @brief Reads a c-string from the file.
+ * Copies the string into the readBuffer array.
+ */
+void DataFile::readString(){
+    fgets(readBuffer, BUFFER_SIZE, file);
+    readBuffer[strlen(readBuffer) - 1] = '\0';
+}
+
+void DataFile::readChampionValues(Champion& champion){
+    readData(&champion.val.walk_speed);
+    readData(&champion.val.dash_speed);
+    readData(&champion.val.dash_start_speed);
+    readData(&champion.val.dash_turn_accel);
+    readData(&champion.val.traction);
+    readData(&champion.val.max_air_speed);
+    readData(&champion.val.air_acceleration);
+    readData(&champion.val.air_friction);
+    readData(&champion.val.jump_speed);
+    readData(&champion.val.short_hop_speed);
+    readData(&champion.val.air_jump_speed);
+    readData(&champion.val.gravity);
+    readData(&champion.val.max_fall_speed);
+    readData(&champion.val.fast_fall_speed);
+    readData(&champion.val.weight);
+    readData(&champion.val.jump_squat_duration);
+    readData(&champion.val.dash_start_duration);
+    readData(&champion.val.dash_stop_duration);
+    readData(&champion.val.dash_turn_duration);
+    readData(&champion.val.landing_duration);
+    readData(&champion.val.guard_start_duration);
+    readData(&champion.val.guard_stop_duration);
+    readData(&champion.val.shield_info.size);
+    readData(&champion.val.shield_info.x);
+    readData(&champion.val.shield_info.y);
+}
+
+void DataFile::readChampionFile(Champion& champion){
+    readString();
+    champion.setDisplayName(readBuffer);
+    cout << "Display name" << (champion.getDisplayName()) << '\n';
+
+    readChampionValues(champion);
+
+    cout << "Jsquat dur " << (int)champion.val.jump_squat_duration << '\n';
+    cout << "dstart dur " << (int)champion.val.dash_start_duration << '\n';
+    cout << "dstop dur " << (int)champion.val.dash_stop_duration << '\n';
+    cout << "dturn dur " << (int)champion.val.dash_turn_duration << '\n';
+}
+
+/**
  * @brief Reads an Animation Data Chunk
  *
  * @param anim the anim that was created or updated based on this Data Chunk
@@ -116,7 +167,7 @@ void DataFile::readDouble (void* res){
 
 void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     int value;
-    Uint8 byte, current_frame_id;
+    Uint8 byte;
     Uint16 word;
     double valueD;
     bool leave_loop;
@@ -128,7 +179,6 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 
     readLong(&value);    //Image size
 
-    long before = ftell(file);
     anim.setSpritesheet(IMG_LoadTexture_RW(renderer, sdl_stream, 0));
     fseek(file, 12, SEEK_CUR);
     readByte(&byte);
@@ -149,7 +199,6 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         break;
                     case FILEMARKER_FRAMEINFO:
                         readByte(&byte);
-                        current_frame_id = byte;
                         current_frame = anim.getFrame(byte);
                         current_entity_frame = anim.getEntityFrame(byte);
                         break;
@@ -172,7 +221,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         readData(&valueD);
                         current_entity_frame->movement.y = valueD;
                         break;
-                    case FILEMARKER_HURTBOXINFO:   
+                    case FILEMARKER_HURTBOXINFO:
                         if (!current_entity_frame){
                             throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
                         }
@@ -182,9 +231,10 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         hurtbox->x = word;
                         if (hurtbox->x == MAX_VALUE_SHORT){  
                             hurtbox->x = -(current_frame->origin.x);
-                            hurtbox->y = -(current_frame->origin.y);
+                            hurtbox->y =  (current_frame->origin.y);
                             hurtbox->w = current_frame->display.w;
                             hurtbox->h = current_frame->display.h;
+                            hurtbox->type = Hurtbox::Type::NORMAL;
                         } else {
                             readWord(&word);
                             hurtbox->y = word;
@@ -192,30 +242,54 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                             hurtbox->w = word;
                             readWord(&word);
                             hurtbox->h = word;
+                            readByte(&byte);
+                            hurtbox->type = (Hurtbox::Type)byte;
                         }
 
-                        readByte(&byte);
-                        hurtbox->type = byte;
                         break;
                     case FILEMARKER_HITBOXINFO:      
-                        hurtbox = &current_entity_frame->hurtboxes.emplace_back();
+                        hitbox = &current_entity_frame->hitboxes.emplace_back();
                         
-                        readWord(&word);
-                        hurtbox->x = word;
-                        readWord(&word);
-                        hurtbox->y = word;
-                        readWord(&word);
-                        hurtbox->w = word;
-                        readWord(&word);
-                        hurtbox->h = word;
-                        readByte(&byte);
-                        hurtbox->type = byte;
+                        readData(&word);
+                        hitbox->x = word;
+                        readData(&word);
+                        hitbox->y = word;
+                        readData(&word);
+                        hitbox->w = word;
+                        readData(&word);
+                        hitbox->h = word;
+                        readData(&byte);
+                        hitbox->type = (Hitbox::Type)byte;
+
+                        cout << "Hitbox : " << hitbox->x << " " << hitbox->y << " " << hitbox->w << " " << hitbox->h << '\n' << std::flush;
+
+                        switch (hitbox->type){
+                            case Hitbox::Type::DAMAGE:
+                                readData(&valueD);
+                                hitbox->damage = valueD;
+                                readData(&word);
+                                hitbox->angle = value;
+                                readData(&valueD);
+                                hitbox->base_knockback = valueD;
+                                readData(&valueD);
+                                hitbox->scalink_knockback = valueD;
+                                readData(&byte);
+                                hitbox->hit = byte;
+                                readData(&byte);
+                                hitbox->priority = byte;
+                                break;
+                            default:
+                                throw KBFatalDetailed("File read : invalid data file content", "Unsupported or invalid hitbox type");
+                        }
+
                         break;
                     case FILEMARKER_INTERFILE:
+                        Debug::log("Interfile");
                         leave_loop = true;
                         break;
                     default:
-                        cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
+                        fseek(file, -1, SEEK_CUR);
+                        cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
                         throw KBFatalExplicit("File read : invalid data file content");
                 }
             } while (!leave_loop);
@@ -249,13 +323,11 @@ char* DataFile::separateTag(char* tag){
  */
 
 void DataFile::read(GameData& data){
-    Debug::log("Reading data file ==============");
+    Debug::log("====== Reading data file ==============");
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
     char* tag;
-    char *entity, *element, *endChar;
-
-    (void)entity; (void)element;
+    char *entity, *element;
 
     while (!eof()){
         switch (readDataType()){
@@ -263,22 +335,25 @@ void DataFile::read(GameData& data){
                 tag = readFileTag();
                 entity = tag;
                 element = separateTag(tag);
+                Debug::log("-Reading animation");
                 Debug::log(entity);
                 Debug::log(element);
-                endChar = element + strlen(element) - 1;
-                *endChar = 0;
+
                 switch(entity[0]){
                     default:
                         readEntityAnimationFile(data.tryChampion(entity).tryAnimation(element));
                 }
-                
-                return;
                 break;
+            case DataFile::DataType::CHAMPION:
+                tag = readFileTag();
+                Debug::log("-Reading CHampion");
+                Debug::log(tag);
+                readChampionFile(data.tryChampion(tag));
             default:
                 break;
         }
     }
-    Debug::log("Data file loading finished ==============");
+    Debug::log("====== Data file loading finished ==============");
 }
 
 bool DataFile::ready(){

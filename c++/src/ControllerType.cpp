@@ -9,9 +9,9 @@
 
 ControllerType::ControllerType():
 
-    default_binding(std::make_unique<Binding>())
+    default_binding(std::make_unique<Binding>(this))
 {
-    default_binding->controller = this;
+
 }
 
 /**

@@ -132,7 +132,6 @@ bool App::loadGameFile(const char* name){
  * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
-	if (!loadGameFile("data.twl"))
 	if (!loadGameFile("../gamefile manager/data.twl"))
 	throw KBFatalExplicit("Can't find data file");
 }
@@ -154,7 +153,7 @@ void App::initControllersData(){
 
 void App::init(){
 	initSDL();
-	InputManager::initInputHandlers();
+	PlayerFighter::initInputHandlers();
 	initControllersData();
 	loadRessources();
 	initGameData();
@@ -201,7 +200,7 @@ void App::readPorts(){
 
 void App::print_report(std::ostream& out){
 	Uint32 app_duration = System::now() - start_time;
-	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration " << ((double)app_duration / frame);
+	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
 }
 
 /**
@@ -295,6 +294,7 @@ void App::loop_timer(){
 		SDL_Delay(wait);
 	}
 
+	total_frame_wait += wait;
 }
 
 /**
@@ -304,6 +304,7 @@ void App::loop_timer(){
 
 void App::loop() try {
 	frame = 0;
+	total_frame_wait = 0;
 	next_frame_date = System::now();
 	start_time = next_frame_date;
 

@@ -22,7 +22,7 @@ launch: all
 
 clean: clear all
 
-doc: doc_light
+doc:
 	doxygen
 
 doc_light:
