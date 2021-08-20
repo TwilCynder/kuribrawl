@@ -96,7 +96,6 @@ void Port::readController(){
     }
 
     if (pod.is_right_trigger_binding && (right_trigger.current_state >= vals.analogTriggerThreshold) && (right_trigger.previous_state < vals.analogTriggerThreshold)){
-        Debug::log("OUIEFIU");
         fighter->handleTriggerPress(TRIGGER_RIGHT);
     }
 }

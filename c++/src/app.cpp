@@ -153,7 +153,7 @@ void App::initControllersData(){
 
 void App::init(){
 	initSDL();
-	InputManager::initInputHandlers();
+	PlayerFighter::initInputHandlers();
 	initControllersData();
 	loadRessources();
 	initGameData();

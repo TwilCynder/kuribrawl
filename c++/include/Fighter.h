@@ -41,6 +41,7 @@ class Fighter {
     void updateAnimation();
 
     Game& getGame();
+    const Champion& getChampion();
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
     CurrentAnimation* getCurrentAnimation();
@@ -61,6 +62,8 @@ class Fighter {
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame.
     int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
     bool grounded;      ///< true if the Fighter is on the ground.
+    Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
+    Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
 
     void applyAirAccel(int direction);
 
@@ -70,9 +73,6 @@ class Fighter {
 
     CurrentAnimation current_animation; ///< CurrentAnimation used to display an Animation of the \ref Fighter#model "model Champion".
     std::string current_animation_name; ///< Never used.
-
-    Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
-    Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
 
     bool isStateFinished(int stateDuration);
 	virtual jumpY decideGroundedJumpYType() const = 0;

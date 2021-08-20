@@ -34,9 +34,7 @@ void InputManager::registerInput(Input input, Port* port, int element, ElementTy
 void InputManager::updateInputs(){
     std::deque<RegisteredInput>::iterator it;
     for (it = inputQ.begin(); it != inputQ.end();){
-        InputHandler handler = input_handlers[it->input];
-
-        if (!handler || !handler(fighter, it->port, *it)){
+        if (fighter->handleInput(*it)){
             it = inputQ.erase(it);
         } else {
             ++it;
@@ -56,7 +54,11 @@ int InputManager::getInputsNumber() const {
 namespace {
 
 int jump_manager(PlayerFighter* fighter, Port* port, RegisteredInput& input, jumpY type){
-    if (fighter->getGrounded()){
+    Fighter::State state = fighter->getState();
+
+    if (state == Fighter::State::JUMPSQUAT){
+
+    } else {
         fighter->setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
     }
 
@@ -92,13 +94,14 @@ int InputHandler_SmashStickSide(PlayerFighter* fighter, Port* port, RegisteredIn
 
     return 0;
 }
+
+int InputHandler_SmashStickDown(PlayerFighter* fighter, Port* port, RegisteredInput& input){
+
+
+    if (!fighter->getGrounded()){
+
+    }
+
+    return 1;
 }
-
-InputManager::InputHandler InputManager::input_handlers[Input::TOTAL];
-
-void InputManager::initInputHandlers(){
-    input_handlers[Input::JUMP] = &InputHandler_Jump;
-    input_handlers[Input::SHORTHOP] = &InputHandler_ShortHop;
-    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
-    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
 }
