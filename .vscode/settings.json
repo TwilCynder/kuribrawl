@@ -56,6 +56,7 @@
         "chrono": "cpp",
         "ctime": "cpp",
         "ratio": "cpp",
-        "*.enum": "cpp"
+        "*.enum": "cpp",
+        "bitset": "cpp"
     }
 }

@@ -68,4 +68,5 @@ class PlayerFighter : public Fighter {
     int InputHandler_ShortHop(RegisteredInput& input);
     int InputHandler_SmashStickSide(RegisteredInput& input);
     int InputHandler_SmashStickDown(RegisteredInput& input);
+    int InputHandler_Attack(RegisteredInput& input);
 };

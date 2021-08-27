@@ -10,6 +10,7 @@
 
 class Champion;
 class Game;
+struct Move;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -44,6 +45,7 @@ class Fighter {
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
+    void startMove(const Move&);
     CurrentAnimation* getCurrentAnimation();
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);

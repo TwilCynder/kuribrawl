@@ -279,6 +279,14 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
     return 0;
 }
 
+int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
+    if (!grounded){
+        startMove(*getChampion().getDefaultMove(Champion::DefaultMoves::Nair));
+    }
+
+    return 0;
+}
+
 int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
     if (!grounded && speed.y < 0.0){
         speed.y = - (getChampion().val.fast_fall_speed);
@@ -294,4 +302,5 @@ void PlayerFighter::initInputHandlers(){
     input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
     input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
     input_handlers[Input::DOWN] = &InputHandler_SmashStickDown;
+    input_handlers[Input::ATTACK] = &InputHandler_Attack;
 }
