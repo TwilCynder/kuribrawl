@@ -10,7 +10,7 @@
 template <class A>
 class AnimationsPool {
     public:
-    A* addAnimation(const char* name);
+    A* addAnimation(const std::string& name);
     A* addAnimation(const char* name, SDL_Texture* spritesheet);
     const A* getAnimation(const std::string& name) const;
     const A* getAnimation(const char* name) const;

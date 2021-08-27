@@ -5,6 +5,7 @@
 #include "util.h"
 #include "Champion.h"
 #include "CollisionBoxes.h"
+#include "Move.h"
 #include <math.h>
 
 /**
@@ -26,12 +27,12 @@ Fighter::Fighter(Game& game, Champion* model_):
  */
 Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     state(State::IDLE),
+        update_anim(true),
     paused(false),
     facing(1),
     grounded(false),
     model(model_),
-    game(game_),
-    update_anim(true)
+    game(game_)
 {
     position.x = x_;
     position.y = y_;
@@ -262,4 +263,10 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
     if (facing_) facing = facing_;
 
     state_timer = 0;
+}
+
+void Fighter::startMove(const Move& move){
+    if (move.animation){
+        current_animation.setAnimation(move.animation);
+    }
 }

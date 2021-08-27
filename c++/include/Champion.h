@@ -6,6 +6,7 @@
 #include "Fighter.h"
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
+#include "Move.h"
 
 /**
  * @brief A character of the game.
@@ -22,6 +23,26 @@ class Champion : public AnimationsPool<EntityAnimation> {
         #include "states.enum"
         AIR_IDLE,
         JUMP,
+        TOTAL
+    };
+
+    enum class DefaultMoves {
+        Jab,
+        Ftilt,
+        UTilt,
+        DTilt,
+        FSmash,
+        USmash,
+        DSmash,
+        Nair,
+        Fair,
+        BAir,
+        UAir,
+        DAir,
+        NSpecial,
+        SSpecial,
+        USpecial,
+        DSpecial,
         TOTAL
     };
 
@@ -68,7 +89,15 @@ class Champion : public AnimationsPool<EntityAnimation> {
     Champion(const std::string& name_);
     const std::string& getName();
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
-    void initAnimations(void);
+    void initDefaultAnimations();
+    void initDefaultMoves();
+    void finalizeMoves();
+
+    Move& addMove(const std::string& name);
+    const Move* getMove(const char* name) const;
+    const Move* getMove(const std::string& name) const;
+    Move& tryMove(const char* name);
+    const Move* getDefaultMove(DefaultMoves) const;
 
     void setDisplayName(const char* display_name);
     const std::string& getDisplayName() const;
@@ -80,10 +109,14 @@ class Champion : public AnimationsPool<EntityAnimation> {
      * @brief Map associating each DefaultAnimation with the name (=string key) is is supposed to have in the animation map.
      */
     static const std::map<DefaultAnimation, std::string> default_animation_name;
+    static const std::map<DefaultMoves, std::string> default_move_name;
 
     const std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
     std::unique_ptr<const EntityAnimation*[]> default_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
                                                     Pointer validity : can be invalidated if an Animation is moved or deleted*/
+    std::unique_ptr<const Move*[]> default_moves;
+    
+    std::map<std::string, Move> moves;
 };
 

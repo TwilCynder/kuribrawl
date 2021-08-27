@@ -11,9 +11,11 @@
  */
 Champion::Champion(const std::string& name_):
     name(name_),
-    default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL))
+    default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL)),
+    default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL))
 {
     this->val.gravity = DEFAULT_GRAVITY;
+    initDefaultMoves();
 }
 
 /**
@@ -47,6 +49,66 @@ const std::string& Champion::getDisplayName() const {
 }
 
 /**
+ * @brief Adds a Move.
+ * Uses in-place construction.
+ * @param name the name that will be used as the map key.
+ * @return Move* a pointer to the created Move.
+ */
+Move& Champion::addMove(const std::string& name){
+    auto [node, success] = moves.try_emplace(name);
+
+    if (!success) {
+        throw KBFatal("Could not create move");
+    }
+
+    return node->second;
+}
+
+/**
+ * @brief Returns a Move of this Champion.
+ *
+ * @param name the internal name (which is also the map key) of the wanted Animation.
+ * @return Move* a pointer to the Move if the specified name is an existing key, NULL otherwise.
+ */
+const Move* Champion::getMove(const std::string& name) const{
+    auto it = moves.find(name);
+    if (it == moves.end()){
+        return NULL;
+    }
+    return &(it->second);
+}
+
+/**
+ * @brief Returns a Move of this Champion.
+ *
+ * @param name the internal name (which is also the map key) of the wanted Animation.
+ * @return Move* a pointer to the Move if the specified name is an existing key, NULL otherwise.
+ */
+const Move* Champion::getMove(const char* name) const{
+    auto it = moves.find(name);
+    if (it == moves.end()){
+        return NULL;
+    }
+    return &(it->second);
+}
+
+/**
+ * @brief Returns a Move, or create it if it doesn't exist yet.
+ * Unlike getMove, always returns a valid Animation. If the Animation didn't exist, it is \ref Move::Move() "default constructed".
+ * @param name the name
+ * @return Move&
+ */
+
+Move& Champion::tryMove(const char* name){
+    auto [node, success] = moves.try_emplace(name);
+    return node->second;
+}
+
+const Move* Champion::getDefaultMove(DefaultMoves move) const {
+    return (default_moves[(int)move]);
+}
+
+/**
  * @brief Returns the Animation associated with a certain \ref Fighter#State "fighter state", if there is any.
  *
  * @param state
@@ -57,19 +119,41 @@ const EntityAnimation* Champion::getDefaultAnimation(const DefaultAnimation anim
     return default_animations[(int)anim];
 }
 
+void Champion::finalizeMoves(){
+    const EntityAnimation* anim;
+    for (auto& [name, move] : moves){
+        anim = getAnimation(move.anim_name);
+        if (anim){
+            move.animation = anim;
+        }
+    }
+}
+
 /**
  * @brief Initializes the data relative to the currently added Animations of this Champion.
  * Initializes the state-animation association (based on the \ref Fighter#state_default_animation_name "state-animation name" association),
  * and the callbacks of certains animations based on their key in the map (e.g. the `jump` animation)
  */
 
-void Champion::initAnimations(){
+void Champion::initDefaultAnimations(){
     const EntityAnimation* anim;
 
     for (auto const& [state, name] : default_animation_name){
         if ((anim = getAnimation(name))){
             default_animations[(int)state] = anim;
         }
+    }
+}
+
+/**
+ * @brief Creates all the moves that are supposed to be present on all champions
+ * 
+ */
+void Champion::initDefaultMoves(){
+    for (auto const& [moveID, name] : default_move_name){
+        Move& move = addMove(name);
+        move.anim_name = name;
+        default_moves[(int)moveID] = &move;
     }
 }
 
@@ -85,4 +169,24 @@ const std::map<Champion::DefaultAnimation, std::string> Champion::default_animat
     {Champion::DefaultAnimation::DASH_TURN, "dash_turn"},
     {Champion::DefaultAnimation::JUMP, "jump"},
     {Champion::DefaultAnimation::AIR_IDLE, "air_idle"}
+};
+
+const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name = {
+    {Champion::DefaultMoves::Jab, "jab"},
+    {Champion::DefaultMoves::Ftilt, "ftilt"},
+    {Champion::DefaultMoves::UTilt, "utilt"},
+    {Champion::DefaultMoves::DTilt, "dtilt"},
+    {Champion::DefaultMoves::FSmash, "fsmash"},
+    {Champion::DefaultMoves::USmash, "usmash"},
+    {Champion::DefaultMoves::DSmash, "dsmash"},
+    {Champion::DefaultMoves::Nair, "nair"},
+    {Champion::DefaultMoves::Fair, "fair"},
+    {Champion::DefaultMoves::BAir, "bair"},
+    {Champion::DefaultMoves::UAir, "uair"},
+    {Champion::DefaultMoves::DAir, "dair"},
+    {Champion::DefaultMoves::NSpecial, "nspecial"},
+    {Champion::DefaultMoves::SSpecial, "sspecial"},
+    {Champion::DefaultMoves::USpecial, "uspecial"},
+    {Champion::DefaultMoves::DSpecial, "dspecial"},
+
 };
