@@ -47,8 +47,11 @@ class Port {
     const Kuribrawl::Vector& getControlStickState() const;
     const Kuribrawl::Vector& getControlStickPreviousState() const;
     const Kuribrawl::Vector& getSecondaryStickState() const;
-    signed char getDpadStateX() const;
-    signed char getDpadStateY() const;
+    void updateDpadState(); //NOT USED YET
+    inline signed char getDpadStateX() const;
+    inline signed char getDpadStateY() const;
+    using DpadState = Kuribrawl::VectorT<int8_t>;
+    const DpadState& getDpadState() const;
 
     private:
     void setJoystick_(int id);
@@ -65,6 +68,7 @@ class Port {
     bool active;
 
     PortOptimizationData pod;
+    DpadState current_dpad_state; //NOT USED YET
 
     //State;
     Stick control_stick;

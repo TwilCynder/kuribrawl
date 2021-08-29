@@ -27,8 +27,8 @@ class PlayerFighter : public Fighter {
     ~PlayerFighter();
 
     //Inputs
-    void updateInputs();
-    void updateSticks();
+    void updateInputsStates();
+    void resolveInputs();
     void handleButtonPress (int button );
     void handleTriggerPress(int trigger);
 
@@ -53,6 +53,7 @@ class PlayerFighter : public Fighter {
     void updateDirectionControlState(ControllerType::ControllerVals controller_vals);
 
 	jumpY decideGroundedJumpYType() const override;
+    jumpX decideJumpXType() const override;
 
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
     Binding* input_binding; ///< Pointer validity is a validist concept

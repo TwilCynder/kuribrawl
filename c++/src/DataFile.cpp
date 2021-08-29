@@ -123,6 +123,7 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.val.dash_speed);
     readData(&champion.val.dash_start_speed);
     readData(&champion.val.dash_turn_accel);
+    readData(&champion.val.dash_stop_deceleration);
     readData(&champion.val.traction);
     readData(&champion.val.max_air_speed);
     readData(&champion.val.air_acceleration);
@@ -130,6 +131,10 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.val.jump_speed);
     readData(&champion.val.short_hop_speed);
     readData(&champion.val.air_jump_speed);
+    readData(&champion.val.ground_forward_jump_speed);
+    readData(&champion.val.ground_backward_jump_speed);
+    readData(&champion.val.air_forward_jump_speed);
+    readData(&champion.val.air_backward_jump_speed);
     readData(&champion.val.gravity);
     readData(&champion.val.max_fall_speed);
     readData(&champion.val.fast_fall_speed);
@@ -144,19 +149,15 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.val.shield_info.size);
     readData(&champion.val.shield_info.x);
     readData(&champion.val.shield_info.y);
+    readData(&champion.val.air_jumps);
 }
 
 void DataFile::readChampionFile(Champion& champion){
     readString();
     champion.setDisplayName(readBuffer);
-    cout << "Display name" << (champion.getDisplayName()) << '\n';
+    cout << "Display name " << (champion.getDisplayName()) << '\n';
 
     readChampionValues(champion);
-
-    cout << "Jsquat dur " << (int)champion.val.jump_squat_duration << '\n';
-    cout << "dstart dur " << (int)champion.val.dash_start_duration << '\n';
-    cout << "dstop dur " << (int)champion.val.dash_stop_duration << '\n';
-    cout << "dturn dur " << (int)champion.val.dash_turn_duration << '\n';
 }
 
 /**

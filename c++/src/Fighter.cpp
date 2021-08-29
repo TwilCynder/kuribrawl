@@ -143,6 +143,19 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
         default:
             break;
     }
+    switch(x_type){
+        case jumpX::Forward:
+            if (abs(speed.x) < model->val.ground_forward_jump_speed){
+                speed.x = model->val.ground_forward_jump_speed * facing;
+            }
+        case jumpX::Backwards:
+            if (abs(speed.x) < model->val.ground_forward_jump_speed){
+                speed.x = model->val.ground_backward_jump_speed * -facing;
+            }
+        default:
+            break;
+    }
+
     setState(State::IDLE, 0, 1);
     grounded = false;
 }
@@ -167,7 +180,7 @@ void Fighter::updateState(){
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){
-                jump(jumpX::Normal, decideGroundedJumpYType());
+                jump(decideJumpXType(), decideGroundedJumpYType());
             }
             break;
         case State::DASH_START:

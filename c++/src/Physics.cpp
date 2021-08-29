@@ -22,7 +22,7 @@ void Fighter::applyAirAccel(int direction){
  */
 void Fighter::groundCollision(){
     setState(Fighter::State::LANDING);
-    grounded = true;
+    land();
 }
 
 /**
@@ -31,6 +31,11 @@ void Fighter::groundCollision(){
  */
 void Fighter::groundToAir(){
     grounded = false;
+}
+
+void Fighter::land(){
+    grounded = true;
+    air_jumps = model->val.air_jumps;
 }
 
 /**

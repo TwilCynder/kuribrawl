@@ -7,8 +7,9 @@ struct ControllerVals;
  * 
  */
 struct PortOptimizationData {
-    bool is_left_trigger_binding;
-    bool is_right_trigger_binding;
+    bool read_left_trigger;
+    bool read_right_trigger;
+    bool read_dpad;
 
     PortOptimizationData();
 };

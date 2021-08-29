@@ -14,6 +14,11 @@ namespace Debug {
     }
     
     template <typename T>
+    void logHex(T value){
+        cout << std::hex << value << '\n' << std::dec << std::flush;
+    }
+
+    template <typename T>
     void logBin(T value){
         cout << std::bitset<sizeof(T) * 8>(value) << '\n' << std::flush;
     }
