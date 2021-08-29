@@ -153,6 +153,7 @@ void App::initControllersData(){
 
 void App::init(){
 	initSDL();
+	SDLHelper::printJoysticks(cout);
 	PlayerFighter::initInputHandlers();
 	initControllersData();
 	loadRessources();

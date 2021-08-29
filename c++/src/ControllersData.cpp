@@ -38,3 +38,13 @@ ControllerType& ControllersData::addController(const std::string& name){
 void ControllersData::mapSDLMappingToControllerType(const char* mapping_string, ControllerType* ct){
     SDL_mapping_to_controllerType.emplace(std::string(mapping_string, MAPPING_ID_LENGTH), ct);
 }
+
+ControllerType* ControllersData::getControllerFromMapping(const char* mapping_string) const{
+    std::string mapping_id(mapping_string, MAPPING_ID_LENGTH);
+
+    auto it = SDL_mapping_to_controllerType.find(mapping_id);
+    if (it == SDL_mapping_to_controllerType.end()){
+        return NULL;
+    }
+    return it->second;
+}

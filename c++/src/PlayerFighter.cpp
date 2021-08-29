@@ -85,6 +85,22 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
         input_manager->registerInput(Input::LEFT, port, -1, ElementType::STICK);
     }
 
+    if (current_state.y > vals.analogStickSmashThreshold
+        && previous_state.y < vals.analogStickSmashThreshold
+        && control_stick_buffer[0].y != 1)
+    {
+        //Smash input right
+		Debug::log("Smash Input Down");
+        input_manager->registerInput(Input::DOWN, port, -1, ElementType::STICK);
+    } else if (current_state.y < -vals.analogStickSmashThreshold
+        && previous_state.y > -vals.analogStickSmashThreshold
+        && control_stick_buffer[0].y != -1)
+    {
+        //Smash input left
+		Debug::log("Smash Input UP");
+        input_manager->registerInput(Input::UP, port, -1, ElementType::STICK);
+    }
+
     if (current_state.x > vals.analogStickThreshold){
         control_stick_buffer[0].x = 1;
     } else if (current_state.x < -vals.analogStickThreshold) {
@@ -241,10 +257,12 @@ int PlayerFighter::handleInput(RegisteredInput& input){
 }
 
 int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
-    if (state == Fighter::State::JUMPSQUAT){
-        state_info |= 0b100;
-    } else {
-        setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+    if (grounded){
+        if (state == Fighter::State::JUMPSQUAT){
+            state_info |= 0b100;
+        } else {
+            setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+        }
     }
 
     return 0;
@@ -261,18 +279,18 @@ int PlayerFighter::InputHandler_ShortHop(RegisteredInput& input){
 
 int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 
-    int facing = (input.input == Input::LEFT) ? -1 : 1;
+    int side = (input.input == Input::LEFT) ? -1 : 1;
 
     if (grounded){
         if (state == Fighter::State::WALK ||
             state == Fighter::State::IDLE ||
-            (state == Fighter::State::DASH_START && facing == -facing))
+            (state == Fighter::State::DASH_START && side == -facing))
         {
-            setState(Fighter::State::DASH_START, facing);
+            setState(Fighter::State::DASH_START, side);
         } else if ((state == Fighter::State::DASH || state == Fighter::State::DASH_STOP) &&
-            facing == -facing)
+            side == -facing)
         {
-            setState(Fighter::State::DASH_TURN, facing);
+            setState(Fighter::State::DASH_TURN, side);
         }
     }
 

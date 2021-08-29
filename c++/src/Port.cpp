@@ -4,6 +4,7 @@
 #include "DebugInput.h"
 #include "app.h"
 #include "Binding.h"
+#include "ControllersData.h"
 #include <stdlib.h>
 
 #include "controllerElements.h"
@@ -11,6 +12,7 @@
 Port::Port(App* app_) :
     app(app_),
     joystick_id(-1),
+    controller(nullptr),
     active(false)
 {
 }
@@ -121,12 +123,15 @@ signed char Port::getDpadStateY() const{
 }
 
 void Port::setJoystick_(int id){
+    if (controller)
+        SDL_GameControllerClose(controller);
+    
 
     controller = SDL_GameControllerOpen(id);
 	joystick = SDL_GameControllerGetJoystick(controller);
     SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
 
-    Debug::log(SDL_GameControllerName(controller));
+    cout << "Controller plugged ( " << id << ") : " << SDL_GameControllerName(controller) << '\n' << std::flush;
 
     if (active){
         app->joysticks[joystick_id] = nullptr;
@@ -146,8 +151,18 @@ void Port::setJoystick(int id, ControllerType* c){
     if (!c){
         throw KBFatal("Trying to enable joystick with null controller pointer");
     }
-    setController(c);
     setJoystick_(id);
+    setController(c);
+}
+
+void Port::setJoystick(int id, ControllersData& cd){
+    setJoystick_(id);
+    ControllerType* ct = cd.getControllerFromMapping(SDL_GameControllerMapping(controller));
+    
+    if (!ct)
+        throw KBFatalDetailed("Tried to set joystick using controllerType detection but mapping matches no controllerType", "Unknown controller");
+
+    setController(ct);
 }
 
 void Port::setJoystick(int id){
