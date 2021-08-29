@@ -18,7 +18,7 @@ class ControllersData {
     ControllerType& addController(const std::string& name);
     ControllerType* getController(const std::string& name);
     void mapSDLMappingToControllerType(const char* mapping_string, ControllerType* ct);
-    ControllerType* getControllerFromMapping();
+    ControllerType* getControllerFromMapping(const char* mapping_string) const;
 
     private:
     ControllersMap known_controllers; ///< Map containing all the ControllerTypes.

@@ -9,6 +9,7 @@
 
 class App;
 class Binding;
+class ControllersData;
 
 class Port {
     struct Stick {
@@ -32,6 +33,7 @@ class Port {
     bool isActive() const ;
     void setJoystick(int id);
     void setJoystick(int id, ControllerType* controller);
+    void setJoystick(int id, ControllersData& cd);
     void setFighter(PlayerFighter*);
     void initOptimizationData();
     void deactivate();
@@ -58,7 +60,7 @@ class Port {
 
     int id;
     int joystick_id;
-    SDL_GameController* controller;
+    SDL_GameController* controller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
 	SDL_Joystick* joystick;
     bool active;
 
