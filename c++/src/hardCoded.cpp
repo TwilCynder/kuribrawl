@@ -21,7 +21,7 @@ void HardCoded::initControllersData(ControllersData& data){
 
     c->control_stick = 0;
     c->secondary_stick = 1;
-    c->setControllerVals(10000, -16000, 20000);
+    c->setControllerVals(10000, 18000, 20000);
     c->default_binding->buttons[0] = Input::ATTACK;
     c->default_binding->buttons[1] = Input::SPECIAL;
     c->default_binding->buttons[2] = Input::SHORTHOP;

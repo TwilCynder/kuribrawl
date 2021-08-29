@@ -67,7 +67,7 @@ Enumeration
     #TYPE_DOUBLE
 EndEnumeration
 
-#CHAMPION_VALUES_NB = 25
+#CHAMPION_VALUES_NB = 30
 Dim championValues.b(#CHAMPION_VALUES_NB)
 XIncludeFile "dataFileMarkerData.pbi"
 
@@ -556,7 +556,7 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
     
     line = getDescriptorLine(sourceFile, @lineN)
     
-    Debug Hex(Loc(datafile))
+    Debug Loc(datafile)
     While startsWithNumber(line)
         For i = 1 To GMB_CountFields(line, " ")
             If valuesRead >= #CHAMPION_VALUES_NB
@@ -564,11 +564,13 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
                 Goto champion_values_loop_end
             EndIf 
             value$ = GMB_StringField(line, i, " ")
-            If (championValues(valuesRead + 1) = #TYPE_BYTE)
+            If (championValues(valuesRead) = #TYPE_BYTE)
                 Debug "byte"
+                Debug Loc(datafile)
                 WriteByte(datafile, Val(value$))
-                Debug Val(value$)
-            Else 
+            Else
+                Debug "double"
+                Debug Loc(datafile)
                 WriteDouble(datafile, ValD(value$))
             EndIf 
             printLog("  -" + *debugValues\championValues[valuesRead] + " : " + value$ + " ("+ *debugValues\championValueTypes[championValues(valuesRead + 1)] +")")
@@ -580,6 +582,7 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
         EndIf 
         line = getDescriptorLine(sourceFile, @lineN)
     Wend
+    Debug Loc(datafile)
     champion_values_loop_end:
     
     If valuesRead < #CHAMPION_VALUES_NB
@@ -718,8 +721,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 558
-; FirstLine = 541
+; CursorPosition = 566
+; FirstLine = 537
 ; Folding = ----
 ; EnableXP
 ; Executable = dataFileMaker.exe

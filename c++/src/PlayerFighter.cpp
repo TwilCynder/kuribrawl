@@ -116,10 +116,10 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
  * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
  */
 void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals controller_vals){
-
+    const Port::DpadState& dpad_state = port->getDpadState();
     if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
-        current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
-        current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
+        current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
+        current_direction_control_state.y = dpad_state.y * input_binding->dpadAnalogValue;
     } else {
         current_direction_control_state = port->getControlStickState();
         if (
@@ -127,8 +127,8 @@ void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals c
             (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < controller_vals.analogStickThreshold)
         )
         {
-            current_direction_control_state.x = port->getDpadStateX() * input_binding->dpadAnalogValue;
-            current_direction_control_state.y = port->getDpadStateY() * input_binding->dpadAnalogValue;
+            current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
+            current_direction_control_state.y = dpad_state.y * input_binding->dpadAnalogValue;
         }
     }
 }
@@ -138,10 +138,6 @@ void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals c
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
     const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
-
-    updateDirectionControlState(controller_vals);
-
-    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState(), controller_vals);
 
     switch (state){
         case State::IDLE:
@@ -180,8 +176,18 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
  * @brief Checks inputs that were registered by this Fighter's InputManager.
  *
  */
-void PlayerFighter::updateInputs(){
+void PlayerFighter::updateInputsStates(){
     if (!port) return;
+    const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
+    updateDirectionControlState(controller_vals);
+    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState(), controller_vals);
+}
+
+/**
+ * @brief Checks inputs that were registered by this Fighter's InputManager.
+ *
+ */
+void PlayerFighter::resolveInputs(){
     checkStickState();
     input_manager->updateInputs();
 }
@@ -205,8 +211,9 @@ Binding* PlayerFighter::getInputBinding()const{
 
 void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
 
-    pod.is_left_trigger_binding  = input_binding->triggers[0]  != Input::NONE;
-    pod.is_right_trigger_binding = input_binding->triggers[1] != Input::NONE;
+    pod.read_left_trigger  = input_binding->triggers[0] != Input::NONE;
+    pod.read_right_trigger = input_binding->triggers[1] != Input::NONE;
+    pod.read_dpad = input_binding->direction_control_mode != Binding::DirectionControlMode::STICK_ONLY;
 }
 
 /**
@@ -249,6 +256,17 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
         ((state_info >> 2) & 1) == jumpY::Full && 
         port->isElementPressed((ElementType)((state_info >> 3) & 0b11),  state_info >> 5)
     ) ? jumpY::Full : jumpY::Short;
+}
+
+/**
+ * @brief Returns the type of jump that should be performed if a grounded jump occured right now.
+ * @return jumpX
+ */
+jumpX PlayerFighter::decideJumpXType() const {
+    int8_t orientation = sign(current_direction_control_state.x);
+    return (abs(current_direction_control_state.x) > port->getController()->getControllerVals().analogStickThreshold) ?
+        (orientation == facing) ? jumpX::Forward : jumpX::Backwards :
+        jumpX::Normal;
 }
 
 int PlayerFighter::handleInput(RegisteredInput& input){

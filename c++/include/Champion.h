@@ -63,6 +63,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
         double dash_speed;
         double dash_start_speed;
         double dash_turn_accel;
+        double dash_stop_deceleration;
         double traction; //grounded horizontal deceleration
         double max_air_speed;
         double air_acceleration;
@@ -70,9 +71,14 @@ class Champion : public AnimationsPool<EntityAnimation> {
         double jump_speed;
         double short_hop_speed;
         double air_jump_speed;
+        double ground_forward_jump_speed;
+        double ground_backward_jump_speed;
+        double air_forward_jump_speed;
+        double air_backward_jump_speed;
         double gravity;
         double max_fall_speed;
         double fast_fall_speed;
+        double weight;
         int8_t jump_squat_duration;
         int8_t dash_start_duration;
         int8_t dash_stop_duration;
@@ -81,7 +87,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
         int8_t guard_start_duration;
         int8_t guard_stop_duration;     
         Champion::ShieldInfo shield_info;
-        double weight;
+        Uint8 air_jumps;
 
         Values();
     };

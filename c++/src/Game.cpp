@@ -78,13 +78,24 @@ void Game::draw(SDL_Renderer* target){
 }
 
 /**
- * @brief \ref Fighter#updateInputs "Updates the inputs" of every Fighter.
+ * @brief
  * 
  */
-void Game::updateInputs(){
+void Game::updateInputsState(){
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->updateInputs();
+        it->updateInputsStates();
+    }
+}
+
+/**
+ * @brief
+ * 
+ */
+void Game::resolveInputs(){
+    Fighteriterator it;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        it->resolveInputs();
     }
 }
 
@@ -142,8 +153,9 @@ void Game::advanceAnimations(){
  */
 
 void Game::step(SDL_Renderer* render_target){
+    updateInputsState();
     updateStates();
-    updateInputs();
+    resolveInputs();
     applyPhysics();
     updateAnimations();
     draw(render_target);

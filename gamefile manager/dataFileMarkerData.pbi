@@ -1,4 +1,5 @@
-﻿championValues(1) = #TYPE_DOUBLE
+﻿championValues(0) = #TYPE_DOUBLE
+championValues(1) = #TYPE_DOUBLE
 championValues(2) = #TYPE_DOUBLE 
 championValues(3) = #TYPE_DOUBLE 
 championValues(4) = #TYPE_DOUBLE 
@@ -13,16 +14,22 @@ championValues(12) = #TYPE_DOUBLE
 championValues(13) = #TYPE_DOUBLE
 championValues(14) = #TYPE_DOUBLE
 championValues(15) = #TYPE_DOUBLE
-championValues(16) = #TYPE_BYTE
-championValues(17) = #TYPE_BYTE
-championValues(18) = #TYPE_BYTE
-championValues(19) = #TYPE_BYTE
+championValues(16) = #TYPE_DOUBLE
+championValues(17) = #TYPE_DOUBLE
+championValues(18) = #TYPE_DOUBLE
+championValues(19) = #TYPE_DOUBLE
 championValues(20) = #TYPE_BYTE
 championValues(21) = #TYPE_BYTE
 championValues(22) = #TYPE_BYTE
 championValues(23) = #TYPE_BYTE
 championValues(24) = #TYPE_BYTE
+championValues(25) = #TYPE_BYTE
+championValues(26) = #TYPE_BYTE
+championValues(27) = #TYPE_BYTE
+championValues(28) = #TYPE_BYTE
+championValues(29) = #TYPE_BYTE
+championValues(30) = #TYPE_BYTE
 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 14
+; CursorPosition = 30
 ; EnableXP

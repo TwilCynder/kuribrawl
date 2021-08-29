@@ -49,7 +49,7 @@ enum jumpY {
  * 
  */
 enum jumpX {
-    Normal,
     Forward,
+    Normal,
     Backwards
 };

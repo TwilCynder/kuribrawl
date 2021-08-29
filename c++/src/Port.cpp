@@ -13,7 +13,8 @@ Port::Port(App* app_) :
     app(app_),
     joystick_id(-1),
     controller(nullptr),
-    active(false)
+    active(false),
+    current_dpad_state({0, 0})
 {
 }
 
@@ -74,6 +75,11 @@ const Kuribrawl::Vector& Port::getSecondaryStickState() const{
     return secondary_stick.current_state;
 }
 
+void Port::updateDpadState(){
+    current_dpad_state.x = getDpadStateX();
+    current_dpad_state.y = getDpadStateY();
+}
+
 void Port::readController(){
 
     control_stick.updatePrevious();
@@ -92,13 +98,16 @@ void Port::readController(){
     //détection du passage de threshold
     const ControllerType::ControllerVals& vals = controller_type->getControllerVals();
 
-    if (pod.is_left_trigger_binding && left_trigger.current_state > vals.analogTriggerThreshold && left_trigger.previous_state < vals.analogTriggerThreshold){
-        
+    if (pod.read_left_trigger && left_trigger.current_state > vals.analogTriggerThreshold && left_trigger.previous_state < vals.analogTriggerThreshold){
         fighter->handleTriggerPress(TRIGGER_LEFT);
     }
 
-    if (pod.is_right_trigger_binding && (right_trigger.current_state >= vals.analogTriggerThreshold) && (right_trigger.previous_state < vals.analogTriggerThreshold)){
+    if (pod.read_right_trigger && (right_trigger.current_state >= vals.analogTriggerThreshold) && (right_trigger.previous_state < vals.analogTriggerThreshold)){
         fighter->handleTriggerPress(TRIGGER_RIGHT);
+    }
+
+    if (pod.read_dpad){
+        updateDpadState();
     }
 }
 
@@ -120,6 +129,10 @@ signed char Port::getDpadStateX() const{
 signed char Port::getDpadStateY() const{
     return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) ? 1 : 
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
+}
+
+const Kuribrawl::VectorT<int8_t>& Port::getDpadState() const{
+    return current_dpad_state;
 }
 
 void Port::setJoystick_(int id){

@@ -62,8 +62,9 @@ class Fighter {
     int state_timer;    ///< Number of frames this the current state was started.
     bool update_anim;   ///< Whether the animation should be updated according to the current state.
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame.
-    int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
+    int8_t facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
     bool grounded;      ///< true if the Fighter is on the ground.
+    Uint8 air_jumps;    ///< Number of times this fighter can air jump before touching the ground again
     Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
     Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
 
@@ -78,6 +79,7 @@ class Fighter {
 
     bool isStateFinished(int stateDuration);
 	virtual jumpY decideGroundedJumpYType() const = 0;
+    virtual jumpX decideJumpXType() const = 0;
 
     //Physics
     void groundCollision();
