@@ -27,10 +27,11 @@ Fighter::Fighter(Game& game, Champion* model_):
  */
 Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     state(State::IDLE),
-        update_anim(true),
+    update_anim(true),
     paused(false),
     facing(1),
     grounded(false),
+	air_jumps(model_->val.air_jumps),
     model(model_),
     game(game_)
 {
@@ -128,7 +129,9 @@ void Fighter::draw(SDL_Renderer* target){
  * @brief Makes the Fighter jump.
  *
  */
-void Fighter::jump(jumpX x_type, jumpY y_type){
+void Fighter::grounded_jump(jumpX x_type, jumpY y_type){
+	x_type = (x_type == jumpX::Undecided) ? decideJumpXType() : x_type;
+	y_type = (y_type == jumpY::Undecided) ? decideJumpYType() : y_type;
 
     switch (y_type){
         case jumpY::Full:
@@ -161,6 +164,35 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
     grounded = false;
 }
 
+
+//Returns int to make jump_manager able to return its return value directly
+bool air_jump(jumpX x_type){
+	
+	if (air_jumps > 0) {
+		x_type = (x_type == jumpX::Undecided) ? decideJumpXType() : x_type;
+	
+		switch(x_type){
+			case jumpX::Forward:
+				if (abs(speed.x) < model->val.air_forward_jump_speed){
+					speed.x = model->val.air_forward_jump_speed * facing;
+				}
+			case jumpX::Backwards:
+				if (abs(speed.x) < model->val.air_backward_jump_speed){
+					speed.x = model->val.air_backward_jump_speed * -facing;
+				}
+			default:
+				break;
+		}
+		
+		air_jumps--;
+		return 1;
+	} else {
+		return 0:
+	}
+	
+
+}
+
 /**
  * @brief If the current state is limited in time, returns whether is has reached its end.
  *
@@ -181,7 +213,7 @@ void Fighter::updateState(){
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){
-                jump(decideJumpXType(), decideGroundedJumpYType());
+                jump();
             }
             break;
         case State::DASH_START:
