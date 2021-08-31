@@ -56,11 +56,15 @@ namespace {
 int jump_manager(PlayerFighter* fighter, Port* port, RegisteredInput& input, jumpY type){
     Fighter::State state = fighter->getState();
 
-    if (state == Fighter::State::JUMPSQUAT){
-
-    } else {
-        fighter->setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
-    }
+	if (grounded){
+		if (state == Fighter::State::JUMPSQUAT){
+			
+		} else {
+			fighter->setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+		}
+	} else {
+		return air_jump()
+	}	
 
     return 0;
 }
@@ -79,7 +83,7 @@ int InputHandler_SmashStickSide(PlayerFighter* fighter, Port* port, RegisteredIn
 
     int facing = (input.input == Input::LEFT) ? -1 : 1;
 
-    if (fighter->getGrounded()){
+    if (grounded){
         if (state == Fighter::State::WALK ||
             state == Fighter::State::IDLE ||
             (state == Fighter::State::DASH_START && fighter->getFacing() == -facing))
