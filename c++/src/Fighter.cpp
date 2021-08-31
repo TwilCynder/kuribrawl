@@ -151,6 +151,7 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
         case jumpX::Backwards:
             if (abs(speed.x) < model->val.ground_forward_jump_speed){
                 speed.x = model->val.ground_backward_jump_speed * -facing;
+                Debug::log(speed.x);
             }
         default:
             break;
