@@ -70,40 +70,40 @@ void HardCoded::initGameData(App* app){
     Champion* acid = &data.tryChampion("acid");
     EntityAnimation* anim;
 
-    anim = acid->addAnimation("walking", app->LoadTexture("../res/walk_strip6.png"));
+    anim = acid->addAnimation("walking", app->LoadTexture("../res/old/walk_strip6.png"));
     anim->initFrames(6);
     anim->setBaseSpeed(0.15);
 
-    anim = acid->addAnimation("jumpsquat", app->LoadTexture("../res/jumpstart.png"));
+    anim = acid->addAnimation("jumpsquat", app->LoadTexture("../res/old/jumpstart.png"));
     anim->initFrames(1);
     anim->setBaseSpeed(-1);
 
-    anim = acid->addAnimation("dash", app->LoadTexture("../res/dash_strip4.png"));
+    anim = acid->addAnimation("dash", app->LoadTexture("../res/old/dash_strip4.png"));
     anim->initFrames(4);
     anim->setBaseSpeed(0.18);
 
-    anim = acid->addAnimation("dash_start", app->LoadTexture("../res/dashstart_strip2.png"));
+    anim = acid->addAnimation("dash_start", app->LoadTexture("../res/old/dashstart_strip2.png"));
     anim->initFrames(2);
     anim->setBaseSpeed(8);
 
-    anim = acid->addAnimation("dash_stop", app->LoadTexture("../res/dashstop_strip2.png"));
+    anim = acid->addAnimation("dash_stop", app->LoadTexture("../res/old/dashstop_strip2.png"));
     anim->initFrames(2);
     anim->setBaseSpeed(5);
 
-    anim = acid->addAnimation("dash_turn", app->LoadTexture("../res/dashturn_strip3.png"));
+    anim = acid->addAnimation("dash_turn", app->LoadTexture("../res/old/dashturn_strip3.png"));
     anim->initFrames(3);
     anim->setBaseSpeed(14);
 
-    anim = acid->addAnimation("air_idle", app->LoadTexture("../res/air_idle.png"));
+    anim = acid->addAnimation("air_idle", app->LoadTexture("../res/old/air_idle.png"));
     anim->initFrames(1);
     anim->setBaseSpeed(-1);
 
-    anim = acid->addAnimation("jump", app->LoadTexture("../res/jump_strip5.png"));
+    anim = acid->addAnimation("jump", app->LoadTexture("../res/old/jump_strip5.png"));
     anim->initFrames(5);
     anim->setBaseSpeed(0.5);
     anim->setNextAnimation(acid->getAnimation("air_idle"));
 
-    anim = acid->addAnimation("landing", app->LoadTexture("../res/land_strip2.png"));
+    anim = acid->addAnimation("landing", app->LoadTexture("../res/old/land_strip2.png"));
     anim->initFrames(2);
     anim->setBaseSpeed(5);
 }
