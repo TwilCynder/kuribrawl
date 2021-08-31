@@ -39,9 +39,9 @@ enum commands {
  * 
  */
 enum jumpY {
+	Undecided,
     Full,
-    Short,
-    Air,
+    Short
 };
 
 /**
@@ -49,6 +49,7 @@ enum jumpY {
  * 
  */
 enum jumpX {
+	Undecided,
     Forward,
     Normal,
     Backwards
