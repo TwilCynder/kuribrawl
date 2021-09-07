@@ -74,10 +74,6 @@ void HardCoded::initGameData(App* app){
     anim->initFrames(6);
     anim->setBaseSpeed(0.15);
 
-    anim = acid->addAnimation("jumpsquat", app->LoadTexture("../res/old/jumpstart.png"));
-    anim->initFrames(1);
-    anim->setBaseSpeed(-1);
-
     anim = acid->addAnimation("dash", app->LoadTexture("../res/old/dash_strip4.png"));
     anim->initFrames(4);
     anim->setBaseSpeed(0.18);

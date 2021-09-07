@@ -37,7 +37,8 @@ class DataFile {
         LEFTANIM, ///< An Animation \ref Animation#spritesheet_left "left image".
         CHAMPION, ///< Info about a Champion.
         STAGE, ///< Info about a Stage.
-        IMAGE ///< A simple lone image.
+        IMAGE, ///< A simple lone image.
+        NONE   ///< Used when eof was read instead of a data type
     };
 
     //Reading

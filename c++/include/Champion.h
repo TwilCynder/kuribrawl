@@ -50,8 +50,8 @@ class Champion : public AnimationsPool<EntityAnimation> {
      * @brief Base position and size of this Charater's shield.
      *
      */
-    struct ShieldInfo : Kuribrawl::Vector {
-        int size;
+    struct ShieldInfo : Kuribrawl::VectorT<int8_t> {
+        Uint8 size;
     };
 
     /**

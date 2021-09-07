@@ -2,5 +2,7 @@ idle_strip4.png
 A:acid/idle idle.dat
 nair_strip6.png
 A:acid/nair nair_acid.dat
+jumpstart.png
+A:acid/jumpsquat 1 -1 c
 acid_rainbows.dat
 C:acid
