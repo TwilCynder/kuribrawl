@@ -64,6 +64,7 @@ void CurrentAnimation::setAnimation(const EntityAnimation* anim){
  */
 
 void CurrentAnimation::setAnimation(const EntityAnimation* anim, double speed_){
+    if (!anim) return;
     model = anim;
     init();
     setSpeed(speed_);

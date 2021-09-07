@@ -1,8 +1,26 @@
-idle_strip4.png
+idle.png
 A:acid/idle idle.dat
-nair_strip6.png
+nair.png
 A:acid/nair nair_acid.dat
 jumpstart.png
 A:acid/jumpsquat 1 -1 c
+walk.png
+A:acid/walking 6 0.15 c
+dash.png 
+A:acid/dash 4 0.18 c
+dash_start.png
+A:acid/dash_start 2 8 c
+dash_stop.png
+A:acid/dash_stop 2 5 c
+dash_turn.png
+A:acid/dash_turn 3 14 c
+air_idle.png
+A:acid/air_idle 1 -1 c
+jump.png
+A:acid/jump 5 16 c
+landing.png
+A:acid/landing 2 5 c
+air_jump.png
+A:acid/air_jump 8 0.25 c
 acid_rainbows.dat
 C:acid

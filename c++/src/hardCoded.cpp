@@ -70,7 +70,7 @@ void HardCoded::initGameData(App* app){
     Champion* acid = &data.tryChampion("acid");
     EntityAnimation* anim;
 
-    anim = acid->addAnimation("walking", app->LoadTexture("../res/old/walk_strip6.png"));
+    /*anim = acid->addAnimation("walking", app->LoadTexture("../res/old/walk_strip6.png"));
     anim->initFrames(6);
     anim->setBaseSpeed(0.15);
 
@@ -97,9 +97,8 @@ void HardCoded::initGameData(App* app){
     anim = acid->addAnimation("jump", app->LoadTexture("../res/old/jump_strip5.png"));
     anim->initFrames(5);
     anim->setBaseSpeed(0.5);
-    anim->setNextAnimation(acid->getAnimation("air_idle"));
 
     anim = acid->addAnimation("landing", app->LoadTexture("../res/old/land_strip2.png"));
     anim->initFrames(2);
-    anim->setBaseSpeed(5);
+    anim->setBaseSpeed(5);*/
 }

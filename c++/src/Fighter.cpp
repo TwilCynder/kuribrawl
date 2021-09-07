@@ -69,6 +69,10 @@ CurrentAnimation* Fighter::getCurrentAnimation(){
     return &current_animation;
 }
 
+void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
+    current_animation.setAnimation(model->getDefaultAnimation(default_anim));
+}
+
 /**
  * @brief Sets the x and y components of the speed of this Fighter
  * @param x x speed in pixels per frame
@@ -187,7 +191,8 @@ int Fighter::air_jump(jumpX x_type){
 		
         speed.y = model->val.air_jump_speed;
 		air_jumps--;
-		setState(Fighter::State::IDLE);
+		setState(Fighter::State::IDLE, 0, 0, false);
+        setAnimation(Champion::DefaultAnimation::AIR_JUMP);
         
         return 1;
 	} else {

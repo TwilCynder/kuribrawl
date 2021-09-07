@@ -138,14 +138,21 @@ void Champion::finalizeMoves(){
  */
 
 void Champion::initDefaultAnimations(){
-    const EntityAnimation* anim;
+    EntityAnimation* anim;
 
     for (auto const& [state, name] : default_animation_name){
         cout << "Looking for animation " << name << '\n';
-        if ((anim = getAnimation(name))){
+        if ((anim = (EntityAnimation*)getAnimation(name))){
             cout << "FOUND" << '\n';
             default_animations[(int)state] = anim;
         }
+    }
+
+    if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::JUMP))){
+        anim->setNextAnimation(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
+    }
+    if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_JUMP))){
+        anim->setNextAnimation(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
     }
 }
 
@@ -172,7 +179,8 @@ const std::map<Champion::DefaultAnimation, std::string> Champion::default_animat
     {Champion::DefaultAnimation::DASH_STOP, "dash_stop"},
     {Champion::DefaultAnimation::DASH_TURN, "dash_turn"},
     {Champion::DefaultAnimation::JUMP, "jump"},
-    {Champion::DefaultAnimation::AIR_IDLE, "air_idle"}
+    {Champion::DefaultAnimation::AIR_IDLE, "air_idle"},
+    {Champion::DefaultAnimation::AIR_JUMP, "air_jump"}
 };
 
 const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name = {

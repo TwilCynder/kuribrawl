@@ -7,8 +7,8 @@
 #include "util.h"
 #include "InputManager.h"
 #include "gameActions.h"
+#include "Champion.h"
 
-class Champion;
 class Game;
 struct Move;
 
@@ -47,6 +47,7 @@ class Fighter {
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
     void startMove(const Move&);
     CurrentAnimation* getCurrentAnimation();
+    void setAnimation(Champion::DefaultAnimation);
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);
     bool getGrounded() const;
