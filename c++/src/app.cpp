@@ -119,6 +119,8 @@ void App::initGameData(){
 }
 
 bool App::loadGameFile(const char* name){
+	cout << "Using data file at " << name << '\n' << std::flush;
+
     DataFile data_file(name, renderer);
     if (data_file.ready()) {
         data_file.read(*game_data);
@@ -132,6 +134,7 @@ bool App::loadGameFile(const char* name){
  * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
+	if (!loadGameFile("../res/data.twl"))
 	if (!loadGameFile("../gamefile manager/data.twl"))
 	throw KBFatalExplicit("Can't find data file");
 }

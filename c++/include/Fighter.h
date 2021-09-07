@@ -52,8 +52,8 @@ class Fighter {
     bool getGrounded() const;
     int getFacing() const;
 
-    void ground_jump(jumpX x_type = jumpX::Undecided, jumpY y_type = jumpY::Undecided);
-	int  air_jump(jumpX x_type = jumpX::Undecided);
+    void ground_jump(jumpX x_type = jumpX::UndecidedX, jumpY y_type = jumpY::UndecidedY);
+	int  air_jump(jumpX x_type = jumpX::UndecidedX);
 
     bool is_initialized();
 

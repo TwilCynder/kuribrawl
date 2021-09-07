@@ -70,7 +70,9 @@ void DataFile::readVersion(){
 
 DataFile::DataType DataFile::readDataType(){
     Uint8 buffer;
-    SDL_RWread(sdl_stream, &buffer, 1, 1);
+    if (!SDL_RWread(sdl_stream, &buffer, 1, 1)){
+        return DataType::NONE;
+    }
     return (DataType)buffer;
 }
 
@@ -158,6 +160,14 @@ void DataFile::readChampionFile(Champion& champion){
     cout << "Display name " << (champion.getDisplayName()) << '\n';
 
     readChampionValues(champion);
+
+    Uint8 byte;
+    readByte(&byte);
+
+    if (byte != FILEMARKER_INTERFILE){
+        cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
+        throw KBFatalExplicit("File read : invalid data file content");
+    }
 }
 
 /**
@@ -179,9 +189,10 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 
 
     readLong(&value);    //Image size
+    value += ftell(file); //Value is the file adress right after the image
 
     anim.setSpritesheet(IMG_LoadTexture_RW(renderer, sdl_stream, 0));
-    fseek(file, 12, SEEK_CUR);
+    fseek(file, value, SEEK_SET);
     readByte(&byte);
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -310,6 +321,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 char* DataFile::separateTag(char* tag){
     char* res = strchr(tag, '/');
     if (!res){
+        cout << "At " << std::hex << ftell(file) << '\n';
         throw KBFatal("Data chunk tag doesn't contain a '/'");
     }
 
@@ -333,6 +345,7 @@ void DataFile::read(GameData& data){
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
+
                 tag = readFileTag();
                 entity = tag;
                 element = separateTag(tag);
@@ -350,9 +363,12 @@ void DataFile::read(GameData& data){
                 Debug::log("-Reading CHampion");
                 Debug::log(tag);
                 readChampionFile(data.tryChampion(tag));
+            case DataFile::DataType::NONE:
+                Debug::log("NOOOOOONE");
             default:
                 break;
         }
+        cout << "Current pos : " << std::hex << ftell(file) << std::dec << '\n';
     }
     Debug::log("====== Data file loading finished ==============");
 }

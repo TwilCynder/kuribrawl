@@ -22,7 +22,7 @@
 5   #Jumpsquat
 -1  #Dash start
 -1  #Dash stop
--1  #Dash Turn
+1  #Dash Turn
 -1  #landing
 2   #guard start
 5   #guard stop

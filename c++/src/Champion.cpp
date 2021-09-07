@@ -141,7 +141,9 @@ void Champion::initDefaultAnimations(){
     const EntityAnimation* anim;
 
     for (auto const& [state, name] : default_animation_name){
+        cout << "Looking for animation " << name << '\n';
         if ((anim = getAnimation(name))){
+            cout << "FOUND" << '\n';
             default_animations[(int)state] = anim;
         }
     }

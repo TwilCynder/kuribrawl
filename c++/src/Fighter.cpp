@@ -129,9 +129,9 @@ void Fighter::draw(SDL_Renderer* target){
  * @brief Makes the Fighter jump.
  *
  */
-void Fighter::grounded_jump(jumpX x_type, jumpY y_type){
-	x_type = (x_type == jumpX::Undecided) ? decideJumpXType() : x_type;
-	y_type = (y_type == jumpY::Undecided) ? decideJumpYType() : y_type;
+void Fighter::ground_jump(jumpX x_type, jumpY y_type){
+	x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
+	y_type = (y_type == jumpY::UndecidedY) ? decideGroundedJumpYType() : y_type;
 
     switch (y_type){
         case jumpY::Full:
@@ -140,22 +140,21 @@ void Fighter::grounded_jump(jumpX x_type, jumpY y_type){
         case jumpY::Short:
             speed.y += model->val.short_hop_speed;
             break;
-        case jumpY::Air:
-            speed.y += model->val.air_jump_speed;
-            break;
         default:
             break;
     }
+    
     switch(x_type){
         case jumpX::Forward:
-            if (abs(speed.x) < model->val.ground_forward_jump_speed){
+            if (speed.x * facing < model->val.ground_forward_jump_speed){
                 speed.x = model->val.ground_forward_jump_speed * facing;
             }
+            break;
         case jumpX::Backwards:
-            if (abs(speed.x) < model->val.ground_forward_jump_speed){
+            if (speed.x * -facing < model->val.ground_backward_jump_speed){
                 speed.x = model->val.ground_backward_jump_speed * -facing;
-                Debug::log(speed.x);
             }
+            break;
         default:
             break;
     }
@@ -166,30 +165,34 @@ void Fighter::grounded_jump(jumpX x_type, jumpY y_type){
 
 
 //Returns int to make jump_manager able to return its return value directly
-bool air_jump(jumpX x_type){
+int Fighter::air_jump(jumpX x_type){
 	
 	if (air_jumps > 0) {
-		x_type = (x_type == jumpX::Undecided) ? decideJumpXType() : x_type;
+		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
 	
-		switch(x_type){
-			case jumpX::Forward:
-				if (abs(speed.x) < model->val.air_forward_jump_speed){
-					speed.x = model->val.air_forward_jump_speed * facing;
-				}
-			case jumpX::Backwards:
-				if (abs(speed.x) < model->val.air_backward_jump_speed){
-					speed.x = model->val.air_backward_jump_speed * -facing;
-				}
-			default:
-				break;
-		}
+	    switch(x_type){
+            case jumpX::Forward:
+                if (speed.x * facing < model->val.air_forward_jump_speed){
+                    speed.x = model->val.air_forward_jump_speed * facing;
+                }
+                break;
+            case jumpX::Backwards:
+                if (speed.x * -facing < model->val.air_backward_jump_speed){
+                    speed.x = model->val.air_backward_jump_speed * -facing;
+                }
+                break;
+            default:
+                break;
+        }
 		
+        speed.y = model->val.air_jump_speed;
 		air_jumps--;
-		return 1;
+		setState(Fighter::State::IDLE);
+        
+        return 1;
 	} else {
-		return 0:
+		return 0;
 	}
-	
 
 }
 
@@ -213,7 +216,7 @@ void Fighter::updateState(){
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){
-                jump();
+                ground_jump();
             }
             break;
         case State::DASH_START:
@@ -227,7 +230,7 @@ void Fighter::updateState(){
             }
             break;
         case State::DASH_TURN:
-            if (isStateFinished(model->val.dash_start_duration)){
+            if (isStateFinished(model->val.dash_turn_duration)){
                 setState(State::DASH);
             }
             break;

@@ -253,7 +253,7 @@ void PlayerFighter::unsetPort(){
  */
 jumpY PlayerFighter::decideGroundedJumpYType() const {
 	return ( 
-        ((state_info >> 2) & 1) == jumpY::Full && 
+        (((state_info >> 2) & 1) == 0) && 
         port->isElementPressed((ElementType)((state_info >> 3) & 0b11),  state_info >> 5)
     ) ? jumpY::Full : jumpY::Short;
 }
@@ -279,8 +279,10 @@ int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
         if (state == Fighter::State::JUMPSQUAT){
             state_info |= 0b100;
         } else {
-            setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)type, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+            setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)(type == jumpY::Short) ? 1 : 0, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
         }
+    } else {
+        return air_jump();
     }
 
     return 0;

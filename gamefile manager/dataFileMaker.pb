@@ -67,7 +67,7 @@ Enumeration
     #TYPE_DOUBLE
 EndEnumeration
 
-#CHAMPION_VALUES_NB = 30
+#CHAMPION_VALUES_NB = 31
 Dim championValues.b(#CHAMPION_VALUES_NB)
 XIncludeFile "dataFileMarkerData.pbi"
 
@@ -97,7 +97,7 @@ EndMacro
 
 Macro warning(text)
     If logging
-        printLogForce("WARNING : " + text)
+        printLogForce(Chr(27) + "WARNING : " + text)
     EndIf      
 EndMacro
 
@@ -159,6 +159,7 @@ Procedure readFileToMemory(path.s)
 EndProcedure
 
 Procedure writeMemoryToFile(datafile.l)
+    Debug "writeData"
     Shared loadedFile
     WriteData(datafile, loadedFile\buffer, loadedFile\size)
 EndProcedure
@@ -205,7 +206,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
     lineN.l = 1
     
     printLog("---")
-    printLog("Writing Animation descriptor at offset " + Hex(Loc(datafile)))
+    printLog("Writing Animation descriptor at offset " + Hex(Loc(datafile)) + " (" + Loc(datafile) + ")")
     WriteAsciiCharacter(datafile, #FILEMARKER_DESCRIPTORSTART)
     
     If Right(info, 4) = ".dat"
@@ -505,20 +506,32 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
             error("Missing frame number")
         EndIf 
         
-        value = Val(value$)
-        If value < 1  
+        frameNumber = Val(value$)
+        If frameNumber < 1  
             error("Null or negative frame number")
         EndIf 
-        WriteByte(datafile, value)
+        WriteByte(datafile, frameNumber)
         printLog("  Frames number : " + value$)
         
         value$ = GMB_StringField(info, 2, " ")
         valueD = ValD(value$)
         If valueD
-          WriteAsciiCharacter(1, #FILEMARKER_ANIMSPEED)
-          WriteDouble(1, valueD)
-          printLog("  Speed" + value$)
+            WriteAsciiCharacter(datafile, #FILEMARKER_ANIMSPEED)
+            WriteDouble(datafile, valueD)
+            printLog("  Speed : " + value$)
         EndIf 
+        
+        value$ = GMB_StringField(info, 3, " ")
+        If value$ = "c"
+            printLog(~"  Writing full-frame hurtboxes for each frame (\"c all\" found)")
+            For i = 0 To frameNumber - 1
+                printLog(~"    Writing full-frame hurtox on frame " + Str(i))
+                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
+                WriteAsciiCharacter(datafile, i)
+                WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
+                WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+            Next
+        EndIf    
     EndIf 
 EndProcedure
 
@@ -556,7 +569,8 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
     
     line = getDescriptorLine(sourceFile, @lineN)
     
-    Debug Loc(datafile)
+        Debug Hex(Loc(datafile))
+    
     While startsWithNumber(line)
         For i = 1 To GMB_CountFields(line, " ")
             If valuesRead >= #CHAMPION_VALUES_NB
@@ -565,12 +579,8 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
             EndIf 
             value$ = GMB_StringField(line, i, " ")
             If (championValues(valuesRead) = #TYPE_BYTE)
-                Debug "byte"
-                Debug Loc(datafile)
                 WriteByte(datafile, Val(value$))
             Else
-                Debug "double"
-                Debug Loc(datafile)
                 WriteDouble(datafile, ValD(value$))
             EndIf 
             printLog("  -" + *debugValues\championValues[valuesRead] + " : " + value$ + " ("+ *debugValues\championValueTypes[championValues(valuesRead + 1)] +")")
@@ -582,7 +592,6 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
         EndIf 
         line = getDescriptorLine(sourceFile, @lineN)
     Wend
-    Debug Loc(datafile)
     champion_values_loop_end:
     
     If valuesRead < #CHAMPION_VALUES_NB
@@ -591,6 +600,7 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
     EndIf 
     
     CloseFile(sourceFile)
+   
 EndProcedure
 
 Procedure addFile(datafile.l, *inputFile.File)
@@ -615,13 +625,15 @@ Procedure addFile(datafile.l, *inputFile.File)
             error(*inputFile\content + " : unknown file type")
     EndSelect
     
+    Debug *inputFile\content
+    
     Define tag.s, info.s
     tag = GMB_StringField(*inputFile\content, 2, ":")
-    info = GMB_StringField(tag, 2, " ")
+    info = GMB_SepRight(tag, " ", 2)
     tag  = GMB_StringField(tag, 1, " ")
     
     printLog("---")
-    printLog("Writing at offset " + Hex(Loc(datafile)))
+    printLog("Writing at offset " + Hex(Loc(datafile)) + " (" + Loc(datafile) + ")")
     
     writeFileType(datafile, type)
     printLog("Type : " + *debugValues\fileTypeNames[type])
@@ -630,6 +642,7 @@ Procedure addFile(datafile.l, *inputFile.File)
     
     If type = #FILETYPE_ANIMATION Or type = #FILETYPE_LEFTANIM Or type = #FILETYPE_IMAGE
         ;these files are data that isn't going to be parsed (image, sound)
+        Debug *inputFile\path
         size.l = readFileToMemory(*inputFile\path)
         If Not size
             error("Could not load file " + *inputFile\path)
@@ -677,7 +690,7 @@ While 1
 Wend        
 
 If Right(source, 1) <> "/" And Len(source) > 0
-    source = "/"
+    source + "/"
 EndIf 
 
 If buildpath = ""
@@ -721,8 +734,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 566
-; FirstLine = 537
+; CursorPosition = 635
+; FirstLine = 631
 ; Folding = ----
 ; EnableXP
 ; Executable = dataFileMaker.exe
