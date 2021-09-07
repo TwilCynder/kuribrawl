@@ -156,6 +156,8 @@ void Game::step(SDL_Renderer* render_target){
     updateInputsState();
     updateStates();
     resolveInputs();
+    //updateAnims
+    //checkHitboxes
     applyPhysics();
     updateAnimations();
     draw(render_target);

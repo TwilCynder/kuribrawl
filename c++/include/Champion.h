@@ -3,7 +3,6 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "util.h"
-#include "Fighter.h"
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Move.h"
@@ -12,6 +11,8 @@
  * @brief A character of the game.
  * Contain purely static information about this character ; does not care about what happens in-game, which is the job of Fighter.
  */
+
+class Fighter;
 
 class Champion : public AnimationsPool<EntityAnimation> {
     public:
@@ -23,6 +24,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
         #include "states.enum"
         AIR_IDLE,
         JUMP,
+        AIR_JUMP,
         TOTAL
     };
 
