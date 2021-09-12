@@ -11,6 +11,8 @@
 
 class Game;
 struct Move;
+struct Hurtbox;
+struct Hitbox ;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -40,6 +42,9 @@ class Fighter {
     //States
     void updateState();
     void updateAnimation();
+    //Hitboxes
+    const std::vector<Hurtbox>& getCurrentHurtboxes() const;
+    const std::vector<Hitbox>&  getCurrentHitboxes ();
 
     Game& getGame();
     const Champion& getChampion();
@@ -80,6 +85,7 @@ class Fighter {
     std::string current_animation_name; ///< Never used.
 
     bool isStateFinished(int stateDuration);
+    void checkStateDuration();
 	virtual jumpY decideGroundedJumpYType() const = 0;
     virtual jumpX decideJumpXType() const = 0;
 

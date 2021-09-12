@@ -211,6 +211,39 @@ bool Fighter::isStateFinished(int duration){
     return (duration == -1) ? current_animation.is_finished() : state_timer >= duration;
 }
 
+void Fighter::checkStateDuration(){
+    Debug::log((int)model->val.dash_turn_duration);
+    switch (state){
+        case State::JUMPSQUAT:
+            if (!model->val.jump_squat_duration){
+                ground_jump();
+            }
+            break;
+        case State::DASH_START:
+            if (!model->val.dash_start_duration){
+                setState(State::DASH);
+            }
+            break;
+        case State::DASH_STOP:
+            if (!model->val.dash_stop_duration){
+                setState(State::IDLE);
+            }
+            break;
+        case State::DASH_TURN:
+            if (!model->val.dash_turn_duration){
+                setState(State::DASH);
+            }
+            break;
+        case State::LANDING:
+            if (!model->val.landing_duration){
+                setState(State::IDLE);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 /**
  * @brief Checks if any change of state should be made based on the current state and the \ref Fighter#state_time "state timer".
  *
@@ -273,6 +306,10 @@ void Fighter::updateAnimation(){
     }
 }
 
+const std::vector<Hurtbox>& Fighter::getCurrentHurtboxes() const{
+    return current_animation.getHurtboxes();
+}
+
 /**
  * @brief Returns the game
  * 
@@ -317,6 +354,7 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
     if (facing_) facing = facing_;
 
     state_timer = 0;
+    checkStateDuration();
 }
 
 void Fighter::startMove(const Move& move){
