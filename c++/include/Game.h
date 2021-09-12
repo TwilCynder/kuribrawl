@@ -28,6 +28,7 @@ class Game {
     void resolveInputs();
     void updateStates();
     void updateAnimations();
+    void hitDetection();
 
     int getFrame();
 

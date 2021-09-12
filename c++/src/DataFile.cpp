@@ -179,7 +179,7 @@ void DataFile::readChampionFile(Champion& champion){
 void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     int value;
     Uint8 byte;
-    Uint16 word;
+    int16_t word;
     double valueD;
     bool leave_loop;
     Frame* current_frame;
@@ -241,7 +241,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         
                         readWord(&word);
                         hurtbox->x = word;
-                        if (hurtbox->x == MAX_VALUE_SHORT){  
+                        if (hurtbox->x == MAX_VALUE_USHORT){  
                             hurtbox->x = -(current_frame->origin.x);
                             hurtbox->y =  (current_frame->origin.y);
                             hurtbox->w = current_frame->display.w;

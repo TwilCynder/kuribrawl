@@ -14,6 +14,7 @@
 #include "DataFile.h"
 #include "System.h"
 #include "messageBox.h"
+#include "Random.h"
 
 using namespace std;
 
@@ -204,7 +205,7 @@ void App::readPorts(){
 
 void App::print_report(std::ostream& out){
 	Uint32 app_duration = System::now() - start_time;
-	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
+	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
 }
 
 /**

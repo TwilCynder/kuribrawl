@@ -37,6 +37,7 @@ EndEnumeration
 
 #MAX_VALUE_BYTE  = 255
 #MAX_VALUE_SHORT = 65535
+#MAX_VALUE_USHORT = 32767
 
 ;General
 #FILEMARKER_404 = $F0
@@ -342,7 +343,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                             WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
                             WriteAsciiCharacter(datafile, i)
                             WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
-                            WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                            WriteUnicodeCharacter(datafile, #MAX_VALUE_USHORT)
                         Next
                         Continue
                     EndIf 
@@ -372,7 +373,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     
                     value$ = GMB_StringField(line, 2, " ")
                     If value$ = ""
-                        WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                        WriteWord(datafile, #MAX_VALUE_USHORT)
                         printLog("    No value ; this hurtbox will cover all the frame and use the default type.")
                         Continue
                     EndIf 
@@ -525,11 +526,11 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
         If value$ = "c"
             printLog(~"  Writing full-frame hurtboxes for each frame (\"c all\" found)")
             For i = 0 To frameNumber - 1
-                printLog(~"    Writing full-frame hurtox on frame " + Str(i))
+                printLog(~"    Writing full-frame hurtox (0x7FFF) on frame " + Str(i))
                 WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
                 WriteAsciiCharacter(datafile, i)
                 WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
-                WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                WriteWord(datafile, #MAX_VALUE_USHORT)
             Next
         EndIf    
     EndIf 
@@ -734,8 +735,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 635
-; FirstLine = 631
+; CursorPosition = 528
+; FirstLine = 492
 ; Folding = ----
 ; EnableXP
 ; Executable = dataFileMaker.exe

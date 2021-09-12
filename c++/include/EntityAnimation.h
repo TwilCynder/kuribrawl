@@ -1,7 +1,7 @@
 #pragma once
 #include "Animation.h"
 #include "EntityFrame.h"
-#include <vector>
+#include "CBoxVectors.h"
 
 class EntityAnimation : public Animation {
     public:

@@ -137,6 +137,7 @@ void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals c
  * @brief Check is the sticks of the controller used by this Fighter's Port are in a position that should lead to an action (according to the current state) and takes it.
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
+    if (!valid_port) return;
     const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
 
     switch (state){
@@ -177,7 +178,7 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
  *
  */
 void PlayerFighter::updateInputsStates(){
-    if (!port) return;
+    if (!valid_port) return;
     const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
     updateDirectionControlState(controller_vals);
     update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState(), controller_vals);

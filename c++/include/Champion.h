@@ -5,6 +5,7 @@
 #include "util.h"
 #include "AnimationsPool.h"
 #include "Move.h"
+#include "EntityAnimation.h"
 
 /**
  * @brief A character of the game.
