@@ -14,7 +14,7 @@ void initSDL()
 
 void prepareRender(SDL_Renderer* target)
 {
-    SDL_SetRenderDrawColor(target, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(target, 200, 200, 200, 255);
 	SDL_RenderClear(target);
 }
 

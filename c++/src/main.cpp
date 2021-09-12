@@ -5,6 +5,7 @@
 #include "Random.h"
 #include "messageBox.h"
 #include <ctime>
+#include "DebugTime.h"
 
 int main(int argc, char** argv) try {
 

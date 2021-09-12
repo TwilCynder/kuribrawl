@@ -11,7 +11,9 @@ struct CollisionBox {
     int y;
     int w;
     int h;
-    };
+
+    int getRealXPos(int facing) const;
+};
 
 struct Hurtbox : CollisionBox {
     enum Type {

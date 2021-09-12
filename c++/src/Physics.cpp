@@ -7,7 +7,7 @@
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
 void Fighter::applyAirAccel(int direction){
-	if (!(sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
+	if (!(Kuribrawl::sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
 		speed.x += model->val.air_acceleration * direction;
 		if (speed.x > model->val.max_air_speed)
 			speed.x = model->val.max_air_speed;
@@ -21,7 +21,13 @@ void Fighter::applyAirAccel(int direction){
  *
  */
 void Fighter::groundCollision(){
-    setState(Fighter::State::LANDING);
+    setAnimation(Champion::DefaultAnimation::LANDING);
+    if (state == Fighter::State::ATTACK){
+        if (current_move->landing_lag != -1) 
+            current_animation.setSpeed(current_move->landing_lag);
+    }
+    setState(Fighter::State::LANDING, 0, 0, false);
+
     land();
 }
 

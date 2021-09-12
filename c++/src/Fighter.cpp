@@ -6,6 +6,7 @@
 #include "Champion.h"
 #include "CollisionBoxes.h"
 #include "Move.h"
+#include "Random.h"
 #include <math.h>
 
 /**
@@ -33,12 +34,15 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     grounded(false),
 	air_jumps(model_->val.air_jumps),
     model(model_),
-    game(game_)
+    game(game_),
+    current_move(nullptr)
 {
     position.x = x_;
     position.y = y_;
     speed.x = 0.0;
     speed.y = 0.0;
+
+    id = Random::get_int();
 }
 
 /**
@@ -112,21 +116,25 @@ void Fighter::draw(SDL_Renderer* target){
     for (unsigned int i = 0; i < hurtboxes.size(); i++){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;
-        box.x = this->position.x + hurtboxes[i].x;
+        box.x = this->position.x + hurtboxes[i].getRealXPos(facing);
         box.y = SCREEN_HEIGHT - (this->position.y + hurtboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
 
     //Drawing hitboxes
     const std::vector<Hitbox>& hitboxes = current_animation.getHitboxes();
-    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    SDL_SetRenderDrawColor(target, 255, 0, 0, 255);
     for (unsigned int i = 0; i < hitboxes.size(); i++){
         box.w = hitboxes[i].w;
         box.h = hitboxes[i].h;
-        box.x = this->position.x + hitboxes[i].x;
+        box.x = this->position.x + hitboxes[i].getRealXPos(facing);
         box.y = SCREEN_HEIGHT - (this->position.y + hitboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
+
+    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    SDL_RenderDrawLine(target, position.x - 10, SCREEN_HEIGHT - position.y, position.x + 10, SCREEN_HEIGHT - position.y);
+    SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
 }
 
 /**
@@ -208,11 +216,12 @@ int Fighter::air_jump(jumpX x_type){
  * @return true if the duration is -1 and the current animation was finished, or if the timer state has reached the duration.
  */
 bool Fighter::isStateFinished(int duration){
+    //Debug::log("----");
+    //Debug::log((int)current_animation.is_finished());
     return (duration == -1) ? current_animation.is_finished() : state_timer >= duration;
 }
 
 void Fighter::checkStateDuration(){
-    Debug::log((int)model->val.dash_turn_duration);
     switch (state){
         case State::JUMPSQUAT:
             if (!model->val.jump_squat_duration){
@@ -306,8 +315,12 @@ void Fighter::updateAnimation(){
     }
 }
 
-const std::vector<Hurtbox>& Fighter::getCurrentHurtboxes() const{
+const HurtboxVector& Fighter::getCurrentHurtboxes() const{
     return current_animation.getHurtboxes();
+}
+
+const HitboxVector& Fighter::getCurrentHitboxes() const{
+    return current_animation.getHitboxes();
 }
 
 /**
@@ -358,6 +371,8 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
 }
 
 void Fighter::startMove(const Move& move){
+    setState(Fighter::State::ATTACK);
+    current_move = &move;
     if (move.animation){
         current_animation.setAnimation(move.animation);
     }

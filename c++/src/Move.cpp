@@ -3,7 +3,7 @@
 Move::Move() : 
     edge_behavior(EdgeBehavior::FALL),
     land_behavior(LandBehavior::NORMAL),
-    landing_lag(-1),
+    landing_lag(50),
     animation(nullptr)
 {
 
