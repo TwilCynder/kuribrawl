@@ -77,6 +77,11 @@ void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
     current_animation.setAnimation(model->getDefaultAnimation(default_anim));
 }
 
+void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
+    current_animation.setAnimation(model->getDefaultAnimation(default_anim), speed);
+}
+
+
 /**
  * @brief Sets the x and y components of the speed of this Fighter
  * @param x x speed in pixels per frame
@@ -371,9 +376,13 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
 }
 
 void Fighter::startMove(const Move& move){
-    setState(Fighter::State::ATTACK);
     current_move = &move;
     if (move.animation){
         current_animation.setAnimation(move.animation);
     }
+}
+
+void Fighter::attack(const Move& move){
+    setState(Fighter::State::ATTACK);
+    startMove(move);
 }

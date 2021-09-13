@@ -6,7 +6,7 @@ Move::Move() :
     landing_lag(50),
     animation(nullptr)
 {
-
+    
 }
 
 Move::Move(const char* anim_name_) : 

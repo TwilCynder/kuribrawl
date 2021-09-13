@@ -31,3 +31,8 @@
 0   #shield center x
 30  #shield center y
 1 # Air jumps
+
+#Moves
+m nair l 8
+m dair l 9
+m uair l 14

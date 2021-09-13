@@ -320,7 +320,7 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
     if (!grounded){
-        startMove(*getChampion().getDefaultMove(Champion::DefaultMoves::Nair));
+        attack(*getChampion().getDefaultMove(Champion::DefaultMoves::UAir));
     }
 
     return 0;
