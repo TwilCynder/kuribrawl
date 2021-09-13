@@ -48,9 +48,10 @@ class Fighter {
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
-    void startMove(const Move&);
+    void attack(const Move&);
     CurrentAnimation* getCurrentAnimation();
     void setAnimation(Champion::DefaultAnimation);
+    void setAnimation(Champion::DefaultAnimation, double speed);
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);
     bool getGrounded() const;
@@ -86,6 +87,7 @@ class Fighter {
     std::string current_animation_name; ///< Never used.
     const Move* current_move;
 
+    void startMove(const Move&);
     bool isStateFinished(int stateDuration);
     void checkStateDuration();
 	virtual jumpY decideGroundedJumpYType() const = 0;

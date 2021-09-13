@@ -52,7 +52,7 @@ Structure des fichiers de données de jeu (twl) :
 - Variables gameplay (à la suite)
 - Infos de move (facultatif) :
 - - - 0x02
-- - - 1 octed ID du move
+- - - nom du move (nt-string)
 - - - [0x20
 - - - 1 octet landing lag]
 - Infos de multimove (facultatif)
@@ -82,7 +82,7 @@ Descripteur de fichier d'animation (format texte, ligne par ligne)
 Descripteur de champion
 - Nom
 - variables sur la même lignes (séparées par espaces)
-- infos de move (facultatif) : m<id du move> [l<landing lag>]
+- infos de move (facultatif) : m <nom du move> [l<landing lag>]
 - info de multimove (facultatif) : u<id du move> {<frame de fin de part> <frame de début de part>}
 
 Descripteur de stage

@@ -160,7 +160,6 @@ Procedure readFileToMemory(path.s)
 EndProcedure
 
 Procedure writeMemoryToFile(datafile.l)
-    Debug "writeData"
     Shared loadedFile
     WriteData(datafile, loadedFile\buffer, loadedFile\size)
 EndProcedure
@@ -169,7 +168,7 @@ Procedure writeFileType(datafile.l, type.b)
     WriteAsciiCharacter(datafile, type)
 EndProcedure
 
-Procedure writeFileTag(datafile.l, tag.s)
+Procedure writeAsciiString(datafile.l, tag.s)
     WriteString(datafile, tag, #PB_Ascii)
     WriteAsciiCharacter(datafile, $A)
 EndProcedure
@@ -195,6 +194,9 @@ EndMacro
 Procedure.s getDescriptorLine(file.l, *lineN.Long)
     Define line.s
     Repeat
+        If Eof(file)
+            ProcedureReturn ""
+        EndIf 
         line = StringField(ReadString(file), 1, "#")
         *lineN\l + 1
     Until Not line = ""
@@ -570,8 +572,6 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
     
     line = getDescriptorLine(sourceFile, @lineN)
     
-        Debug Hex(Loc(datafile))
-    
     While startsWithNumber(line)
         For i = 1 To GMB_CountFields(line, " ")
             If valuesRead >= #CHAMPION_VALUES_NB
@@ -599,6 +599,35 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
         Debug valuesRead
         error("Missing champion values")
     EndIf 
+    
+    While Not line = ""
+        Select Left(line, 1)
+            Case "m"
+                value$ = GMB_StringField(line, 2, " ")
+                If value$ = ""
+                    error("Move names cannot be empty")
+                EndIf 
+                WriteAsciiCharacter(datafile, #FILEMARKER_MOVEINFO)
+                writeAsciiString(datafile, value$)
+                printLog("- Writing move info : " + value$)
+                
+                ;- - - Reading all values
+                For i = 3 To GMB_CountFields(line, " ")
+                    value$ = GMB_StringField(line, i, " ")
+                    Select value$
+                        Case "l" ; landing lag
+                            i + 1
+                            value$ = GMB_StringField(line, i, " ")
+                            WriteAsciiCharacter(datafile, #FILEMARKER_LANDINGLAG)
+                            WriteAsciiCharacter(datafile, Val(value$))
+                            printLog("  - Landing lag : " + value$)
+                    EndSelect    
+                            
+                Next
+        EndSelect
+        line = getDescriptorLine(sourceFile, @lineN)
+    Wend    
+                
     
     CloseFile(sourceFile)
    
@@ -638,12 +667,11 @@ Procedure addFile(datafile.l, *inputFile.File)
     
     writeFileType(datafile, type)
     printLog("Type : " + *debugValues\fileTypeNames[type])
-    writeFileTag(datafile, tag)
+    writeAsciiString(datafile, tag)
     printLog("Tag : " + tag)
     
     If type = #FILETYPE_ANIMATION Or type = #FILETYPE_LEFTANIM Or type = #FILETYPE_IMAGE
         ;these files are data that isn't going to be parsed (image, sound)
-        Debug *inputFile\path
         size.l = readFileToMemory(*inputFile\path)
         If Not size
             error("Could not load file " + *inputFile\path)
@@ -735,8 +763,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 528
-; FirstLine = 492
+; CursorPosition = 620
+; FirstLine = 588
 ; Folding = ----
 ; EnableXP
 ; Executable = dataFileMaker.exe

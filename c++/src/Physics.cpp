@@ -21,10 +21,11 @@ void Fighter::applyAirAccel(int direction){
  *
  */
 void Fighter::groundCollision(){
-    setAnimation(Champion::DefaultAnimation::LANDING);
-    if (state == Fighter::State::ATTACK){
-        if (current_move->landing_lag != -1) 
-            current_animation.setSpeed(current_move->landing_lag);
+    
+    if (state == Fighter::State::ATTACK && current_move->landing_lag != -1){
+        setAnimation(Champion::DefaultAnimation::LANDING, current_move->landing_lag);
+    } else {
+        setAnimation(Champion::DefaultAnimation::LANDING);
     }
     setState(Fighter::State::LANDING, 0, 0, false);
 

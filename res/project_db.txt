@@ -22,5 +22,7 @@ landing.png
 A:acid/landing 2 5 c
 air_jump.png
 A:acid/air_jump 8 0.25 c
+uair.png
+A:acid/uair uair.dat
 acid_rainbows.dat
 C:acid

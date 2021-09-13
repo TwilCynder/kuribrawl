@@ -164,6 +164,8 @@ void Champion::initDefaultMoves(){
     for (auto const& [moveID, name] : default_move_name){
         Move& move = addMove(name);
         move.anim_name = name;
+        //Debug::log(name);
+        //Debug::log((void*)&move);
         default_moves[(int)moveID] = &move;
     }
 }

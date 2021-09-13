@@ -162,12 +162,37 @@ void DataFile::readChampionFile(Champion& champion){
     readChampionValues(champion);
 
     Uint8 byte;
-    readByte(&byte);
+    Move* current_move = nullptr;
+    bool leave_loop = false;
 
-    if (byte != FILEMARKER_INTERFILE){
-        cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
-        throw KBFatalExplicit("File read : invalid data file content");
-    }
+    do {
+        readByte(&byte);
+        switch (byte){
+            case FILEMARKER_MOVEINFO:
+                readString();
+                current_move = &champion.tryMove(readBuffer);
+                cout << "Move : " << readBuffer << '\n' << std::flush;
+                break;
+            case FILEMARKER_LANDINGLAG:
+                if (!current_move){
+                    throw KBFatalDetailed("File read : invalid data file content", "Landing lag info present before any move info");
+                }
+                readByte(&byte);
+                current_move->landing_lag = byte;
+                cout << "Landing lag : " << (int)byte << '\n' << std::flush;
+                break;
+            case FILEMARKER_INTERFILE:
+                Debug::log("Interfile");
+                leave_loop = true;
+                break;
+            default:
+                fseek(file, -1, SEEK_CUR);
+                cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
+                throw KBFatalExplicit("File read : invalid data file content");
+                break;
+        }
+    } while (!leave_loop);
+
 }
 
 /**
@@ -368,7 +393,6 @@ void DataFile::read(GameData& data){
             default:
                 break;
         }
-        cout << "Current pos : " << std::hex << ftell(file) << std::dec << '\n';
     }
     Debug::log("====== Data file loading finished ==============");
 }
