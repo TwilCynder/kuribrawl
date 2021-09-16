@@ -27,10 +27,11 @@ class PlayerFighter : public Fighter {
     ~PlayerFighter();
 
     //Inputs
-    void updateInputs();
-    void updateSticks();
+    void updateInputsStates();
+    void resolveInputs();
     void handleButtonPress (int button );
     void handleTriggerPress(int trigger);
+    void handleStickFlick(Kuribrawl::Direction direction); //currently only for the second stick
 
     Port* getPort() const;
     void setPort(Port* port);
@@ -49,12 +50,21 @@ class PlayerFighter : public Fighter {
     void checkStickState();
     void init_control_stick_buffer();
     void swap_control_stick_buffer();
-    void update_control_stick_buffer(const Vector&, const Vector&, const ControllerType::ControllerVals&);
-    void updateDirectionControlState(ControllerType::ControllerVals controller_vals);
+    void update_control_stick_buffer(const Vector&, const Vector&);
+    void updateDirectionControlState();
+
+
+    Kuribrawl::Direction getDirection4(const Kuribrawl::Vector& stick_state) const;
+    Kuribrawl::DirectionIG getDirection4IG(const Kuribrawl::Vector& stick_state) const;
+
+    Kuribrawl::Direction getControlDirection4() const;
+    Kuribrawl::DirectionIG getControlDirection4IG() const;
 
 	jumpY decideGroundedJumpYType() const override;
+    jumpX decideJumpXType() const override;
 
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
+    ControllerType::ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port;
     std::unique_ptr<InputManager> input_manager;    ///< InputManager used to process the input made by the Port.
@@ -68,4 +78,5 @@ class PlayerFighter : public Fighter {
     int InputHandler_ShortHop(RegisteredInput& input);
     int InputHandler_SmashStickSide(RegisteredInput& input);
     int InputHandler_SmashStickDown(RegisteredInput& input);
+    int InputHandler_Attack(RegisteredInput& input);
 };

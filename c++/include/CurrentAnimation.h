@@ -1,7 +1,6 @@
 #pragma once
 #include "SDL2/SDL.h"
-#include "CollisionBoxes.h"
-#include <vector>
+#include "CBoxVectors.h"
 
 class EntityAnimation;
 class Fighter;

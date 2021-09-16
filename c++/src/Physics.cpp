@@ -8,7 +8,7 @@
 #define slowed(value) value / slowness
 
 void Fighter::applyAirAccel(int direction){
-	if (!(sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
+	if (!(Kuribrawl::sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
 		speed.x += model->val.air_acceleration * direction;
 		if (speed.x > model->val.max_air_speed)
 			speed.x = model->val.max_air_speed;
@@ -22,8 +22,15 @@ void Fighter::applyAirAccel(int direction){
  *
  */
 void Fighter::groundCollision(){
-    setState(Fighter::State::LANDING);
-    grounded = true;
+    
+    if (state == Fighter::State::ATTACK && current_move->landing_lag != -1){
+        setAnimation(Champion::DefaultAnimation::LANDING, current_move->landing_lag);
+    } else {
+        setAnimation(Champion::DefaultAnimation::LANDING);
+    }
+    setState(Fighter::State::LANDING, 0, 0, false);
+
+    land();
 }
 
 /**
@@ -32,6 +39,11 @@ void Fighter::groundCollision(){
  */
 void Fighter::groundToAir(){
     grounded = false;
+}
+
+void Fighter::land(){
+    grounded = true;
+    air_jumps = model->val.air_jumps;
 }
 
 /**

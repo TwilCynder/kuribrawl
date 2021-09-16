@@ -1,15 +1,18 @@
 #include <iostream>
+#include <vector>
 #include "Game.h"
 #include "util.h"
-#include "CurrentAnimation.h"
 #include "Champion.h"
 #include "Debug.h"
+#include "CollisionBoxes.h"
+#include "DebugTime.h"
 
 using namespace std;
 
 /**
- * @brief Construct a new Game object
+ * @brief 
  * 
+ *
  */
 Game::Game():
     frame(0),
@@ -91,13 +94,24 @@ void Game::draw(SDL_Renderer* target){
 }
 
 /**
- * @brief \ref Fighter#updateInputs "Updates the inputs" of every Fighter.
+ * @brief
  * 
  */
-void Game::updateInputs(){
+void Game::updateInputsState(){
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->updateInputs();
+        it->updateInputsStates();
+    }
+}
+
+/**
+ * @brief
+ * 
+ */
+void Game::resolveInputs(){
+    Fighteriterator it;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        it->resolveInputs();
     }
 }
 
@@ -149,16 +163,57 @@ void Game::advanceAnimations(){
     }
 }
 
+inline bool testRectCollision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2){
+    return (x1 < x2 + w2 &&
+            x1 + w1 > x2 &&
+            y1 > y2 - h2 &&
+            y1 - h1 < y2
+    );
+}
+
+void Game::hitDetection(){
+
+    Fighteriterator attacker, defender;
+    HurtboxVector::const_iterator hurtbox;
+    HitboxVector::const_iterator hitbox;
+
+    for (attacker = fighters.begin(); attacker != fighters.end(); ++attacker){
+
+        const Kuribrawl::VectorDouble& attackerPos = attacker->getPosition();
+        const HitboxVector & hitbox_vector  = attacker->getCurrentHitboxes();
+        for (defender = fighters.begin(); defender != fighters.end(); ++defender){
+            
+            if (attacker == defender) continue;
+            const Kuribrawl::VectorDouble& defenderPos = defender->getPosition();
+            const HurtboxVector& hurtbox_vector = defender->getCurrentHurtboxes();
+            for (hitbox = hitbox_vector.begin(); hitbox != hitbox_vector.end(); ++hitbox){
+
+                for (hurtbox = hurtbox_vector.begin(); hurtbox != hurtbox_vector.end(); ++hurtbox){
+                    
+                    if (testRectCollision(attackerPos.x + hitbox->getRealXPos(attacker->getFacing()), attackerPos.y + hitbox->y, hitbox->w, hitbox->h,
+                        defenderPos.x + hurtbox->getRealXPos(attacker->getFacing()), defenderPos.y + hurtbox->y, hurtbox->w, hurtbox->h))
+                    {
+                        
+                    }
+                }
+            }
+        }
+    }
+}
+
 /**
  * @brief Does everything a Game needs to do during one iteration of the main loop
  * 
  */
 
 void Game::step(SDL_Renderer* render_target){
+    updateInputsState();
     updateStates();
-    updateInputs();
-    applyPhysics();
+    resolveInputs();
     updateAnimations();
+    //updateAnims
+    hitDetection();
+    applyPhysics();
     draw(render_target);
     advanceAnimations();
     frame++;

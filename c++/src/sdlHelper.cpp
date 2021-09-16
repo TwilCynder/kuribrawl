@@ -14,13 +14,25 @@ void initSDL()
 
 void prepareRender(SDL_Renderer* target)
 {
-    SDL_SetRenderDrawColor(target, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(target, 200, 200, 200, 255);
 	SDL_RenderClear(target);
 }
 
 void render(SDL_Renderer* target)
 {
 	SDL_RenderPresent(target);
+}
+
+void printJoysticks(std::ostream& out){
+	SDL_Joystick* joy;
+	out << "---- Available joysticks -----" << '\n';
+	for (int i = 0; i < SDL_NumJoysticks(); i++){
+		joy = SDL_JoystickOpen(i);
+		out << i << " : " << SDL_JoystickName(joy) << '\n';
+		SDL_JoystickClose(joy);
+	}
+
+	out << "---------" << '\n'  << std::flush;
 }
 
 

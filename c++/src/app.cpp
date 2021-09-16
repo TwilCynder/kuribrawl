@@ -14,6 +14,7 @@
 #include "DataFile.h"
 #include "System.h"
 #include "messageBox.h"
+#include "Random.h"
 
 using namespace std;
 
@@ -119,6 +120,8 @@ void App::initGameData(){
 }
 
 bool App::loadGameFile(const char* name){
+	cout << "Using data file at " << name << '\n' << std::flush;
+
     DataFile data_file(name, renderer);
     if (data_file.ready()) {
         data_file.read(*game_data);
@@ -132,6 +135,7 @@ bool App::loadGameFile(const char* name){
  * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
+	if (!loadGameFile("../res/data.twl"))
 	if (!loadGameFile("../gamefile manager/data.twl"))
 	throw KBFatalExplicit("Can't find data file");
 }
@@ -153,6 +157,7 @@ void App::initControllersData(){
 
 void App::init(){
 	initSDL();
+	SDLHelper::printJoysticks(cout);
 	PlayerFighter::initInputHandlers();
 	initControllersData();
 	loadRessources();
@@ -200,7 +205,7 @@ void App::readPorts(){
 
 void App::print_report(std::ostream& out){
 	Uint32 app_duration = System::now() - start_time;
-	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
+	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
 }
 
 /**

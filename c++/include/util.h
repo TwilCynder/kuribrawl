@@ -1,10 +1,18 @@
 #pragma once
 
 namespace Kuribrawl {
-    enum Direction {
+    enum class Direction {
         RIGHT,
         UP,
         LEFT,
+        DOWN,
+        NONE
+    };
+
+    enum class DirectionIG {
+        FORWARD,
+        UP,
+        BACK,
         DOWN,
         NONE
     };
@@ -30,8 +38,13 @@ namespace Kuribrawl {
         double y;
     };
 
-    int sign(int);
-    int sign(double);
+    signed char sign(int);
+    signed char sign(double);
+    signed char signReduced(int value, int minimum);
     void substractValue(double* v1, double v2);
+    DirectionIG DirectionToDirectionIG(Direction, int facing);
+
+    Direction getDirection4(const Vector& stick_state, int threshold);
+    DirectionIG getDirection4IG(const Vector& stick_state, int threshold, int facing);
 }
 

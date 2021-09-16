@@ -25,9 +25,11 @@ class Game {
     void applyPhysics();
     void advanceAnimations();
     void draw(SDL_Renderer* target);
-    void updateInputs();
+    void updateInputsState();
+    void resolveInputs();
     void updateStates();
     void updateAnimations();
+    void hitDetection();
 
     int getFrame();
 

@@ -5,6 +5,8 @@
 #include "util.h"
 #include "Champion.h"
 #include "CollisionBoxes.h"
+#include "Move.h"
+#include "Random.h"
 #include <math.h>
 
 /**
@@ -26,17 +28,21 @@ Fighter::Fighter(Game& game, Champion* model_):
  */
 Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     state(State::IDLE),
+    update_anim(true),
     paused(false),
     facing(1),
     grounded(false),
+	air_jumps(model_->val.air_jumps),
     model(model_),
     game(game_),
-    update_anim(true)
+    current_move(nullptr)
 {
     position.x = x_;
     position.y = y_;
     speed.x = 0.0;
     speed.y = 0.0;
+
+    id = Random::get_int();
 }
 
 /**
@@ -66,6 +72,15 @@ Kuribrawl::VectorDouble& Fighter::getPosition() {
 CurrentAnimation* Fighter::getCurrentAnimation(){
     return &current_animation;
 }
+
+void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
+    current_animation.setAnimation(model->getDefaultAnimation(default_anim));
+}
+
+void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
+    current_animation.setAnimation(model->getDefaultAnimation(default_anim), speed);
+}
+
 
 /**
  * @brief Sets the x and y components of the speed of this Fighter
@@ -106,28 +121,34 @@ void Fighter::draw(SDL_Renderer* target){
     for (unsigned int i = 0; i < hurtboxes.size(); i++){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;
-        box.x = this->position.x + hurtboxes[i].x;
+        box.x = this->position.x + hurtboxes[i].getRealXPos(facing);
         box.y = SCREEN_HEIGHT - (this->position.y + hurtboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
 
     //Drawing hitboxes
     const std::vector<Hitbox>& hitboxes = current_animation.getHitboxes();
-    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    SDL_SetRenderDrawColor(target, 255, 0, 0, 255);
     for (unsigned int i = 0; i < hitboxes.size(); i++){
         box.w = hitboxes[i].w;
         box.h = hitboxes[i].h;
-        box.x = this->position.x + hitboxes[i].x;
+        box.x = this->position.x + hitboxes[i].getRealXPos(facing);
         box.y = SCREEN_HEIGHT - (this->position.y + hitboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
+
+    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    SDL_RenderDrawLine(target, position.x - 10, SCREEN_HEIGHT - position.y, position.x + 10, SCREEN_HEIGHT - position.y);
+    SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
 }
 
 /**
  * @brief Makes the Fighter jump.
  *
  */
-void Fighter::jump(jumpX x_type, jumpY y_type){
+void Fighter::ground_jump(jumpX x_type, jumpY y_type){
+	x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
+	y_type = (y_type == jumpY::UndecidedY) ? decideGroundedJumpYType() : y_type;
 
     switch (y_type){
         case jumpY::Full:
@@ -136,14 +157,61 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
         case jumpY::Short:
             speed.y += model->val.short_hop_speed;
             break;
-        case jumpY::Air:
-            speed.y += model->val.air_jump_speed;
+        default:
+            break;
+    }
+    
+    switch(x_type){
+        case jumpX::Forward:
+            if (speed.x * facing < model->val.ground_forward_jump_speed){
+                speed.x = model->val.ground_forward_jump_speed * facing;
+            }
+            break;
+        case jumpX::Backwards:
+            if (speed.x * -facing < model->val.ground_backward_jump_speed){
+                speed.x = model->val.ground_backward_jump_speed * -facing;
+            }
             break;
         default:
             break;
     }
+
     setState(State::IDLE, 0, 1);
     grounded = false;
+}
+
+
+//Returns int to make jump_manager able to return its return value directly
+int Fighter::air_jump(jumpX x_type){
+	
+	if (air_jumps > 0) {
+		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
+	
+	    switch(x_type){
+            case jumpX::Forward:
+                if (speed.x * facing < model->val.air_forward_jump_speed){
+                    speed.x = model->val.air_forward_jump_speed * facing;
+                }
+                break;
+            case jumpX::Backwards:
+                if (speed.x * -facing < model->val.air_backward_jump_speed){
+                    speed.x = model->val.air_backward_jump_speed * -facing;
+                }
+                break;
+            default:
+                break;
+        }
+		
+        speed.y = model->val.air_jump_speed;
+		air_jumps--;
+		setState(Fighter::State::IDLE, 0, 0, false);
+        setAnimation(Champion::DefaultAnimation::AIR_JUMP);
+        
+        return 1;
+	} else {
+		return 0;
+	}
+
 }
 
 /**
@@ -153,7 +221,41 @@ void Fighter::jump(jumpX x_type, jumpY y_type){
  * @return true if the duration is -1 and the current animation was finished, or if the timer state has reached the duration.
  */
 bool Fighter::isStateFinished(int duration){
+    //Debug::log("----");
+    //Debug::log((int)current_animation.is_finished());
     return (duration == -1) ? current_animation.is_finished() : state_timer >= duration;
+}
+
+void Fighter::checkStateDuration(){
+    switch (state){
+        case State::JUMPSQUAT:
+            if (!model->val.jump_squat_duration){
+                ground_jump();
+            }
+            break;
+        case State::DASH_START:
+            if (!model->val.dash_start_duration){
+                setState(State::DASH);
+            }
+            break;
+        case State::DASH_STOP:
+            if (!model->val.dash_stop_duration){
+                setState(State::IDLE);
+            }
+            break;
+        case State::DASH_TURN:
+            if (!model->val.dash_turn_duration){
+                setState(State::DASH);
+            }
+            break;
+        case State::LANDING:
+            if (!model->val.landing_duration){
+                setState(State::IDLE);
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 /**
@@ -174,7 +276,7 @@ void Fighter::updateState(Uint8 slowness){
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){
-                jump(jumpX::Normal, decideGroundedJumpYType());
+                ground_jump();
             }
             break;
         case State::DASH_START:
@@ -188,7 +290,7 @@ void Fighter::updateState(Uint8 slowness){
             }
             break;
         case State::DASH_TURN:
-            if (isStateFinished(model->val.dash_start_duration)){
+            if (isStateFinished(model->val.dash_turn_duration)){
                 setState(State::DASH);
             }
             break;
@@ -224,6 +326,14 @@ void Fighter::updateAnimation(){
         }
         update_anim = false;
     }
+}
+
+const HurtboxVector& Fighter::getCurrentHurtboxes() const{
+    return current_animation.getHurtboxes();
+}
+
+const HitboxVector& Fighter::getCurrentHitboxes() const{
+    return current_animation.getHitboxes();
 }
 
 /**
@@ -270,4 +380,17 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
     if (facing_) facing = facing_;
 
     state_timer = 0;
+    checkStateDuration();
+}
+
+void Fighter::startMove(const Move& move){
+    current_move = &move;
+    if (move.animation){
+        current_animation.setAnimation(move.animation);
+    }
+}
+
+void Fighter::attack(const Move& move){
+    setState(Fighter::State::ATTACK);
+    startMove(move);
 }

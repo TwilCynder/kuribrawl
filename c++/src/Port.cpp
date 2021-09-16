@@ -4,14 +4,17 @@
 #include "DebugInput.h"
 #include "app.h"
 #include "Binding.h"
+#include "ControllersData.h"
 #include <stdlib.h>
-
 #include "controllerElements.h"
+
 
 Port::Port(App* app_) :
     app(app_),
     joystick_id(-1),
-    active(false)
+    controller(nullptr),
+    active(false),
+    current_dpad_state({0, 0})
 {
 }
 
@@ -60,16 +63,26 @@ bool Port::isElementPressed(ElementType type, int element) const{
     }
 }
 
-const Kuribrawl::Vector& Port::getControlStickState() const{
-    return control_stick.current_state;
+const Port::StickState& Port::getControlStickState() const{
+    return control_stick;
 }
 
-const Kuribrawl::Vector& Port::getControlStickPreviousState() const{
-    return control_stick.previous_state;
+
+const Port::StickState& Port::getSecondaryStickState() const{
+    return secondary_stick;
 }
 
-const Kuribrawl::Vector& Port::getSecondaryStickState() const{
-    return secondary_stick.current_state;
+const Port::TriggerState& Port::getLeftTriggerState()  const {
+    return left_trigger;
+}
+
+const Port::TriggerState& Port::getRightTriggerState() const {
+    return right_trigger;
+}
+
+void Port::updateDpadState(){
+    current_dpad_state.x = getDpadStateX();
+    current_dpad_state.y = getDpadStateY();
 }
 
 void Port::readController(){
@@ -87,16 +100,8 @@ void Port::readController(){
     left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
     right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
 
-    //détection du passage de threshold
-    const ControllerType::ControllerVals& vals = controller_type->getControllerVals();
-
-    if (pod.is_left_trigger_binding && left_trigger.current_state > vals.analogTriggerThreshold && left_trigger.previous_state < vals.analogTriggerThreshold){
-        
-        fighter->handleTriggerPress(TRIGGER_LEFT);
-    }
-
-    if (pod.is_right_trigger_binding && (right_trigger.current_state >= vals.analogTriggerThreshold) && (right_trigger.previous_state < vals.analogTriggerThreshold)){
-        fighter->handleTriggerPress(TRIGGER_RIGHT);
+    if (pod.read_dpad){
+        updateDpadState();
     }
 }
 
@@ -120,13 +125,20 @@ signed char Port::getDpadStateY() const{
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
 }
 
+const Kuribrawl::VectorT<int8_t>& Port::getDpadState() const{
+    return current_dpad_state;
+}
+
 void Port::setJoystick_(int id){
+    if (controller)
+        SDL_GameControllerClose(controller);
+    
 
     controller = SDL_GameControllerOpen(id);
 	joystick = SDL_GameControllerGetJoystick(controller);
     SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
 
-    Debug::log(SDL_GameControllerName(controller));
+    cout << "Controller plugged ( " << id << ") : " << SDL_GameControllerName(controller) << '\n' << std::flush;
 
     if (active){
         app->joysticks[joystick_id] = nullptr;
@@ -146,8 +158,18 @@ void Port::setJoystick(int id, ControllerType* c){
     if (!c){
         throw KBFatal("Trying to enable joystick with null controller pointer");
     }
-    setController(c);
     setJoystick_(id);
+    setController(c);
+}
+
+void Port::setJoystick(int id, ControllersData& cd){
+    setJoystick_(id);
+    ControllerType* ct = cd.getControllerFromMapping(SDL_GameControllerMapping(controller));
+    
+    if (!ct)
+        throw KBFatalDetailed("Tried to set joystick using controllerType detection but mapping matches no controllerType", "Unknown controller");
+
+    setController(ct);
 }
 
 void Port::setJoystick(int id){
@@ -167,12 +189,12 @@ void Port::deactivate(){
     active = false;
 }
 
-inline void Port::Stick::updatePrevious(){
+inline void Port::StickState::updatePrevious(){
     previous_state.x = current_state.x;
     previous_state.y = current_state.y;
 }
 
-inline void Port::Trigger::updatePrevious(){
+inline void Port::TriggerState::updatePrevious(){
     previous_state = current_state;
 }
 

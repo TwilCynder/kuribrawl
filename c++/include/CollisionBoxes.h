@@ -1,11 +1,19 @@
 #pragma once 
 
+/**
+ * @brief Basically a rectangle, that will be used as a collision area for hit detection
+ * Coordinates works like follows :
+ * Position relative to Fighter position, with a **down-top** y axis  (which uses **down-top** coordinates too (relative to the center point of the stage))  
+ * Position is the **top-left** corner of the box.
+ */
 struct CollisionBox {
     int x;
     int y;
     int w;
     int h;
-    };
+
+    int getRealXPos(int facing) const;
+};
 
 struct Hurtbox : CollisionBox {
     enum Type {

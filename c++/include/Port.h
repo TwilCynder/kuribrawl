@@ -9,29 +9,30 @@
 
 class App;
 class Binding;
+class ControllersData;
 
 class Port {
-    struct Stick {
+    public:
+    struct StickState {
         Kuribrawl::Vector current_state;
         Kuribrawl::Vector previous_state;
 
         void updatePrevious();
     };
 
-    struct Trigger {
+    struct TriggerState {
         int previous_state;
         int current_state;
 
         void updatePrevious();
     };
 
-    public:
-
     Port(App* app_);
 
     bool isActive() const ;
     void setJoystick(int id);
     void setJoystick(int id, ControllerType* controller);
+    void setJoystick(int id, ControllersData& cd);
     void setFighter(PlayerFighter*);
     void initOptimizationData();
     void deactivate();
@@ -42,11 +43,15 @@ class Port {
     bool isTriggerPressed(int trigger) const;
     bool isElementPressed(ElementType type, int element) const;
     void readController();
-    const Kuribrawl::Vector& getControlStickState() const;
-    const Kuribrawl::Vector& getControlStickPreviousState() const;
-    const Kuribrawl::Vector& getSecondaryStickState() const;
-    signed char getDpadStateX() const;
-    signed char getDpadStateY() const;
+    const StickState& getControlStickState() const;
+    const StickState& getSecondaryStickState() const;
+    const TriggerState& getLeftTriggerState() const;
+    const TriggerState& getRightTriggerState() const;
+    void updateDpadState(); //NOT USED YET
+    inline signed char getDpadStateX() const;
+    inline signed char getDpadStateY() const;
+    using DpadState = Kuribrawl::VectorT<int8_t>;
+    const DpadState& getDpadState() const;
 
     private:
     void setJoystick_(int id);
@@ -58,15 +63,16 @@ class Port {
 
     int id;
     int joystick_id;
-    SDL_GameController* controller;
+    SDL_GameController* controller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
 	SDL_Joystick* joystick;
     bool active;
 
     PortOptimizationData pod;
+    DpadState current_dpad_state; //NOT USED YET
 
     //State;
-    Stick control_stick;
-    Stick secondary_stick; //TODO supporter plusieurs sticks secondaires ?
-    Trigger left_trigger;
-    Trigger right_trigger; /** TODO Supporter un nombre dynamique de triggers ? */
+    StickState control_stick;
+    StickState secondary_stick; //TODO supporter plusieurs sticks secondaires ?
+    TriggerState left_trigger;
+    TriggerState right_trigger; /** TODO Supporter un nombre dynamique de triggers ? */
 };

@@ -47,27 +47,33 @@ Procedure.i initDebugValues()
     *vals\championValues[1] = "Dash speed"
     *vals\championValues[2] = "Dash Start speed"
     *vals\championValues[3] = "Dash Turn acceleration"
-    *vals\championValues[4] = "Traction (horizontal deceleration on ground)"
-    *vals\championValues[5] = "Max Air H Speed"
-    *vals\championValues[6] = "Air H acceleration"
-    *vals\championValues[7] = "Air friction (H deceleration)"
-    *vals\championValues[8] = "Full Hop V speed"
-    *vals\championValues[9] = "Short Hop V speed"
-    *vals\championValues[10] = "Air Jump V speed"
-    *vals\championValues[11] = "Gravity"
-    *vals\championValues[12] = "Max fall speed"
-    *vals\championValues[13] = "Fast fall speed"
-    *vals\championValues[14] = "Weight"
-    *vals\championValues[15] = "Jumpsquat duration"
-    *vals\championValues[16] = "Dash Start duration"
-    *vals\championValues[17] = "Dash Stop duration"
-    *vals\championValues[18] = "Dash Turn duration"
-    *vals\championValues[19] = "Landing duration"
-    *vals\championValues[20] = "Guard Start duration"
-    *vals\championValues[21] = "Guard Stop duration"
-    *vals\championValues[22] = "Shield size"
-    *vals\championValues[23] = "Shield center X"
-    *vals\championValues[24] = "Shield center Y"
+    *vals\championValues[4] = "Dash Stop deceleration"
+    *vals\championValues[5] = "Traction (horizontal deceleration on ground)"
+    *vals\championValues[6] = "Max Air H Speed"
+    *vals\championValues[7] = "Air H acceleration"
+    *vals\championValues[8] = "Air friction (H deceleration)"
+    *vals\championValues[9] = "Full Hop V speed"
+    *vals\championValues[10] = "Short Hop V speed"
+    *vals\championValues[11] = "Air Jump V speed"
+    *vals\championValues[12] = "Ground Forward Jump H speed"
+    *vals\championValues[13] = "Ground Backward Jump H speed"
+    *vals\championValues[14] = "Air Forward Jump H speed"
+    *vals\championValues[15] = "Air Backward Jump H speed"
+    *vals\championValues[16] = "Gravity"
+    *vals\championValues[17] = "Max fall speed"
+    *vals\championValues[18] = "Fast fall speed"
+    *vals\championValues[19] = "Weight"
+    *vals\championValues[20] = "Jumpsquat duration" ;first integer
+    *vals\championValues[21] = "Dash Start duration"
+    *vals\championValues[22] = "Dash Stop duration"
+    *vals\championValues[23] = "Dash Turn duration"
+    *vals\championValues[24] = "Landing duration"
+    *vals\championValues[25] = "Guard Start duration"
+    *vals\championValues[26] = "Guard Stop duration"
+    *vals\championValues[27] = "Shield size"
+    *vals\championValues[28] = "Shield center X"
+    *vals\championValues[29] = "Shield center Y"
+    *vals\championValues[30] = "Jumps"
     
     *vals\championValueTypes[0] = "Byte"
     *vals\championValueTypes[1] = "Double"
@@ -75,7 +81,7 @@ Procedure.i initDebugValues()
     ProcedureReturn *vals
 EndProcedure
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 72
-; FirstLine = 21
+; CursorPosition = 75
+; FirstLine = 29
 ; Folding = -
 ; EnableXP

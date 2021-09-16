@@ -1,124 +1,28 @@
-snowdin.dat
-S:Snowdin
-acid_rainbows.dat
-C:Acid
-shieldstart.png
-A:Acid/shieldstart shieldstart.dat
-shield.png
-A:Acid/shield shield.dat
-shieldend.png
-A:Acid/shieldend shieldend.dat
-crouch.png
-A:Acid/crouch crouch.dat
-crouch_start.png
-A:Acid/crouchstart crouchstart.dat
-crouch_end.png 
-A:Acid/crouchend crouchend.dat
-dash_strip4.png
-A:Acid/dash dash.dat
-dash_strip4L.png
-AL:Acid/dash
-dashstart_strip2.png
-A:Acid/dashStart dashstart.dat
-dashstart_strip2L.png
-AL:Acid/dashStart
-dashstop_strip2.png
-A:Acid/dashStop dashStop.dat
-dashstop_strip2L.png
-AL:Acid/dashStop
-dashturn_strip3.png
-A:Acid/dashTurn dashTurn.dat
-dashturn_strip3L.png
-AL:Acid/dashTurn
-idle_strip4.png
-A:Acid/idle idle.dat
-idle_strip4L.png
-AL:Acid/idle
+idle.png
+A:acid/idle idle.dat
+nair.png
+A:acid/nair nair_acid.dat
 jumpstart.png
-A:Acid/jumpsquat jumpsquat.dat
-jumpstartL.png
-AL:Acid/jumpsquat
-walk_strip6.png
-A:Acid/walk walk.dat
-walk_strip6L.png
-AL:Acid/walk
-air_idle.png 
-A:Acid/airIdle airIdle.dat
-air_idleL.png
-AL:Acid/airIdle
-jump_strip5.png
-A:Acid/jump jump.dat
-jump_strip5L.png
-AL:Acid/jump
-land_strip2.png
-A:Acid/land land.dat
-land_strip2L.png
-AL:Acid/land
-nair_strip6.png
-A:Acid/nair nair.dat
-nair_strip6L.png
-AL:Acid/nair
-uair_strip8.png
-A:Acid/uair uair.dat
-uair_strip8L.png
-AL:Acid/uair
-hurt.png
-A:Acid/hurt hurt.dat
-hurtL.png
-AL:Acid/hurt
-bighurt.png
-A:Acid/hurtheavy hurtheavy.dat
-bighurtL.png
-AL:Acid/hurtheavy
-hurtground.png
-A:Acid/hurtground hurtground.dat
-hurtgroundL.png
-AL:Acid/hurtground
-fair_strip10.png
-A:Acid/fair fair.dat
-fair_strip10L.png
-AL:Acid/fair
-uphurt.png
-A:Acid/hurtup hurtup.dat
-spinhurt_strip4.png
-A:Acid/tumble tumble.dat
-spinhurt_strip4L.png
-AL:Acid/tumble
-downhurt.png
-A:Acid/hurtdown hurtdown.dat
-downhurtL.png
-AL:Acid/hurtdown
-bouncehurt.png
-A:Acid/hurtbounce hurtbounce.dat
-bouncehurtL.png
-AL:Acid/hurtbounce
-dair_strip14.png
-A:Acid/dair dair.dat
-utilt_3_strip8.png
-A:Acid/utilt utilt.dat
-utilt_3_strip8L.png
-AL:Acid/utilt
-jab_strip19.png
-A:Acid/jab jab.dat
-jab_strip19L.png
-AL:Acid/jab
-doublejump_strip8.png
-A:Acid/doublejump doublejump.dat
-doublejump_strip8L.png
-AL:Acid/doublejump
-test_secondary_sprite.png
-A:Acid/test_sprite 4 0.1
-stage_plat_main.png
-A:_Snowdin/platform platform.dat
-stage_bg.png
-A:_Snowdin/background 1
-damages_font.png
-I:damages_font
-hud.png
-I:@Acid/hud_icon
-menu_start.png
-I:start_menu/start 
-menu_quit.png
-I:start_menu/quit
-menu_cursor.png
-I:start_menu/cursor
+A:acid/jumpsquat 1 -1 c
+walk.png
+A:acid/walking 6 0.15 c
+dash.png 
+A:acid/dash 4 0.18 c
+dash_start.png
+A:acid/dash_start 2 8 c
+dash_stop.png
+A:acid/dash_stop 2 5 c
+dash_turn.png
+A:acid/dash_turn 3 14 c
+air_idle.png
+A:acid/air_idle 1 -1 c
+jump.png
+A:acid/jump 5 16 c
+landing.png
+A:acid/landing 2 5 c
+air_jump.png
+A:acid/air_jump 8 0.25 c
+uair.png
+A:acid/uair uair.dat
+acid_rainbows.dat
+C:acid

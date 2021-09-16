@@ -37,6 +37,7 @@ EndEnumeration
 
 #MAX_VALUE_BYTE  = 255
 #MAX_VALUE_SHORT = 65535
+#MAX_VALUE_USHORT = 32767
 
 ;General
 #FILEMARKER_404 = $F0
@@ -67,7 +68,7 @@ Enumeration
     #TYPE_DOUBLE
 EndEnumeration
 
-#CHAMPION_VALUES_NB = 25
+#CHAMPION_VALUES_NB = 31
 Dim championValues.b(#CHAMPION_VALUES_NB)
 XIncludeFile "dataFileMarkerData.pbi"
 
@@ -97,7 +98,7 @@ EndMacro
 
 Macro warning(text)
     If logging
-        printLogForce("WARNING : " + text)
+        printLogForce(Chr(27) + "WARNING : " + text)
     EndIf      
 EndMacro
 
@@ -167,7 +168,7 @@ Procedure writeFileType(datafile.l, type.b)
     WriteAsciiCharacter(datafile, type)
 EndProcedure
 
-Procedure writeFileTag(datafile.l, tag.s)
+Procedure writeAsciiString(datafile.l, tag.s)
     WriteString(datafile, tag, #PB_Ascii)
     WriteAsciiCharacter(datafile, $A)
 EndProcedure
@@ -193,6 +194,9 @@ EndMacro
 Procedure.s getDescriptorLine(file.l, *lineN.Long)
     Define line.s
     Repeat
+        If Eof(file)
+            ProcedureReturn ""
+        EndIf 
         line = StringField(ReadString(file), 1, "#")
         *lineN\l + 1
     Until Not line = ""
@@ -205,7 +209,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
     lineN.l = 1
     
     printLog("---")
-    printLog("Writing Animation descriptor at offset " + Hex(Loc(datafile)))
+    printLog("Writing Animation descriptor at offset " + Hex(Loc(datafile)) + " (" + Loc(datafile) + ")")
     WriteAsciiCharacter(datafile, #FILEMARKER_DESCRIPTORSTART)
     
     If Right(info, 4) = ".dat"
@@ -341,7 +345,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                             WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
                             WriteAsciiCharacter(datafile, i)
                             WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
-                            WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                            WriteUnicodeCharacter(datafile, #MAX_VALUE_USHORT)
                         Next
                         Continue
                     EndIf 
@@ -371,7 +375,7 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
                     
                     value$ = GMB_StringField(line, 2, " ")
                     If value$ = ""
-                        WriteUnicodeCharacter(datafile, #MAX_VALUE_SHORT)
+                        WriteWord(datafile, #MAX_VALUE_USHORT)
                         printLog("    No value ; this hurtbox will cover all the frame and use the default type.")
                         Continue
                     EndIf 
@@ -505,20 +509,32 @@ Procedure writeAnimationDescriptor(datafile.l, info.s)
             error("Missing frame number")
         EndIf 
         
-        value = Val(value$)
-        If value < 1  
+        frameNumber = Val(value$)
+        If frameNumber < 1  
             error("Null or negative frame number")
         EndIf 
-        WriteByte(datafile, value)
+        WriteByte(datafile, frameNumber)
         printLog("  Frames number : " + value$)
         
         value$ = GMB_StringField(info, 2, " ")
         valueD = ValD(value$)
         If valueD
-          WriteAsciiCharacter(1, #FILEMARKER_ANIMSPEED)
-          WriteDouble(1, valueD)
-          printLog("  Speed" + value$)
+            WriteAsciiCharacter(datafile, #FILEMARKER_ANIMSPEED)
+            WriteDouble(datafile, valueD)
+            printLog("  Speed : " + value$)
         EndIf 
+        
+        value$ = GMB_StringField(info, 3, " ")
+        If value$ = "c"
+            printLog(~"  Writing full-frame hurtboxes for each frame (\"c all\" found)")
+            For i = 0 To frameNumber - 1
+                printLog(~"    Writing full-frame hurtox (0x7FFF) on frame " + Str(i))
+                WriteAsciiCharacter(datafile, #FILEMARKER_FRAMEINFO)
+                WriteAsciiCharacter(datafile, i)
+                WriteAsciiCharacter(datafile, #FILEMARKER_HURTBOXINFO)
+                WriteWord(datafile, #MAX_VALUE_USHORT)
+            Next
+        EndIf    
     EndIf 
 EndProcedure
 
@@ -556,7 +572,6 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
     
     line = getDescriptorLine(sourceFile, @lineN)
     
-    Debug Hex(Loc(datafile))
     While startsWithNumber(line)
         For i = 1 To GMB_CountFields(line, " ")
             If valuesRead >= #CHAMPION_VALUES_NB
@@ -564,11 +579,9 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
                 Goto champion_values_loop_end
             EndIf 
             value$ = GMB_StringField(line, i, " ")
-            If (championValues(valuesRead + 1) = #TYPE_BYTE)
-                Debug "byte"
+            If (championValues(valuesRead) = #TYPE_BYTE)
                 WriteByte(datafile, Val(value$))
-                Debug Val(value$)
-            Else 
+            Else
                 WriteDouble(datafile, ValD(value$))
             EndIf 
             printLog("  -" + *debugValues\championValues[valuesRead] + " : " + value$ + " ("+ *debugValues\championValueTypes[championValues(valuesRead + 1)] +")")
@@ -587,7 +600,37 @@ Procedure writeChampionFile(datafile.l, sourceFileName.s)
         error("Missing champion values")
     EndIf 
     
+    While Not line = ""
+        Select Left(line, 1)
+            Case "m"
+                value$ = GMB_StringField(line, 2, " ")
+                If value$ = ""
+                    error("Move names cannot be empty")
+                EndIf 
+                WriteAsciiCharacter(datafile, #FILEMARKER_MOVEINFO)
+                writeAsciiString(datafile, value$)
+                printLog("- Writing move info : " + value$)
+                
+                ;- - - Reading all values
+                For i = 3 To GMB_CountFields(line, " ")
+                    value$ = GMB_StringField(line, i, " ")
+                    Select value$
+                        Case "l" ; landing lag
+                            i + 1
+                            value$ = GMB_StringField(line, i, " ")
+                            WriteAsciiCharacter(datafile, #FILEMARKER_LANDINGLAG)
+                            WriteAsciiCharacter(datafile, Val(value$))
+                            printLog("  - Landing lag : " + value$)
+                    EndSelect    
+                            
+                Next
+        EndSelect
+        line = getDescriptorLine(sourceFile, @lineN)
+    Wend    
+                
+    
     CloseFile(sourceFile)
+   
 EndProcedure
 
 Procedure addFile(datafile.l, *inputFile.File)
@@ -612,17 +655,19 @@ Procedure addFile(datafile.l, *inputFile.File)
             error(*inputFile\content + " : unknown file type")
     EndSelect
     
+    Debug *inputFile\content
+    
     Define tag.s, info.s
     tag = GMB_StringField(*inputFile\content, 2, ":")
-    info = GMB_StringField(tag, 2, " ")
+    info = GMB_SepRight(tag, " ", 2)
     tag  = GMB_StringField(tag, 1, " ")
     
     printLog("---")
-    printLog("Writing at offset " + Hex(Loc(datafile)))
+    printLog("Writing at offset " + Hex(Loc(datafile)) + " (" + Loc(datafile) + ")")
     
     writeFileType(datafile, type)
     printLog("Type : " + *debugValues\fileTypeNames[type])
-    writeFileTag(datafile, tag)
+    writeAsciiString(datafile, tag)
     printLog("Tag : " + tag)
     
     If type = #FILETYPE_ANIMATION Or type = #FILETYPE_LEFTANIM Or type = #FILETYPE_IMAGE
@@ -674,7 +719,7 @@ While 1
 Wend        
 
 If Right(source, 1) <> "/" And Len(source) > 0
-    source = "/"
+    source + "/"
 EndIf 
 
 If buildpath = ""
@@ -718,8 +763,8 @@ If logging
 EndIf 
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; ExecutableFormat = Console
-; CursorPosition = 558
-; FirstLine = 541
+; CursorPosition = 620
+; FirstLine = 588
 ; Folding = ----
 ; EnableXP
 ; Executable = dataFileMaker.exe

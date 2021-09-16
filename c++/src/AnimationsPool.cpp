@@ -10,7 +10,7 @@
  * @return Animation* a pointer to the created Animation.
  */
 template <class A>
-A* AnimationsPool<A>::addAnimation(const char* name){
+A* AnimationsPool<A>::addAnimation(const std::string& name){
     auto [node, success] = animations.try_emplace(name);
 
     if (!success) {

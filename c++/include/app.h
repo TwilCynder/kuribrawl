@@ -17,7 +17,7 @@ class ControllersData;
 /**
  * @brief A number of miliseconds elapsed since SDL initialization
  */
-typedef Uint32 Date;
+typedef int32_t Date;
 
 /**
  * @brief Struct containing the parameters passed to the executable

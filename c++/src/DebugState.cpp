@@ -12,7 +12,8 @@ namespace Debug {
         {Fighter::State::DASH_START, "Dash Start"},
         {Fighter::State::DASH_STOP, "Dash Stop"},
         {Fighter::State::DASH_TURN, "Dash turn"},
-        {Fighter::State::LANDING, "Landing"}
+        {Fighter::State::LANDING, "Landing"},
+        {Fighter::State::ATTACK, "Attacking"}
     };
 };
 

@@ -24,8 +24,8 @@ struct Binding {
     Binding(ControllerType*);
 
     Input buttons[MAX_NB_BUTTONS]; ///< Array containing the input associated with each button (each button correspondig to an index of the array).
-
     Input triggers[2];
+    Input second_stick;
 
     DirectionControlMode direction_control_mode;
     int dpadAnalogValue;

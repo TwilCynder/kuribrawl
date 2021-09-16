@@ -36,11 +36,11 @@ EntityFrame* EntityAnimation::getEntityFrame(int n){
 }
 
 void EntityAnimation::setNextAnimation(const EntityAnimation* anim){
-    setNextAnimation((Animation*)anim);
+    setNextAnimation((const Animation*)anim);
 }
 
 const EntityAnimation* EntityAnimation::getNextAnimation() const{
-    return (EntityAnimation*) Animation::getNextAnimation();
+    return (const EntityAnimation*) Animation::getNextAnimation();
 }
 
 const std::vector<Hitbox>&  EntityAnimation::getHitboxes(int frame) const {

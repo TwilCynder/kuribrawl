@@ -70,7 +70,9 @@ void DataFile::readVersion(){
 
 DataFile::DataType DataFile::readDataType(){
     Uint8 buffer;
-    SDL_RWread(sdl_stream, &buffer, 1, 1);
+    if (!SDL_RWread(sdl_stream, &buffer, 1, 1)){
+        return DataType::NONE;
+    }
     return (DataType)buffer;
 }
 
@@ -123,6 +125,7 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.val.dash_speed);
     readData(&champion.val.dash_start_speed);
     readData(&champion.val.dash_turn_accel);
+    readData(&champion.val.dash_stop_deceleration);
     readData(&champion.val.traction);
     readData(&champion.val.max_air_speed);
     readData(&champion.val.air_acceleration);
@@ -130,6 +133,10 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.val.jump_speed);
     readData(&champion.val.short_hop_speed);
     readData(&champion.val.air_jump_speed);
+    readData(&champion.val.ground_forward_jump_speed);
+    readData(&champion.val.ground_backward_jump_speed);
+    readData(&champion.val.air_forward_jump_speed);
+    readData(&champion.val.air_backward_jump_speed);
     readData(&champion.val.gravity);
     readData(&champion.val.max_fall_speed);
     readData(&champion.val.fast_fall_speed);
@@ -144,19 +151,48 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.val.shield_info.size);
     readData(&champion.val.shield_info.x);
     readData(&champion.val.shield_info.y);
+    readData(&champion.val.air_jumps);
 }
 
 void DataFile::readChampionFile(Champion& champion){
     readString();
     champion.setDisplayName(readBuffer);
-    cout << "Display name" << (champion.getDisplayName()) << '\n';
+    cout << "Display name " << (champion.getDisplayName()) << '\n';
 
     readChampionValues(champion);
 
-    cout << "Jsquat dur " << (int)champion.val.jump_squat_duration << '\n';
-    cout << "dstart dur " << (int)champion.val.dash_start_duration << '\n';
-    cout << "dstop dur " << (int)champion.val.dash_stop_duration << '\n';
-    cout << "dturn dur " << (int)champion.val.dash_turn_duration << '\n';
+    Uint8 byte;
+    Move* current_move = nullptr;
+    bool leave_loop = false;
+
+    do {
+        readByte(&byte);
+        switch (byte){
+            case FILEMARKER_MOVEINFO:
+                readString();
+                current_move = &champion.tryMove(readBuffer);
+                cout << "Move : " << readBuffer << '\n' << std::flush;
+                break;
+            case FILEMARKER_LANDINGLAG:
+                if (!current_move){
+                    throw KBFatalDetailed("File read : invalid data file content", "Landing lag info present before any move info");
+                }
+                readByte(&byte);
+                current_move->landing_lag = byte;
+                cout << "Landing lag : " << (int)byte << '\n' << std::flush;
+                break;
+            case FILEMARKER_INTERFILE:
+                Debug::log("Interfile");
+                leave_loop = true;
+                break;
+            default:
+                fseek(file, -1, SEEK_CUR);
+                cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
+                throw KBFatalExplicit("File read : invalid data file content");
+                break;
+        }
+    } while (!leave_loop);
+
 }
 
 /**
@@ -168,7 +204,7 @@ void DataFile::readChampionFile(Champion& champion){
 void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     int value;
     Uint8 byte;
-    Uint16 word;
+    int16_t word;
     double valueD;
     bool leave_loop;
     Frame* current_frame;
@@ -178,9 +214,10 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 
 
     readLong(&value);    //Image size
+    value += ftell(file); //Value is the file adress right after the image
 
     anim.setSpritesheet(IMG_LoadTexture_RW(renderer, sdl_stream, 0));
-    fseek(file, 12, SEEK_CUR);
+    fseek(file, value, SEEK_SET);
     readByte(&byte);
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -229,7 +266,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         
                         readWord(&word);
                         hurtbox->x = word;
-                        if (hurtbox->x == MAX_VALUE_SHORT){  
+                        if (hurtbox->x == MAX_VALUE_USHORT){  
                             hurtbox->x = -(current_frame->origin.x);
                             hurtbox->y =  (current_frame->origin.y);
                             hurtbox->w = current_frame->display.w;
@@ -309,6 +346,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 char* DataFile::separateTag(char* tag){
     char* res = strchr(tag, '/');
     if (!res){
+        cout << "At " << std::hex << ftell(file) << '\n';
         throw KBFatal("Data chunk tag doesn't contain a '/'");
     }
 
@@ -332,6 +370,7 @@ void DataFile::read(GameData& data){
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
+
                 tag = readFileTag();
                 entity = tag;
                 element = separateTag(tag);
@@ -349,6 +388,8 @@ void DataFile::read(GameData& data){
                 Debug::log("-Reading CHampion");
                 Debug::log(tag);
                 readChampionFile(data.tryChampion(tag));
+            case DataFile::DataType::NONE:
+                Debug::log("NOOOOOONE");
             default:
                 break;
         }

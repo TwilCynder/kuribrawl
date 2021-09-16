@@ -7,8 +7,9 @@
  */
 
 PortOptimizationData::PortOptimizationData() : 
-    is_left_trigger_binding (false),
-    is_right_trigger_binding(false)
+    read_left_trigger (false),
+    read_right_trigger(false),
+    read_dpad(false)
 {
 
 }

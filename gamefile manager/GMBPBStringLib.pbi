@@ -1,6 +1,7 @@
 ﻿Import "GMBCStringLib.lib"
     GMB_StringFieldUnicode.l(*string, field.l, separator.u, *startPos, *l)
     GMB_CountFieldsUnicode(*string, separator.u)
+    GMB_SepRightUnicode(*string, separator.u, n.i)
 EndImport
 
 Procedure.s GMB_StringField(line.s, field.l, separator.s)
@@ -23,7 +24,17 @@ EndProcedure
 Macro GMB_CountFields_(line, separator)
     GMB_CountFieldsUnicode(@line, Asc(separator))
 EndMacro
+
+Procedure.s GMB_SepRight(line.s, separator.s, n.i)
+    ProcedureReturn Mid(line, GMB_SepRightUnicode(@line, Asc(separator), n))
+EndProcedure
+
+Macro GMB_SepRight_(line, separator, n)
+    GMB_SepRightUnicode(@line, Asc(separator), n)
+EndMacro
+
+
 ; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 12
-; Folding = -
+; CursorPosition = 27
+; Folding = --
 ; EnableXP

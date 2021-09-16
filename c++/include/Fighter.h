@@ -7,9 +7,10 @@
 #include "util.h"
 #include "InputManager.h"
 #include "gameActions.h"
+#include "Champion.h"
 
-class Champion;
 class Game;
+struct Move;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -41,20 +42,30 @@ class Fighter {
     void updateState();
     void updateState(Uint8 slowness);
     void updateAnimation();
+    //Hitboxes
+    const HurtboxVector& getCurrentHurtboxes() const;
+    const HitboxVector&  getCurrentHitboxes () const;
 
     Game& getGame();
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
+    void attack(const Move&);
     CurrentAnimation* getCurrentAnimation();
+    void setAnimation(Champion::DefaultAnimation);
+    void setAnimation(Champion::DefaultAnimation, double speed);
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);
     bool getGrounded() const;
     int getFacing() const;
 
-    void jump(jumpX x_type, jumpY y_type);
+    void ground_jump(jumpX x_type = jumpX::UndecidedX, jumpY y_type = jumpY::UndecidedY);
+	int  air_jump(jumpX x_type = jumpX::UndecidedX);
 
     bool is_initialized();
+
+    //Debug
+    int id;
 
     protected:
     State state;        ///< Current State.
@@ -62,8 +73,9 @@ class Fighter {
     float state_timer;  ///< Number of frames this the current state was started.
     bool update_anim;   ///< Whether the animation should be updated according to the current state.
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the CurrentAnimation will be updated.\ Is decremented each frame.
-    int facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
+    int8_t facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
     bool grounded;      ///< true if the Fighter is on the ground.
+    Uint8 air_jumps;    ///< Number of times this fighter can air jump before touching the ground again
     Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
     Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
 
@@ -75,9 +87,13 @@ class Fighter {
 
     CurrentAnimation current_animation; ///< CurrentAnimation used to display an Animation of the \ref Fighter#model "model Champion".
     std::string current_animation_name; ///< Never used.
+    const Move* current_move;
 
+    void startMove(const Move&);
     bool isStateFinished(int stateDuration);
+    void checkStateDuration();
 	virtual jumpY decideGroundedJumpYType() const = 0;
+    virtual jumpX decideJumpXType() const = 0;
 
     //Physics
     void groundCollision();

@@ -5,6 +5,7 @@
 8   #Run speed
 11  #Initial dash speed
 1.5 #Dash turn accel
+0.5 #Dash stop decel
 0.7 #Traction
 5   #Max air speed
 0.3 #Air accel
@@ -12,6 +13,7 @@
 13  #FHop initial speed
 9   #SHop initial speed
 12  #air jump initial speed 
+3 3 3 3 #Horizontal jump speeds (GF/GB/AF/AB)
 0.7 #Gravity
 11  #Max fall speed
 14  #Fast fall speed
@@ -28,3 +30,6 @@
 60  #shield size
 0   #shield center x
 30  #shield center y
+1 # Air jumps
+
+m nair l 8
