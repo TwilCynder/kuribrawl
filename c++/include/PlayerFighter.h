@@ -31,6 +31,7 @@ class PlayerFighter : public Fighter {
     void resolveInputs();
     void handleButtonPress (int button );
     void handleTriggerPress(int trigger);
+    void handleStickFlick(Kuribrawl::Direction direction); //currently only for the second stick
 
     Port* getPort() const;
     void setPort(Port* port);

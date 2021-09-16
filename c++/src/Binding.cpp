@@ -25,4 +25,5 @@ Binding::Binding(ControllerType* ct):
     for (int i = 0; i < MAX_NB_TRIGGERS; i++){
         triggers[i] = Input::NONE;
     }
+    second_stick = Input::NONE;
 }

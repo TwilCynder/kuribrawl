@@ -42,5 +42,6 @@ namespace Kuribrawl {
     signed char sign(double);
     signed char signReduced(int value, int minimum);
     void substractValue(double* v1, double v2);
+    DirectionIG DirectionToDirectionIG(Direction, int facing);
 }
 

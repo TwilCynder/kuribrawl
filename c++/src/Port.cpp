@@ -6,8 +6,8 @@
 #include "Binding.h"
 #include "ControllersData.h"
 #include <stdlib.h>
-
 #include "controllerElements.h"
+
 
 Port::Port(App* app_) :
     app(app_),
@@ -63,16 +63,21 @@ bool Port::isElementPressed(ElementType type, int element) const{
     }
 }
 
-const Kuribrawl::Vector& Port::getControlStickState() const{
-    return control_stick.current_state;
+const Port::StickState& Port::getControlStickState() const{
+    return control_stick;
 }
 
-const Kuribrawl::Vector& Port::getControlStickPreviousState() const{
-    return control_stick.previous_state;
+
+const Port::StickState& Port::getSecondaryStickState() const{
+    return secondary_stick;
 }
 
-const Kuribrawl::Vector& Port::getSecondaryStickState() const{
-    return secondary_stick.current_state;
+const Port::TriggerState& Port::getLeftTriggerState()  const {
+    return left_trigger;
+}
+
+const Port::TriggerState& Port::getRightTriggerState() const {
+    return right_trigger;
 }
 
 void Port::updateDpadState(){
@@ -94,17 +99,6 @@ void Port::readController(){
 
     left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
     right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
-
-    //détection du passage de threshold
-    const ControllerType::ControllerVals& vals = controller_type->getControllerVals();
-
-    if (pod.read_left_trigger && left_trigger.current_state > vals.analogTriggerThreshold && left_trigger.previous_state < vals.analogTriggerThreshold){
-        fighter->handleTriggerPress(TRIGGER_LEFT);
-    }
-
-    if (pod.read_right_trigger && (right_trigger.current_state >= vals.analogTriggerThreshold) && (right_trigger.previous_state < vals.analogTriggerThreshold)){
-        fighter->handleTriggerPress(TRIGGER_RIGHT);
-    }
 
     if (pod.read_dpad){
         updateDpadState();
@@ -195,12 +189,12 @@ void Port::deactivate(){
     active = false;
 }
 
-inline void Port::Stick::updatePrevious(){
+inline void Port::StickState::updatePrevious(){
     previous_state.x = current_state.x;
     previous_state.y = current_state.y;
 }
 
-inline void Port::Trigger::updatePrevious(){
+inline void Port::TriggerState::updatePrevious(){
     previous_state = current_state;
 }
 
