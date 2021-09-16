@@ -2,6 +2,8 @@
 #include "Debug.h"
 #include <cmath>
 
+using namespace Kuribrawl;
+
 signed char Kuribrawl::sign(int v) {
     return (0 < v) - (v < 0);
 }
@@ -24,4 +26,30 @@ void Kuribrawl::substractValue(double* v1, double v2){
 
 Kuribrawl::DirectionIG Kuribrawl::DirectionToDirectionIG(Kuribrawl::Direction direction, int facing){
     return (facing == -1 && (int)direction % 2 == 0) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
+}
+
+Direction Kuribrawl::getDirection4(const Vector& stick_state, int threshold){
+    int absX = abs(stick_state.x);
+    int absY = abs(stick_state.y);
+
+    if (absX < threshold && absY < threshold){
+        return Direction::NONE;
+    } else if (absX > absY){
+        return (Direction)( 1 - sign(stick_state.x));
+    } else {
+        return (Direction)( 2 + sign(stick_state.y));
+    }
+}
+
+DirectionIG Kuribrawl::getDirection4IG(const Vector& stick_state, int threshold, int facing) {
+    int absX = abs(stick_state.x);
+    int absY = abs(stick_state.y);
+
+    if (absX < threshold && absY < threshold){
+        return DirectionIG::NONE;
+    } else if (absX > absY){
+        return (DirectionIG)( 1 - (sign(stick_state.x) * facing));
+    } else {
+        return (DirectionIG)( 2 + sign(stick_state.y));
+    }
 }

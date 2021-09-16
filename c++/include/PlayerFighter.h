@@ -53,8 +53,12 @@ class PlayerFighter : public Fighter {
     void update_control_stick_buffer(const Vector&, const Vector&);
     void updateDirectionControlState();
 
-    Kuribrawl::Direction getDirection4() const;
-    Kuribrawl::DirectionIG getDirection4IG(int facing) const;
+
+    Kuribrawl::Direction getDirection4(const Kuribrawl::Vector& stick_state) const;
+    Kuribrawl::DirectionIG getDirection4IG(const Kuribrawl::Vector& stick_state) const;
+
+    Kuribrawl::Direction getControlDirection4() const;
+    Kuribrawl::DirectionIG getControlDirection4IG() const;
 
 	jumpY decideGroundedJumpYType() const override;
     jumpX decideJumpXType() const override;

@@ -142,30 +142,20 @@ void PlayerFighter::updateDirectionControlState(){
     }
 }
 
-Direction PlayerFighter::getDirection4() const{
-    int absX = abs(current_direction_control_state.x);
-    int absY = abs(current_direction_control_state.y);
-
-    if (absX < current_controller_vals.analogStickThreshold && absY < current_controller_vals.analogStickThreshold){
-        return Direction::NONE;
-    } else if (absX > absY){
-        return (Direction)( 1 - sign(current_direction_control_state.x));
-    } else {
-        return (Direction)( 2 + sign(current_direction_control_state.y));
-    }
+Direction PlayerFighter::getDirection4(const Kuribrawl::Vector& stick_state) const{
+    return Kuribrawl::getDirection4(stick_state, current_controller_vals.analogStickThreshold);
 }
 
-DirectionIG PlayerFighter::getDirection4IG(int facing) const{
-    int absX = abs(current_direction_control_state.x);
-    int absY = abs(current_direction_control_state.y);
+DirectionIG PlayerFighter::getDirection4IG(const Kuribrawl::Vector& stick_state) const{
+    return Kuribrawl::getDirection4IG(stick_state, current_controller_vals.analogStickThreshold, facing);
+}
 
-    if (absX < current_controller_vals.analogStickThreshold && absY < current_controller_vals.analogStickThreshold){
-        return DirectionIG::NONE;
-    } else if (absX > absY){
-        return (DirectionIG)( 1 - (sign(current_direction_control_state.x) * facing));
-    } else {
-        return (DirectionIG)( 2 + sign(current_direction_control_state.y));
-    }
+Direction PlayerFighter::getControlDirection4() const {
+    return getDirection4(current_direction_control_state);
+}
+
+DirectionIG PlayerFighter::getControlDirection4IG() const {
+    return getDirection4IG(current_direction_control_state);
 }
 
 /**
@@ -386,7 +376,7 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
     if (!grounded){
 
         Debug::log(input.data);
-        direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getDirection4IG(facing);
+        direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
 
         switch (direction){
             case DirectionIG::NONE:
