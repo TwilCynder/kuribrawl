@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "macros.h"
 #include "Champion.h"
+#include "controllerElements.h"
 
 using namespace Kuribrawl;
 
@@ -69,6 +70,12 @@ void PlayerFighter::handleTriggerPress(int trigger){
     input_manager->registerInput(input, port, trigger, ElementType::TRIGGER, 0);
 }
 
+void PlayerFighter::handleStickFlick(Direction direction){
+    if (input_binding->second_stick != Input::NONE){
+        input_manager->registerInput(input_binding->second_stick, port, 0, ElementType::STICK, 1 addBitValue((int)direction, 1));
+    }
+}
+
 void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state){
     //At this point we assume the buffer is actually containing the position of the stick 2 frames ago
     if (current_state.x > current_controller_vals.analogStickSmashThreshold
@@ -123,7 +130,7 @@ void PlayerFighter::updateDirectionControlState(){
         current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
         current_direction_control_state.y = dpad_state.y * input_binding->dpadAnalogValue;
     } else {
-        current_direction_control_state = port->getControlStickState();
+        current_direction_control_state = port->getControlStickState().current_state;
         if (
             input_binding->direction_control_mode == Binding::DirectionControlMode::BOTH &&
             (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < current_controller_vals.analogStickThreshold)
@@ -178,6 +185,9 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
 				}
             }
             break;
+        case State::ATTACK:
+            if (!grounded) applyAirAccel(sign(current_direction_control_state.x));
+            break;
         case State::WALK:
             if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
                 setState(State::IDLE);
@@ -208,7 +218,29 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
 void PlayerFighter::updateInputsStates(){
     if (!valid_port) return;
     updateDirectionControlState();
-    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState());
+    update_control_stick_buffer(port->getControlStickState().current_state, port->getControlStickState().previous_state);
+
+    const Port::TriggerState& left_trigger = port->getLeftTriggerState();
+    if (left_trigger.current_state >= current_controller_vals.analogTriggerThreshold && left_trigger.previous_state < current_controller_vals.analogTriggerThreshold){
+        handleTriggerPress(TRIGGER_LEFT);
+    }
+    const Port::TriggerState& right_trigger = port->getRightTriggerState();
+    if (right_trigger.current_state >= current_controller_vals.analogTriggerThreshold && right_trigger.previous_state < current_controller_vals.analogTriggerThreshold){
+        handleTriggerPress(TRIGGER_RIGHT);
+    }
+
+    const Port::StickState& secondary_stick = port->getSecondaryStickState();
+    if (secondary_stick.current_state.x > current_controller_vals.analogStickThreshold && secondary_stick.previous_state.x < current_controller_vals.analogStickThreshold){
+        handleStickFlick(Direction::RIGHT);
+    } else if (secondary_stick.current_state.x < -current_controller_vals.analogStickThreshold && secondary_stick.previous_state.x > -current_controller_vals.analogStickThreshold){
+        handleStickFlick(Direction::LEFT);
+    } 
+
+    if (secondary_stick.current_state.y > current_controller_vals.analogStickThreshold && secondary_stick.previous_state.y < current_controller_vals.analogStickThreshold){
+        handleStickFlick(Direction::DOWN);
+    } else if (secondary_stick.current_state.y < -current_controller_vals.analogStickThreshold && secondary_stick.previous_state.y > -current_controller_vals.analogStickThreshold){
+        handleStickFlick(Direction::UP);
+    } 
 }
 
 /**
@@ -348,28 +380,40 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 }
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
+    using Move = Champion::DefaultMoves;
+    DirectionIG direction;
+    Move move;
     if (!grounded){
-        attack(*getChampion().getDefaultMove(Champion::DefaultMoves::UAir));
 
-        switch (getDirection4IG(facing)){
+        Debug::log(input.data);
+        direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getDirection4IG(facing);
+
+        switch (direction){
             case DirectionIG::NONE:
                 Debug::log("Nair");
+                move = Move::Nair;
                 break;
             case DirectionIG::UP:
                 Debug::log("Uair");
+                move = Move::UAir;
                 break;
             case DirectionIG::DOWN:
+                move = Move::Nair;
                 Debug::log("Dair");
                 break;
             case DirectionIG::FORWARD:
+                move = Move::Nair;
                 Debug::log("Fair");
                 break;
             case DirectionIG::BACK:
+                move = Move::Nair;
                 Debug::log("Bair");
                 break;
             default:
                 break;
         }
+
+        attack(*getChampion().getDefaultMove(move));
     }
 
     return 0;

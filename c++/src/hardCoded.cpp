@@ -31,6 +31,7 @@ void HardCoded::initControllersData(ControllersData& data){
     c->default_binding->buttons[10] = Input::LEFT;
     c->default_binding->buttons[11] = Input::RIGHT;
     c->default_binding->triggers[TRIGGER_RIGHT] = Input::JUMP;
+    c->default_binding->second_stick = Input::ATTACK;
     c->default_binding->dpadAnalogValue = 32000;
     c->default_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
 

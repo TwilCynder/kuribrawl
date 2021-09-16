@@ -21,3 +21,7 @@ void Kuribrawl::substractValue(double* v1, double v2){
     if (*v1 < 0) *v1 = 0;
     *v1 *= s;
 }
+
+Kuribrawl::DirectionIG Kuribrawl::DirectionToDirectionIG(Kuribrawl::Direction direction, int facing){
+    return (facing == -1 && (int)direction % 2 == 0) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
+}
