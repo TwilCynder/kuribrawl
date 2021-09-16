@@ -43,5 +43,8 @@ namespace Kuribrawl {
     signed char signReduced(int value, int minimum);
     void substractValue(double* v1, double v2);
     DirectionIG DirectionToDirectionIG(Direction, int facing);
+
+    Direction getDirection4(const Vector& stick_state, int threshold);
+    DirectionIG getDirection4IG(const Vector& stick_state, int threshold, int facing);
 }
 
