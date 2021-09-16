@@ -49,13 +49,17 @@ class PlayerFighter : public Fighter {
     void checkStickState();
     void init_control_stick_buffer();
     void swap_control_stick_buffer();
-    void update_control_stick_buffer(const Vector&, const Vector&, const ControllerType::ControllerVals&);
-    void updateDirectionControlState(ControllerType::ControllerVals controller_vals);
+    void update_control_stick_buffer(const Vector&, const Vector&);
+    void updateDirectionControlState();
+
+    Kuribrawl::Direction getDirection4() const;
+    Kuribrawl::DirectionIG getDirection4IG(int facing) const;
 
 	jumpY decideGroundedJumpYType() const override;
     jumpX decideJumpXType() const override;
 
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
+    ControllerType::ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port;
     std::unique_ptr<InputManager> input_manager;    ///< InputManager used to process the input made by the Port.
