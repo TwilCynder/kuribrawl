@@ -2,12 +2,16 @@
 #include "Debug.h"
 #include <cmath>
 
-int Kuribrawl::sign(int v) {
+signed char Kuribrawl::sign(int v) {
     return (0 < v) - (v < 0);
 }
 
-int Kuribrawl::sign(double v){
+signed char Kuribrawl::sign(double v){
     return (0 < v) - (v < 0);
+}
+
+signed char Kuribrawl::signReduced(int v, int m){
+    return (v < -m) ? -1 : (v > m) ? 1 : 0;
 }
 
 void Kuribrawl::substractValue(double* v1, double v2){

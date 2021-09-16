@@ -6,6 +6,8 @@
 #include "macros.h"
 #include "Champion.h"
 
+using namespace Kuribrawl;
+
 PlayerFighter::PlayerFighter(Game& game, Champion* model):
     Fighter(game, model),
     port(nullptr),
@@ -67,17 +69,17 @@ void PlayerFighter::handleTriggerPress(int trigger){
     input_manager->registerInput(input, port, trigger, ElementType::TRIGGER, 0);
 }
 
-void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state, const ControllerType::ControllerVals& vals){
+void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state){
     //At this point we assume the buffer is actually containing the position of the stick 2 frames ago
-    if (current_state.x > vals.analogStickSmashThreshold
-        && previous_state.x < vals.analogStickSmashThreshold
+    if (current_state.x > current_controller_vals.analogStickSmashThreshold
+        && previous_state.x < current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer[0].x != 1)
     {
         //Smash input right
 		Debug::log("Smash Input Right");
         input_manager->registerInput(Input::RIGHT, port, -1, ElementType::STICK);
-    } else if (current_state.x < -vals.analogStickSmashThreshold
-        && previous_state.x > -vals.analogStickSmashThreshold
+    } else if (current_state.x < -current_controller_vals.analogStickSmashThreshold
+        && previous_state.x > -current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer[0].x != -1)
     {
         //Smash input left
@@ -85,15 +87,15 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
         input_manager->registerInput(Input::LEFT, port, -1, ElementType::STICK);
     }
 
-    if (current_state.y > vals.analogStickSmashThreshold
-        && previous_state.y < vals.analogStickSmashThreshold
+    if (current_state.y > current_controller_vals.analogStickSmashThreshold
+        && previous_state.y < current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer[0].y != 1)
     {
         //Smash input right
 		Debug::log("Smash Input Down");
         input_manager->registerInput(Input::DOWN, port, -1, ElementType::STICK);
-    } else if (current_state.y < -vals.analogStickSmashThreshold
-        && previous_state.y > -vals.analogStickSmashThreshold
+    } else if (current_state.y < -current_controller_vals.analogStickSmashThreshold
+        && previous_state.y > -current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer[0].y != -1)
     {
         //Smash input left
@@ -101,9 +103,9 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
         input_manager->registerInput(Input::UP, port, -1, ElementType::STICK);
     }
 
-    if (current_state.x > vals.analogStickThreshold){
+    if (current_state.x > current_controller_vals.analogStickThreshold){
         control_stick_buffer[0].x = 1;
-    } else if (current_state.x < -vals.analogStickThreshold) {
+    } else if (current_state.x < -current_controller_vals.analogStickThreshold) {
         control_stick_buffer[0].x = -1;
     } else {
         control_stick_buffer[0].x = 0;
@@ -115,7 +117,7 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
  * @brief Updates the state of the direction control of the controller
  * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
  */
-void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals controller_vals){
+void PlayerFighter::updateDirectionControlState(){
     const Port::DpadState& dpad_state = port->getDpadState();
     if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
         current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
@@ -124,12 +126,38 @@ void PlayerFighter::updateDirectionControlState(ControllerType::ControllerVals c
         current_direction_control_state = port->getControlStickState();
         if (
             input_binding->direction_control_mode == Binding::DirectionControlMode::BOTH &&
-            (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < controller_vals.analogStickThreshold)
+            (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < current_controller_vals.analogStickThreshold)
         )
         {
             current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
             current_direction_control_state.y = dpad_state.y * input_binding->dpadAnalogValue;
         }
+    }
+}
+
+Direction PlayerFighter::getDirection4() const{
+    int absX = abs(current_direction_control_state.x);
+    int absY = abs(current_direction_control_state.y);
+
+    if (absX < current_controller_vals.analogStickThreshold && absY < current_controller_vals.analogStickThreshold){
+        return Direction::NONE;
+    } else if (absX > absY){
+        return (Direction)( 1 - sign(current_direction_control_state.x));
+    } else {
+        return (Direction)( 2 + sign(current_direction_control_state.y));
+    }
+}
+
+DirectionIG PlayerFighter::getDirection4IG(int facing) const{
+    int absX = abs(current_direction_control_state.x);
+    int absY = abs(current_direction_control_state.y);
+
+    if (absX < current_controller_vals.analogStickThreshold && absY < current_controller_vals.analogStickThreshold){
+        return DirectionIG::NONE;
+    } else if (absX > absY){
+        return (DirectionIG)( 1 - (sign(current_direction_control_state.x) * facing));
+    } else {
+        return (DirectionIG)( 2 + sign(current_direction_control_state.y));
     }
 }
 
@@ -170,7 +198,7 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
             break;
         default:
             break;
-    }
+    }   
 }
 
 /**
@@ -179,9 +207,8 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
  */
 void PlayerFighter::updateInputsStates(){
     if (!valid_port) return;
-    const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
-    updateDirectionControlState(controller_vals);
-    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState(), controller_vals);
+    updateDirectionControlState();
+    update_control_stick_buffer(port->getControlStickState(), port->getControlStickPreviousState());
 }
 
 /**
@@ -236,6 +263,7 @@ void PlayerFighter::setPort(Port* port_){
     port = port_;
 
     input_binding = port->getController()->default_binding.get();
+    current_controller_vals = port->getController()->getControllerVals();
 }
 
 /**
@@ -305,6 +333,7 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
     if (grounded){
         if (state == Fighter::State::WALK ||
             state == Fighter::State::IDLE ||
+            state == Fighter::State::LANDING ||
             (state == Fighter::State::DASH_START && side == -facing))
         {
             setState(Fighter::State::DASH_START, side);
@@ -321,6 +350,26 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
     if (!grounded){
         attack(*getChampion().getDefaultMove(Champion::DefaultMoves::UAir));
+
+        switch (getDirection4IG(facing)){
+            case DirectionIG::NONE:
+                Debug::log("Nair");
+                break;
+            case DirectionIG::UP:
+                Debug::log("Uair");
+                break;
+            case DirectionIG::DOWN:
+                Debug::log("Dair");
+                break;
+            case DirectionIG::FORWARD:
+                Debug::log("Fair");
+                break;
+            case DirectionIG::BACK:
+                Debug::log("Bair");
+                break;
+            default:
+                break;
+        }
     }
 
     return 0;
