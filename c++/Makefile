@@ -1,8 +1,7 @@
 EXEC = kuribrawl
 
 CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=c++17
-LDFLAGS = `sdl2-config --libs` -lSDL2_mixer -lSDL2_image -lSDL2_ttf -lm
-
+LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
 SRC= $(wildcard src/*.cpp)
 _OBJS= $(SRC:.cpp=.o)
 
@@ -16,6 +15,10 @@ NB_FILES = $(words $(SRC))
 CURRENT_NB = 0
 
 all: start $(EXEC)
+
+distr: all
+	cp kuribrawl.exe ../build/c++/kuribrawl.exe
+	cp ../res/data.twl ../build/c++/data.twl
 
 launch: all 
 	./kuribrawl.exe

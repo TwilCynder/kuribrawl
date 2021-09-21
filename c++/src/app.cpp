@@ -135,6 +135,7 @@ bool App::loadGameFile(const char* name){
  * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
+	if (!loadGameFile("data.twl"))
 	if (!loadGameFile("../res/data.twl"))
 	if (!loadGameFile("../gamefile manager/data.twl"))
 	throw KBFatalExplicit("Can't find data file");
