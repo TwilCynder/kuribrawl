@@ -1,1 +1,0 @@
-Execution lasted 34205ms  and 2049 frames were displayed (average framewait : 10).
