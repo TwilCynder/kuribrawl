@@ -16,11 +16,11 @@ CURRENT_NB = 0
 
 all: start $(EXEC)
 
-distr: all
-	cp kuribrawl.exe ../build/c++/kuribrawl.exe
-	cp ../res/data.twl ../build/c++/data.twl
+release: all
+	cp kuribrawl.exe ../release/files/kuribrawl.exe
+	cp ../res/data.twl ../release/files/data.twl
 
-launch: all 
+launch: all
 	./kuribrawl.exe
 
 clean: clear all
@@ -32,7 +32,9 @@ doc_light:
 	doxygen DoxyfileLight
 
 start: 
-	clear
+	@if [ -z "$(NOCLEAR)" ]; then\
+		clear;\
+	fi
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 
 bin/%.o: %.cpp #$(SRC)
