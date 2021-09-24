@@ -10,5 +10,5 @@ Page instfiles
 Section
     SetOutPath $INSTDIR
 
-    File "..\release\c++\*"
+    File "..\release\files\*"
 SectionEnd
