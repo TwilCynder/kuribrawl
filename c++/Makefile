@@ -36,6 +36,7 @@ start:
 		clear;\
 	fi
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
+	@mkdir -p bin
 
 bin/%.o: %.cpp #$(SRC)
 	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
