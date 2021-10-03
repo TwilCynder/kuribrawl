@@ -2,7 +2,7 @@
 #include <memory>
 #include "inputs.h"
 
-#define MAX_NB_BUTTONS 32
+#define MAX_NB_BUTTONS 512//yes
 #define MAX_NB_STICKS 4
 #define MAX_NB_TRIGGERS 2
 
@@ -28,7 +28,8 @@ struct Binding {
     Input second_stick;
 
     DirectionControlMode direction_control_mode;
+    bool tap_jump;
     int dpadAnalogValue;
 
-    ControllerType* controller; /**< The Controller this binding refers to. Pointer validity : can be invalidated if a controllerType is deleted (not supposed to happen) */
+    ControllerType* controller; /**< The Controller this binding refers to. 1 if it's a keyboard binding. Pointer validity : can be invalidated if a controllerType is deleted (not supposed to happen) */
 };

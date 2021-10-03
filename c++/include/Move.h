@@ -16,6 +16,11 @@ struct Move {
         KEEP ///< Keep going while the fighter is now on the ground
     };
 
+    enum struct EndBehavior{
+        NORMAL, ///< Go into IDLE state
+        FREEFALL
+    };
+
     Move();
     Move(const char* anim_name);
 
@@ -26,4 +31,5 @@ struct Move {
     int landing_lag;
     EdgeBehavior edge_behavior;
     LandBehavior land_behavior;
+    EndBehavior  end_behavior ;
 };

@@ -18,9 +18,6 @@ void HardCoded::initControllersData(ControllersData& data){
     ControllerType* c;
 
     c = &data.addController("GC");
-
-    c->control_stick = 0;
-    c->secondary_stick = 1;
     c->setControllerVals(10000, 18000, 20000);
     c->default_binding->buttons[0] = Input::ATTACK;
     c->default_binding->buttons[1] = Input::SPECIAL;
@@ -34,15 +31,12 @@ void HardCoded::initControllersData(ControllersData& data){
     c->default_binding->second_stick = Input::ATTACK;
     c->default_binding->dpadAnalogValue = 32000;
     c->default_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
+    //mapping_string = "0300000034120000adbe000000000000,Gamecube Controller vJoy,platform:Windows,a:b0,b:b1,y:b2,x:b3,start:b7,rightshoulder:b4,dpup:b8,dpleft:b10,dpdown:b9,dpright:b11,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5";
+    //SDL_GameControllerAddMapping(mapping_string);
+    //data.mapSDLMappingToControllerType(mapping_string, c);
 
-
-    mapping_string = "0300000034120000adbe000000000000,Gamecube Controller vJoy,platform:Windows,a:b0,b:b1,y:b2,x:b3,start:b7,rightshoulder:b4,dpup:b8,dpleft:b10,dpdown:b9,dpright:b11,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5";
-    SDL_GameControllerAddMapping(mapping_string);
-    data.mapSDLMappingToControllerType(mapping_string, c);
 
     c = &data.addController("PS4");
-    c->control_stick = 0;
-    c->secondary_stick = 1;
     c->setControllerVals(10000, 18000, 20000);
     c->default_binding->buttons[0] = Input::ATTACK;
     c->default_binding->buttons[1] = Input::SPECIAL;
@@ -55,9 +49,30 @@ void HardCoded::initControllersData(ControllersData& data){
     c->default_binding->triggers[TRIGGER_RIGHT] = Input::JUMP;
     c->default_binding->dpadAnalogValue = 32000;
     c->default_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
-    mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";
-    SDL_GameControllerAddMapping(mapping_string);
-    data.mapSDLMappingToControllerType(mapping_string, c);
+    c->default_binding->second_stick = Input::ATTACK;
+    c->default_binding->tap_jump = true;
+
+    c->valid_element_mapping = true;
+    c->element_mapping.control_stick.x = 0;
+    c->element_mapping.control_stick.y = 1;
+    c->element_mapping.direction_buttons.up = 11;
+    c->element_mapping.direction_buttons.up = 12;
+    c->element_mapping.direction_buttons.up = 13;
+    c->element_mapping.direction_buttons.up = 14;
+    //mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";
+    //SDL_GameControllerAddMapping(mapping_string);
+    //data.mapSDLMappingToControllerType(mapping_string, c);
+
+
+    c = data.getKeyboardController();
+    c->default_binding->buttons[SDL_SCANCODE_K] = Input::ATTACK;
+    c->default_binding->buttons[SDL_SCANCODE_W] = Input::UP;
+    c->default_binding->buttons[SDL_SCANCODE_A] = Input::LEFT;
+    c->default_binding->buttons[SDL_SCANCODE_D] = Input::RIGHT;
+    c->default_binding->buttons[SDL_SCANCODE_S] = Input::DOWN;
+    c->default_binding->direction_control_mode = Binding::DirectionControlMode::DPAD_ONLY;
+    c->default_binding->tap_jump = true;
+    c->default_binding->dpadAnalogValue = 32000;
 }
 
 /**
@@ -67,9 +82,6 @@ void HardCoded::initControllersData(ControllersData& data){
  * @param data the ControllersData object that will contain the hard-coded data.
  */
 void HardCoded::initGameData(App* app){
-    GameData& data = app->gameData();
-    Champion* acid = &data.tryChampion("acid");
-    EntityAnimation* anim;
 
     /*anim = acid->addAnimation("walking", app->LoadTexture("../res/old/walk_strip6.png"));
     anim->initFrames(6);
