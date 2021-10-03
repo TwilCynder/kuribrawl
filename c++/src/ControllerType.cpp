@@ -9,7 +9,8 @@
 
 ControllerType::ControllerType():
 
-    default_binding(std::make_unique<Binding>(this))
+    default_binding(std::make_unique<Binding>(this)),
+    vals{10000, 18000, 20000}
 {
 
 }

@@ -16,6 +16,7 @@ Binding::Binding():
  */
 Binding::Binding(ControllerType* ct):
     direction_control_mode(DirectionControlMode::STICK_ONLY),
+    tap_jump(false),
     dpadAnalogValue(0),
     controller(ct)
 {

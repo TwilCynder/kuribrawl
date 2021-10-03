@@ -176,15 +176,16 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
             break;
     }
 
-    setState(State::IDLE, 0, 1);
+    setState(State::IDLE, 0, 1, false);
+    setAnimation(Champion::DefaultAnimation::JUMP);
     grounded = false;
 }
 
 
 //Returns int to make jump_manager able to return its return value directly
 int Fighter::air_jump(jumpX x_type){
-	
-	if (air_jumps > 0) {
+	Debug::log("air jump ????");
+	if (air_jumps > 0) {    
 		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
 	
 	    switch(x_type){
@@ -221,8 +222,6 @@ int Fighter::air_jump(jumpX x_type){
  * @return true if the duration is -1 and the current animation was finished, or if the timer state has reached the duration.
  */
 bool Fighter::isStateFinished(int duration){
-    //Debug::log("----");
-    //Debug::log((int)current_animation.is_finished());
     return (duration == -1) ? current_animation.is_finished() : state_timer >= duration;
 }
 
@@ -253,6 +252,7 @@ void Fighter::checkStateDuration(){
                 setState(State::IDLE);
             }
             break;
+
         default:
             break;
     }
@@ -289,6 +289,17 @@ void Fighter::updateState(){
         case State::LANDING:
             if (isStateFinished(model->val.landing_duration)){
                 setState(State::IDLE);
+            }
+            break;
+        case State::ATTACK:
+            if (current_animation.is_finished()){
+                switch (current_move->end_behavior){
+                    case Move::EndBehavior::NORMAL:
+                        setState(Fighter::State::IDLE);
+                        break;
+                    case Move::EndBehavior::FREEFALL:
+                        setState(Fighter::State::FREEFALL);
+                }
             }
             break;
         default:

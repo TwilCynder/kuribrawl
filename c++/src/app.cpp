@@ -96,6 +96,7 @@ void App::initSDL(){
 	}
 
 	SDL_JoystickEventState(SDL_ENABLE);
+	keyboard_state = SDL_GetKeyboardState(nullptr);
 }
 
 /**
@@ -185,7 +186,7 @@ void App::render(){
  */
 
 void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
-	Port* port = joysticks[evt->which];
+	Port* port = controllers[evt->which];
 	if (port != nullptr && port->isActive()){
 		port->handleButtonPress(evt->button);
 	}
@@ -251,6 +252,8 @@ void App::handleEvents(){
 						advance = true;
 						break;
 					default:
+						if (!event.key.repeat)
+							keyboard->handleButtonPress(event.key.keysym.scancode);
 						break;
 				}
 				break;

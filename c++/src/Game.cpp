@@ -198,7 +198,6 @@ void Game::step(SDL_Renderer* render_target){
     updateStates();
     resolveInputs();
     updateAnimations();
-    //updateAnims
     hitDetection();
     applyPhysics();
     draw(render_target);
