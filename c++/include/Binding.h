@@ -30,6 +30,8 @@ struct Binding {
     DirectionControlMode direction_control_mode;
     bool tap_jump;
     int dpadAnalogValue;
+    int dpadAnalogValueModified;
+    int analog_modifier_button;
 
     ControllerType* controller; /**< The Controller this binding refers to. 1 if it's a keyboard binding. Pointer validity : can be invalidated if a controllerType is deleted (not supposed to happen) */
 };

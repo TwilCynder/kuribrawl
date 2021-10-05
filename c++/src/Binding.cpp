@@ -17,8 +17,11 @@ Binding::Binding():
 Binding::Binding(ControllerType* ct):
     direction_control_mode(DirectionControlMode::STICK_ONLY),
     tap_jump(false),
-    dpadAnalogValue(0),
+    dpadAnalogValue(32000),
+    dpadAnalogValueModified(10000),
+    analog_modifier_button(-1),
     controller(ct)
+
 {
     for (int i = 0; i < MAX_NB_BUTTONS; i++){
         buttons[i] = Input::NONE;

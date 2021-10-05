@@ -141,14 +141,9 @@ void Champion::initDefaultAnimations(){
     EntityAnimation* anim;
 
     for (auto const& [state, name] : default_animation_name){
-        cout << "Looking for animation " << name << '\n';
         if ((anim = (EntityAnimation*)getAnimation(name))){
-            cout << "FOUND" << '\n';
             default_animations[(int)state] = anim;
             if (state == DefaultAnimation::JUMP) {
-                Debug::log("Jump animation :");
-                Debug::log(name);
-                Debug::log(anim->getNbFrames());
             }
         }
     }

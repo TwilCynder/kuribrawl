@@ -66,13 +66,14 @@ void HardCoded::initControllersData(ControllersData& data){
 
     c = data.getKeyboardController();
     c->default_binding->buttons[SDL_SCANCODE_K] = Input::ATTACK;
-    c->default_binding->buttons[SDL_SCANCODE_W] = Input::UP;
-    c->default_binding->buttons[SDL_SCANCODE_A] = Input::LEFT;
-    c->default_binding->buttons[SDL_SCANCODE_D] = Input::RIGHT;
-    c->default_binding->buttons[SDL_SCANCODE_S] = Input::DOWN;
+    // c->default_binding->buttons[SDL_SCANCODE_W] = Input::UP;
+    // c->default_binding->buttons[SDL_SCANCODE_A] = Input::LEFT;
+    // c->default_binding->buttons[SDL_SCANCODE_D] = Input::RIGHT;
+    // c->default_binding->buttons[SDL_SCANCODE_S] = Input::DOWN;
     c->default_binding->direction_control_mode = Binding::DirectionControlMode::DPAD_ONLY;
     c->default_binding->tap_jump = true;
     c->default_binding->dpadAnalogValue = 32000;
+    c->default_binding->analog_modifier_button = SDL_SCANCODE_SPACE;
 }
 
 /**
