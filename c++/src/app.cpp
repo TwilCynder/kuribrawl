@@ -293,7 +293,6 @@ void App::update_frame_duration(){
 void App::loop_timer(){
 	Date current_date = System::now();
 	Date wait = next_frame_date - current_date;
-
 	if (wait < 0){
 		next_frame_date = current_date;
 	} else {

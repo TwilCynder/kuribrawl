@@ -17,7 +17,7 @@ class ControllersData;
 /**
  * @brief A number of miliseconds elapsed since SDL initialization
  */
-typedef int32_t Date;
+typedef long double Date;
 
 /**
  * @brief An instance of the program.
