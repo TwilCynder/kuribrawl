@@ -42,10 +42,6 @@ void HardCoded::initControllersData(ControllersData& data){
     c->default_binding->buttons[1] = Input::SPECIAL;
     c->default_binding->buttons[2] = Input::SHORTHOP;
     c->default_binding->buttons[3] = Input::JUMP;
-    c->default_binding->buttons[11] = Input::UP;
-    c->default_binding->buttons[12] = Input::DOWN;
-    c->default_binding->buttons[13] = Input::LEFT;
-    c->default_binding->buttons[14] = Input::RIGHT;
     c->default_binding->triggers[TRIGGER_RIGHT] = Input::JUMP;
     c->default_binding->dpadAnalogValue = 32000;
     c->default_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
@@ -59,9 +55,9 @@ void HardCoded::initControllersData(ControllersData& data){
     c->element_mapping.direction_buttons.up = 12;
     c->element_mapping.direction_buttons.up = 13;
     c->element_mapping.direction_buttons.up = 14;
-    //mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";
-    //SDL_GameControllerAddMapping(mapping_string);
-    //data.mapSDLMappingToControllerType(mapping_string, c);
+    mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";
+    SDL_GameControllerAddMapping(mapping_string);
+    data.mapSDLMappingToControllerType(mapping_string, c);
 
 
     c = data.getKeyboardController();

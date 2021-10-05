@@ -125,11 +125,10 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
  * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
  */
 void PlayerFighter::updateDirectionControlState(){
-    Debug::log(input_binding->analog_modifier_button);
     int value = (input_binding->analog_modifier_button != -1 && port->isButtonPressed(input_binding->analog_modifier_button)) ?
         input_binding->dpadAnalogValueModified :
         input_binding->dpadAnalogValue;
-    Debug::log(value);
+
     const Port::DpadState& dpad_state = port->getDpadState();
     if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
         current_direction_control_state.x = dpad_state.x * value;
@@ -212,8 +211,12 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
  */
 void PlayerFighter::updateInputsStates(){
     if (!valid_port) return;
+    
+    {
+    const Kuribrawl::Vector previous_direction_control_state = current_direction_control_state;
     updateDirectionControlState();
-    update_control_stick_buffer(port->getControlStickState().current_state, port->getControlStickState().previous_state);
+    update_control_stick_buffer(current_direction_control_state, previous_direction_control_state);
+    }
 
     const Port::TriggerState& left_trigger = port->getLeftTriggerState();
     if (left_trigger.current_state >= current_controller_vals.analogTriggerThreshold && left_trigger.previous_state < current_controller_vals.analogTriggerThreshold){
@@ -289,10 +292,6 @@ void PlayerFighter::setPort(Port* port_){
     valid_port = true;
     port = port_;
 
-    Debug::log(port);
-    Debug::log(port->getController());
-    Debug::log(port->getController()->default_binding.get());
-
     input_binding = port->getController()->default_binding.get();
     current_controller_vals = port->getController()->getControllerVals();
 }
@@ -318,7 +317,7 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
     ElementType elem_type = (ElementType)((state_info >> 3) & 0b11);
     int element = state_info >> 5;
     if (elem_type == ElementType::STICK && element == -1){ //This was a smash input (with tap jump enabled)
-        return (port->getControlStickState().current_state.y < -current_controller_vals.analogStickThreshold) ? jumpY::Full : jumpY::Short ;
+        return (current_direction_control_state.y < -current_controller_vals.analogStickThreshold) ? jumpY::Full : jumpY::Short ;
     } else {
         return port->isElementPressed(elem_type, element) ? jumpY::Full : jumpY::Short;
     }
