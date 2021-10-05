@@ -7,6 +7,8 @@
 #include "util.h"
 #include "PortOptimizationData.h"
 
+#define JOSTICKID_KEYBOARD -1
+
 class App;
 class Binding;
 class ControllersData;
@@ -27,16 +29,22 @@ class Port {
         void updatePrevious();
     };
 
+    enum class SDLMode {
+        JOYSTICK,
+        GAMECONTROLLER,
+        INVALID
+    };
+
     Port(App* app_);
 
-    bool isActive() const ;
+    bool isActive() const;
     void setJoystick(int id);
-    void setJoystick(int id, ControllerType* controller);
     void setJoystick(int id, ControllersData& cd);
     void setFighter(PlayerFighter*);
     void initOptimizationData();
+    void unregisterController();
     void deactivate();
-    void setController(ControllerType* c);
+    void setControllerType(ControllerType* c);
     ControllerType* getController() const;
     void handleButtonPress(int button);
     bool isButtonPressed(int button) const;
@@ -56,16 +64,19 @@ class Port {
     private:
     void setJoystick_(int id);
 
-    App* app;
-
-    ControllerType* controller_type;
-    PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of it's normal functioning.
+    App* app;   ///< The app that opened this Port
 
     int id;
-    int joystick_id;
+
+    //These attributes determine the behavior of the controller or keyboard.
+    bool active; ///< True if the controller is active ; if false, the other attributes may be garbage.
+    SDLMode sdl_mode;
+    ControllerType* controller_type;
     SDL_GameController* controller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
 	SDL_Joystick* joystick;
-    bool active;
+    int joystick_id; ///< Numerical ID or the controller given by SDL, or -1 if using the keyboard.
+
+    PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of its normal functioning.
 
     PortOptimizationData pod;
     DpadState current_dpad_state; //NOT USED YET
