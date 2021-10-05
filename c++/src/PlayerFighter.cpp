@@ -303,10 +303,16 @@ void PlayerFighter::unsetPort(){
  * @return jumpY
  */
 jumpY PlayerFighter::decideGroundedJumpYType() const {
-	return ( 
-        (((state_info >> 2) & 1) == 0) && 
-        port->isElementPressed((ElementType)((state_info >> 3) & 0b11),  state_info >> 5)
-    ) ? jumpY::Full : jumpY::Short;
+
+    if (((state_info >> 2) & 1) == 1) return jumpY::Short;
+
+    ElementType elem_type = (ElementType)((state_info >> 3) & 0b11);
+    int element = state_info >> 5;
+    if (elem_type == ElementType::STICK && element == -1){ //This was a smash input (with tap jump enabled)
+        return (port->getControlStickState().current_state.y < -current_controller_vals.analogStickThreshold) ? jumpY::Full : jumpY::Short ;
+    } else {
+        return port->isElementPressed(elem_type, element) ? jumpY::Full : jumpY::Short;
+    }
 }
 
 /**
@@ -370,12 +376,12 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 }
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
+
     using Move = Champion::DefaultMoves;
     DirectionIG direction;
     Move move;
     if (!grounded){
 
-        Debug::log(input.data);
         direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
 
         switch (direction){
@@ -416,6 +422,13 @@ int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
     return 0;
 }
 
+int PlayerFighter::InputHandler_SmashStickUp(RegisteredInput& input){
+    if (input_binding->tap_jump){
+        jump_manager(input, jumpY::Full);
+    }
+    return 0;
+}
+
 PlayerFighter::InputHandler PlayerFighter::input_handlers[Input::TOTAL];
 
 void PlayerFighter::initInputHandlers(){
@@ -424,5 +437,6 @@ void PlayerFighter::initInputHandlers(){
     input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
     input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
     input_handlers[Input::DOWN] = &InputHandler_SmashStickDown;
+    input_handlers[Input::UP] = &InputHandler_SmashStickUp;
     input_handlers[Input::ATTACK] = &InputHandler_Attack;
 }

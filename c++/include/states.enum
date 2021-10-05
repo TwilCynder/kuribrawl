@@ -13,6 +13,7 @@
         ATTACK,         ///< Attacking (in the animation of an attack)
         HITSTUN,        ///< Unable to act after getting hit
         TUMBLE,         ///< Started after the hitstun from a strong hit ended, actions are a bit restrcited.
+        FREEFALL,
         GUARD_STUN,     ///< Unable to act or to put down shield after getting their shield it.
         LANDING_LAG,    ///< Started when a Fighter hits the ground after being previously airborne and while the state was Attacking.
         CROUCH,

@@ -45,8 +45,11 @@ class App
     //SDL functions
     SDL_Texture* LoadTexture(const char *file);
 
-    Port* joysticks[16];    ///<An array associating each joystick numerical id with a Port. 
+    Port* controllers[16];    ///<An array associating each joystick numerical id with a Port. 
                             /**<Pointer validity : can be invalidated if a Port is deleted or moved */
+    Port* keyboard; ///<Port associated with the keyboard
+    const Uint8* keyboard_state;
+
     private:
     void initSDL();
     void initControllersData();

@@ -1,9 +1,10 @@
 #pragma once
 #include <map>
 #include <string>
+#include <memory>
 #include "ControllerType.h"
 
-#define MAPPING_ID_LENGTH 32
+#define MAPPING_ID_LENGTH 24
 
 /**
  * @brief Class containing all data related to controllers.
@@ -15,12 +16,17 @@ class ControllersData {
     using ControllerMapKVP = ControllersMap::value_type;
 
     public:
+    ControllersData();
+
     ControllerType& addController(const std::string& name);
     ControllerType* getController(const std::string& name);
     void mapSDLMappingToControllerType(const char* mapping_string, ControllerType* ct);
     ControllerType* getControllerFromMapping(const char* mapping_string) const;
+    ControllerType* getKeyboardController() const;
+    
 
     private:
     ControllersMap known_controllers; ///< Map containing all the ControllerTypes.
     std::map<std::string, ControllerType*> SDL_mapping_to_controllerType;
+    std::unique_ptr<ControllerType> keyboard;
 };

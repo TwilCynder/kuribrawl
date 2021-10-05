@@ -145,6 +145,11 @@ void Champion::initDefaultAnimations(){
         if ((anim = (EntityAnimation*)getAnimation(name))){
             cout << "FOUND" << '\n';
             default_animations[(int)state] = anim;
+            if (state == DefaultAnimation::JUMP) {
+                Debug::log("Jump animation :");
+                Debug::log(name);
+                Debug::log(anim->getNbFrames());
+            }
         }
     }
 
@@ -164,8 +169,6 @@ void Champion::initDefaultMoves(){
     for (auto const& [moveID, name] : default_move_name){
         Move& move = addMove(name);
         move.anim_name = name;
-        //Debug::log(name);
-        //Debug::log((void*)&move);
         default_moves[(int)moveID] = &move;
     }
 }
