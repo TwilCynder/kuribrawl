@@ -9,12 +9,14 @@
 
 void App::startTestGame(){
 
+	Debug::log("===Starting game=====");
+
 	current_game = new Game();
 
 	Champion* acid = game_data->getChampion("acid");
 
-	//ports[0].setJoystick(-1, this->controllersData());
-	current_game->addFighter(acid, 100, 1/*, ports[0]*/);
+	ports[0].setJoystick(-1, this->controllersData());
+	current_game->addFighter(acid, 100, 1, ports[0]);
 	current_game->addFighter(acid, 300, 1);
 	current_game->addFighter(acid, 500, 1);
 

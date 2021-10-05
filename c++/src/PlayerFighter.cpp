@@ -125,10 +125,15 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
  * Which is, depending on the binding settings, either the direction given by the control stick or the dpad.
  */
 void PlayerFighter::updateDirectionControlState(){
+    Debug::log(input_binding->analog_modifier_button);
+    int value = (input_binding->analog_modifier_button != -1 && port->isButtonPressed(input_binding->analog_modifier_button)) ?
+        input_binding->dpadAnalogValueModified :
+        input_binding->dpadAnalogValue;
+    Debug::log(value);
     const Port::DpadState& dpad_state = port->getDpadState();
     if (input_binding->direction_control_mode == Binding::DirectionControlMode::DPAD_ONLY){
-        current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
-        current_direction_control_state.y = dpad_state.y * input_binding->dpadAnalogValue;
+        current_direction_control_state.x = dpad_state.x * value;
+        current_direction_control_state.y = dpad_state.y * value;
     } else {
         current_direction_control_state = port->getControlStickState().current_state;
         if (
@@ -136,8 +141,8 @@ void PlayerFighter::updateDirectionControlState(){
             (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < current_controller_vals.analogStickThreshold)
         )
         {
-            current_direction_control_state.x = dpad_state.x * input_binding->dpadAnalogValue;
-            current_direction_control_state.y = dpad_state.y * input_binding->dpadAnalogValue;
+            current_direction_control_state.x = dpad_state.x * value;
+            current_direction_control_state.y = dpad_state.y * value;
         }
     }
 }
@@ -283,6 +288,10 @@ Port* PlayerFighter::getPort() const {
 void PlayerFighter::setPort(Port* port_){
     valid_port = true;
     port = port_;
+
+    Debug::log(port);
+    Debug::log(port->getController());
+    Debug::log(port->getController()->default_binding.get());
 
     input_binding = port->getController()->default_binding.get();
     current_controller_vals = port->getController()->getControllerVals();

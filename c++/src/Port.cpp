@@ -205,7 +205,7 @@ void Port::setJoystick(int id){
     }
     setJoystick_(id);
 }
-
+/*
 void closeSDLInstance(){
     if (controller){
         SDL_GameControllerClose(controller);
@@ -255,6 +255,7 @@ void setController_GameController(int id, ControllerType* controller){
     setController_();
 }
 
+*/
 void Port::setFighter(PlayerFighter* fighter_){
     fighter = fighter_;
     fighter->setPort(this);
