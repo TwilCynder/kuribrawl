@@ -23,7 +23,13 @@ struct Binding {
     Binding();
     Binding(ControllerType*);
 
-    Input buttons[MAX_NB_BUTTONS]; ///< Array containing the input associated with each button (each button correspondig to an index of the array).
+
+    /**
+     * @brief Array containing the input associated with each button (each button correspondig to an index of the array).
+     * The concept of button here is a bit blurry, can be any controller event identified by a number, from GameController buttons
+     * to keyboard keys. 
+     */
+    Input buttons[MAX_NB_BUTTONS]; 
     Input triggers[2];
     Input second_stick;
 

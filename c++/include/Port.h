@@ -66,7 +66,8 @@ class Port {
 
     App* app;   ///< The app that opened this Port
 
-    int id;
+
+    int id; /** Index in the \ref app#ports "port vector" */
 
     //These attributes determine the behavior of the controller or keyboard.
     bool active; ///< True if the controller is active ; if false, the other attributes may be garbage.
