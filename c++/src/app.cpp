@@ -61,6 +61,20 @@ ControllersData& App::controllersData(){
 }
 
 /**
+ * @brief Returns the first \ref Port#isActive "inactive" port or nullptr if there is none.
+ * 
+ * @return Port* 
+ */
+Port* App::getFirstInactivePort(){
+	for (unsigned int i = 0; i < ports.size(); i++){
+		if (!ports[i].isActive()){
+			return &ports[i];
+		}
+	}
+	return nullptr;
+}
+
+/**
  * @brief Initializes SDL components.
  * Initializes :
  * - SDL Core

@@ -50,6 +50,8 @@ class App
     Port* keyboard; ///<Port associated with the keyboard
     const Uint8* keyboard_state;
 
+    Port* getFirstInactivePort();
+
     private:
     void initSDL();
     void initControllersData();
