@@ -66,24 +66,22 @@ class Port {
 
     App* app;   ///< The app that opened this Port
 
-    int id;
+    int id; 
 
-    //These attributes determine the behavior of the controller or keyboard.
+    //These attributes determine the behavior of the controller or keyboard. They must be set (or unset, as long as everything is valid) everytime the controller changes
     bool active; ///< True if the controller is active ; if false, the other attributes may be garbage.
-    SDLMode sdl_mode;
     ControllerType* controller_type;
     SDL_GameController* controller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
 	SDL_Joystick* joystick;
-    int joystick_id; ///< Numerical ID or the controller given by SDL, or -1 if using the keyboard.
+    int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.
 
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of its normal functioning.
-
     PortOptimizationData pod;
-    DpadState current_dpad_state; //NOT USED YET
 
     //State;
     StickState control_stick;
     StickState secondary_stick; //TODO supporter plusieurs sticks secondaires ?
     TriggerState left_trigger;
     TriggerState right_trigger; /** TODO Supporter un nombre dynamique de triggers ? */
+    DpadState current_dpad_state; //NOT USED YET
 };

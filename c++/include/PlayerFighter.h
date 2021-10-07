@@ -64,7 +64,7 @@ class PlayerFighter : public Fighter {
     jumpX decideJumpXType() const override;
 
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
-    ControllerType::ControllerVals current_controller_vals ; //Set when the port is set
+    ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port;
     std::unique_ptr<InputManager> input_manager;    ///< InputManager used to process the input made by the Port.

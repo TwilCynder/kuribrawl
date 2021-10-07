@@ -10,7 +10,7 @@
 ControllerType::ControllerType():
 
     default_binding(std::make_unique<Binding>(this)),
-    vals{10000, 18000, 20000}
+    default_vals{10000, 18000, 20000}
 {
 
 }
@@ -21,8 +21,8 @@ ControllerType::ControllerType():
  * @return const ControllerType::ControllerVals& vals.
  */
 
-const ControllerType::ControllerVals& ControllerType::getControllerVals() const{
-    return vals;
+const ControllerVals& ControllerType::getControllerVals() const{
+    return default_vals;
 }
 
 
@@ -33,7 +33,8 @@ const ControllerType::ControllerVals& ControllerType::getControllerVals() const{
  * @param AnalogSmashStickThreshold
  */
 void ControllerType::setControllerVals(int ast, int att, int asst){
-    vals.analogStickThreshold = ast;
-    vals.analogTriggerThreshold = att;
-    vals.analogStickSmashThreshold = asst;
+    default_vals.analogStickThreshold = ast;
+    default_vals.analogTriggerThreshold = att;
+    default_vals.analogStickSmashThreshold = asst;
 }
+
