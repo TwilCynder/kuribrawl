@@ -5,7 +5,7 @@
  * 
  */
 Binding::Binding():
-    Binding(nullptr)
+    Binding(nullptr, true)
 {
 
 }
@@ -14,7 +14,9 @@ Binding::Binding():
  * @brief Construct a new Binding:: Binding object
  * 
  */
-Binding::Binding(ControllerType* ct):
+Binding::Binding(ControllerType* ct, bool override_controller_vals_):
+    controller_vals{10000, 18000, 20000},
+    override_controller_vals(override_controller_vals_),
     direction_control_mode(DirectionControlMode::STICK_ONLY),
     tap_jump(false),
     dpadAnalogValue(32000),
@@ -30,4 +32,8 @@ Binding::Binding(ControllerType* ct):
         triggers[i] = Input::NONE;
     }
     second_stick = Input::NONE;
+
+    if (!ct){
+        
+    }
 }
