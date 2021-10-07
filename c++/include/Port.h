@@ -44,8 +44,8 @@ class Port {
     void initOptimizationData();
     void unregisterController();
     void deactivate();
-    void setControllerType(ControllerType* c);
-    ControllerType* getController() const;
+    void setControllerType(const ControllerType* c);
+    const ControllerType* getControllerType() const;
     void handleButtonPress(int button);
     bool isButtonPressed(int button) const;
     bool isTriggerPressed(int trigger) const;
@@ -70,7 +70,7 @@ class Port {
 
     //These attributes determine the behavior of the controller or keyboard. They must be set (or unset, as long as everything is valid) everytime the controller changes
     bool active; ///< True if the controller is active ; if false, the other attributes may be garbage.
-    ControllerType* controller_type;
+    const ControllerType* controller_type;
     SDL_GameController* controller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
 	SDL_Joystick* joystick;
     int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.

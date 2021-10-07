@@ -22,11 +22,13 @@ class ControllersData {
     ControllerType* getController(const std::string& name);
     void mapSDLMappingToControllerType(const char* mapping_string, ControllerType* ct);
     ControllerType* getControllerFromMapping(const char* mapping_string) const;
-    ControllerType* getKeyboardController() const;
+    const ControllerType& getKeyboardController() const;
+    const ControllerType& getDefaultController() const;
     
 
     private:
     ControllersMap known_controllers; ///< Map containing all the ControllerTypes.
     std::map<std::string, ControllerType*> SDL_mapping_to_controllerType;
-    std::unique_ptr<ControllerType> keyboard;
+    ControllerType keyboard;
+    ControllerType default_controller;
 };
