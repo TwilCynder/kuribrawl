@@ -68,17 +68,20 @@ Port* PlayerFighter::getPort() const {
  * @param port_ a pointer to a Port.
  */
 void PlayerFighter::setPort(Port* port_){
+    if (!port_) throw KBFatal("null pointer passed to PlayerFighter::setPort");
+    if (!port_->isActive()) throw KBFatal("Tried to assign inactive port to PlayerFighter");
+
     valid_port = true;
     port = port_;
 
-    input_binding = port->getController()->default_binding.get();
+    const ControllerType* controller_type = port->getControllerType();
+    if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
 
-    if (!input_binding){
-        KBFatalDetailed("PlayerFighter assigned to port, ended up with no input binding", "oula");
-    }
+    input_binding = controller_type->default_binding.get();
+    if (!input_binding) throw KBFatalDetailed("PlayerFighter assigned to port, ended up with no input binding", "oula");
 
-    current_controller_vals = ((!input_binding->override_controller_vals) && port->getController()) ? 
-        port->getController()->getControllerVals() :
+    current_controller_vals = ((!input_binding->override_controller_vals) && port->getControllerType()) ? 
+        port->getControllerType()->getControllerVals() :
         input_binding->controller_vals;
 }
 
@@ -213,11 +216,10 @@ DirectionIG PlayerFighter::getControlDirection4IG() const {
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
     if (!valid_port) return;
-    const ControllerVals& controller_vals = port->getController()->getControllerVals();
 
     switch (state){
         case State::IDLE:
-            if (abs(current_direction_control_state.x) > controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold){
                 if (grounded){
                     setState(State::WALK, sign(current_direction_control_state.x));
                 } else {
@@ -229,7 +231,7 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
             if (!grounded) applyAirAccel(sign(current_direction_control_state.x));
             break;
         case State::WALK:
-            if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold){
                 setState(State::IDLE);
             } else if (sign(current_direction_control_state.x) != facing){
 
@@ -237,12 +239,12 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
             }
             break;
         case State::DASH:
-            if (current_direction_control_state.x * facing < controller_vals.analogStickThreshold){
+            if (current_direction_control_state.x * facing < current_controller_vals.analogStickThreshold){
                 setState(State::DASH_STOP);
             }
             break;
         case State::DASH_START:
-            if (abs(current_direction_control_state.x) < controller_vals.analogStickThreshold){
+            if (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold){
                 setState(State::IDLE);
             }
             break;
@@ -337,7 +339,7 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
  */
 jumpX PlayerFighter::decideJumpXType() const {
     int8_t orientation = sign(current_direction_control_state.x);
-    return (abs(current_direction_control_state.x) > port->getController()->getControllerVals().analogStickThreshold) ?
+    return (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold) ?
         (orientation == facing) ? jumpX::Forward : jumpX::Backwards :
         jumpX::Normal;
 }

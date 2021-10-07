@@ -13,7 +13,6 @@
 Port::Port(App* app_) :
     app(app_),
     active(false),
-    sdl_mode(Port::SDLMode::INVALID),
     controller(nullptr),
     joystick_id(-1),
     current_dpad_state({0, 0})
@@ -24,11 +23,11 @@ bool Port::isActive() const{
     return active;
 }
 
-ControllerType* Port::getController() const {
+const ControllerType* Port::getControllerType() const {
     return controller_type;
 }
 
-void Port::setControllerType(ControllerType* c){
+void Port::setControllerType(const ControllerType* c){
     controller_type = c;
 }
 
@@ -186,7 +185,7 @@ void Port::setJoystick(int id, ControllersData& cd){
     setJoystick_(id);
 
     if (isKeyboard){
-        setControllerType(cd.getKeyboardController());
+        setControllerType(&cd.getKeyboardController());
     } else {
         ControllerType* ct = cd.getControllerFromMapping(SDL_GameControllerMapping(controller));
     

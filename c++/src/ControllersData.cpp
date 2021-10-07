@@ -1,8 +1,7 @@
 #include "ControllersData.h"
 #include "Debug.h"
 
-ControllersData::ControllersData():
-    keyboard(std::make_unique<ControllerType>())
+ControllersData::ControllersData()
 {
 
 }
@@ -54,6 +53,10 @@ ControllerType* ControllersData::getControllerFromMapping(const char* mapping_st
     return it->second;
 }
 
-ControllerType* ControllersData::getKeyboardController() const {
-    return keyboard.get();
+const ControllerType& ControllersData::getKeyboardController() const {
+    return keyboard;
+}
+
+const ControllerType& ControllersData::getDefaultController() const {
+    return default_controller;
 }
