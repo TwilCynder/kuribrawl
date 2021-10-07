@@ -6,6 +6,7 @@
 #include "macros.h"
 #include "Champion.h"
 #include "controllerElements.h"
+#include "ControllerVals.h"
 
 using namespace Kuribrawl;
 
@@ -44,6 +45,51 @@ Binding* PlayerFighter::getInputBinding() const {
     return (input_binding && input_binding->controller == controller_type) ? input_binding : controller_type->default_binding.get();
 }
 */
+
+void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
+
+    pod.read_left_trigger  = input_binding->triggers[0] != Input::NONE;
+    pod.read_right_trigger = input_binding->triggers[1] != Input::NONE;
+    pod.read_dpad = input_binding->direction_control_mode != Binding::DirectionControlMode::STICK_ONLY;
+}
+
+/**
+ * @brief Returns the Port controlling this Fighter.
+ *
+ * @return Port*
+ */
+Port* PlayerFighter::getPort() const {
+    return port;
+}
+
+/**
+ * @brief Sets the Port controlling this Fighter.
+ * Makes the port active.
+ * @param port_ a pointer to a Port.
+ */
+void PlayerFighter::setPort(Port* port_){
+    valid_port = true;
+    port = port_;
+
+    input_binding = port->getController()->default_binding.get();
+
+    if (!input_binding){
+        KBFatalDetailed("PlayerFighter assigned to port, ended up with no input binding", "oula");
+    }
+
+    current_controller_vals = ((!input_binding->override_controller_vals) && port->getController()) ? 
+        port->getController()->getControllerVals() :
+        input_binding->controller_vals;
+}
+
+/**
+ * @brief Unsets the current port, indicating that this PlayerFighter no longer has a port.
+ * Not sure if this will be ever used but it kinda made sense to make it idk 
+ */
+void PlayerFighter::unsetPort(){
+    valid_port = false;
+    port = nullptr;
+}
 
 void PlayerFighter::swap_control_stick_buffer(){
     /*int* buffer = control_stick_buffer[1];
@@ -167,7 +213,7 @@ DirectionIG PlayerFighter::getControlDirection4IG() const {
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
     if (!valid_port) return;
-    const ControllerType::ControllerVals& controller_vals = port->getController()->getControllerVals();
+    const ControllerVals& controller_vals = port->getController()->getControllerVals();
 
     switch (state){
         case State::IDLE:
@@ -265,44 +311,6 @@ InputManager* PlayerFighter::getInputManager() const{
 
 Binding* PlayerFighter::getInputBinding()const{
     return input_binding;
-}
-
-void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
-
-    pod.read_left_trigger  = input_binding->triggers[0] != Input::NONE;
-    pod.read_right_trigger = input_binding->triggers[1] != Input::NONE;
-    pod.read_dpad = input_binding->direction_control_mode != Binding::DirectionControlMode::STICK_ONLY;
-}
-
-/**
- * @brief Returns the Port controlling this Fighter.
- *
- * @return Port*
- */
-Port* PlayerFighter::getPort() const {
-    return port;
-}
-
-/**
- * @brief Sets the Port controlling this Fighter.
- * Makes the port active.
- * @param port_ a pointer to a Port.
- */
-void PlayerFighter::setPort(Port* port_){
-    valid_port = true;
-    port = port_;
-
-    input_binding = port->getController()->default_binding.get();
-    current_controller_vals = port->getController()->getControllerVals();
-}
-
-/**
- * @brief Unsets the current port, indicating that this PlayerFighter no longer has a port.
- * Not sure if this will be ever used but it kinda made sense to make it idk 
- */
-void PlayerFighter::unsetPort(){
-    valid_port = false;
-    port = nullptr;
 }
 
 /**

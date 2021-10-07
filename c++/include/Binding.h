@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
 #include "inputs.h"
+#include "ControllerVals.h"
 
-#define MAX_NB_BUTTONS 512//yes
+#define MAX_NB_BUTTONS 512//thank you SDL for these HUMONGOUS arrays
 #define MAX_NB_STICKS 4
 #define MAX_NB_TRIGGERS 2
 
@@ -21,7 +22,7 @@ struct Binding {
     };
 
     Binding();
-    Binding(ControllerType*);
+    Binding(ControllerType*, bool override_controller_vals = false);
 
 
     /**
@@ -32,6 +33,9 @@ struct Binding {
     Input buttons[MAX_NB_BUTTONS]; 
     Input triggers[2];
     Input second_stick;
+
+    ControllerVals controller_vals;
+    bool override_controller_vals;
 
     DirectionControlMode direction_control_mode;
     bool tap_jump;
