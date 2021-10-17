@@ -105,6 +105,10 @@ int Fighter::getFacing() const{
     return facing;
 }
 
+bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox& hurtbox){
+    return true;
+}
+
 /**
  * @brief displays the Fighter.
  * Simply displays the CurrentAnimation.
