@@ -386,6 +386,11 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
     checkStateDuration();
 }
 
+void Fighter::setState(const Fighter::State s, int facing, int info, Champion::DefaultAnimation anim){
+    setAnimation(anim);
+    setState(s, facing, info, false);
+}
+
 void Fighter::startMove(const Move& move){
     current_move = &move;
     if (move.animation){
