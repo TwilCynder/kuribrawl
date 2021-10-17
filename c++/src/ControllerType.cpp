@@ -9,8 +9,8 @@
 
 ControllerType::ControllerType():
 
-    default_binding(std::make_unique<Binding>(this)),
-    default_vals{10000, 18000, 20000}
+    default_vals{10000, 18000, 20000},
+    default_binding(std::make_unique<Binding>(this))
 {
 
 }
@@ -38,3 +38,19 @@ void ControllerType::setControllerVals(int ast, int att, int asst){
     default_vals.analogStickSmashThreshold = asst;
 }
 
+ControllerLayout* ControllerType::getElementLayout() const{
+    return element_mapping.get();
+}
+
+ControllerLayout& ControllerType::addElementLayout(){
+    element_mapping = std::make_unique<ControllerLayout>();
+    return *element_mapping.get();
+}
+
+Binding* ControllerType::getDefaultBinding(){
+    return default_binding.get();
+}
+
+Binding& ControllerType::getDefaultBinding() const{
+    return *default_binding.get();
+}

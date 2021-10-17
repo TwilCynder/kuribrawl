@@ -1,3 +1,4 @@
+#pragma once
 enum GameStep{
     START,
     UPDATED_STATES,

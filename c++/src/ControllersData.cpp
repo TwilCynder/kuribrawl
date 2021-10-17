@@ -53,10 +53,18 @@ ControllerType* ControllersData::getControllerFromMapping(const char* mapping_st
     return it->second;
 }
 
-const ControllerType& ControllersData::getKeyboardController() const {
-    return keyboard;
+const ControllerType* ControllersData::getKeyboardController() const {
+    return &keyboard;
 }
 
-const ControllerType& ControllersData::getDefaultController() const {
-    return default_controller;
+ControllerType* ControllersData::getKeyboardController() {
+    return &keyboard;
+}
+
+ControllerType* ControllersData::getDefaultController() {
+    return &default_controller;
+}
+
+const ControllerType* ControllersData::getDefaultController() const {
+    return &default_controller;
 }

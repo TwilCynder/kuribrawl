@@ -22,8 +22,10 @@ class ControllersData {
     ControllerType* getController(const std::string& name);
     void mapSDLMappingToControllerType(const char* mapping_string, ControllerType* ct);
     ControllerType* getControllerFromMapping(const char* mapping_string) const;
-    const ControllerType& getKeyboardController() const;
-    const ControllerType& getDefaultController() const;
+    const ControllerType* getKeyboardController() const;
+    ControllerType* getKeyboardController();
+    const ControllerType* getDefaultController() const;
+    ControllerType* getDefaultController();
     
 
     private:

@@ -1,3 +1,4 @@
+#pragma once
 //General
 #define FILEMARKER_404 0xF0
 #define FILEMARKER_INTERFILE 0xFF

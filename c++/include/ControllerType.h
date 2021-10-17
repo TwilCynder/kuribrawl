@@ -21,15 +21,19 @@ class ControllerType {
 
     const ControllerVals& getControllerVals() const;
     void setControllerVals(int ast, int att, int asst);
-
-
-    ControllerLayout* getLayout();
-    std::unique_ptr<ControllerLayout> element_mapping; //Will not be present for all controllers; only when there is a need to override the SDL one
-
-    std::unique_ptr<Binding> default_binding; ///< The Binding that will be used by default for controllers that are associated with this ControllerType
+  
     ControllerVals default_vals; ///< Maybe useful idk i haven't played the game
 
+    ControllerLayout* getElementLayout() const;
+    ControllerLayout& addElementLayout();
+
+    Binding& getDefaultBinding() const;
+    Binding* getDefaultBinding();
+
     private:
+    std::unique_ptr<ControllerLayout> element_mapping; //Will not be present for all controllers; only when there is a need to override the SDL one
+    std::unique_ptr<Binding> default_binding; ///< The Binding that will be used by default for controllers that are associated with this ControllerType
+
     int nb_buttons; 
     int nb_sticks; //Sticks include triggers //no they don't //fuck you
 };

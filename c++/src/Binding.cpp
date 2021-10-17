@@ -32,8 +32,4 @@ Binding::Binding(ControllerType* ct, bool override_controller_vals_):
         triggers[i] = Input::NONE;
     }
     second_stick = Input::NONE;
-
-    if (!ct){
-        
-    }
 }
