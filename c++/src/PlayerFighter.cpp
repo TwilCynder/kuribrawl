@@ -48,8 +48,8 @@ Binding* PlayerFighter::getInputBinding() const {
 
 void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
 
-    pod.read_left_trigger  = input_binding->triggers[0] != Input::NONE;
-    pod.read_right_trigger = input_binding->triggers[1] != Input::NONE;
+    pod.read_left_trigger  = input_binding->triggers[TRIGGER_LEFT] != Input::NONE;
+    pod.read_right_trigger = input_binding->triggers[TRIGGER_RIGHT] != Input::NONE;
     pod.read_dpad = input_binding->direction_control_mode != Binding::DirectionControlMode::STICK_ONLY;
 }
 
@@ -77,7 +77,7 @@ void PlayerFighter::setPort(Port* port_){
     const ControllerType* controller_type = port->getControllerType();
     if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
 
-    input_binding = controller_type->default_binding.get();
+    input_binding = &controller_type->getDefaultBinding();
     if (!input_binding) throw KBFatalDetailed("PlayerFighter assigned to port, ended up with no input binding", "oula");
 
     current_controller_vals = ((!input_binding->override_controller_vals) && port->getControllerType()) ? 
@@ -329,7 +329,7 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
     if (elem_type == ElementType::STICK && element == -1){ //This was a smash input (with tap jump enabled)
         return (current_direction_control_state.y < -current_controller_vals.analogStickThreshold) ? jumpY::Full : jumpY::Short ;
     } else {
-        return port->isElementPressed(elem_type, element) ? jumpY::Full : jumpY::Short;
+        return port->isElementPressed(elem_type, element, current_controller_vals) ? jumpY::Full : jumpY::Short;
     }
 }
 

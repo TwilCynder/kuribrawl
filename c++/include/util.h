@@ -38,6 +38,14 @@ namespace Kuribrawl {
         double y;
     };
 
+    template<typename T>
+    struct SideH {
+        T left;
+        T right;
+    };
+
+    using SideHInt = SideH<int>;
+
     signed char sign(int);
     signed char sign(double);
     signed char signReduced(int value, int minimum);

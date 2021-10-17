@@ -29,6 +29,7 @@ const ControllerType* Port::getControllerType() const {
 
 void Port::setControllerType(const ControllerType* c){
     controller_type = c;
+    current_controller_layout = c->getElementLayout();
 }
 
 void Port::handleButtonPress(int button){
@@ -38,15 +39,43 @@ void Port::handleButtonPress(int button){
 }
 
 ///SDL GAMECONTROLLER
-bool Port::isButtonPressed(int button) const{
+bool Port::isJoystickButtonPressed(int button) const{
+    if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
+	return SDL_JoystickGetButton(joystick, button);
+}
+
+bool Port::isButtonPressed(int button) const {
     if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
 	return SDL_JoystickGetButton(joystick, button);
 }
 
 ///SDL GAMECONTROLLER
-bool Port::isTriggerPressed(int trigger) const{
+
+/**
+ * @brief DEPRECATED Checks if a trigger is pressed
+ * 
+ * @param trigger 
+ * @return true 
+ * @return false 
+ */
+
+bool Port::isTriggerPressed(int trigger) const {
+    return isTriggerPressed(trigger, controller_type->getControllerVals());
+}
+
+/**
+ * @brief Checks if a trigger is pressed given a certain threshold
+ * 
+ * @param trigger 
+ * @param controller_vals 
+ * @return true 
+ * @return false 
+ */
+
+bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) const{
     if (isKeyboard) return false;
-    int threshold = controller_type->getControllerVals().analogTriggerThreshold;
+    int threshold = controller_vals.analogTriggerThreshold;
+
     switch(trigger){
         case TRIGGER_LEFT:
             return SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > threshold;
@@ -63,6 +92,17 @@ bool Port::isElementPressed(ElementType type, int element) const{
             return isButtonPressed(element);
         case ElementType::TRIGGER:
             return isTriggerPressed(element);
+        default:
+            return false;
+    }
+}
+
+bool Port::isElementPressed(ElementType type, int element, const ControllerVals& controller_vals) const{
+    switch(type){
+        case ElementType::BUTTON:
+            return isButtonPressed(element);
+        case ElementType::TRIGGER:
+            return isTriggerPressed(element, controller_vals);
         default:
             return false;
     }
@@ -90,6 +130,10 @@ void Port::updateDpadState(){
     current_dpad_state.y = getDpadStateY();
 }
 
+Sint16 getJoystickAxis(SDL_Joystick* joy, int axis){
+    return (axis < 0) ? 0 : SDL_JoystickGetAxis(joy, axis);
+}
+
 ///SDL GAMECONTROLLER
 void Port::readController(){
 
@@ -99,14 +143,25 @@ void Port::readController(){
     right_trigger.updatePrevious();
 
     if (!isKeyboard){
-        control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-        control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-        secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
-        secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
+        if (current_controller_layout){
+            control_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->control_stick.x);
+            control_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->control_stick.y);
+            secondary_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->secondary_stick.x);
+            secondary_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->secondary_stick.y);
 
-        
-        left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
-        right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+            left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
+            right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
+        } else {
+            control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+            control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+            secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
+            secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
+
+            
+            left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
+            right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        }
+
     }
 
     if (pod.read_dpad){
@@ -122,8 +177,8 @@ void Port::readController(){
 ///SDL GAMECONTROLLER
 signed char Port::getDpadStateX() const{
     if (isKeyboard){
-        return app->keyboard_state[SDL_SCANCODE_A] ? -1 : 
-        (app->keyboard_state[SDL_SCANCODE_D] ? 1 : 0); 
+        return app->keyboard_state[current_controller_layout->direction_buttons.left] ? -1 : 
+        (app->keyboard_state[current_controller_layout->direction_buttons.right] ? 1 : 0); 
     }
     return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) ? -1 : 
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) ? 1 : 0);
@@ -137,8 +192,8 @@ signed char Port::getDpadStateX() const{
 ///SDL GAMECONTROLLER
 signed char Port::getDpadStateY() const{
     if (isKeyboard){
-        return app->keyboard_state[SDL_SCANCODE_W] ? -1 : 
-        (app->keyboard_state[SDL_SCANCODE_S] ? 1 : 0); 
+        return app->keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
+        (app->keyboard_state[current_controller_layout->direction_buttons.down] ? 1 : 0); 
     }
     return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) ? 1 : 
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
@@ -150,29 +205,30 @@ const Kuribrawl::VectorT<int8_t>& Port::getDpadState() const{
 
 /**
  * @brief Binds this port to a controller (keyboard included)
- * 
+ * Handles the creation of a SDL_GameController, and registers itself as the port for that joystick
  * @param id numerical ID given by the OS to the controller, or -1 for the keyboard
  */
 ///SDL GAMECONTROLLER
-void Port::setJoystick_(int id){
+void Port::plugController_(int controller_id){
+    unregisterController();
 
-    if (id == JOSTICKID_KEYBOARD){
+    if (controller_id == JOSTICKID_KEYBOARD){
+        joystick_id = JOSTICKID_KEYBOARD;
         app->keyboard = this;
     } else {
-
         if (controller)
             SDL_GameControllerClose(controller);
 
-        controller = SDL_GameControllerOpen(id);
+        controller = SDL_GameControllerOpen(controller_id);
         joystick = SDL_GameControllerGetJoystick(controller);
         SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
-
-        cout << "Controller plugged ( " << instance_id << ") : " << SDL_GameControllerName(controller) << '\n' << std::flush;
 
         if (instance_id < 0) {
             Debug::log(SDL_GetError());
             return;
         }
+
+        cout << "Controller plugged ( " << instance_id << ") to port " << id << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
 
         unregisterController();
         joystick_id = instance_id;
@@ -181,28 +237,47 @@ void Port::setJoystick_(int id){
     active = true;
 }
 
-void Port::setJoystick(int id, ControllersData& cd){
-    setJoystick_(id);
+/**
+ * @brief Calls Port::plugController_, and determines the ControllerType object that will be used for this Port.
+ * 
+ * @param id the index of the controller
+ * @param cd the ControllersData object that will be used to obtain a ControllerType
+ */
+void Port::plugController(int id, ControllersData& cd){
+    plugController_(id);
 
     if (isKeyboard){
-        setControllerType(&cd.getKeyboardController());
+        setControllerType(cd.getKeyboardController());
     } else {
         ControllerType* ct = cd.getControllerFromMapping(SDL_GameControllerMapping(controller));
-    
-        Debug::log(SDL_GameControllerMapping(controller));
 
-        if (!ct)
-            throw KBFatalDetailed("Tried to set joystick using controllerType detection but mapping matches no controllerType", "Unknown controller");
+        if (!ct){
+            ct = cd.getDefaultController();
+        }
 
-        setControllerType(ct);
+        controller_type = ct;
+    }
+
+    current_controller_layout = controller_type->getElementLayout();
+}
+
+void Port::setFighter(PlayerFighter* fighter_){
+    fighter = fighter_;
+    fighter->setPort(this);
+    fighter->initPortOptimizationData(pod);
+}
+
+void Port::unregisterController(){
+    if (active){
+        if (joystick_id == JOSTICKID_KEYBOARD) app->keyboard = nullptr;
+        else
+            app->controllers[joystick_id] = nullptr;
     }
 }
 
-void Port::setJoystick(int id){
-    if (!controller_type){
-        throw KBFatal("Trying to enable port with no controller");
-    }
-    setJoystick_(id);
+void Port::deactivate(){
+    unregisterController();
+    active = false;
 }
 /*
 void closeSDLInstance(){
@@ -255,24 +330,6 @@ void setController_GameController(int id, ControllerType* controller){
 }
 
 */
-void Port::setFighter(PlayerFighter* fighter_){
-    fighter = fighter_;
-    fighter->setPort(this);
-    fighter->initPortOptimizationData(pod);
-}
-
-void Port::unregisterController(){
-    if (active){
-        if (joystick_id == JOSTICKID_KEYBOARD) app->keyboard = nullptr;
-        else
-            app->controllers[joystick_id] = nullptr;
-    }
-}
-
-void Port::deactivate(){
-    unregisterController();
-    active = false;
-}
 
 inline void Port::StickState::updatePrevious(){
     previous_state.x = current_state.x;

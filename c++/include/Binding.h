@@ -31,7 +31,7 @@ struct Binding {
      * to keyboard keys. 
      */
     Input buttons[MAX_NB_BUTTONS]; 
-    Input triggers[2];
+    Input triggers[MAX_NB_TRIGGERS];
     Input second_stick;
 
     ControllerVals controller_vals;

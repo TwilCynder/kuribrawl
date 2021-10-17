@@ -251,7 +251,7 @@ void App::handleEvents(){
 			case SDL_QUIT:
 				stop(0);
 				break;
-			case SDL_JOYBUTTONDOWN:
+			case SDL_CONTROLLERBUTTONDOWN:
 				handleButtonEvent(&event.jbutton);
 				break;
 			case SDL_KEYDOWN:
