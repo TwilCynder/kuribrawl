@@ -158,6 +158,12 @@ inline bool testRectCollision(int x1, int y1, int w1, int h1, int x2, int y2, in
     );
 }
 
+void hit(Fighter& attacker, Fighter& defender, const Hitbox& hitbox, const Hurtbox& hurtbox){
+    if (attacker.hitFighter(defender, hitbox, hurtbox)){
+        defender.getHit(attacker, hitbox, hurtbox);
+    }
+}
+
 void Game::hitDetection(){
 
     Fighteriterator attacker, defender;
@@ -180,7 +186,7 @@ void Game::hitDetection(){
                     if (testRectCollision(attackerPos.x + hitbox->getRealXPos(attacker->getFacing()), attackerPos.y + hitbox->y, hitbox->w, hitbox->h,
                         defenderPos.x + hurtbox->getRealXPos(attacker->getFacing()), defenderPos.y + hurtbox->y, hurtbox->w, hurtbox->h))
                     {
-                        
+                        hit(*attacker, *defender, *hitbox, *hurtbox);
                     }
                 }
             }

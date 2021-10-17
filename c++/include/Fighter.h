@@ -48,6 +48,7 @@ class Fighter {
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
+    void setState(const State s, int facing, int info, Champion::DefaultAnimation anim);
     void attack(const Move&);
     CurrentAnimation* getCurrentAnimation();
     void setAnimation(Champion::DefaultAnimation);
@@ -56,6 +57,8 @@ class Fighter {
     void setSpeed(double x, double y);
     bool getGrounded() const;
     int getFacing() const;
+    bool hitFighter(Fighter& target, const Hitbox& hitbox, const Hurtbox& hurtbox);
+    void getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox);
 
     void ground_jump(jumpX x_type = jumpX::UndecidedX, jumpY y_type = jumpY::UndecidedY);
 	int  air_jump(jumpX x_type = jumpX::UndecidedX);
