@@ -1,3 +1,5 @@
+///\todo Animation* -> Animation&
+
 #include <math.h>
 #include "CurrentAnimation.h"
 #include "EntityAnimation.h"
@@ -10,7 +12,8 @@
  */
 
 CurrentAnimation::CurrentAnimation():
-    current_frame(0)
+    current_frame(0),
+    model(nullptr)
 {
 }
 
@@ -35,6 +38,10 @@ CurrentAnimation::CurrentAnimation(EntityAnimation* animation):
 
 bool CurrentAnimation::is_initialized()const{
     return model && model->is_initialized();
+}
+
+const EntityAnimation* CurrentAnimation::getAnimation() const {
+    return model;
 }
 
 /**

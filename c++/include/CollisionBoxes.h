@@ -25,6 +25,7 @@ struct Hurtbox : CollisionBox {
 };
 
 struct Hitbox : CollisionBox {
+    using HitID = int;
     enum Type{
         DAMAGE,
         GRAB,
@@ -35,6 +36,6 @@ struct Hitbox : CollisionBox {
     double base_knockback;
     double scalink_knockback;
     float angle;
-    int hit;
+    HitID hit;
     int priority;
 };

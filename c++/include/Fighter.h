@@ -8,6 +8,9 @@
 #include "InputManager.h"
 #include "gameActions.h"
 #include "Champion.h"
+#include "StaticList.h"
+
+#define MAX_FIGHTERS_HIT 12
 
 class Game;
 struct Move;
@@ -39,7 +42,7 @@ class Fighter {
     void applyPhysics();
     //States
     void updateState();
-    void updateAnimation();
+    void checkUpdateAnimation();
     //Hitboxes
     const HurtboxVector& getCurrentHurtboxes() const;
     const HitboxVector&  getCurrentHitboxes () const;
@@ -50,9 +53,10 @@ class Fighter {
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
     void setState(const State s, int facing, int info, Champion::DefaultAnimation anim);
     void attack(const Move&);
-    CurrentAnimation* getCurrentAnimation();
+    const EntityAnimation* getCurrentAnimation() const;
     void setAnimation(Champion::DefaultAnimation);
     void setAnimation(Champion::DefaultAnimation, double speed);
+    void advanceAnimation();
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);
     bool getGrounded() const;
@@ -82,6 +86,9 @@ class Fighter {
 
     void applyAirAccel(int direction);
 
+    void updateAnimation();
+    void setAnimation(Animation*);
+
     private:
     const Champion* const model;    /**<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)*/
     Game& game;               /**<Game this Fighter belongs to. Pointer validity : can be invalidated if a game is moved or deleted (should not happen during the lifetime of a Fighter)*/
@@ -89,7 +96,11 @@ class Fighter {
     CurrentAnimation current_animation; ///< CurrentAnimation used to display an Animation of the \ref Fighter#model "model Champion".
     std::string current_animation_name; ///< Never used.
     const Move* current_move;
+    StaticList<Fighter*, MAX_FIGHTERS_HIT> fighters_hit;
+    Hitbox::HitID last_hit;
 
+    void setAnimation(const EntityAnimation* anim);
+    void setAnimation(const EntityAnimation* anim, double speed);
     void startMove(const Move&);
     bool isStateFinished(int stateDuration);
     void checkStateDuration();

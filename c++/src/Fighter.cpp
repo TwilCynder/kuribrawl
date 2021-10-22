@@ -7,6 +7,7 @@
 #include "CollisionBoxes.h"
 #include "Move.h"
 #include "Random.h"
+#include "gameCalculations.h"
 #include <math.h>
 
 /**
@@ -35,7 +36,8 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
 	air_jumps(model_->val.air_jumps),
     model(model_),
     game(game_),
-    current_move(nullptr)
+    current_move(nullptr),
+    last_hit(-1)
 {
     position.x = x_;
     position.y = y_;
@@ -67,20 +69,33 @@ Kuribrawl::VectorDouble& Fighter::getPosition() {
 /**
  * @brief Returns the Animation of the Champion that is being displayed currently.
  *
- * @return CurrentAnimation* a pointer to the Animation the CurrentAnimation is currently playing.
+ * @return Animation* a pointer to the Animation the CurrentAnimation is currently playing.
  */
-CurrentAnimation* Fighter::getCurrentAnimation(){
-    return &current_animation;
+const EntityAnimation* Fighter::getCurrentAnimation() const {
+    return current_animation.getAnimation();
+}
+
+void Fighter::setAnimation(const EntityAnimation* anim) {
+    last_hit = -1;
+    current_animation.setAnimation(anim);
+}
+
+void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
+    last_hit = -1;
+    current_animation.setAnimation(anim, speed);
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
-    current_animation.setAnimation(model->getDefaultAnimation(default_anim));
+    setAnimation(model->getDefaultAnimation(default_anim));
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
-    current_animation.setAnimation(model->getDefaultAnimation(default_anim), speed);
+    setAnimation(model->getDefaultAnimation(default_anim), speed);
 }
 
+void Fighter::advanceAnimation(){
+    current_animation.advance();
+}
 
 /**
  * @brief Sets the x and y components of the speed of this Fighter
@@ -106,7 +121,28 @@ int Fighter::getFacing() const{
 }
 
 bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox& hurtbox){
+    if (last_hit != hitbox.hit){
+        fighters_hit.clear();
+        last_hit = hitbox.hit;
+    } else {
+        for (Fighter* f : fighters_hit){
+            if (f == &defender) return false;
+        }
+    }
+
+    fighters_hit.add(&defender);
     return true;
+}
+
+void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox) {
+    double knockback = GameCalc::getKnockback(0, 0, 0, 0);
+    double angle = PI / 4;
+    if (attacker.facing < 0){
+        angle = (PI - angle);
+    }
+
+    speed.x = knockback * cos(angle);
+    speed.y = knockback * sin(angle);
 }
 
 /**
@@ -315,23 +351,27 @@ void Fighter::updateState(){
  * @brief If this current Animation should be updated, changes it based on the current state.
  * Also indicates that the current Animation doesn't need to be updated anymore.
  */
-void Fighter::updateAnimation(){
+void Fighter::checkUpdateAnimation(){
     if (update_anim){
-        const EntityAnimation* anim;
-        switch(state){
-            case State::IDLE:
-                anim = (grounded) ? 
-                    model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
-                    (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
-                if (anim)
-                    current_animation.setAnimation(anim);
-                break;
-            default:
-                anim = model->getDefaultAnimation((Champion::DefaultAnimation)state);
-                if (anim)
-                    current_animation.setAnimation(anim);
-        }
+        updateAnimation();
         update_anim = false;
+    }
+}
+
+void Fighter::updateAnimation(){
+    const EntityAnimation* anim;
+    switch(state){
+        case State::IDLE:
+            anim = (grounded) ? 
+                model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
+                (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
+            if (anim)
+                current_animation.setAnimation(anim);
+            break;
+        default:
+            anim = model->getDefaultAnimation((Champion::DefaultAnimation)state);
+            if (anim)
+                current_animation.setAnimation(anim);
     }
 }
 

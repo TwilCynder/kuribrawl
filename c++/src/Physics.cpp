@@ -38,6 +38,7 @@ void Fighter::groundCollision(){
  */
 void Fighter::groundToAir(){
     grounded = false;
+    updateAnimation();
 }
 
 void Fighter::land(){
