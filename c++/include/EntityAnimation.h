@@ -15,6 +15,7 @@ class EntityAnimation : public Animation {
     void setNextAnimation(const EntityAnimation*);
     const EntityAnimation* getNextAnimation() const;
 
+    bool hasHitboxes() const;
     const std::vector<Hitbox>&  getHitboxes (int frame) const;
     const std::vector<Hurtbox>& getHurtboxes(int frame) const;
     Hitbox*  addHitbox (int frame);
@@ -25,4 +26,5 @@ class EntityAnimation : public Animation {
     private:
     using Animation::setNextAnimation;
     std::unique_ptr<EntityFrame[]> entity_frames;
+    bool has_hitboxes;
 };

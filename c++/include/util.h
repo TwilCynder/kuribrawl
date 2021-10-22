@@ -1,6 +1,9 @@
 #pragma once
 
+#define PI 3.1416
+
 namespace Kuribrawl {
+
     enum class Direction {
         RIGHT,
         UP,

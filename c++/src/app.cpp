@@ -265,6 +265,8 @@ void App::handleEvents(){
 					case SDL_SCANCODE_SPACE:
 						advance = true;
 						break;
+					case SDL_SCANCODE_F6:
+						setFrameRate(framerate - 5);
 					default:
 						if (!event.key.repeat)
 							keyboard->handleButtonPress(event.key.keysym.scancode);

@@ -24,6 +24,7 @@ class CurrentAnimation {
 
     bool is_initialized()const;
     bool is_finished();
+    const EntityAnimation* getAnimation() const;
     void setAnimation(const EntityAnimation* anim);
     void setAnimation(const EntityAnimation* anim, double speed);
     void setSpeed(double speed);

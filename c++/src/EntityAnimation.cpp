@@ -3,7 +3,8 @@
 
 EntityAnimation::EntityAnimation():
     Animation(),
-    entity_frames(nullptr)
+    entity_frames(nullptr),
+    has_hitboxes(false)
 {
 }
 
@@ -43,6 +44,10 @@ const EntityAnimation* EntityAnimation::getNextAnimation() const{
     return (const EntityAnimation*) Animation::getNextAnimation();
 }
 
+bool EntityAnimation::hasHitboxes() const {
+    return has_hitboxes;
+}
+
 const std::vector<Hitbox>&  EntityAnimation::getHitboxes(int frame) const {
     if (frame > nb_frames) {
         throw KBFatal("Frame index out of bounds");
@@ -70,6 +75,8 @@ void EntityAnimation::addHitbox(int frame, int x, int y, int w, int h){
     hb->y = y;
     hb->w = w;
     hb->h = h;
+
+    has_hitboxes = true;
 }
 
 Hurtbox* EntityAnimation::addHurtbox(int frame){

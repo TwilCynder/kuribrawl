@@ -120,7 +120,7 @@ void Game::updateStates(){
 void Game::updateAnimations(){
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->updateAnimation();
+        it->checkUpdateAnimation();
     }
 }
 
@@ -143,10 +143,7 @@ void Game::advanceAnimations(){
     Fighteriterator it;
     CurrentAnimation* anim;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        anim = it->getCurrentAnimation();
-        if (anim->is_initialized()){
-            anim->advance();
-        }
+        it->advanceAnimation();
     }
 }
 
@@ -204,6 +201,7 @@ void Game::step(SDL_Renderer* render_target){
     updateStates();
     resolveInputs();
     updateAnimations();
+    //From this point on every animation change must be done manually   
     hitDetection();
     applyPhysics();
     draw(render_target);
