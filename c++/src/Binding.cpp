@@ -20,7 +20,7 @@ Binding::Binding(ControllerType* ct, bool override_controller_vals_):
     direction_control_mode(DirectionControlMode::STICK_ONLY),
     tap_jump(false),
     dpadAnalogValue(32000),
-    dpadAnalogValueModified(10000),
+    dpadAnalogValueModified(11000),
     analog_modifier_button(-1),
     controller(ct)
 

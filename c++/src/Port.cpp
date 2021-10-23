@@ -46,7 +46,7 @@ bool Port::isJoystickButtonPressed(int button) const{
 
 bool Port::isButtonPressed(int button) const {
     if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
-	return SDL_JoystickGetButton(joystick, button);
+	return SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)button);
 }
 
 ///SDL GAMECONTROLLER
