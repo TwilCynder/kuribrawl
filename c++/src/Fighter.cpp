@@ -86,7 +86,8 @@ void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
-    setAnimation(model->getDefaultAnimation(default_anim));
+    EntityAnimation* anim = model->getDefaultAnimation(default_anim)
+    setAnimation(anim);
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
@@ -143,6 +144,12 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
 
     speed.x = knockback * cos(angle);
     speed.y = knockback * sin(angle);
+
+    int hitstun = 20;
+    setState(Fighter::State::HITSTUN, 0, hitstun, false);
+
+    /*Choix de l'animation de hitstun*/
+    setAnimation(Champion::DefaultAnimation::HITSTUN);
 }
 
 /**
@@ -331,6 +338,10 @@ void Fighter::updateState(){
                 setState(State::IDLE);
             }
             break;
+        case State::HITSTUN:    //State info is the hitstun duration
+            if (state_timer >= state_info) {
+                setState(State::IDLE);
+            }
         case State::ATTACK:
             if (current_animation.is_finished()){
                 switch (current_move->end_behavior){
@@ -367,6 +378,8 @@ void Fighter::updateAnimation(){
                 (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
             if (anim)
                 current_animation.setAnimation(anim);
+            break;
+        case State::HITSTUN:
             break;
         default:
             anim = model->getDefaultAnimation((Champion::DefaultAnimation)state);

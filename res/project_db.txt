@@ -16,6 +16,8 @@ dash_turn.png
 A:acid/dash_turn 3 14 c
 air_idle.png
 A:acid/air_idle 1 -1 c
+hurt.png
+A:acid/hurt 1 -1 c
 jump.png
 A:acid/jump 5 16 c
 landing.png
