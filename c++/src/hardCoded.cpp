@@ -43,6 +43,7 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->buttons[SDL_SCANCODE_K] = Input::ATTACK;
     input_binding->buttons[SDL_SCANCODE_O] = Input::JUMP;
     input_binding->direction_control_mode = Binding::DirectionControlMode::DPAD_ONLY;
+    input_binding->analog_modifier_button = SDL_SCANCODE_LSHIFT;
     input_binding->tap_jump = true;
 }
 
