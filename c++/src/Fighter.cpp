@@ -50,7 +50,7 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
 /**
  * @brief Returns whether the Fighter is correctly initialized and ready to use.
  *
- * @return true is the CurrentAnimation is ready to use.
+ * @return true is the AnimationPlayer is ready to use.
  * @return false otherwise.
  */
 bool Fighter::is_initialized(){
@@ -69,7 +69,7 @@ Kuribrawl::VectorDouble& Fighter::getPosition() {
 /**
  * @brief Returns the Animation of the Champion that is being displayed currently.
  *
- * @return Animation* a pointer to the Animation the CurrentAnimation is currently playing.
+ * @return Animation* a pointer to the Animation the AnimationPlayer is currently playing.
  */
 const EntityAnimation* Fighter::getCurrentAnimation() const {
     return current_animation.getAnimation();
@@ -85,13 +85,32 @@ void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
     current_animation.setAnimation(anim, speed);
 }
 
+
+///\todo Use templates.
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
-    const EntityAnimation* anim = model->getDefaultAnimation(default_anim)
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    checkNull(anim, KBFatalExplicit("Missing Animation"))
     setAnimation(anim);
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
-    setAnimation(model->getDefaultAnimation(default_anim), speed);
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    checkNull(anim, KBFatalExplicit("Missing Animation"))
+    setAnimation(anim, speed);
+}
+
+bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim){
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    if (!anim) return false;
+    setAnimation(anim);
+    return true;
+}
+
+bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim, double speed){
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    if (!anim) return false;
+    setAnimation(anim, speed);
+    return true;
 }
 
 void Fighter::advanceAnimation(){
@@ -154,7 +173,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
 
 /**
  * @brief displays the Fighter.
- * Simply displays the CurrentAnimation.
+ * Simply displays the AnimationPlayer.
  * @param target the renderer the frame will be drawn to.
  */
 void Fighter::draw(SDL_Renderer* target){
