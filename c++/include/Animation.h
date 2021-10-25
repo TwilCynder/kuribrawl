@@ -14,7 +14,7 @@ struct Frame;
  */
 
 class Animation {
-    friend class CurrentAnimation;
+    friend class AnimationPlayer;
 
     public:
 

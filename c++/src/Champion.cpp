@@ -180,7 +180,8 @@ const std::map<Champion::DefaultAnimation, std::string> Champion::default_animat
     {Champion::DefaultAnimation::DASH_TURN, "dash_turn"},
     {Champion::DefaultAnimation::JUMP, "jump"},
     {Champion::DefaultAnimation::AIR_IDLE, "air_idle"},
-    {Champion::DefaultAnimation::AIR_JUMP, "air_jump"}
+    {Champion::DefaultAnimation::AIR_JUMP, "air_jump"},
+    {Champion::DefaultAnimation::HITSTUN, "hurt"}
 };
 
 const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name = {

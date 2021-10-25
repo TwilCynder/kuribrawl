@@ -1,7 +1,7 @@
 ///\todo Animation* -> Animation&
 
 #include <math.h>
-#include "CurrentAnimation.h"
+#include "AnimationPlayer.h"
 #include "EntityAnimation.h"
 #include "Debug.h"
 #include "Frame.h"
@@ -11,7 +11,7 @@
  * Creates it without an Animation to run, so it is unusable until an Animation is set.
  */
 
-CurrentAnimation::CurrentAnimation():
+AnimationPlayer::AnimationPlayer():
     current_frame(0),
     model(nullptr)
 {
@@ -23,8 +23,8 @@ CurrentAnimation::CurrentAnimation():
  * @param animation the Animation that will be ran at first.
  */
 
-CurrentAnimation::CurrentAnimation(EntityAnimation* animation):
-    CurrentAnimation()
+AnimationPlayer::AnimationPlayer(EntityAnimation* animation):
+    AnimationPlayer()
 {
     setAnimation(animation);
 }
@@ -36,11 +36,11 @@ CurrentAnimation::CurrentAnimation(EntityAnimation* animation):
  * @return false otherwise
  */
 
-bool CurrentAnimation::is_initialized()const{
+bool AnimationPlayer::is_initialized()const{
     return model && model->is_initialized();
 }
 
-const EntityAnimation* CurrentAnimation::getAnimation() const {
+const EntityAnimation* AnimationPlayer::getAnimation() const {
     return model;
 }
 
@@ -49,7 +49,7 @@ const EntityAnimation* CurrentAnimation::getAnimation() const {
  *
  * @return finished or not.
  */
-bool CurrentAnimation::is_finished(){
+bool AnimationPlayer::is_finished(){
     return finished;
 }
 
@@ -59,7 +59,7 @@ bool CurrentAnimation::is_finished(){
  * @param anim
  */
 
-void CurrentAnimation::setAnimation(const EntityAnimation* anim){
+void AnimationPlayer::setAnimation(const EntityAnimation* anim){
     setAnimation(anim, anim->base_speed);
 }
 
@@ -70,7 +70,7 @@ void CurrentAnimation::setAnimation(const EntityAnimation* anim){
  * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
  */
 
-void CurrentAnimation::setAnimation(const EntityAnimation* anim, double speed_){
+void AnimationPlayer::setAnimation(const EntityAnimation* anim, double speed_){
     if (!anim) return;
     model = anim;
     init();
@@ -85,7 +85,7 @@ void CurrentAnimation::setAnimation(const EntityAnimation* anim, double speed_){
  * For speeds that do not make each frame displayed the same amount of time, using this method while the animation has already advanced at least one frame will result in imprecisions.
  */
 
-void CurrentAnimation::setSpeed(double speed_){
+void AnimationPlayer::setSpeed(double speed_){
     if (speed_){
         speed = speed_;
     } else {
@@ -118,7 +118,7 @@ void CurrentAnimation::setSpeed(double speed_){
  *
  */
 
-void CurrentAnimation::init(){
+void AnimationPlayer::init(){
     reset();
     finished = 0;
 }
@@ -127,7 +127,7 @@ void CurrentAnimation::init(){
  * @brief resets this Current Animation to the initial state of the current Animation.
  */
 
-void CurrentAnimation::reset(){
+void AnimationPlayer::reset(){
     current_frame = 0;
     current_carry = 0;
 }
@@ -137,7 +137,7 @@ void CurrentAnimation::reset(){
  *
  */
 
-void CurrentAnimation::start(){
+void AnimationPlayer::start(){
     Frame* f = &(model->frames[current_frame]);
     if (f->duration){
         timeleft = f->duration;
@@ -151,7 +151,7 @@ void CurrentAnimation::start(){
  *
  */
 
-void CurrentAnimation::advance(){
+void AnimationPlayer::advance(){
     if (speed != -1 && is_initialized()){
         timeleft--;
         if (timeleft <= 0){
@@ -166,7 +166,7 @@ void CurrentAnimation::advance(){
  * Updates the timeleft for the current frame, and the carry attriutes if needed.
  */
 
-void CurrentAnimation::nextFrame(){
+void AnimationPlayer::nextFrame(){
     finished = false;
     current_frame++;
 
@@ -202,26 +202,26 @@ void CurrentAnimation::nextFrame(){
  * @param y y position on the destination.
  */
 
-void CurrentAnimation::draw(SDL_Renderer* target, int x, int y){
+void AnimationPlayer::draw(SDL_Renderer* target, int x, int y){
     if (!model){
-        throw KBFatal("Tried to draw non-initalized CurrentAnimation");
+        throw KBFatal("Tried to draw non-initalized AnimationPlayer");
     }
 
     model->draw(target, x, y, current_frame);
 }
 
-void CurrentAnimation::draw(SDL_Renderer* target, int x, int y, int facing){
+void AnimationPlayer::draw(SDL_Renderer* target, int x, int y, int facing){
     if (!model){
-        throw KBFatal("Tried to draw non-initalized CurrentAnimation");
+        throw KBFatal("Tried to draw non-initalized AnimationPlayer");
     }
 
     model->draw(target, x, y, current_frame, facing);
 }
 
-const std::vector<Hurtbox>& CurrentAnimation::getHurtboxes() const {
+const std::vector<Hurtbox>& AnimationPlayer::getHurtboxes() const {
     return model->getHurtboxes(current_frame);
 }
 
-const std::vector<Hitbox>& CurrentAnimation::getHitboxes() const {
+const std::vector<Hitbox>& AnimationPlayer::getHitboxes() const {
     return model->getHitboxes(current_frame);
 }
