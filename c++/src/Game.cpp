@@ -136,12 +136,12 @@ void Game::applyPhysics(){
 }
 
 /**
- * @brief \ref CurrentAnimation#advance "Advances" the CurrentAnimation of every Fighter.
+ * @brief \ref AnimationPlayer#advance "Advances" the AnimationPlayer of every Fighter.
  * 
  */
 void Game::advanceAnimations(){
     Fighteriterator it;
-    CurrentAnimation* anim;
+    AnimationPlayer* anim;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->advanceAnimation();
     }

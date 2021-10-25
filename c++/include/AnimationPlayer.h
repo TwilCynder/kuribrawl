@@ -11,11 +11,11 @@ class Fighter;
  * and can switch to another Animation completely at any time.
  */
 
-class CurrentAnimation {
+class AnimationPlayer {
     public:
 
-    CurrentAnimation();
-    CurrentAnimation(EntityAnimation* animation);
+    AnimationPlayer();
+    AnimationPlayer(EntityAnimation* animation);
 
     void draw(SDL_Renderer* target, int x, int y);
     void draw(SDL_Renderer* target, int x, int y, int facing);
@@ -32,7 +32,7 @@ class CurrentAnimation {
 
     private:
     const EntityAnimation* model;   ///< The Animation that is running.
-                                    /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a CurrentAnimation instance exists)*/
+                                    /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
     
     int current_frame; ///< Index of the current frame.
     int timeleft; ///<Time remaining *on the current frame*.

@@ -1,6 +1,8 @@
 #pragma once
 
 #define PI 3.1416
+#define addBitValue(value, shift) + (value << shift)
+#define checkNull(value, exception) if (!value) {throw exception;}
 
 namespace Kuribrawl {
 
