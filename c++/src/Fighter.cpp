@@ -165,7 +165,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
     speed.y = knockback * sin(angle);
 
     int hitstun = 20;
-    setState(Fighter::State::HITSTUN, 0, hitstun, false);
+    setState(Fighter::State::HITSTUN, -sign(speed.x), hitstun, false);
 
     /*Choix de l'animation de hitstun*/
     setAnimation(Champion::DefaultAnimation::HITSTUN);
@@ -250,7 +250,6 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
 
 //Returns int to make jump_manager able to return its return value directly
 int Fighter::air_jump(jumpX x_type){
-	Debug::log("air jump ????");
 	if (air_jumps > 0) {    
 		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
 	
