@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include "AnimationPlayer.h"
-#include "EntityAnimation.h"
+#include "Animation.h"
 #include "Debug.h"
 #include "Frame.h"
 
@@ -23,7 +23,7 @@ AnimationPlayer::AnimationPlayer():
  * @param animation the Animation that will be ran at first.
  */
 
-AnimationPlayer::AnimationPlayer(EntityAnimation* animation):
+AnimationPlayer::AnimationPlayer(Animation* animation):
     AnimationPlayer()
 {
     setAnimation(animation);
@@ -40,7 +40,7 @@ bool AnimationPlayer::is_initialized()const{
     return model && model->is_initialized();
 }
 
-const EntityAnimation* AnimationPlayer::getAnimation() const {
+const Animation* AnimationPlayer::getAnimation() const {
     return model;
 }
 
@@ -59,7 +59,7 @@ bool AnimationPlayer::is_finished(){
  * @param anim
  */
 
-void AnimationPlayer::setAnimation(const EntityAnimation* anim){
+void AnimationPlayer::setAnimation(const Animation* anim){
     setAnimation(anim, anim->base_speed);
 }
 
@@ -70,7 +70,7 @@ void AnimationPlayer::setAnimation(const EntityAnimation* anim){
  * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
  */
 
-void AnimationPlayer::setAnimation(const EntityAnimation* anim, double speed_){
+void AnimationPlayer::setAnimation(const Animation* anim, double speed_){
     if (!anim) return;
     model = anim;
     init();
@@ -172,7 +172,7 @@ void AnimationPlayer::nextFrame(){
 
     if (current_frame >= model->nb_frames){
         finished = true;
-        const EntityAnimation* next = model->getNextAnimation();
+        const Animation* next = model->getNextAnimation();
         if (next != nullptr){
             setAnimation(next);
         } else {
@@ -216,12 +216,4 @@ void AnimationPlayer::draw(SDL_Renderer* target, int x, int y, int facing){
     }
 
     model->draw(target, x, y, current_frame, facing);
-}
-
-const std::vector<Hurtbox>& AnimationPlayer::getHurtboxes() const {
-    return model->getHurtboxes(current_frame);
-}
-
-const std::vector<Hitbox>& AnimationPlayer::getHitboxes() const {
-    return model->getHitboxes(current_frame);
 }
