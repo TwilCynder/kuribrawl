@@ -2,7 +2,7 @@
 #include "SDL2/SDL.h"
 #include "CBoxVectors.h"
 
-class EntityAnimation;
+class Animation;
 class Fighter;
 
 /**
@@ -15,26 +15,25 @@ class AnimationPlayer {
     public:
 
     AnimationPlayer();
-    AnimationPlayer(EntityAnimation* animation);
+    AnimationPlayer(Animation* animation);
 
     void draw(SDL_Renderer* target, int x, int y);
     void draw(SDL_Renderer* target, int x, int y, int facing);
-    const std::vector<Hurtbox>& getHurtboxes() const;
-    const std::vector<Hitbox>&  getHitboxes() const;
 
-    bool is_initialized()const;
+    bool is_initialized() const;
     bool is_finished();
-    const EntityAnimation* getAnimation() const;
-    void setAnimation(const EntityAnimation* anim);
-    void setAnimation(const EntityAnimation* anim, double speed);
+    const Animation* getAnimation() const;
+    void setAnimation(const Animation* anim);
+    void setAnimation(const Animation* anim, double speed);
     void setSpeed(double speed);
     void advance();
 
-    private:
-    const EntityAnimation* model;   ///< The Animation that is running.
-                                    /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
-    
+    protected:
     int current_frame; ///< Index of the current frame.
+    const Animation* model;   ///< The Animation that is running.
+                                    /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
+
+    private:
     int timeleft; ///<Time remaining *on the current frame*.
     double speed; ///<Current \ref Animation#base_speed "speed" at which the animation runs (will override the base speed of the Animation).
 
@@ -42,7 +41,6 @@ class AnimationPlayer {
     double base_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
     double current_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
     bool finished; ///< True if the animation just finished (even if it looped).
-    Fighter* owner; ///< Entity running this animation. Currently restricted to \ref Fighter "Fighters".
 
     void nextFrame();
     void reset();

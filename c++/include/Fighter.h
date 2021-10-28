@@ -3,12 +3,13 @@
 #include <string>
 #include <memory>
 #include "SDL2/SDL.h"
-#include "AnimationPlayer.h"
+#include "EntityAnimationPlayer.h"
 #include "util.h"
 #include "InputManager.h"
 #include "gameActions.h"
 #include "Champion.h"
 #include "StaticList.h"
+#include "Entity.h"
 
 #define MAX_FIGHTERS_HIT 12
 
@@ -19,7 +20,7 @@ struct Move;
  * @brief An in-game character ("instance" of a Champion).
  * A Fighter is an in-game entity that can be player-controlled, and bases its animation, properties, and overall gameplay on a Champion.
  */
-class Fighter {
+class Fighter : Entity {
     public:
 
     /**
@@ -94,7 +95,7 @@ class Fighter {
     const Champion* const model;    /**<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)*/
     Game& game;               /**<Game this Fighter belongs to. Pointer validity : can be invalidated if a game is moved or deleted (should not happen during the lifetime of a Fighter)*/
 
-    AnimationPlayer current_animation; ///< AnimationPlayer used to display an Animation of the \ref Fighter#model "model Champion".
+    EntityAnimationPlayer current_animation; ///< AnimationPlayer used to display an Animation of the \ref Fighter#model "model Champion".
     std::string current_animation_name; ///< Never used.
     const Move* current_move;
     StaticList<Fighter*, MAX_FIGHTERS_HIT> fighters_hit;
