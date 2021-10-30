@@ -7,10 +7,16 @@
 using namespace Kuribrawl;
 
 struct EntityFrame{
+    using FrameMovementAxis = struct {
+        bool enabled;
+        bool set_speed; //if false speed is added
+        bool whole_frame; //if false, set/added only when transitioning to this frame
+        double value;
+    };
+    using FrameMovement = VectorT<FrameMovementAxis>;
+
     std::vector<Hurtbox> hurtboxes; 
     std::vector<Hitbox> hitboxes;
-    VectorDouble movement;  ///< Speed used to modify the speed of the entity that owns the AnimationPlayer playing this Animation.
-    VectorT<Uint8> movement_type; //bit 1 : enabled/disabled | bit 2 : speed is set/added | bit 3 : when frame starts/during the whole frame
-    
+    FrameMovement movement;  ///< Speed used to modify the speed of the entity that owns the AnimationPlayer playing this Animation.
     EntityFrame();
 };

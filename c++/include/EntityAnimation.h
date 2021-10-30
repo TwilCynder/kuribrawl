@@ -12,12 +12,14 @@ class EntityAnimation : public Animation {
 
     void initFrames(int n);
     EntityFrame* getEntityFrame (int n);
+    const EntityFrame& getEntityFrame(int n) const;
     void setNextAnimation(const EntityAnimation*);
     const EntityAnimation* getNextAnimation() const;
 
     bool hasHitboxes() const;
     const std::vector<Hitbox>&  getHitboxes (int frame) const;
     const std::vector<Hurtbox>& getHurtboxes(int frame) const;
+    const EntityFrame::FrameMovement& getFrameMovement(int frame) const;
     Hitbox*  addHitbox (int frame);
     void addHitbox(int frame, int, int, int, int);
     Hurtbox* addHurtbox(int frame);
@@ -25,6 +27,7 @@ class EntityAnimation : public Animation {
 
     private:
     using Animation::setNextAnimation;
+    using Animation::setEndAction;
     std::unique_ptr<EntityFrame[]> entity_frames;
     bool has_hitboxes;
 };

@@ -22,6 +22,10 @@ const std::vector<Hitbox>& EntityAnimationPlayer::getHitboxes() const {
     return model_->getHitboxes(current_frame);
 }
 
+const EntityFrame::FrameMovement& EntityAnimationPlayer::getFrameMovement() const {
+    return model_->getEntityFrame(current_frame)->movement;
+}
+
 const EntityAnimation* EntityAnimationPlayer::getAnimation() const {
     return model_;
 }

@@ -36,6 +36,13 @@ EntityFrame* EntityAnimation::getEntityFrame(int n){
     return &entity_frames[n];
 }
 
+const EntityFrame& EntityAnimation::getEntityFrame(int n) const{
+    if (n > nb_frames) {
+        throw KBFatal("Frame index out of bounds");
+    }
+    return entity_frames[n];
+}
+
 void EntityAnimation::setNextAnimation(const EntityAnimation* anim){
     setNextAnimation((const Animation*)anim);
 }
@@ -60,6 +67,9 @@ const std::vector<Hurtbox>& EntityAnimation::getHurtboxes(int frame) const {
         throw KBFatal("Frame index out of bounds");
     }
     return entity_frames[frame].hurtboxes;
+}
+
+const EntityFrame::FrameMovement& EntityAnimation::getFrameMovement(int frame) const {
 }
 
 Hitbox* EntityAnimation::addHitbox(int frame){
