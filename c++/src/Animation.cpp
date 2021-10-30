@@ -11,7 +11,7 @@ Animation::Animation():
     nb_frames(0),
     frames(NULL),
     base_speed(1),
-    next(nullptr)
+    end_action{NULL}
 {
 }
 
@@ -101,16 +101,27 @@ void Animation::initFrames(int n){
     nb_frames = n;
 }
 
+void Animation::setEndAction(Animation::EndAction mode, Animation::EndActionData action){
+    end_action_mode = mode;
+    end_action = action;
+}
+
 /**
- * @brief Sets the \ref Animation#next "next animation".
+ * @brief DEPRECATED. Sets the \ref Animation#next "next animation".
  * The next animation is an Animation that will be started once this one finishes.
  */
 void Animation::setNextAnimation(const Animation* anim){
-    next = anim;
+    end_action_mode = EndAction::START_ANIMATION;
+    end_action.next_anim = anim;
 }
 
+/**
+ * @brief DEPRECATED.
+ * 
+ * @return const Animation* 
+ */
 const Animation* Animation::getNextAnimation() const {
-    return next;
+    return (end_action_mode == EndAction::START_ANIMATION) ? end_action.next_anim : nullptr;
 }
 
 /**

@@ -1,5 +1,6 @@
 #pragma once
 #include "AnimationPlayer.h"
+#include "EntityFrame.h"
 #include "Entity.h"
 
 class EntityAnimation;
@@ -11,6 +12,7 @@ class EntityAnimationPlayer : public AnimationPlayer {
 
     const std::vector<Hurtbox>& getHurtboxes() const;
     const std::vector<Hitbox>&  getHitboxes() const;
+    const EntityFrame::FrameMovement getFrameMovement() const;
 
     void setAnimation(const EntityAnimation* anim);
     void setAnimation(const EntityAnimation* anim, double speed);
@@ -20,5 +22,4 @@ class EntityAnimationPlayer : public AnimationPlayer {
     private:
     using AnimationPlayer::getAnimation;
     using AnimationPlayer::setAnimation;
-    Entity* owner; ///< Entity running this animation. Currently restricted to \ref Fighter "Fighters".
 };
