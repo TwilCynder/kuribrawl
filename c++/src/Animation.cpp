@@ -7,7 +7,8 @@
  * The frame array is not even created, which means that this object should not be used at all until frames are created with Animation::initFrames()
  */
 
-Animation::Animation():
+template<class FrameType>
+Animation<FrameType>::Animation():
     nb_frames(0),
     frames(NULL),
     base_speed(1),
@@ -21,8 +22,8 @@ Animation::Animation():
  * Delegates to Animation::Animation().
  * @param spritesheet_ SDL Texture that will be used as the source image, containing all frames.
  */
-
-Animation::Animation(SDL_Texture* spritesheet_) : Animation(){
+template<class FrameType>
+Animation<FrameType>::Animation(SDL_Texture* spritesheet_) : Animation(){
     setSpritesheet(spritesheet_);
 }
 
@@ -32,8 +33,8 @@ Animation::Animation(SDL_Texture* spritesheet_) : Animation(){
  * @param spritesheet SDL Texture that will be used as the source image, containing all frames.
  * @param nFrames Number of frames this animation has.
  */
-
-Animation::Animation(SDL_Texture* spritesheet, int nFrames) : Animation(spritesheet){
+template<class FrameType>
+Animation<FrameType>::Animation(SDL_Texture* spritesheet, int nFrames) : Animation(spritesheet){
     initFrames(nFrames);
 }
 
@@ -41,8 +42,8 @@ Animation::Animation(SDL_Texture* spritesheet, int nFrames) : Animation(spritesh
  * @brief Destroy the Animation object
  *
  */
-
-Animation::~Animation(){
+template<class FrameType>
+Animation<FrameType>::~Animation(){
 }
 
 /**
@@ -50,8 +51,8 @@ Animation::~Animation(){
  *
  * @param spritesheet the SDL texture that will be used as the spritesheet.
  */
-
-void Animation::setSpritesheet(SDL_Texture* spritesheet_){
+template<class FrameType>
+void Animation<FrameType>::setSpritesheet(SDL_Texture* spritesheet_){
     if (!spritesheet_){
         throw KBFatal("SetSpritesheet : spritesheet texture pointer is null");
     }
@@ -64,8 +65,8 @@ void Animation::setSpritesheet(SDL_Texture* spritesheet_){
  *
  * @return SDL_Texture*
  */
-
-SDL_Texture* Animation::getSpritesheet() const {
+template<class FrameType>
+SDL_Texture* Animation<FrameType>::getSpritesheet() const {
     return spritesheet;
 }
 
@@ -77,8 +78,8 @@ SDL_Texture* Animation::getSpritesheet() const {
  * The origin of each frame is (width/2 ; height)
  * @param n
  */
-
-void Animation::initFrames(int n){
+template<class FrameType>
+void Animation<FrameType>::initFrames(int n){
     if (n < 1){
         throw KBFatal("Tried to init animation with 0 frames");
     }
@@ -100,8 +101,8 @@ void Animation::initFrames(int n){
     }
     nb_frames = n;
 }
-
-void Animation::setEndAction(Animation::EndAction mode, Animation::EndActionData action){
+template<class FrameType>
+void Animation<FrameType>::setEndAction(Animation::EndAction mode, Animation::EndActionData action){
     end_action_mode = mode;
     end_action = action;
 }
@@ -110,7 +111,8 @@ void Animation::setEndAction(Animation::EndAction mode, Animation::EndActionData
  * @brief DEPRECATED. Sets the \ref Animation#next "next animation".
  * The next animation is an Animation that will be started once this one finishes.
  */
-void Animation::setNextAnimation(const Animation* anim){
+template<class FrameType>
+void Animation<FrameType>::setNextAnimation(const Animation<FrameType>* anim){
     end_action_mode = EndAction::START_ANIMATION;
     end_action.next_anim = anim;
 }
@@ -120,7 +122,8 @@ void Animation::setNextAnimation(const Animation* anim){
  * 
  * @return const Animation* 
  */
-const Animation* Animation::getNextAnimation() const {
+template<class FrameType>
+const Animation<FrameType>* Animation<FrameType>::getNextAnimation() const {
     return (end_action_mode == EndAction::START_ANIMATION) ? end_action.next_anim : nullptr;
 }
 
@@ -130,8 +133,8 @@ const Animation* Animation::getNextAnimation() const {
  * @return true if this Animation has a valid spritesheet and frames array.
  * @return false otherwise.
  */
-
-bool Animation::is_initialized() const {
+template<class FrameType>
+bool Animation<FrameType>::is_initialized() const {
     return spritesheet && frames;
 }
 
@@ -140,8 +143,8 @@ bool Animation::is_initialized() const {
  *
  * @return int
  */
-
-int Animation::getNbFrames(){
+template<class FrameType>
+int Animation<FrameType>::getNbFrames(){
     return nb_frames;
 }
 
@@ -151,8 +154,8 @@ int Animation::getNbFrames(){
  * @param n the id of the frame. Frame ids are just array indexes, thus start at 0.
  * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the Animation exists.
  */
-
-Frame* Animation::getFrame(int n){
+template<class FrameType>
+FrameType* Animation<FrameType>::getFrame(int n){
     return &frames[n];
 }
 
@@ -162,8 +165,8 @@ Frame* Animation::getFrame(int n){
  * be the total duration of the Animation.
  * @param speed
  */
-
-void Animation::setBaseSpeed(double speed){
+template<class FrameType>
+void Animation<FrameType>::setBaseSpeed(double speed){
     base_speed = speed;
 }
 
@@ -174,8 +177,8 @@ void Animation::setBaseSpeed(double speed){
  * Any value that isn't either of those (a non-integer > 1) is invalid and will cause **undefined behavior**
  * @return the speed
  */
-
-double Animation::getBaseSpeed(){
+template<class FrameType>
+double Animation<FrameType>::getBaseSpeed(){
     return base_speed;
 }
 
@@ -188,8 +191,8 @@ double Animation::getBaseSpeed(){
  * @param y y position in the destination.
  * @param frame index of the frame.
  */
-
-void Animation::draw(SDL_Renderer* target, int x, int y, int frame)const{
+template<class FrameType>
+void Animation<FrameType>::draw(SDL_Renderer* target, int x, int y, int frame)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
@@ -207,14 +210,15 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame)const{
     SDL_RenderCopy(target, spritesheet, &source.display, &dest);
 }
 
-void Animation::draw(SDL_Renderer* target, int x, int y, int frame, int facing)const{
+template<class FrameType>
+void Animation<FrameType>::draw(SDL_Renderer* target, int x, int y, int frame, int facing)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
         throw KBFatal("Frame index out of bounds");
     }
 
-    Frame& source = frames[frame];
+    Frame& source = (Frame&)frames[frame];
 
     SDL_Rect dest;
     dest.x = x - source.origin.x;

@@ -3,10 +3,11 @@
 #include "SDL2/SDL_rect.h"
 #include "CollisionBoxes.h"
 #include "util.h"
+#include "Frame.h"
 
 using namespace Kuribrawl;
 
-struct EntityFrame{
+struct EntityFrame : public Frame {
     using FrameMovementAxis = struct {
         bool enabled;
         bool set_speed; //if false speed is added

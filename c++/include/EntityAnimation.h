@@ -3,18 +3,12 @@
 #include "EntityFrame.h"
 #include "CBoxVectors.h"
 
-class EntityAnimation : public Animation {
+class EntityAnimation : public Animation<EntityFrame> {
     public:
     EntityAnimation();
     EntityAnimation(SDL_Texture* spritesheet);
     EntityAnimation(SDL_Texture* spritesheet, int nFrames);
     ~EntityAnimation();
-
-    void initFrames(int n);
-    EntityFrame* getEntityFrame (int n);
-    const EntityFrame& getEntityFrame(int n) const;
-    void setNextAnimation(const EntityAnimation*);
-    const EntityAnimation* getNextAnimation() const;
 
     bool hasHitboxes() const;
     const std::vector<Hitbox>&  getHitboxes (int frame) const;
@@ -26,8 +20,5 @@ class EntityAnimation : public Animation {
     void addHurtbox(int frame, int, int, int, int);
 
     private:
-    using Animation::setNextAnimation;
-    using Animation::setEndAction;
-    std::unique_ptr<EntityFrame[]> entity_frames;
     bool has_hitboxes;
 };

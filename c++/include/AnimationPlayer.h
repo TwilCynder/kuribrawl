@@ -2,12 +2,16 @@
 #include "SDL2/SDL.h"
 #include "CBoxVectors.h"
 
+class Frame;
+template<class FrameType>
 class Animation;
+using BasicAnimation = Animation<Frame>;
+
 class Fighter;
 
 /**
  * @brief Object that can run an Animation.
- * Contains all the information needed for an Animation *while it is running*. A Current Animation object is not restrained to a specific Animation,
+ * Contains all the information needed for an Animation *while it is running*. An AnimationPlayer object is not restrained to a specific Animation,
  * and can switch to another Animation completely at any time.
  */
 
@@ -15,22 +19,22 @@ class AnimationPlayer {
     public:
 
     AnimationPlayer();
-    AnimationPlayer(Animation* animation);
+    AnimationPlayer(BasicAnimation* animation);
 
     void draw(SDL_Renderer* target, int x, int y);
     void draw(SDL_Renderer* target, int x, int y, int facing);
 
     bool is_initialized() const;
     bool is_finished();
-    const Animation* getAnimation() const;
-    void setAnimation(const Animation* anim);
-    void setAnimation(const Animation* anim, double speed);
+    const BasicAnimation* getAnimation() const;
+    void setAnimation(const BasicAnimation* anim);
+    void setAnimation(const BasicAnimation* anim, double speed);
     void setSpeed(double speed);
     void advance();
 
     protected:
     int current_frame; ///< Index of the current frame.
-    const Animation* model;   ///< The Animation that is running.
+    const BasicAnimation* model;   ///< The Animation that is running.
                                     /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
 
     private:

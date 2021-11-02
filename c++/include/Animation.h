@@ -13,12 +13,11 @@ struct Frame;
  * Animations are composed of a source image and an array of frames, which are just rectangle positions on the source image.
  */
 
+template <class FrameType>
 class Animation {
     friend class AnimationPlayer;
 
     public:
-
-    void initFrames(int n);
         enum class EndAction {
         REPEAT,
         START_ANIMATION,
@@ -26,7 +25,7 @@ class Animation {
     };;
 
     using EndActionData = union {
-        const Animation* next_anim; /**< Animation that will be started when this one finishes.
+        const Animation<FrameType>* next_anim; /**< Animation that will be started when this one finishes.
                             Poiter Validity : can be invalidated if the target animation if moved or destroyed (normal behavior should not make this happen)*/
         int code;   ///< A code to be passed to the caller of advance()
     };
@@ -38,9 +37,10 @@ class Animation {
 
     void setSpritesheet(SDL_Texture* spritesheet);
     SDL_Texture* getSpritesheet() const ;
+    void initFrames(int n);
     bool is_initialized()const;
     int getNbFrames();
-    Frame* getFrame(int n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
+    FrameType* getFrame(int n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
     void setBaseSpeed(double speed);
     double getBaseSpeed();
 
@@ -49,20 +49,20 @@ class Animation {
 
     //Construction
     void setEndAction();
-    void setEndAction(const Animation* anim);
+    void setEndAction(const Animation<FrameType>* anim);
     void setEndAction(int code);
-    void setNextAnimation(const Animation*);
-    const Animation* getNextAnimation() const;
-
+    void setEndAction(Animation::EndAction mode, Animation::EndActionData action);
+    void setNextAnimation(const Animation<FrameType>*);
+    const Animation<FrameType>* getNextAnimation() const;
 
 
     protected:
     int nb_frames;  ///< Number of frames in this animation.
-
+    std::unique_ptr<FrameType[]> frames; ///<Array (Basic array unique-pointed) containing the frames (= positions of the frames on the image) of this animation.
+    
     private:
     SDL_Texture* spritesheet;       ///<SDL Texture used as the source image.
-    SDL_Texture* spritesheet_left;  ///< SDL Texture used as the alternative source image for entities that can be oriented in two different directions (typically Fighters)
-    std::unique_ptr<Frame[]> frames; ///<Array (Basic array unique-pointed) containing the frames (= positions of the frames on the image) of this animation.
+    SDL_Texture* spritesheet_left;  //KEKW ///< SDL Texture used as the alternative source image for entities that can be oriented in two different directions (typically Fighters)
     Vector display; ///< Size of the source image.
 
     double base_speed;  /**< Speed of this animation.
@@ -71,3 +71,5 @@ class Animation {
     EndAction end_action_mode;
     EndActionData end_action;
 };
+
+using BasicAnimation = Animation<Frame>;
