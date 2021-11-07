@@ -12,6 +12,9 @@ namespace Debug {
     void log(T value){
         cout << value << '\n' << std::flush;
     }
+
+    template<>
+    void log (bool value);
     
     template <typename T>
     void logHex(T value){

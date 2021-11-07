@@ -1,7 +1,13 @@
+#include "Debug.h"
 #include "EntityAnimationPlayer.h"
 #include "EntityAnimation.h"
 
 #define model_ ((EntityAnimation*)model)
+
+EntityAnimationPlayer::EntityAnimationPlayer():
+    AnimationPlayer()
+{
+}
 
 /**
  * @brief Construct a new Current Animation object.
@@ -12,6 +18,25 @@
 EntityAnimationPlayer::EntityAnimationPlayer(EntityAnimation* animation):
     AnimationPlayer((Animation*)animation)
 {
+}
+
+int EntityAnimationPlayer::advance(){
+    AnimationPlayer::advance();
+    if (finished){
+        switch (model_->getEndActionMode()){
+            case EntityAnimation::EndAction::REPEAT:
+                break;
+            case EntityAnimation::EndAction::RETURN_CODE:
+                return model_->getEndAction().code;
+            case EntityAnimation::EndAction::START_ANIMATION:
+                const EntityAnimation* next = model_->getEndAction().next_anim;
+                if (next != nullptr){
+                    setAnimation(next);
+                }
+                break;
+        }
+    }
+    return 0;
 }
 
 const std::vector<Hurtbox>& EntityAnimationPlayer::getHurtboxes() const {

@@ -5,7 +5,9 @@
  * @brief Construct a new Frame object
  */
 EntityFrame::EntityFrame() : 
-    movement({0, 0}),
-    movement_type({0, 0})
+    movement{
+        .x = {0, 0, 0, 0}, 
+        .y = {0, 0, 0, 0}
+    }
 {
 }

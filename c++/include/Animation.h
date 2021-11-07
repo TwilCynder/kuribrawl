@@ -19,17 +19,6 @@ class Animation {
     public:
 
     void initFrames(int n);
-        enum class EndAction {
-        REPEAT,
-        START_ANIMATION,
-        RETURN_CODE
-    };;
-
-    using EndActionData = union {
-        const Animation* next_anim; /**< Animation that will be started when this one finishes.
-                            Poiter Validity : can be invalidated if the target animation if moved or destroyed (normal behavior should not make this happen)*/
-        int code;   ///< A code to be passed to the caller of advance()
-    };
 
     Animation();
     Animation(SDL_Texture* spritesheet);
@@ -47,17 +36,9 @@ class Animation {
     void draw(SDL_Renderer* target, int x, int y, int frame)const;
     void draw(SDL_Renderer* target, int x, int y, int frame, int facing)const;
 
-    //Construction
-    void setEndAction();
-    void setEndAction(const Animation* anim);
-    void setEndAction(int code);
-    void setNextAnimation(const Animation*);
-    const Animation* getNextAnimation() const;
-
-
-
     protected:
     int nb_frames;  ///< Number of frames in this animation.
+    bool loop;
 
     private:
     SDL_Texture* spritesheet;       ///<SDL Texture used as the source image.
@@ -66,8 +47,5 @@ class Animation {
     Vector display; ///< Size of the source image.
 
     double base_speed;  /**< Speed of this animation.
-                        Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.*/
-
-    EndAction end_action_mode;
-    EndActionData end_action;
+                        Can be < 1, in which case it will be used as a multiplier; or a >0 integer, in which case it will be the total duration of the Animation.*/
 };

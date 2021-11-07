@@ -331,6 +331,7 @@ void Fighter::checkStateDuration(){
 void Fighter::updateState(){
     if (paused) return;
     ++state_timer;
+
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){

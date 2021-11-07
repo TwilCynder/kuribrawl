@@ -6,6 +6,7 @@
 #include "EntityAnimation.h"
 #include "Champion.h"
 #include "GameData.h"
+#include "util.h"
 
 #define FILE_SIGNATURE 0x54545454
 #include "fileMarkers.h"
@@ -251,12 +252,18 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         break;
                     case FILEMARKER_FRAMEMOVEMENT:
                         readByte(&byte);
-                        current_entity_frame->movement_type.x = byte & 0b111;
-                        current_entity_frame->movement_type.y = (byte & 0b111000) >> 3;
+
+                        current_entity_frame->movement.x.enabled = byte & 1;
+                        current_entity_frame->movement.x.set_speed = getBit(byte, 1);
+                        current_entity_frame->movement.x.whole_frame = getBit(byte, 2);
+                        current_entity_frame->movement.y.enabled = getBit(byte, 3);
+                        current_entity_frame->movement.y.set_speed = getBit(byte, 4);
+                        current_entity_frame->movement.y.whole_frame = getBit(byte, 5);
+
                         readData(&valueD);
-                        current_entity_frame->movement.x = valueD;
+                        current_entity_frame->movement.x.value = valueD;
                         readData(&valueD);
-                        current_entity_frame->movement.y = valueD;
+                        current_entity_frame->movement.y.value = valueD;
                         break;
                     case FILEMARKER_HURTBOXINFO:
                         if (!current_entity_frame){

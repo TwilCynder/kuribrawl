@@ -32,6 +32,9 @@ class AnimationPlayer {
     int current_frame; ///< Index of the current frame.
     const Animation* model;   ///< The Animation that is running.
                                     /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
+    bool finished; ///< True if the animation just finished (even if it looped). 
+    bool advanced; ///< True if the current frame should have just changed (it either changed or reached the end)
+    bool over; ///< True if the animation is finished and didn't loop.
 
     private:
     int timeleft; ///<Time remaining *on the current frame*.
@@ -40,7 +43,6 @@ class AnimationPlayer {
     int frame_multiplier; ///< Time each frame will be displayed for.
     double base_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
     double current_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
-    bool finished; ///< True if the animation just finished (even if it looped).
 
     void nextFrame();
     void reset();

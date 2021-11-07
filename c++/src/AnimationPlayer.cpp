@@ -13,7 +13,8 @@
 
 AnimationPlayer::AnimationPlayer():
     current_frame(0),
-    model(nullptr)
+    model(nullptr),
+    finished(false)
 {
 }
 
@@ -73,7 +74,7 @@ void AnimationPlayer::setAnimation(const Animation* anim){
 void AnimationPlayer::setAnimation(const Animation* anim, double speed_){
     if (!anim) return;
     model = anim;
-    init();
+    reset();
     setSpeed(speed_);
     start();
 }
@@ -120,7 +121,6 @@ void AnimationPlayer::setSpeed(double speed_){
 
 void AnimationPlayer::init(){
     reset();
-    finished = 0;
 }
 
 /**
@@ -128,6 +128,7 @@ void AnimationPlayer::init(){
  */
 
 void AnimationPlayer::reset(){
+    over = false;
     current_frame = 0;
     current_carry = 0;
 }
@@ -153,6 +154,8 @@ void AnimationPlayer::start(){
 
 void AnimationPlayer::advance(){
     if (speed != -1 && is_initialized()){
+        finished = false;
+        advanced = false;
         timeleft--;
         if (timeleft <= 0){
             current_carry += base_carry;
@@ -163,21 +166,22 @@ void AnimationPlayer::advance(){
 
 /**
  * @brief Changes the current frame (and updates all the attributes that depend on the current frame)
- * Updates the timeleft for the current frame, and the carry attriutes if needed.
+ * Updates the timeleft for the current frame, and the carry if needed.
  */
 
 void AnimationPlayer::nextFrame(){
-    finished = false;
+    if (!model->loop && over) return;
+    
     current_frame++;
+    advanced = true;
 
     if (current_frame >= model->nb_frames){
         finished = true;
-        const Animation* next = model->getNextAnimation();
-        if (next != nullptr){
-            setAnimation(next);
-        } else {
+        if (model->loop){
             reset();
             start();
+        } else {
+            over = true;
         }
         return;
     }
