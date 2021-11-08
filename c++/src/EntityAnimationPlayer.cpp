@@ -23,13 +23,14 @@ EntityAnimationPlayer::EntityAnimationPlayer(EntityAnimation* animation):
 int EntityAnimationPlayer::advance(){
     AnimationPlayer::advance();
     if (finished){
+        const EntityAnimation* next;
         switch (model_->getEndActionMode()){
             case EntityAnimation::EndAction::REPEAT:
                 break;
             case EntityAnimation::EndAction::RETURN_CODE:
                 return model_->getEndAction().code;
             case EntityAnimation::EndAction::START_ANIMATION:
-                const EntityAnimation* next = model_->getEndAction().next_anim;
+                next = model_->getEndAction().next_anim;
                 if (next != nullptr){
                     setAnimation(next);
                 }

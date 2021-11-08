@@ -14,7 +14,9 @@
 AnimationPlayer::AnimationPlayer():
     current_frame(0),
     model(nullptr),
-    finished(false)
+    finished(false),
+    advanced(false),
+    over(false)
 {
 }
 
@@ -74,7 +76,7 @@ void AnimationPlayer::setAnimation(const Animation* anim){
 void AnimationPlayer::setAnimation(const Animation* anim, double speed_){
     if (!anim) return;
     model = anim;
-    reset();
+    init();
     setSpeed(speed_);
     start();
 }
@@ -120,6 +122,7 @@ void AnimationPlayer::setSpeed(double speed_){
  */
 
 void AnimationPlayer::init(){
+    over = false;
     reset();
 }
 
@@ -128,7 +131,6 @@ void AnimationPlayer::init(){
  */
 
 void AnimationPlayer::reset(){
-    over = false;
     current_frame = 0;
     current_carry = 0;
 }
@@ -172,15 +174,16 @@ void AnimationPlayer::advance(){
 void AnimationPlayer::nextFrame(){
     if (!model->loop && over) return;
     
-    current_frame++;
     advanced = true;
 
+    current_frame++;
     if (current_frame >= model->nb_frames){
         finished = true;
         if (model->loop){
             reset();
             start();
         } else {
+            current_frame--;
             over = true;
         }
         return;

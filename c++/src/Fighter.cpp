@@ -156,7 +156,7 @@ bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox&
 
 void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox) {
     double knockback = GameCalc::getKnockback(0, 0, 0, 0);
-    double angle = PI / 4;
+    double angle = PI * 3 / 8;
     if (attacker.facing < 0){
         angle = (PI - angle);
     }

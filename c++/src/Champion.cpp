@@ -149,11 +149,10 @@ void Champion::initDefaultAnimations(){
     }
 
     if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::JUMP))){
-        anim->setNextAnimation(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
         anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
     }
     if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_JUMP))){
-        anim->setNextAnimation(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
+        anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
     }
 }
 
