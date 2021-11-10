@@ -17,7 +17,7 @@ void App::startTestGame(){
 
 	ports[0].plugController(-1, this->controllersData());
 	current_game->addFighter(acid, 100, 1, ports[0]);
-	//current_game->addFighter(acid, 300, 1);
+	current_game->addFighter(acid, 300, 1);
 	//current_game->addFighter(acid, 500, 1);
 
 	//ports[0].setFighter(f1);

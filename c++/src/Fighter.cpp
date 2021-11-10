@@ -164,7 +164,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
     speed.x = knockback * cos(angle);
     speed.y = knockback * sin(angle);
 
-    int hitstun = 20;
+    int hitstun = 10;
     setState(Fighter::State::HITSTUN, -sign(speed.x), hitstun, false);
 
     /*Choix de l'animation de hitstun*/
