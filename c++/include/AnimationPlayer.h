@@ -21,7 +21,8 @@ class AnimationPlayer {
     void draw(SDL_Renderer* target, int x, int y, int facing);
 
     bool is_initialized() const;
-    bool is_finished();
+    bool is_finished() const;
+    bool frameChanged() const;
     const Animation* getAnimation() const;
     void setAnimation(const Animation* anim);
     void setAnimation(const Animation* anim, double speed);
@@ -32,9 +33,13 @@ class AnimationPlayer {
     int current_frame; ///< Index of the current frame.
     const Animation* model;   ///< The Animation that is running.
                                     /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
+    
+    bool animation_set; ///< True if the animation has changed since the last advance().
     bool finished; ///< True if the animation just finished (even if it looped). 
-    bool advanced; ///< True if the current frame should have just changed (it either changed or reached the end)
     bool over; ///< True if the animation is finished and didn't loop.
+    bool frame_changed; ///< True if the frame just changed
+                        /**<Guarantees that the current frame has been set, but does not guaranteed that it actuzlly changed (the old value may be the new value)*/
+   
 
     private:
     int timeleft; ///<Time remaining *on the current frame*.

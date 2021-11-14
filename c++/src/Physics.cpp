@@ -85,6 +85,11 @@ void Fighter::applyPhysics(){
             break;
     }
 
+    const EntityFrame::FrameMovement& frame_movement = current_animation.getFrameMovement();
+    Debug::log("Frame movement: ");
+    applyFrameMovement(speed.x, frame_movement.x);
+    applyFrameMovement(speed.y, frame_movement.y);
+
     new_pos.x = position.x + speed.x;
     new_pos.y = position.y + speed.y;
 

@@ -33,6 +33,7 @@ class App
     ~App();
 
     void init();
+    void close();
     void loop();
     void stop(int code);
 
@@ -67,6 +68,7 @@ class App
 
     void update_frame_duration();
     void loop_timer();
+    bool initialized;
     Date next_frame_date; ///< Date at which the next frame is supposed to start
     Date start_time;
     int framerate; ///< Frames displayed per second

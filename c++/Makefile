@@ -11,7 +11,6 @@ LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_im
 SRC= $(wildcard src/*.cpp)
 _OBJS= $(SRC:.cpp=.o)
 
-
 vpath %.h include
 vpath %.cpp src
 

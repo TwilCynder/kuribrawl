@@ -14,9 +14,10 @@
 AnimationPlayer::AnimationPlayer():
     current_frame(0),
     model(nullptr),
+    animation_set(),
     finished(false),
-    advanced(false),
-    over(false)
+    over(false),
+    frame_changed(false)
 {
 }
 
@@ -52,8 +53,12 @@ const Animation* AnimationPlayer::getAnimation() const {
  *
  * @return finished or not.
  */
-bool AnimationPlayer::is_finished(){
+bool AnimationPlayer::is_finished() const {
     return finished;
+}
+
+bool AnimationPlayer::frameChanged() const {
+    return frame_changed;
 }
 
 /**
@@ -79,6 +84,8 @@ void AnimationPlayer::setAnimation(const Animation* anim, double speed_){
     init();
     setSpeed(speed_);
     start();
+
+    animation_set = true;
 }
 
 /**
@@ -123,6 +130,7 @@ void AnimationPlayer::setSpeed(double speed_){
 
 void AnimationPlayer::init(){
     over = false;
+    finished = false;
     reset();
 }
 
@@ -132,6 +140,7 @@ void AnimationPlayer::init(){
 
 void AnimationPlayer::reset(){
     current_frame = 0;
+    frame_changed = true;
     current_carry = 0;
 }
 
@@ -156,13 +165,22 @@ void AnimationPlayer::start(){
 
 void AnimationPlayer::advance(){
     if (speed != -1 && is_initialized()){
-        finished = false;
-        advanced = false;
+        
+        if (animation_set){
+            frame_changed = true;
+            animation_set = false;
+        } else  {
+            finished = false;
+            frame_changed = false;
+
+        }
+
         timeleft--;
         if (timeleft <= 0){
             current_carry += base_carry;
             nextFrame();
         }
+
     }
 }
 
@@ -174,16 +192,15 @@ void AnimationPlayer::advance(){
 void AnimationPlayer::nextFrame(){
     if (!model->loop && over) return;
     
-    advanced = true;
-
-    current_frame++;
-    if (current_frame >= model->nb_frames){
+    if (current_frame < model->nb_frames - 1){
+        current_frame++;
+        frame_changed = true;
+    } else {
         finished = true;
         if (model->loop){
             reset();
             start();
         } else {
-            current_frame--;
             over = true;
         }
         return;

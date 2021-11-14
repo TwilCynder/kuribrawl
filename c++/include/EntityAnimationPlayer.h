@@ -1,7 +1,7 @@
 #pragma once
 #include "AnimationPlayer.h"
 #include "EntityFrame.h"
-#include "Entity.h"
+#include "AnimatedEntity.h"
 
 class EntityAnimation;
 class EntityAnimationPlayer : public AnimationPlayer {
@@ -21,6 +21,7 @@ class EntityAnimationPlayer : public AnimationPlayer {
     const EntityAnimation* getAnimation() const;
 
     private:
+
     using AnimationPlayer::getAnimation;
     using AnimationPlayer::setAnimation;
 };

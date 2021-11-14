@@ -39,7 +39,7 @@ App::App(int framerate):
 }
 
 App::~App(){
-
+	close();
 }
 
 /**
@@ -179,6 +179,13 @@ void App::init(){
 	loadRessources();
 	initGameData();
 	startTestGame();
+	initialized = true;
+}
+
+void App::close(){
+	if (initialized){
+		SDLHelper::closeSDL();
+	}
 }
 
 /**

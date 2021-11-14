@@ -9,7 +9,6 @@
 #include "gameActions.h"
 #include "Champion.h"
 #include "StaticList.h"
-#include "Entity.h"
 
 #define MAX_FIGHTERS_HIT 12
 
@@ -20,7 +19,7 @@ struct Move;
  * @brief An in-game character ("instance" of a Champion).
  * A Fighter is an in-game entity that can be player-controlled, and bases its animation, properties, and overall gameplay on a Champion.
  */
-class Fighter : Entity {
+class Fighter {
     public:
 
     /**
@@ -60,6 +59,7 @@ class Fighter : Entity {
     bool setAnimationMaybe(Champion::DefaultAnimation);
     bool setAnimationMaybe(Champion::DefaultAnimation, double speed);
     void advanceAnimation();
+    void applyFrameMovement(double& speed, const EntityFrame::FrameMovementAxis& fma);
     Kuribrawl::VectorDouble& getPosition();
     void setSpeed(double x, double y);
     bool getGrounded() const;

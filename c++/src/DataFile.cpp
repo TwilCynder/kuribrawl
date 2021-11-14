@@ -337,7 +337,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         throw KBFatalExplicit("File read : invalid data file content");
                 }
             } while (!leave_loop);
-
+            
             break;
         default:
             cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";

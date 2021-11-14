@@ -117,6 +117,18 @@ void Fighter::advanceAnimation(){
     current_animation.advance();
 }
 
+void Fighter::applyFrameMovement(double& speed, const EntityFrame::FrameMovementAxis& fma){
+    if (fma.enabled){
+        Debug::log(fma.whole_frame);
+        Debug::log(fma.set_speed);
+        if (fma.whole_frame){
+            speed = fma.value + (fma.set_speed ? 0 : speed); 
+        } else if (current_animation.frameChanged()){
+            speed = fma.value + (fma.set_speed ? 0 : speed); 
+        }
+    }
+}
+
 /**
  * @brief Sets the x and y components of the speed of this Fighter
  * @param x x speed in pixels per frame
@@ -328,6 +340,7 @@ void Fighter::checkStateDuration(){
  *
  */
 void Fighter::updateState(){
+
     if (paused) return;
     ++state_timer;
 
@@ -361,6 +374,7 @@ void Fighter::updateState(){
             if (state_timer >= state_info) {
                 setState(State::IDLE);
             }
+            break;
         case State::ATTACK:
             if (current_animation.is_finished()){
                 switch (current_move->end_behavior){
@@ -369,6 +383,7 @@ void Fighter::updateState(){
                         break;
                     case Move::EndBehavior::FREEFALL:
                         setState(Fighter::State::FREEFALL);
+                        break;
                 }
             }
             break;

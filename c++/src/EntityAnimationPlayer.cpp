@@ -22,6 +22,7 @@ EntityAnimationPlayer::EntityAnimationPlayer(EntityAnimation* animation):
 
 int EntityAnimationPlayer::advance(){
     AnimationPlayer::advance();
+
     if (finished){
         const EntityAnimation* next;
         switch (model_->getEndActionMode()){
