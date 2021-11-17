@@ -37,7 +37,7 @@ namespace Kuribrawl {
 
     struct Rect {
         int w;
-        int y;
+        int h;
     };
 
     struct VectorDouble {

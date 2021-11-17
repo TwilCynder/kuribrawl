@@ -15,6 +15,7 @@
 #include "System.h"
 #include "messageBox.h"
 #include "Random.h"
+#include "TextureFont.h"
 
 using namespace std;
 
@@ -180,6 +181,8 @@ void App::init(){
 	initGameData();
 	startTestGame();
 	initialized = true;
+	TextureFont font("oracle.png", renderer, {8, 11});
+	font.displayString("Macron demission", 100, 100);
 }
 
 void App::close(){

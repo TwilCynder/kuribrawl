@@ -20,7 +20,7 @@ void closeSDL(){
 void prepareRender(SDL_Renderer* target)
 {
     SDL_SetRenderDrawColor(target, 200, 200, 200, 255);
-	SDL_RenderClear(target);
+	//SDL_RenderClear(target);
 }
 
 void render(SDL_Renderer* target)
