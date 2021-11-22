@@ -9,7 +9,7 @@
 
 class EntityAnimation;
 class Champion;
-class GameData;
+class App;
 
 /**
  * @brief An opened file, treated as a Kuribrawl Data File.
@@ -23,7 +23,7 @@ class DataFile {
     DataFile(const char* file, SDL_Renderer* renderer);
     ~DataFile();
 
-    void read(GameData& data);
+    void read(App& data);
     bool ready();
 
     private:

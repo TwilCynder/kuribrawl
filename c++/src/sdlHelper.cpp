@@ -12,9 +12,14 @@ void initSDL()
 	IMG_Init(IMG_INIT_PNG);
 }
 
+void closeSDL(){
+	SDL_Quit();
+	IMG_Quit();
+}
+
 void prepareRender(SDL_Renderer* target)
 {
-    SDL_SetRenderDrawColor(target, 200, 200, 200, 255);
+    SDL_SetRenderDrawColor(target, 0, 0, 0, 255);
 	SDL_RenderClear(target);
 }
 

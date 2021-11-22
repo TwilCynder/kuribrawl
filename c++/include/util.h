@@ -1,6 +1,10 @@
 #pragma once
 
 #define PI 3.1416
+#define addBitValue(value, shift) + (value << shift)
+#define getBits(value, mask, shift) ((value & mask) >> shift)
+#define getBit(value, shift) ((value & (1 << shift) )  >> shift )
+#define checkNull(value, exception) if (!value) {throw exception;}
 
 namespace Kuribrawl {
 
@@ -33,7 +37,7 @@ namespace Kuribrawl {
 
     struct Rect {
         int w;
-        int y;
+        int h;
     };
 
     struct VectorDouble {

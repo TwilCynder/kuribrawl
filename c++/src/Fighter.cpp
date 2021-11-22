@@ -8,6 +8,7 @@
 #include "Move.h"
 #include "Random.h"
 #include "gameCalculations.h"
+#include "Text/TextDisplayer.h"
 #include <math.h>
 
 /**
@@ -50,7 +51,7 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
 /**
  * @brief Returns whether the Fighter is correctly initialized and ready to use.
  *
- * @return true is the CurrentAnimation is ready to use.
+ * @return true is the AnimationPlayer is ready to use.
  * @return false otherwise.
  */
 bool Fighter::is_initialized(){
@@ -69,7 +70,7 @@ Kuribrawl::VectorDouble& Fighter::getPosition() {
 /**
  * @brief Returns the Animation of the Champion that is being displayed currently.
  *
- * @return Animation* a pointer to the Animation the CurrentAnimation is currently playing.
+ * @return Animation* a pointer to the Animation the AnimationPlayer is currently playing.
  */
 const EntityAnimation* Fighter::getCurrentAnimation() const {
     return current_animation.getAnimation();
@@ -85,17 +86,49 @@ void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
     current_animation.setAnimation(anim, speed);
 }
 
+
+///\todo Use templates.
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
     const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+<<<<<<< HEAD
+=======
+    checkNull(anim, KBFatalExplicit("Missing Animation"))
+>>>>>>> c2de1782a30f825a508db551233980c1ffabfbc7
     setAnimation(anim);
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
-    setAnimation(model->getDefaultAnimation(default_anim), speed);
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    checkNull(anim, KBFatalExplicit("Missing Animation"))
+    setAnimation(anim, speed);
+}
+
+bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim){
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    if (!anim) return false;
+    setAnimation(anim);
+    return true;
+}
+
+bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim, double speed){
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
+    if (!anim) return false;
+    setAnimation(anim, speed);
+    return true;
 }
 
 void Fighter::advanceAnimation(){
     current_animation.advance();
+}
+
+void Fighter::applyFrameMovement(double& speed, const EntityFrame::FrameMovementAxis& fma){
+    if (fma.enabled){
+        if (fma.whole_frame){
+            speed = fma.value + (fma.set_speed ? 0 : speed); 
+        } else if (current_animation.frameChanged()){
+            speed = fma.value + (fma.set_speed ? 0 : speed); 
+        }
+    }
 }
 
 /**
@@ -137,7 +170,7 @@ bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox&
 
 void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox) {
     double knockback = GameCalc::getKnockback(0, 0, 0, 0);
-    double angle = PI / 4;
+    double angle = PI * 3 / 8;
     if (attacker.facing < 0){
         angle = (PI - angle);
     }
@@ -145,8 +178,8 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
     speed.x = knockback * cos(angle);
     speed.y = knockback * sin(angle);
 
-    int hitstun = 20;
-    setState(Fighter::State::HITSTUN, 0, hitstun, false);
+    int hitstun = 10;
+    setState(Fighter::State::HITSTUN, -sign(speed.x), hitstun, false);
 
     /*Choix de l'animation de hitstun*/
     setAnimation(Champion::DefaultAnimation::HITSTUN);
@@ -154,7 +187,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
 
 /**
  * @brief displays the Fighter.
- * Simply displays the CurrentAnimation.
+ * Simply displays the AnimationPlayer.
  * @param target the renderer the frame will be drawn to.
  */
 void Fighter::draw(SDL_Renderer* target){
@@ -187,6 +220,10 @@ void Fighter::draw(SDL_Renderer* target){
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
     SDL_RenderDrawLine(target, position.x - 10, SCREEN_HEIGHT - position.y, position.x + 10, SCREEN_HEIGHT - position.y);
     SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
+}
+
+void Fighter::drawDebugInfo(TextDisplayer& out){
+    out << "Speed X : " << speed.x << " ; Speed Y : " << speed.y << " " << Debug::state_to_string(state);
 }
 
 /**
@@ -231,7 +268,6 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
 
 //Returns int to make jump_manager able to return its return value directly
 int Fighter::air_jump(jumpX x_type){
-	Debug::log("air jump ????");
 	if (air_jumps > 0) {    
 		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
 	
@@ -310,8 +346,10 @@ void Fighter::checkStateDuration(){
  *
  */
 void Fighter::updateState(){
+
     if (paused) return;
     ++state_timer;
+
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->val.jump_squat_duration)){
@@ -342,6 +380,7 @@ void Fighter::updateState(){
             if (state_timer >= state_info) {
                 setState(State::IDLE);
             }
+            break;
         case State::ATTACK:
             if (current_animation.is_finished()){
                 switch (current_move->end_behavior){
@@ -350,6 +389,7 @@ void Fighter::updateState(){
                         break;
                     case Move::EndBehavior::FREEFALL:
                         setState(Fighter::State::FREEFALL);
+                        break;
                 }
             }
             break;

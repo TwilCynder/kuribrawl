@@ -9,9 +9,9 @@
 
 Animation::Animation():
     nb_frames(0),
+    loop(true),
     frames(NULL),
-    base_speed(1),
-    next(nullptr)
+    base_speed(1)
 {
 }
 
@@ -99,18 +99,6 @@ void Animation::initFrames(int n){
         x += w;
     }
     nb_frames = n;
-}
-
-/**
- * @brief Sets the \ref Animation#next "next animation".
- * The next animation is an Animation that will be started once this one finishes.
- */
-void Animation::setNextAnimation(const Animation* anim){
-    next = anim;
-}
-
-const Animation* Animation::getNextAnimation() const {
-    return next;
 }
 
 /**

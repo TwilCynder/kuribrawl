@@ -7,12 +7,14 @@
 #include "SDL2/SDL_syswm.h"
 #include "Animation.h"
 #include "GameData.h"
+#include "Text/TextureFont.h"
 
 #define NB_PORTS 4
 
 class Port;
 class Game;
 class ControllersData;
+
 
 /**
  * @brief A number of miliseconds elapsed since SDL initialization
@@ -33,6 +35,7 @@ class App
     ~App();
 
     void init();
+    void close();
     void loop();
     void stop(int code);
 
@@ -67,6 +70,7 @@ class App
 
     void update_frame_duration();
     void loop_timer();
+    bool initialized;
     Date next_frame_date; ///< Date at which the next frame is supposed to start
     Date start_time;
     int framerate; ///< Frames displayed per second
@@ -90,4 +94,7 @@ class App
     int frame; ///< Number of frames displayed since the loop was started.
     int total_frame_wait;
     void print_report(std::ostream& out);
+
+    //Debug
+    std::unique_ptr<TextureFont> debugFont;
 };

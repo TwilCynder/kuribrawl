@@ -5,7 +5,9 @@
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Champion.h"
+#include "App.h"
 #include "GameData.h"
+#include "util.h"
 
 #define FILE_SIGNATURE 0x54545454
 #include "fileMarkers.h"
@@ -251,12 +253,18 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         break;
                     case FILEMARKER_FRAMEMOVEMENT:
                         readByte(&byte);
-                        current_entity_frame->movement_type.x = byte & 0b111;
-                        current_entity_frame->movement_type.y = (byte & 0b111000) >> 3;
+
+                        current_entity_frame->movement.x.enabled = byte & 1;
+                        current_entity_frame->movement.x.set_speed = getBit(byte, 1);
+                        current_entity_frame->movement.x.whole_frame = getBit(byte, 2);
+                        current_entity_frame->movement.y.enabled = getBit(byte, 3);
+                        current_entity_frame->movement.y.set_speed = getBit(byte, 4);
+                        current_entity_frame->movement.y.whole_frame = getBit(byte, 5);
+
                         readData(&valueD);
-                        current_entity_frame->movement.x = valueD;
+                        current_entity_frame->movement.x.value = valueD;
                         readData(&valueD);
-                        current_entity_frame->movement.y = valueD;
+                        current_entity_frame->movement.y.value = valueD;
                         break;
                     case FILEMARKER_HURTBOXINFO:
                         if (!current_entity_frame){
@@ -330,7 +338,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         throw KBFatalExplicit("File read : invalid data file content");
                 }
             } while (!leave_loop);
-
+            
             break;
         default:
             cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
@@ -360,7 +368,7 @@ char* DataFile::separateTag(char* tag){
  * @param data the GameData that will be updated and populated.
  */
 
-void DataFile::read(GameData& data){
+void DataFile::read(App& app){
     Debug::log("====== Reading data file ==============");
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
@@ -380,16 +388,19 @@ void DataFile::read(GameData& data){
 
                 switch(entity[0]){
                     default:
-                        readEntityAnimationFile(data.tryChampion(entity).tryAnimation(element));
+                        readEntityAnimationFile(app.gameData().tryChampion(entity).tryAnimation(element));
                 }
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();
                 Debug::log("-Reading CHampion");
                 Debug::log(tag);
-                readChampionFile(data.tryChampion(tag));
+                readChampionFile(app.gameData().tryChampion(tag));
+                break;
+            case DataFile::DataType::IMAGE:
+
             case DataFile::DataType::NONE:
-                Debug::log("NOOOOOONE");
+                Debug::log("-None");
             default:
                 break;
         }

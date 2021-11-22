@@ -14,9 +14,11 @@ struct Frame;
  */
 
 class Animation {
-    friend class CurrentAnimation;
+    friend class AnimationPlayer;
 
     public:
+
+    void initFrames(int n);
 
     Animation();
     Animation(SDL_Texture* spritesheet);
@@ -34,13 +36,9 @@ class Animation {
     void draw(SDL_Renderer* target, int x, int y, int frame)const;
     void draw(SDL_Renderer* target, int x, int y, int frame, int facing)const;
 
-    //Construction
-    void initFrames(int n);
-    void setNextAnimation(const Animation*);
-    const Animation* getNextAnimation() const;
-
     protected:
     int nb_frames;  ///< Number of frames in this animation.
+    bool loop;
 
     private:
     SDL_Texture* spritesheet;       ///<SDL Texture used as the source image.
@@ -49,8 +47,5 @@ class Animation {
     Vector display; ///< Size of the source image.
 
     double base_speed;  /**< Speed of this animation.
-                        Can be < 1, in which case it will be used as a multiplier; or an integer, in which case it will be the total duration of the Animation.*/
-
-    const Animation* next;  /**< Animation that will be started when this one finishes.
-                            Poiter Validity : can be invalidated if the target animation if moved or destroyed (normal behavior should not make this happen)*/
+                        Can be < 1, in which case it will be used as a multiplier; or a >0 integer, in which case it will be the total duration of the Animation.*/
 };
