@@ -197,7 +197,7 @@ void Game::drawDebugInfo(TextureFont& font){
     int y = 20;
     int i = 1;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        TextDisplayer td = TextDisplayer(20, y, font) << "Fighter " << i << " : " ;
+        AdvancedTextDisplayer td = AdvancedTextDisplayer(20, y, font) << "Fighter " << i << " : " ;
         it->drawDebugInfo(td);
         y += 20;
         i++;

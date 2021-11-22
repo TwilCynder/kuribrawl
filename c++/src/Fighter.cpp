@@ -90,10 +90,7 @@ void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
 ///\todo Use templates.
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
     const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
-<<<<<<< HEAD
-=======
     checkNull(anim, KBFatalExplicit("Missing Animation"))
->>>>>>> c2de1782a30f825a508db551233980c1ffabfbc7
     setAnimation(anim);
 }
 
@@ -222,8 +219,11 @@ void Fighter::draw(SDL_Renderer* target){
     SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
 }
 
-void Fighter::drawDebugInfo(TextDisplayer& out){
-    out << "Speed X : " << speed.x << " ; Speed Y : " << speed.y << " " << Debug::state_to_string(state);
+void Fighter::drawDebugInfo(AdvancedTextDisplayer& out){
+    out 
+        << "Speed X : " << speed.x << AdvancedTextDisplayer::force_advance(80) 
+        << " ; Speed Y : " << speed.y << AdvancedTextDisplayer::force_advance(80)
+        << " " << Debug::state_to_string(state);
 }
 
 /**

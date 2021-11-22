@@ -8,18 +8,22 @@ TextDisplayer::TextDisplayer(int x, int y, TextureFont& font_) :
 {
 }
 
-TextDisplayer& TextDisplayer::operator<<(std::string s){
+inline void TextDisplayer::displayString(const std::string& s){
     font.displayString(s, pos.x, pos.y);
+}
+
+TextDisplayer& TextDisplayer::operator<<(const std::string& s){
+    displayString(s);
     return *this;
 }
 
 TextDisplayer& TextDisplayer::operator<<(double d){
-    font.displayString(std::to_string(d), pos.x, pos.y);
+    displayString(std::to_string(d));
     return *this;
 }
 
 TextDisplayer& TextDisplayer::operator<<(int i){
-    font.displayString(std::to_string(i), pos.x, pos.y);
+    displayString(std::to_string(i));
     return *this;
 }
 
@@ -43,4 +47,29 @@ void TextDisplayer::setPosition(int x_, int y_){
 
 void TextDisplayer::advance(int x_){
     pos.x += x_;
+}
+
+TextDisplayer::SetPositionData TextDisplayer::changePos(int x, int y){
+    return {x, y};
+}
+
+TextDisplayer& TextDisplayer::operator<<(TextDisplayer::SetPositionData& new_pos){
+    pos = new_pos;
+    return *this;
+}
+
+AdvancedTextDisplayer::AdvancedTextDisplayer(int x, int y, TextureFont& font):
+    TextDisplayer(x, y, font)
+{
+}
+
+AdvancedTextDisplayer::AdvanceLength AdvancedTextDisplayer::force_advance(int l){
+    return l;
+}
+
+AdvancedTextDisplayer& AdvancedTextDisplayer::operator<<(AdvancedTextDisplayer::AdvanceLength l){
+    if (last_advance < l){
+        advance(l - last_advance);
+    }
+    return *this;
 }

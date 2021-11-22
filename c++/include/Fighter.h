@@ -15,7 +15,7 @@
 class Game;
 struct Move;
 
-class TextDisplayer;
+class AdvancedTextDisplayer;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -46,7 +46,7 @@ class Fighter {
     void updateState();
     void checkUpdateAnimation();
     //Debug
-    void drawDebugInfo(TextDisplayer& out);
+    void drawDebugInfo(AdvancedTextDisplayer& out);
 
     //Hitboxes
     const HurtboxVector& getCurrentHurtboxes() const;

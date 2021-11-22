@@ -1,7 +1,7 @@
 #include "Text/AnchoredTextDisplayer.h"
 
 AnchoredTextDisplayer::AnchoredTextDisplayer(int x, int y, TextureFont& font) : 
-    TextDisplayer(x, y, font),
+    AdvancedTextDisplayer(x, y, font),
     orig_pos {x, y}
 {
 }
