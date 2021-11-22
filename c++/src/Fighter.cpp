@@ -86,7 +86,7 @@ void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
-    const EntityAnimation* anim = model->getDefaultAnimation(default_anim)
+    const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
     setAnimation(anim);
 }
 
