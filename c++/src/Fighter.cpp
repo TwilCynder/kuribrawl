@@ -8,6 +8,7 @@
 #include "Move.h"
 #include "Random.h"
 #include "gameCalculations.h"
+#include "Text/TextDisplayer.h"
 #include <math.h>
 
 /**
@@ -119,8 +120,6 @@ void Fighter::advanceAnimation(){
 
 void Fighter::applyFrameMovement(double& speed, const EntityFrame::FrameMovementAxis& fma){
     if (fma.enabled){
-        Debug::log(fma.whole_frame);
-        Debug::log(fma.set_speed);
         if (fma.whole_frame){
             speed = fma.value + (fma.set_speed ? 0 : speed); 
         } else if (current_animation.frameChanged()){
@@ -218,6 +217,10 @@ void Fighter::draw(SDL_Renderer* target){
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
     SDL_RenderDrawLine(target, position.x - 10, SCREEN_HEIGHT - position.y, position.x + 10, SCREEN_HEIGHT - position.y);
     SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
+}
+
+void Fighter::drawDebugInfo(TextDisplayer& out){
+    out << "Speed X : " << speed.x << " ; Speed Y : " << speed.y << " " << Debug::state_to_string(state);
 }
 
 /**

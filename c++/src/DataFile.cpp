@@ -5,6 +5,7 @@
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Champion.h"
+#include "App.h"
 #include "GameData.h"
 #include "util.h"
 
@@ -367,7 +368,7 @@ char* DataFile::separateTag(char* tag){
  * @param data the GameData that will be updated and populated.
  */
 
-void DataFile::read(GameData& data){
+void DataFile::read(App& app){
     Debug::log("====== Reading data file ==============");
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
@@ -387,16 +388,19 @@ void DataFile::read(GameData& data){
 
                 switch(entity[0]){
                     default:
-                        readEntityAnimationFile(data.tryChampion(entity).tryAnimation(element));
+                        readEntityAnimationFile(app.gameData().tryChampion(entity).tryAnimation(element));
                 }
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();
                 Debug::log("-Reading CHampion");
                 Debug::log(tag);
-                readChampionFile(data.tryChampion(tag));
+                readChampionFile(app.gameData().tryChampion(tag));
+                break;
+            case DataFile::DataType::IMAGE:
+
             case DataFile::DataType::NONE:
-                Debug::log("NOOOOOONE");
+                Debug::log("-None");
             default:
                 break;
         }

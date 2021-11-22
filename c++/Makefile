@@ -8,13 +8,14 @@ endif
 
 
 LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
-SRC= $(wildcard src/*.cpp)
+SRC= $(wildcard src/*.cpp src/**/*.cpp)
 _OBJS= $(SRC:.cpp=.o)
 
 vpath %.h include
 vpath %.cpp src
 
 OBJS = $(patsubst src/%,bin/%,$(_OBJS))
+OBJDIRS:=$(dir $(OBJECTS))
 
 NB_FILES = $(words $(SRC))
 CURRENT_NB = 0
@@ -46,6 +47,7 @@ start:
 bin/%.o: %.cpp #$(SRC)
 	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
 	@printf "\033[1;33m[$(CURRENT_NB)/$(NB_FILES)]\033[0m "
+	@mkdir -p $(dir $@)
 	g++ $(CFLAGS) -c $< -o $@
 
 clear:

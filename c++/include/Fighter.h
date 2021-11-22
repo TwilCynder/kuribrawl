@@ -15,6 +15,8 @@
 class Game;
 struct Move;
 
+class TextDisplayer;
+
 /**
  * @brief An in-game character ("instance" of a Champion).
  * A Fighter is an in-game entity that can be player-controlled, and bases its animation, properties, and overall gameplay on a Champion.
@@ -43,6 +45,9 @@ class Fighter {
     //States
     void updateState();
     void checkUpdateAnimation();
+    //Debug
+    void drawDebugInfo(TextDisplayer& out);
+
     //Hitboxes
     const HurtboxVector& getCurrentHurtboxes() const;
     const HitboxVector&  getCurrentHitboxes () const;

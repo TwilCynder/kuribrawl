@@ -15,7 +15,7 @@
 #include "System.h"
 #include "messageBox.h"
 #include "Random.h"
-#include "TextureFont.h"
+#include "Text/TextDisplayer.h"
 
 using namespace std;
 
@@ -140,10 +140,11 @@ bool App::loadGameFile(const char* name){
 
     DataFile data_file(name, renderer);
     if (data_file.ready()) {
-        data_file.read(*game_data);
+        data_file.read(*this);
         return true;
     }
     return false;
+
 }
 
 /**
@@ -181,8 +182,9 @@ void App::init(){
 	initGameData();
 	startTestGame();
 	initialized = true;
-	TextureFont font("oracle.png", renderer, {8, 11});
-	font.displayString("Macron demission", 100, 100);
+
+	debugFont = make_unique<TextureFont>(TextureFont("oracle.png", renderer, {8, 11}));
+	TextDisplayer(100, 100, *debugFont) << "Oui";
 }
 
 void App::close(){
@@ -344,16 +346,17 @@ void App::loop() try {
 
     while(1){
 		next_frame_date += frame_duration;
-        this->handleEvents();
+        handleEvents();
 
 		if (!paused || advance){
 			advance = false;
 			readPorts();
-			SDLHelper::prepareRender(this->renderer);
+			SDLHelper::prepareRender(renderer);
 			if (current_game && current_game->is_running()){
-				current_game->step(this->renderer);
+				current_game->step(renderer);
+				current_game->drawDebugInfo(*debugFont);
 			}
-			SDLHelper::render(this->renderer);
+			SDLHelper::render(renderer);
 			frame++;
 		}
 

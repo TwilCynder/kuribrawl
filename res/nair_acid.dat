@@ -2,7 +2,7 @@
 f0 d4
 f1 d3 
 f2 d2
-f3 d13 m%111000 0 10
+f3 d13 m%101000 10 4 #Whole_frame set speed enabled
 f4 d3
 f5 d3
 c all

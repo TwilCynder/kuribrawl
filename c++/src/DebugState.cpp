@@ -18,13 +18,28 @@ namespace Debug {
     };
 };
 
-void Debug::log(Fighter::State state){
+const static std::string stateNotFound(" (enum name not found)\n");
+
+const std::string* Debug::state_to_string_ptr(Fighter::State state){
+        auto it = state_name.find(state);
+    if (it == state_name.end()){
+        return nullptr;
+    } else {
+        return &it->second;
+    }
+}
+
+const std::string& Debug::state_to_string(Fighter::State state){
     auto it = state_name.find(state);
     if (it == state_name.end()){
-        std::cout << (int)state << " (enum name not found)\n" << std::flush;
+        return stateNotFound;
     } else {
-        std::cout << it->second << '\n' << std::flush;
+        return it->second;
     }
+}
+
+void Debug::log(Fighter::State state){
+    std::cout << state_to_string(state) << '\n' << std::flush;
 }
 
 void Debug::log(Fighter::State state, int frame){

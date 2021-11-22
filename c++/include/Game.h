@@ -4,7 +4,7 @@
 #include "PlayerFighter.h"
 
 class Champion;
-
+class TextureFont;
 
 /**
  * @brief Contains all information needed to run a game, like the Stage and all in-game Entities.
@@ -30,6 +30,8 @@ class Game {
     void updateAnimations();
     void hitDetection();
 
+    void drawDebugInfo(TextureFont& font);
+
     int getFrame();
 
     private:
@@ -38,4 +40,7 @@ class Game {
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
     SDL_Rect camera;    ///< The area of the Stage that should be displayed.
     bool running;       ///Indicates if the game is actually running or not.
+
+    //Debug
+
 };

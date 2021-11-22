@@ -65,7 +65,12 @@ void Fighter::applyPhysics(){
 
     //Application des frictions
 
-    if (grounded) Kuribrawl::substractValue(&speed.x, model->val.traction);
+    if (grounded) {
+        Kuribrawl::substractValue(&speed.x, model->val.traction);
+    }   else {
+        Kuribrawl::substractValue(&speed.x, model->val.air_friction);
+    }
+
 
     //Applications des vitesses dues aux states
 
@@ -86,7 +91,6 @@ void Fighter::applyPhysics(){
     }
 
     const EntityFrame::FrameMovement& frame_movement = current_animation.getFrameMovement();
-    //Debug::log("Frame movement: ");
     applyFrameMovement(speed.x, frame_movement.x);
     applyFrameMovement(speed.y, frame_movement.y);
 

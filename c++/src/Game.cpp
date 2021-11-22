@@ -6,6 +6,8 @@
 #include "Debug.h"
 #include "CollisionBoxes.h"
 #include "DebugTime.h"
+#include "Text/TextureFont.h"
+#include "Text/TextDisplayer.h"
 
 using namespace std;
 
@@ -66,7 +68,7 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
  */
 bool Game::is_running(){
     return true;  
-}
+}   
 
 /**
  * @brief Displays the Game.
@@ -141,7 +143,6 @@ void Game::applyPhysics(){
  */
 void Game::advanceAnimations(){
     Fighteriterator it;
-    AnimationPlayer* anim;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->advanceAnimation();
     }
@@ -188,6 +189,18 @@ void Game::hitDetection(){
                 }
             }
         }
+    }
+}
+
+void Game::drawDebugInfo(TextureFont& font){
+    Fighteriterator it;
+    int y = 20;
+    int i = 1;
+    for (it = fighters.begin(); it != fighters.end(); ++it){
+        TextDisplayer td = TextDisplayer(20, y, font) << "Fighter " << i << " : " ;
+        it->drawDebugInfo(td);
+        y += 20;
+        i++;
     }
 }
 
