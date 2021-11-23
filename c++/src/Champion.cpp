@@ -1,6 +1,5 @@
 #include "Champion.h"
 #include "Debug.h"
-#include "EntityAnimation.h"
 
 #define DEFAULT_GRAVITY 0.6
 

@@ -236,6 +236,10 @@ void App::print_report(std::ostream& out){
 	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
 }
 
+void App::drawDebugInfo(){
+	//TextDisplayer(SCREEN_WIDTH - )
+}
+
 /**
  * @brief Stops the program.
  *
@@ -359,6 +363,8 @@ void App::loop() try {
 			SDLHelper::render(renderer);
 			frame++;
 		}
+
+
 
         loop_timer();
     }

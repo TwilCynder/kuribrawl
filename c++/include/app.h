@@ -97,4 +97,5 @@ class App
 
     //Debug
     std::unique_ptr<TextureFont> debugFont;
+    void drawDebugInfo();
 };
