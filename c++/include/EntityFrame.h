@@ -2,7 +2,7 @@
 #include <vector>
 #include "SDL2/SDL_rect.h"
 #include "CollisionBoxes.h"
-#include "util.h"
+#include "Util/util.h"
 
 using namespace Kuribrawl;
 

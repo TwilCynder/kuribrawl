@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <limits>
 #include "Debug.h"
 #include "sdlHelper.h"
 #include "app.h"
@@ -33,7 +34,8 @@ App::App(int framerate):
 	advance(false),
 	game_data(std::make_unique<GameData>()),
 	controllers_data(std::make_unique<ControllersData>()),
-	ports{Port(this), Port(this), Port(this), Port(this)}
+	ports{Port(this), Port(this), Port(this), Port(this)},
+	last_frames_wait(std::numeric_limits<Duration>::max())
 {
 	current_game = NULL;
 	setFrameRate(framerate);
@@ -184,7 +186,7 @@ void App::init(){
 	initialized = true;
 
 	debugFont = make_unique<TextureFont>(TextureFont("oracle.png", renderer, {8, 11}));
-	TextDisplayer(100, 100, *debugFont) << "Oui";
+	debug_text_displayer = make_unique<AnchoredTextDisplayer>(SCREEN_WIDTH - 88, 20, *debugFont);
 }
 
 void App::close(){
@@ -236,8 +238,18 @@ void App::print_report(std::ostream& out){
 	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
 }
 
+Duration App::getLowestWait(){
+	Duration min = std::numeric_limits<Duration>::max();
+	for (Duration d : last_frames_wait){
+		if (d < min) min = d;
+	}
+
+	return min;
+}
+
 void App::drawDebugInfo(){
-	//TextDisplayer(SCREEN_WIDTH - )
+	debug_text_displayer->reset();
+	*debug_text_displayer << getLowestWait();
 }
 
 /**
@@ -327,12 +339,14 @@ void App::update_frame_duration(){
  */
 void App::loop_timer(){
 	Date current_date = System::now();
-	Date wait = next_frame_date - current_date;
+	Duration wait = next_frame_date - current_date;
 	if (wait < 0){
 		next_frame_date = current_date;
 	} else {
 		SDL_Delay(wait);
 	}
+
+	last_frames_wait.add(wait);
 
 	total_frame_wait += wait;
 }
@@ -360,11 +374,10 @@ void App::loop() try {
 				current_game->step(renderer);
 				current_game->drawDebugInfo(*debugFont);
 			}
+			drawDebugInfo();
 			SDLHelper::render(renderer);
 			frame++;
 		}
-
-
 
         loop_timer();
     }

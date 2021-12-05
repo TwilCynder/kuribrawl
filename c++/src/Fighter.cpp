@@ -194,7 +194,11 @@ void Fighter::draw(SDL_Renderer* target){
 
     //Drawing hurtboxes
     const std::vector<Hurtbox>& hurtboxes = current_animation.getHurtboxes();
-    SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
+    if (state == State::HITSTUN){
+        SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
+    } else {
+        SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
+    }
     for (unsigned int i = 0; i < hurtboxes.size(); i++){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;

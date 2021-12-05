@@ -1,7 +1,7 @@
 #pragma once
 #include "Fighter.h"
 #include "ControllerType.h"
-#include "util.h"
+#include "Util/util.h"
 #include "inputs.h"
 
 #define CONTROL_STICK_FRAME_BUFFER 1 //TODO make it customizable ?

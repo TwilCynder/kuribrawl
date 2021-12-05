@@ -3,7 +3,7 @@
 #include "Binding.h"
 #include "ControllerLayout.h"
 #include "ControllerVals.h"
-#include "util.h"
+#include "Util/util.h"
 #include <SDL2/SDL_types.h>
 
 #define DEFAULT_NB_BUTTONS 24
