@@ -7,3 +7,7 @@ double GameCalc::getKnockback(int percentage, double bkb, double skb, double wei
     //return bkb + (((percentage * weight) +KNOCKBACK_BASE) * skb * KNOCKBACK_MULT);
     return 10.0;
 }
+
+int GameCalc::getHitLag(double damage){
+    return 6;
+}

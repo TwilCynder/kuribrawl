@@ -1,5 +1,5 @@
 #include "EntityFrame.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 
 /**
  * @brief Construct a new Frame object

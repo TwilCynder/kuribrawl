@@ -1,6 +1,5 @@
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
-#include "Debug.h"
 
 TextDisplayer::TextDisplayer(int x, int y, TextureFont& font_) :
     pos{x, y},

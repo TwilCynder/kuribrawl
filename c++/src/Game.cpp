@@ -1,11 +1,11 @@
 #include <iostream>
 #include <vector>
 #include "Game.h"
-#include "util.h"
+#include "Util/util.h"
 #include "Champion.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "CollisionBoxes.h"
-#include "DebugTime.h"
+#include "KBDebug/DebugTime.h"
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
 

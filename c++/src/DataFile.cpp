@@ -1,13 +1,13 @@
 #include <string.h>
 #include "SDL2/SDL_error.h"
 #include "DataFile.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Champion.h"
 #include "App.h"
 #include "GameData.h"
-#include "util.h"
+#include "Util/util.h"
 
 #define FILE_SIGNATURE 0x54545454
 #include "fileMarkers.h"

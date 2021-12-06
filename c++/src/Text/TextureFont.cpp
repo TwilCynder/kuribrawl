@@ -1,5 +1,5 @@
 #include "Text/TextureFont.h"
-#include "Debug.h"
+#include <string>
 
 TextureFont::TextureFont(SDL_Texture* sheet_, SDL_Renderer* renderer_, const Kuribrawl::Rect& char_size_):
     char_sheet(sheet_),

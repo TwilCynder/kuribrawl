@@ -1,11 +1,11 @@
 #include <iostream>
 #include "SDL2/SDL.h"
 #include "app.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "Random.h"
 #include "messageBox.h"
 #include <ctime>
-#include "DebugTime.h"
+#include "KBDebug/DebugTime.h"
 
 int main(int argc, char** argv) try {
 

@@ -1,4 +1,4 @@
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "EntityAnimationPlayer.h"
 #include "EntityAnimation.h"
 

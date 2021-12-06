@@ -1,5 +1,5 @@
 #include "EntityAnimation.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 
 EntityAnimation::EndActionData::EndActionData(const EntityAnimation* anim) : next_anim(anim) {}
 EntityAnimation::EndActionData::EndActionData(int code_) : code(code_) {}

@@ -3,7 +3,7 @@
 #include <math.h>
 #include "AnimationPlayer.h"
 #include "Animation.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "Frame.h"
 
 /**

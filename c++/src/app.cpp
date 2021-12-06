@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <limits>
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "sdlHelper.h"
 #include "app.h"
 #include "defs.h"

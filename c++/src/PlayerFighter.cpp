@@ -2,7 +2,7 @@
 #include "InputManager.h"
 #include "Port.h"
 #include "PortOptimizationData.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "macros.h"
 #include "Champion.h"
 #include "controllerElements.h"

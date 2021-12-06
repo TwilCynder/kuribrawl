@@ -1,6 +1,6 @@
 #pragma once
-#include <exception>
 #include <string>
+#include <exception>
 
 /**
  * \brief Exception representing a fatal error that stops Solarus.

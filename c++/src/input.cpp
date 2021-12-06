@@ -1,5 +1,4 @@
 #include "input.h"
-#include "Debug.h"
 
 /**
  * @brief Construct a new Registered Input object

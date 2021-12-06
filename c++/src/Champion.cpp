@@ -1,5 +1,5 @@
 #include "Champion.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 
 #define DEFAULT_GRAVITY 0.6
 

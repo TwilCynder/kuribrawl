@@ -1,8 +1,8 @@
-#include "Debug.h"
-#include "DebugState.h"
+#include "KBDebug/Debug.h"
+#include "KBDebug/DebugState.h"
 #include "Fighter.h"
 #include "defs.h"
-#include "util.h"
+#include "Util/util.h"
 #include "Champion.h"
 #include "CollisionBoxes.h"
 #include "Move.h"
@@ -115,6 +115,7 @@ bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim, double 
 }
 
 void Fighter::advanceAnimation(){
+    if (paused) return;
     current_animation.advance();
 }
 
@@ -180,6 +181,11 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
 
     /*Choix de l'animation de hitstun*/
     setAnimation(Champion::DefaultAnimation::HITSTUN);
+
+    //Hitlag
+    int hitLag = GameCalc::getHitLag(hitbox.damage);
+    attacker.paused = hitLag;
+    paused = hitLag;
 }
 
 /**
@@ -351,7 +357,10 @@ void Fighter::checkStateDuration(){
  */
 void Fighter::updateState(){
 
-    if (paused) return;
+    if (paused > 0){
+        --paused;
+        return;
+    }
     ++state_timer;
 
     switch (state){
@@ -421,14 +430,14 @@ void Fighter::updateAnimation(){
                 model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
                 (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
             if (anim)
-                current_animation.setAnimation(anim);
+                setAnimation(anim);
             break;
         case State::HITSTUN:
             break;
         default:
             anim = model->getDefaultAnimation((Champion::DefaultAnimation)state);
             if (anim)
-                current_animation.setAnimation(anim);
+                setAnimation(anim);
     }
 }
 
@@ -484,6 +493,7 @@ void Fighter::setState(const Fighter::State s, int facing_, int info, bool updat
     if (facing_) facing = facing_;
 
     state_timer = 0;
+    paused = 0;
     checkStateDuration();
 }
 
@@ -495,7 +505,7 @@ void Fighter::setState(const Fighter::State s, int facing, int info, Champion::D
 void Fighter::startMove(const Move& move){
     current_move = &move;
     if (move.animation){
-        current_animation.setAnimation(move.animation);
+        setAnimation(move.animation);
     }
 }
 

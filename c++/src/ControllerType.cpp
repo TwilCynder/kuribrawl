@@ -1,5 +1,5 @@
 #include "ControllerType.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "Binding.h"
 
 /**
