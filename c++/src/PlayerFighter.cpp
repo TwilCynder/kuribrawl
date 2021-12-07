@@ -14,7 +14,7 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model):
     Fighter(game, model),
     port(nullptr),
     valid_port(false),
-    input_manager(std::make_unique<InputManager>(this))
+    input_manager(this)
 {
     init_control_stick_buffer();
 }
@@ -24,7 +24,7 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     Fighter(game, model, x, y),
     port(nullptr),
     valid_port(false),
-    input_manager(std::make_unique<InputManager>(this))
+    input_manager(this)
 {
     init_control_stick_buffer();
 }
@@ -110,18 +110,18 @@ void PlayerFighter::init_control_stick_buffer(){
 void PlayerFighter::handleButtonPress(int button){
     Input input = input_binding->buttons[button];
     if (input != Input::NONE)
-    input_manager->registerInput(input, port, button, ElementType::BUTTON, 0);
+    input_manager.registerInput(input, port, button, ElementType::BUTTON, 0);
 }
 
 void PlayerFighter::handleTriggerPress(int trigger){
     Input input = input_binding->triggers[trigger];
     if (input != Input::NONE)
-    input_manager->registerInput(input, port, trigger, ElementType::TRIGGER, 0);
+    input_manager.registerInput(input, port, trigger, ElementType::TRIGGER, 0);
 }
 
 void PlayerFighter::handleStickFlick(Direction direction){
     if (input_binding->second_stick != Input::NONE){
-        input_manager->registerInput(input_binding->second_stick, port, 0, ElementType::STICK, 1 addBitValue((int)direction, 1));
+        input_manager.registerInput(input_binding->second_stick, port, 0, ElementType::STICK, 1 addBitValue((int)direction, 1));
     }
 }
 
@@ -133,14 +133,14 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     {
         //Smash input right
 		Debug::log("Smash Input Right");
-        input_manager->registerInput(Input::RIGHT, port, -1, ElementType::STICK);
+        input_manager.registerInput(Input::RIGHT, port, -1, ElementType::STICK);
     } else if (current_state.x < -current_controller_vals.analogStickSmashThreshold
         && previous_state.x > -current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer[0].x != -1)
     {
         //Smash input left
 		Debug::log("Smash Input Left");
-        input_manager->registerInput(Input::LEFT, port, -1, ElementType::STICK);
+        input_manager.registerInput(Input::LEFT, port, -1, ElementType::STICK);
     }
 
     if (current_state.y > current_controller_vals.analogStickSmashThreshold
@@ -149,14 +149,14 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     {
         //Smash input right
 		Debug::log("Smash Input Down");
-        input_manager->registerInput(Input::DOWN, port, -1, ElementType::STICK);
+        input_manager.registerInput(Input::DOWN, port, -1, ElementType::STICK);
     } else if (current_state.y < -current_controller_vals.analogStickSmashThreshold
         && previous_state.y > -current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer[0].y != -1)
     {
         //Smash input left
 		Debug::log("Smash Input UP");
-        input_manager->registerInput(Input::UP, port, -1, ElementType::STICK);
+        input_manager.registerInput(Input::UP, port, -1, ElementType::STICK);
     }
 
     if (current_state.x > current_controller_vals.analogStickThreshold){
@@ -295,15 +295,15 @@ void PlayerFighter::updateInputsStates(){
  */
 void PlayerFighter::resolveInputs(){
     checkStickState();
-    input_manager->updateInputs();
+    input_manager.updateInputs();
 }
 
 /**
  * @brief returns the InputManager used by this Fighter.
  * @return InputManager*
  */
-InputManager* PlayerFighter::getInputManager() const{
-    return input_manager.get();
+const InputManager* PlayerFighter::getInputManager() const{
+    return &input_manager;
 }
 
 /**
@@ -346,7 +346,7 @@ jumpX PlayerFighter::decideJumpXType() const {
 
 int PlayerFighter::handleInput(RegisteredInput& input){
     InputHandler handler = input_handlers[input.input];
-    return (handler) ? !(this->*handler)(input) : 0;
+    return (handler) ? (this->*handler)(input) : 0;
 }
 
 int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
@@ -361,100 +361,4 @@ int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
     }
 
     return 0;
-}
-
-int PlayerFighter::InputHandler_Jump(RegisteredInput& input){
-    return jump_manager(input, jumpY::Full);
-}
-
-int PlayerFighter::InputHandler_ShortHop(RegisteredInput& input){
-    return jump_manager(input, jumpY::Short);
-}
-
-
-int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
-
-    int side = (input.input == Input::LEFT) ? -1 : 1;
-
-    if (grounded){
-        if (state == Fighter::State::WALK ||
-            state == Fighter::State::IDLE ||
-            state == Fighter::State::LANDING ||
-            (state == Fighter::State::DASH_START && side == -facing))
-        {
-            setState(Fighter::State::DASH_START, side);
-        } else if ((state == Fighter::State::DASH || state == Fighter::State::DASH_STOP) &&
-            side == -facing)
-        {
-            setState(Fighter::State::DASH_TURN, side);
-        }
-    }
-
-    return 0;
-}
-
-int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
-
-    using Move = Champion::DefaultMoves;
-    DirectionIG direction;
-    Move move;
-    if (!grounded){
-
-        direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
-
-        switch (direction){
-            case DirectionIG::NONE:
-                Debug::log("Nair");
-                move = Move::Nair;
-                break;
-            case DirectionIG::UP:
-                Debug::log("Uair");
-                move = Move::UAir;
-                break;
-            case DirectionIG::DOWN:
-                move = Move::Nair;
-                Debug::log("Dair");
-                break;
-            case DirectionIG::FORWARD:
-                move = Move::Nair;
-                Debug::log("Fair");
-                break;
-            case DirectionIG::BACK:
-                move = Move::Nair;
-                Debug::log("Bair");
-                break;
-            default:
-                break;
-        }
-
-        attack(*getChampion().getDefaultMove(move));
-    }
-
-    return 0;
-}
-
-int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
-    if (!grounded && speed.y < 0.0){
-        speed.y = - (getChampion().val.fast_fall_speed);
-    }
-    return 0;
-}
-
-int PlayerFighter::InputHandler_SmashStickUp(RegisteredInput& input){
-    if (input_binding->tap_jump){
-        jump_manager(input, jumpY::Full);
-    }
-    return 0;
-}
-
-PlayerFighter::InputHandler PlayerFighter::input_handlers[Input::TOTAL];
-
-void PlayerFighter::initInputHandlers(){
-    input_handlers[Input::JUMP] = &InputHandler_Jump;
-    input_handlers[Input::SHORTHOP] = &InputHandler_ShortHop;
-    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
-    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
-    input_handlers[Input::DOWN] = &InputHandler_SmashStickDown;
-    input_handlers[Input::UP] = &InputHandler_SmashStickUp;
-    input_handlers[Input::ATTACK] = &InputHandler_Attack;
 }

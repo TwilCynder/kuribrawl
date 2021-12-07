@@ -1,4 +1,5 @@
 #include "Util/util.h"
+#include "KBDebug/Debug.h"
 #include <cmath>
 
 using namespace Kuribrawl;

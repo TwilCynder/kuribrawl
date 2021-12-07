@@ -7,10 +7,6 @@
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
 void Fighter::applyAirAccel(int direction){
-    Debug::log(direction);
-    Debug::log(speed.x);
-    Debug::log(model->val.max_air_speed);
-    Debug::log(model->val.air_acceleration);
 	if (!(Kuribrawl::sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
 		speed.x += model->val.air_acceleration * direction;
 		if (speed.x > model->val.max_air_speed)
@@ -18,7 +14,6 @@ void Fighter::applyAirAccel(int direction){
 		else if (speed.x < -model->val.max_air_speed)
 			speed.x = -model->val.max_air_speed;
 	}
-    Debug::log(speed.x);
 }
 
 /**
@@ -56,7 +51,6 @@ void Fighter::land(){
  *
  */
 void Fighter::applyPhysics(){
-
     if (paused) return;
 
     Kuribrawl::VectorDouble new_pos;
@@ -72,11 +66,9 @@ void Fighter::applyPhysics(){
 
     if (grounded) {
         Kuribrawl::substractValue(&speed.x, model->val.traction);
-    }   else {
-        Debug::log(model->val.air_friction);
+    } else {
         Kuribrawl::substractValue(&speed.x, model->val.air_friction);
     }
-
 
     //Applications des vitesses dues aux states
 
