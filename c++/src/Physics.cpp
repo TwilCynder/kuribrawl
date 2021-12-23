@@ -1,8 +1,8 @@
 #include <math.h>
 #include "Fighter.h"
 #include "Champion.h"
-#include "Debug.h"
-#include "util.h"
+#include "KBDebug/Debug.h"
+#include "Util/util.h"
 
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
@@ -51,7 +51,6 @@ void Fighter::land(){
  *
  */
 void Fighter::applyPhysics(){
-
     if (paused) return;
 
     Kuribrawl::VectorDouble new_pos;
@@ -67,10 +66,9 @@ void Fighter::applyPhysics(){
 
     if (grounded) {
         Kuribrawl::substractValue(&speed.x, model->val.traction);
-    }   else {
+    } else {
         Kuribrawl::substractValue(&speed.x, model->val.air_friction);
     }
-
 
     //Applications des vitesses dues aux states
 

@@ -1,6 +1,6 @@
 #include "app.h"
 #include "SDL2/SDL_image.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "ControllerType.h"
 #include "Fighter.h"
 #include "Game.h"

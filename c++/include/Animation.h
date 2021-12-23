@@ -2,7 +2,7 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "Frame.h"
-#include "util.h"
+#include "Util/util.h"
 
 using namespace Kuribrawl;
 struct Frame;

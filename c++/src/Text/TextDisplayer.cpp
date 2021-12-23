@@ -1,6 +1,5 @@
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
-#include "Debug.h"
 
 TextDisplayer::TextDisplayer(int x, int y, TextureFont& font_) :
     pos{x, y},
@@ -18,6 +17,11 @@ TextDisplayer& TextDisplayer::operator<<(const std::string& s){
 }
 
 TextDisplayer& TextDisplayer::operator<<(double d){
+    displayString(std::to_string(d));
+    return *this;
+}
+
+TextDisplayer& TextDisplayer::operator<<(long double d){
     displayString(std::to_string(d));
     return *this;
 }
@@ -49,17 +53,28 @@ void TextDisplayer::advance(int x_){
     pos.x += x_;
 }
 
-TextDisplayer::SetPositionData TextDisplayer::changePos(int x, int y){
+TextDisplayer::SetPositionData TextDisplayer::position(int x, int y){
     return {x, y};
 }
 
-TextDisplayer& TextDisplayer::operator<<(TextDisplayer::SetPositionData& new_pos){
+TextDisplayer& TextDisplayer::operator<<(TextDisplayer::SetPositionData&& new_pos){
     pos = new_pos;
     return *this;
 }
 
+AnchoredTextDisplayer::AnchoredTextDisplayer(int x, int y, TextureFont& font) : 
+    TextDisplayer(x, y, font),
+    orig_pos {x, y}
+{
+}
+
+void AnchoredTextDisplayer::reset(){
+    pos.x = orig_pos.x;
+    pos.y = orig_pos.y;
+}
+
 AdvancedTextDisplayer::AdvancedTextDisplayer(int x, int y, TextureFont& font):
-    TextDisplayer(x, y, font)
+    AnchoredTextDisplayer(x, y, font)
 {
 }
 

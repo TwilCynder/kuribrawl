@@ -1,5 +1,6 @@
 #include "input.h"
-#include "Debug.h"
+
+constexpr int INPUT_DURABILITY = 10;
 
 /**
  * @brief Construct a new Registered Input object
@@ -16,6 +17,6 @@ RegisteredInput::RegisteredInput(Input input_, Port* port_, int element_ = -1, E
     element(element_),
     element_type(element_type_),
     data(data_),
-    durability(3)
+    durability(INPUT_DURABILITY)
 {   
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Fighter.h"
 #include "ControllerType.h"
-#include "util.h"
+#include "Util/util.h"
 #include "inputs.h"
 
 #define CONTROL_STICK_FRAME_BUFFER 1 //TODO make it customizable ?
@@ -45,7 +45,7 @@ class PlayerFighter : public Fighter {
     using InputHandler = int (PlayerFighter::*)(RegisteredInput&); ///< Function applying the effect of an Input to a Fighter.  
 
     private:
-    InputManager* getInputManager() const;
+    const InputManager* getInputManager() const;
     //Inputs
     void checkStickState();
     void init_control_stick_buffer();
@@ -67,7 +67,8 @@ class PlayerFighter : public Fighter {
     ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port;
-    std::unique_ptr<InputManager> input_manager;    ///< InputManager used to process the input made by the Port.
+    friend class InputManager;
+    InputManager input_manager;    ///< InputManager used to process the input made by the Port.
     Vector control_stick_buffer[CONTROL_STICK_FRAME_BUFFER];
     Vector current_direction_control_state;
 
@@ -80,4 +81,10 @@ class PlayerFighter : public Fighter {
     int InputHandler_SmashStickDown(RegisteredInput& input);
     int InputHandler_SmashStickUp(RegisteredInput& input);
     int InputHandler_Attack(RegisteredInput& input);
+
+    enum InputHandlerResult {
+        HANDLED,
+        DISMISSED,
+        POSTPONE
+    };
 };

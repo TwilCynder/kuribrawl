@@ -1,5 +1,5 @@
 #include "AnimationsPool.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "Animation.h"
 #include "EntityAnimation.h"
 

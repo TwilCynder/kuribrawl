@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 #include "SDL2/SDL.h"
-#include "util.h"
+#include "Util/util.h"
 #include "AnimationsPool.h"
 #include "Move.h"
 #include "EntityAnimation.h"

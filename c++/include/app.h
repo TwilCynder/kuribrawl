@@ -8,6 +8,8 @@
 #include "Animation.h"
 #include "GameData.h"
 #include "Text/TextureFont.h"
+#include "Text/TextDisplayer.h"
+#include "Util/StaticFullQueue.h"
 
 #define NB_PORTS 4
 
@@ -20,6 +22,8 @@ class ControllersData;
  * @brief A number of miliseconds elapsed since SDL initialization
  */
 typedef long double Date;
+
+typedef long double Duration;
 
 /**
  * @brief An instance of the program.
@@ -91,11 +95,14 @@ class App
     std::vector<Port> ports; ///< Currently active Ports.
 
     //Performance test
+    StaticFullQueue<Duration, 60> last_frames_wait;
+    Duration getLowestWait();
     int frame; ///< Number of frames displayed since the loop was started.
     int total_frame_wait;
     void print_report(std::ostream& out);
 
     //Debug
     std::unique_ptr<TextureFont> debugFont;
+    std::unique_ptr<AnchoredTextDisplayer> debug_text_displayer;
     void drawDebugInfo();
 };

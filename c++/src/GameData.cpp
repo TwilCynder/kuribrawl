@@ -1,6 +1,6 @@
 #include <memory>
 #include "GameData.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 
 /**
  * @brief Returns the Champion associated with the given name.

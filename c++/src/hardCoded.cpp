@@ -2,7 +2,7 @@
 #include "GameData.h"
 #include "CollisionBoxes.h"
 #include "inputs.h"
-#include "Debug.h"
+#include "KBDebug/Debug.h"
 #include "SDL2/SDL_gamecontroller.h"
 #include "SDL2/SDL_image.h"
 

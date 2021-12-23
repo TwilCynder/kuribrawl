@@ -1,5 +1,5 @@
 #pragma once
-#include "util.h"
+#include "Util/util.h"
 #include "SDL2/SDL_types.h"
 
 /**

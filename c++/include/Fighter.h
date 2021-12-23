@@ -4,11 +4,11 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "EntityAnimationPlayer.h"
-#include "util.h"
+#include "Util/util.h"
 #include "InputManager.h"
 #include "gameActions.h"
 #include "Champion.h"
-#include "StaticList.h"
+#include "Util/StaticList.h"
 
 #define MAX_FIGHTERS_HIT 12
 

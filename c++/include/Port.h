@@ -4,7 +4,7 @@
 #include "PlayerFighter.h"
 #include "ControllerType.h"
 #include "inputs.h"
-#include "util.h"
+#include "Util/util.h"
 #include "PortOptimizationData.h"
 
 #define JOSTICKID_KEYBOARD -1

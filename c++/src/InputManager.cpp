@@ -1,6 +1,6 @@
 #include "InputManager.h"
-#include "Debug.h"
-#include "DebugInput.h"
+#include "KBDebug/Debug.h"
+#include "KBDebug/DebugInput.h"
 #include "PlayerFighter.h"
 #include "macros.h"
 
@@ -29,15 +29,30 @@ void InputManager::registerInput(Input input, Port* port, int element, ElementTy
 
 /**
  * @brief Updates all registered Inputs, attempting to apply their effect.
- * Decrements the durability of all registered inputs.
+ * Handles the result of the input handler if there is one for this type of input.  
+ * These results can be :   
+ * - 0 : nothing was done by the handler, the input durability is decreased
+ * - 1 : the input was handled
  */
 void InputManager::updateInputs(){
+    using Result = PlayerFighter::InputHandlerResult;
     std::deque<RegisteredInput>::iterator it;
     for (it = inputQ.begin(); it != inputQ.end();){
-        if (fighter->handleInput(*it)){
-            it = inputQ.erase(it);
-        } else {
-            ++it;
+        switch (fighter->handleInput(*it)){
+            case Result::HANDLED:
+                it = inputQ.erase(it);
+                break;
+            case Result::DISMISSED:
+                --(it->durability);
+                if (it->durability <= 0){
+                    it = inputQ.erase(it);
+                } else {
+                    ++it;
+                }
+                break;
+            default:
+                ++it; 
+                break;
         }
     }
 }

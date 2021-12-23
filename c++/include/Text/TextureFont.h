@@ -3,7 +3,7 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
-#include "util.h"
+#include "Util/util.h"
 
 class TextureFont {
     public:
