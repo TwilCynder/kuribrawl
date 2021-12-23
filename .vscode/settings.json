@@ -58,5 +58,8 @@
         "ratio": "cpp",
         "*.enum": "cpp",
         "bitset": "cpp"
-    }
+    },
+    "java.project.sourcePaths": [
+        "tools\\editor\\javaEditor\\src"
+    ]
 }
