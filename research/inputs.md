@@ -1,4 +1,4 @@
-REMPLACER LES FIGHTER* DES INPUT HANDLERS PAR DES PLAYERFIGHTER*
+REMPLACER LES FIGHTER* DES INPUT HANDLERS PAR DES PLAYERFIGHTER* (fait)
 
 Deux types de bindings : 
 - Menu binding (mappage entre signfication générale d'un bouton pour les menus et button id)

@@ -153,7 +153,7 @@ int Fighter::getFacing() const{
 }
 
 bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox& hurtbox){
-    if (last_hit != hitbox.hit){
+    if (last_hit < hitbox.hit){
         fighters_hit.clear();
         last_hit = hitbox.hit;
     } else {
@@ -167,7 +167,7 @@ bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox&
 }
 
 void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox) {
-    double knockback = GameCalc::getKnockback(0, 0, 0, 0);
+    double knockback = GameCalc::getKnockback(0, 0, 0, 0) * 2;
     double angle = PI * 3 / 8;
     if (attacker.facing < 0){
         angle = (PI - angle);
@@ -391,7 +391,7 @@ void Fighter::updateState(){
             break;
         case State::HITSTUN:    //State info is the hitstun duration
             if (state_timer >= state_info) {
-                setState(State::IDLE);
+                setState(State::IDLE, 0, 2, Champion::DefaultAnimation::AIR_HITSTUN_TO_IDLE);
             }
             break;
         case State::ATTACK:

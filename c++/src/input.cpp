@@ -18,5 +18,5 @@ RegisteredInput::RegisteredInput(Input input_, Port* port_, int element_ = -1, E
     element_type(element_type_),
     data(data_),
     durability(INPUT_DURABILITY)
-{   
+{
 }

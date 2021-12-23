@@ -7,6 +7,7 @@
 #include "SDL2/SDL_syswm.h"
 #include "Animation.h"
 #include "GameData.h"
+#include "GameManager.h"
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
 #include "Util/StaticFullQueue.h"
@@ -90,12 +91,13 @@ class App
     SDL_SysWMinfo win_info; ///< Structure containing info about the main window.
     SDL_Renderer* renderer; ///< The SDL renderer used to render this app.
 
-    Game* current_game; ///< The Game that is currently running, if there is any. Pointer validity : is invalitated when the game is destroyed (everytime a game ends) .*/
+    GameManager game_manager;
+    //Game* current_game; 
 
     std::vector<Port> ports; ///< Currently active Ports.
 
     //Performance test
-    StaticFullQueue<Duration, 60> last_frames_wait;
+    StaticFullQueue<Duration, 30> last_frames_wait;
     Duration getLowestWait();
     int frame; ///< Number of frames displayed since the loop was started.
     int total_frame_wait;

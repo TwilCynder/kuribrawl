@@ -60,7 +60,28 @@ void Fighter::applyPhysics(){
     if (abs(speed.x) < MAX_SPEED_PRECISION) speed.x = 0;
     if (abs(speed.y) < MAX_SPEED_PRECISION) speed.y = 0;
 
+    
+
+
+
+if (speed.y > -model->val.max_fall_speed){
     speed.y -= model->val.gravity;
+
+    if (speed.y < -model->val.max_fall_speed){
+        speed.y = -model->val.max_fall_speed;
+    } 
+}/*
+      If *fighter\state = #STATE_HITSTUN
+        *fighter\physics\v\y - #HITSTUN_GRAVITY
+      Else
+        *fighter\physics\v\y - #GRAVITY
+      EndIf   
+      If *fighter\physics\v\y < -*fighter\character\maxFallSpeed
+        *fighter\physics\v\y = -*fighter\character\maxFallSpeed
+      EndIf 
+    EndIf 
+
+*/
 
     //Application des frictions
 

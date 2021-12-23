@@ -37,7 +37,6 @@ App::App(int framerate):
 	ports{Port(this), Port(this), Port(this), Port(this)},
 	last_frames_wait(std::numeric_limits<Duration>::max())
 {
-	current_game = NULL;
 	setFrameRate(framerate);
 }
 
@@ -202,7 +201,7 @@ void App::close(){
 
 void App::render(){
 	SDLHelper::prepareRender(this->renderer);
-	if (current_game && current_game->is_running()){
+	if (game_manager.get() && game_manager->is_running()){
 	}
 	SDLHelper::render(this->renderer);
 }
@@ -370,9 +369,9 @@ void App::loop() try {
 			advance = false;
 			readPorts();
 			SDLHelper::prepareRender(renderer);
-			if (current_game && current_game->is_running()){
-				current_game->step(renderer);
-				current_game->drawDebugInfo(*debugFont);
+			if (game_manager.get() && game_manager->is_running()){
+				game_manager->step(renderer);
+				game_manager->drawDebugInfo(*debugFont);
 			}
 			drawDebugInfo();
 			SDLHelper::render(renderer);

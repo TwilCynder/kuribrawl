@@ -25,6 +25,8 @@ class Champion : public AnimationsPool<EntityAnimation> {
         AIR_IDLE,
         JUMP,
         AIR_JUMP,
+        AIR_HITSTUN_TO_IDLE,
+        AIR_IDLE_AFTER_HIT,
         TOTAL
     };
 
@@ -49,7 +51,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     };
 
     /**
-     * @brief Base position and size of this Charater's shield.
+     * @brief Base position and size of a Charater's shield.
      *
      */
     struct ShieldInfo : Kuribrawl::VectorT<int8_t> {
@@ -97,6 +99,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     Champion(const std::string& name_);
     const std::string& getName();
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
+    void setDefaultAnimation(const DefaultAnimation state, const EntityAnimation* anim);
     void initDefaultAnimations();
     void initDefaultMoves();
     void finalizeMoves();

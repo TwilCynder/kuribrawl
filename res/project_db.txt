@@ -26,5 +26,9 @@ air_jump.png
 A:acid/air_jump 8 0.25 c
 uair.png
 A:acid/uair uair.dat
+air_hurt_to_idle.png
+A:acid/air_hurt_to_idle 7 0.4 c
+air_idle_after_hurt.png
+A:acid/air_idle_after_hurt 1 -1 c
 acid_rainbows.dat
 C:acid

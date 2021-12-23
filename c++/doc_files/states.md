@@ -1,6 +1,6 @@
 Name|Description|Infos
 -|-|-
-IDLE|Basic state.|1 if just jumped.
+IDLE|Basic state.|1 if just jumped, 2 if just got hit
 GUARD|Shield|*none*
 GUARD_START|Shield start (the shield hasn't came out yet)|Duration 
 GUARD_STOP|Shield endlag (the shield is already gone)|Duration

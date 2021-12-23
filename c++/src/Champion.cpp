@@ -120,6 +120,11 @@ const EntityAnimation* Champion::getDefaultAnimation(const DefaultAnimation anim
     return default_animations[(int)anim];
 }
 
+void Champion::setDefaultAnimation(const DefaultAnimation default_anim, const EntityAnimation* anim){
+    if (default_anim >= DefaultAnimation::TOTAL) throw KBFatal("Wrong default_anim");
+    default_animations[(int)default_anim] = anim;
+}
+
 void Champion::finalizeMoves(){
     const EntityAnimation* anim;
     for (auto& [name, move] : moves){
@@ -137,7 +142,7 @@ void Champion::finalizeMoves(){
  */
 
 void Champion::initDefaultAnimations(){
-    EntityAnimation* anim;
+    EntityAnimation *anim, *anim2;
 
     for (auto const& [state, name] : default_animation_name){
         if ((anim = (EntityAnimation*)getAnimation(name))){
@@ -152,6 +157,18 @@ void Champion::initDefaultAnimations(){
     }
     if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_JUMP))){
         anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
+    }
+
+    anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_IDLE_AFTER_HIT);
+    if (!anim){
+        anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_IDLE);
+    }
+
+    anim2 = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_HITSTUN_TO_IDLE); 
+    if (anim2){ //there is a air_hurt_to_idle animation
+        anim2->setEndAction(anim);
+    } else {
+        setDefaultAnimation(DefaultAnimation::AIR_HITSTUN_TO_IDLE, anim);
     }
 }
 
@@ -180,7 +197,9 @@ const std::map<Champion::DefaultAnimation, std::string> Champion::default_animat
     {Champion::DefaultAnimation::JUMP, "jump"},
     {Champion::DefaultAnimation::AIR_IDLE, "air_idle"},
     {Champion::DefaultAnimation::AIR_JUMP, "air_jump"},
-    {Champion::DefaultAnimation::HITSTUN, "hurt"}
+    {Champion::DefaultAnimation::HITSTUN, "hurt"},
+    {Champion::DefaultAnimation::AIR_HITSTUN_TO_IDLE, "air_hurt_to_idle"},
+    {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, "air_idle_after_hurt"}
 };
 
 const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name = {

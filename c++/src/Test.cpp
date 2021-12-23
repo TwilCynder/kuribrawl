@@ -13,6 +13,8 @@ void App::startTestGame(){
 
 	current_game = new Game();
 
+	game_manager = 
+
 	Champion* acid = game_data->getChampion("acid");
 
 	ports[0].plugController(-1, this->controllersData());
@@ -21,4 +23,6 @@ void App::startTestGame(){
 	current_game->addFighter(acid, 500, 1);
 
 	//ports[0].setFighter(f1);
+
+	Debug::log(game_manager.get());
 }
