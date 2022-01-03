@@ -42,7 +42,7 @@ class App
     void init();
     void close();
     void loop();
-    void stop(int code);
+    void stop();
 
     GameData& gameData();
     ControllersData& controllersData();
@@ -82,6 +82,8 @@ class App
     double frame_duration; ///< Duration of a frame in miliseconds
     bool paused;
     bool advance;
+
+    bool quit;
 
     //Data singletons
     std::unique_ptr<GameData> game_data; //*< the GameData (all the data related to gameplay) that will be used for games ran by this App.

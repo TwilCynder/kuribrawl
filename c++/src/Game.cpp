@@ -6,8 +6,11 @@
 #include "KBDebug/Debug.h"
 #include "CollisionBoxes.h"
 #include "KBDebug/DebugTime.h"
+#include "GameConfiguration.h"
+#include "PlayerConfiguration.h"
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
+#include "defs.h"
 
 using namespace std;
 
@@ -17,8 +20,47 @@ using namespace std;
  *
  */
 Game::Game():
-    frame(0)
+    frame(0),
+    original_config(nullptr)
 {
+}
+
+Game::Game(GameConfiguration& config) :
+    Game()
+{
+    Debug::log("Constructed Game using config object");
+    applyConfig(config);
+    original_config = std::make_shared<GameConfiguration>(config);
+}
+
+Game::Game(GameConfSPtr& config_sptr) : 
+    Game()
+{
+    Debug::log("Constructed Game using existing sptr to config object");
+    original_config = config_sptr;
+    applyConfig(*config_sptr);
+}
+
+Game::~Game(){
+    Debug::log("Game destroyed");
+}
+
+void Game::applyConfig(GameConfiguration& config){
+    //Appliquer règles
+
+    int w = SCREEN_WIDTH;
+    int step = w / config.players.size();
+    int x = step / 2;
+
+    for (PlayerConfiguration& player : config.players){
+        if (player.port != nullptr){
+            addFighter(&player.champion, x, 100, *player.port);
+        } else {
+            addFighter(&player.champion, x, 100);
+        }
+        x += step;
+    }
+
 }
 
 /**
@@ -220,6 +262,29 @@ void Game::step(SDL_Renderer* render_target){
     draw(render_target);
     advanceAnimations();
     frame++;
+}
+
+Game::Result::Result() : 
+    completed(false),
+    original_config(nullptr)
+{}
+
+Game::Result::Result(bool completed_, GameConfSPtr&& config_) : 
+    completed(completed_),
+    original_config(config_)
+{}
+
+Game::Result Game::stop(){
+    Result res(true, std::move(original_config));
+    return res;
+}
+
+GameConfiguration* Game::getOriginalConfiguration() const {
+    return original_config.get();
+}
+
+const GameConfSPtr& Game::getOriginalConfigurationSharedPtr() const {
+    return original_config;
 }
 
 int Game::getFrame(){

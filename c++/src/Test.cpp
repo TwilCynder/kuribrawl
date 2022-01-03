@@ -3,26 +3,24 @@
 #include "KBDebug/Debug.h"
 #include "ControllerType.h"
 #include "Fighter.h"
-#include "Game.h"
 #include "Port.h"
 #include "ControllersData.h"
+#include "GameConfiguration.h"
 
 void App::startTestGame(){
 
-	Debug::log("===Starting game=====");
-
-	current_game = new Game();
-
-	game_manager = 
-
-	Champion* acid = game_data->getChampion("acid");
+	Debug::log("=====Starting game=====");
 
 	ports[0].plugController(-1, this->controllersData());
-	current_game->addFighter(acid, 100, 1, ports[0]);
-	current_game->addFighter(acid, 300, 1);
-	current_game->addFighter(acid, 500, 1);
+	
+	Champion* acid = game_data->getChampion("acid");
 
-	//ports[0].setFighter(f1);
+	GameConfiguration config;
+	config.addPlayer(&ports[0], *acid);
+	config.addPlayer(nullptr, *acid);
+	config.addPlayer(nullptr, *acid);
+
+	Game& game = game_manager.start(config);
 
 	Debug::log(game_manager.get());
 }

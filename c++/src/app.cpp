@@ -32,6 +32,7 @@ App::App() :
 App::App(int framerate):
 	paused(false),
 	advance(false),
+	quit(false),
 	game_data(std::make_unique<GameData>()),
 	controllers_data(std::make_unique<ControllersData>()),
 	ports{Port(this), Port(this), Port(this), Port(this)},
@@ -234,7 +235,7 @@ void App::readPorts(){
 
 void App::print_report(std::ostream& out){
 	Uint32 app_duration = System::now() - start_time;
-	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame);
+	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame) << '\n';
 }
 
 Duration App::getLowestWait(){
@@ -256,9 +257,9 @@ void App::drawDebugInfo(){
  *
  * @param code the exit code.
  */
-void App::stop(int code){
+void App::stop(){
 	print_report(cout);
-	exit(code);
+	quit = true;
 }
 
 /**
@@ -276,7 +277,7 @@ void App::handleEvents(){
 		switch (event.type)
 		{
 			case SDL_QUIT:
-				stop(0);
+				stop();
 				break;
 			case SDL_CONTROLLERBUTTONDOWN:
 				handleButtonEvent(&event.jbutton);
@@ -284,7 +285,7 @@ void App::handleEvents(){
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.scancode){
 					case SDL_SCANCODE_ESCAPE:
-						stop(0);
+						stop();
 						break;
 					case SDL_SCANCODE_RETURN:
 						paused = !paused;
@@ -292,8 +293,15 @@ void App::handleEvents(){
 					case SDL_SCANCODE_SPACE:
 						advance = true;
 						break;
+					case SDL_SCANCODE_F5:
+						game_manager.restart();
+						break;
 					case SDL_SCANCODE_F6:
 						setFrameRate(framerate - 5);
+						break;
+					case SDL_SCANCODE_F7:
+						setFrameRate(framerate + 5);
+						break;
 					default:
 						if (!event.key.repeat)
 							keyboard->handleButtonPress(event.key.keysym.scancode);
@@ -361,7 +369,7 @@ void App::loop() try {
 	next_frame_date = System::now();
 	start_time = next_frame_date;
 
-    while(1){
+    while(!quit){
 		next_frame_date += frame_duration;
         handleEvents();
 
