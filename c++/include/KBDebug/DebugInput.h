@@ -4,5 +4,6 @@
 
 namespace Debug
 {
+    
     void log(Input input);
 } // namespace Debug

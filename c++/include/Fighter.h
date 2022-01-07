@@ -25,7 +25,8 @@ class Fighter {
     public:
 
     /**
-     * @brief The situation of a Fighter, definind the actions they can take and the behavior of the Fighter as an entity.
+     * @brief The situation of a Fighter, definind the actions they can take and the behavior of the Fighter as an entity.  
+     * See [states.md](md_doc_files_states.html).  
      * A Fighter can have only one State at a time.
      * A state being "started" means that the current state of a Fighter was set to this state.
      * @note States don't care about whether a Fighter is on the ground or not, certain states can very well be used no matter that ; what defines if a Fighter is grounded or not is

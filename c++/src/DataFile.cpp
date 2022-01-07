@@ -10,6 +10,9 @@
 #include "Util/util.h"
 
 #define FILE_SIGNATURE 0x54545454
+#define FILEFORMAT_MAJOR 0
+#define FILEFORMAT_MINOR 2
+#define FILEFORMAT_REVISION 0
 #include "fileMarkers.h"
 
 template <typename T>

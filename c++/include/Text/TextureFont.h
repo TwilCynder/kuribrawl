@@ -5,12 +5,16 @@
 #include "SDL2/SDL_image.h"
 #include "Util/util.h"
 
+/**
+ * @brief Bitmap font displayable on a GPU renderer.
+ * 
+ */
 class TextureFont {
     public:
-    SDL_Texture* char_sheet;
-    Kuribrawl::Rect char_size;
-    int chars_per_line;
-    SDL_Renderer* renderer;
+    SDL_Texture* char_sheet;    /**<Image used as the source, containing all the glyphs/visuals for characters, organized in a table-like structure*/
+    Kuribrawl::Rect char_size;  /**<Size of glyphs on the source image*/
+    int chars_per_line;         /**<Number of characters on each line*/
+    SDL_Renderer* renderer;     /**<Renderer the source image is bound to.*/
     bool is_init;
 
     void displayChar(char c, int x, int y, SDL_Renderer* target) const;
