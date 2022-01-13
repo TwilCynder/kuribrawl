@@ -19,3 +19,7 @@ long long int DebugTime::end(){
     auto diff = duration_cast<nanoseconds>(std::chrono::high_resolution_clock::now() - start_time).count();
     return (diff);
 }
+
+double DebugTime::endSec(){
+    return end() / 1000000000.0;
+}

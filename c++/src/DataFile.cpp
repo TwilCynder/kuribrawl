@@ -1,13 +1,14 @@
 #include <string.h>
 #include "SDL2/SDL_error.h"
 #include "DataFile.h"
-#include "KBDebug/Debug.h"
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Champion.h"
 #include "app.h"
 #include "GameData.h"
 #include "Util/util.h"
+#include "KBDebug/Debug.h"
+#include "KBDebug/DebugTime.h"
 
 #define FILE_SIGNATURE 0x54545454
 #define FILEFORMAT_MAJOR 0
@@ -373,6 +374,10 @@ char* DataFile::separateTag(char* tag){
 
 void DataFile::read(App& app){
     Debug::log("====== Reading data file ==============");
+
+    DebugTime chrono;
+    chrono.start();
+
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
     char* tag;
@@ -408,6 +413,7 @@ void DataFile::read(App& app){
                 break;
         }
     }
+    Debug::log(chrono.endSec());
     Debug::log("====== Data file loading finished ==============");
 }
 

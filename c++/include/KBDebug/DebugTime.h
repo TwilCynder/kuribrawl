@@ -11,5 +11,6 @@ class DebugTime {
     std::chrono::high_resolution_clock::time_point start_time; /**<Point in time (date) when the chrono was started*/
     public:
     void start();
-    long long int end();
+    long long int end();   
+    double endSec(); 
 };
