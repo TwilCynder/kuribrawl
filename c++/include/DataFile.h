@@ -50,15 +50,19 @@ class DataFile {
     char* separateTag(char* tag);
     SDL_Texture* LoadImageFromDatafile();
 
-    void readEntityAnimationFile(EntityAnimation& anim);
-    void readChampionValues(Champion& champion);
-    void readChampionFile(Champion& champion);
-
     void readByte(void* res);
     void readWord(void* res);
     void readLong(void* res);
     void readDouble(void* res);
     void readString();
+    
+    //SDL-Specific
+    SDL_Texture* readTexture();
+
+    //Kuribrawl-Specific
+    void readEntityAnimationFile(EntityAnimation& anim);
+    void readChampionValues(Champion& champion);
+    void readChampionFile(Champion& champion);
 
     template<typename T>
     void readData(T* res);

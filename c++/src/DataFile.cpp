@@ -181,7 +181,7 @@ void DataFile::readChampionFile(Champion& champion){
                 break;
             case FILEMARKER_LANDINGLAG:
                 if (!current_move){
-                    throw KBFatalDetailed("File read : invalid data file content", "Landing lag info present before any move info");
+                    throw KBFatalDetailed("File Loading : invalid data file content", "Landing lag info present before any move info");
                 }
                 readByte(&byte);
                 current_move->landing_lag = byte;
@@ -194,11 +194,20 @@ void DataFile::readChampionFile(Champion& champion){
             default:
                 fseek(file, -1, SEEK_CUR);
                 cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
-                throw KBFatalExplicit("File read : invalid data file content");
+                throw KBFatalExplicit("File Loading : invalid data file content");
                 break;
         }
     } while (!leave_loop);
 
+}
+
+SDL_Texture* DataFile::readTexture(){
+    int fileEnd;
+    readLong(&fileEnd);
+    fileEnd += ftell(file); //Value is the file adress right after the image
+    SDL_Texture* result = IMG_LoadTexture_RW(renderer, sdl_stream, 0);
+    fseek(file, fileEnd, SEEK_SET);
+    return result;
 }
 
 /**
@@ -218,12 +227,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     Hurtbox* hurtbox = nullptr;
     Hitbox* hitbox = nullptr;
 
-
-    readLong(&value);    //Image size
-    value += ftell(file); //Value is the file adress right after the image
-
-    anim.setSpritesheet(IMG_LoadTexture_RW(renderer, sdl_stream, 0));
-    fseek(file, value, SEEK_SET);
+    anim.setSpritesheet(readTexture());
     readByte(&byte);
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -328,7 +332,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                                 hitbox->priority = byte;
                                 break;
                             default:
-                                throw KBFatalDetailed("File read : invalid data file content", "Unsupported or invalid hitbox type");
+                                throw KBFatalDetailed("File Loading : invalid data file content", "Unsupported or invalid hitbox type");
                         }
 
                         break;
@@ -339,14 +343,14 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                     default:
                         fseek(file, -1, SEEK_CUR);
                         cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
-                        throw KBFatalExplicit("File read : invalid data file content");
+                        throw KBFatalExplicit("File Loading : invalid data file content");
                 }
             } while (!leave_loop);
             
             break;
         default:
             cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
-            throw KBFatalExplicit("File read : invalid data file content");
+            throw KBFatalExplicit("File Loading : invalid data file content");
     }
 }
 
@@ -406,15 +410,21 @@ void DataFile::read(App& app){
                 readChampionFile(app.gameData().tryChampion(tag));
                 break;
             case DataFile::DataType::IMAGE:
-
+                tag = readFileTag();
+                app.assets().textures.add(tag, readTexture());
+                Debug::log("Image");
+                for (auto elt : app.assets().textures.elements){
+                    Debug::log(elt.first);
+                    Debug::log(elt.second);
+                }
             case DataFile::DataType::NONE:
                 Debug::log("-None");
             default:
                 break;
         }
     }
-    Debug::log(chrono.endSec());
-    Debug::log("====== Data file loading finished ==============");
+    cout << "Loading time : " << chrono.endSec() << " secs.\n";
+    Debug::log("=========== Data file loading finished ==============");
 }
 
 bool DataFile::ready(){

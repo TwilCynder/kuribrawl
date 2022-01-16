@@ -63,6 +63,10 @@ ControllersData& App::controllersData(){
 	return *controllers_data;
 }
 
+Assets& App::assets() {
+	return assets_;
+}
+
 /**
  * @brief Returns the first \ref Port#isActive "inactive" port or nullptr if there is none.
  * 
@@ -185,7 +189,9 @@ void App::init(){
 	startTestGame();
 	initialized = true;
 
-	debugFont = make_unique<TextureFont>(TextureFont("oracle.png", renderer, {8, 11}));
+	SDL_Texture* debug_font = assets_.textures.get("font_oracle");
+	if (!debug_font) throw KBFatalDetailed("Missing font", "Cannot find the debug font");
+	debugFont = make_unique<TextureFont>(TextureFont(debug_font, renderer, {8, 11}));
 	debug_text_displayer = make_unique<AnchoredTextDisplayer>(SCREEN_WIDTH - 88, 20, *debugFont);
 }
 

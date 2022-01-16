@@ -7,6 +7,7 @@
 #include "SDL2/SDL_syswm.h"
 #include "Animation.h"
 #include "GameData.h"
+#include "Assets.h"
 #include "GameManager.h"
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
@@ -46,6 +47,7 @@ class App
 
     GameData& gameData();
     ControllersData& controllersData();
+    Assets& assets();
 
     void setFrameRate(int fr);
     void viewPopupMessage(const char* title, const char* message);
@@ -88,6 +90,7 @@ class App
     //Data singletons
     std::unique_ptr<GameData> game_data; //*< the GameData (all the data related to gameplay) that will be used for games ran by this App.
     std::unique_ptr<ControllersData> controllers_data; //*< the ControllersData (all the data related to reading controllers inputs) that will be used by this App.
+    Assets assets_; /** \todo tranformer en unique_pointer */
 
     SDL_Window* window; ///< The window this app is running in.
     SDL_SysWMinfo win_info; ///< Structure containing info about the main window.

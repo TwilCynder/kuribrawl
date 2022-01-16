@@ -1,12 +1,9 @@
 #pragma once
-#include <map>
 #include <string>
+#include "Util/Dictionary.h"
 #include "SDL2/SDL.h"
 
 class Assets {
-    std::map<std::string, SDL_Texture*> textures;
-
     public:
-    
-
+    Dictionnary<SDL_Texture*> textures;
 };
