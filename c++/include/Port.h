@@ -35,7 +35,7 @@ class Port {
         INVALID
     };
 
-    Port(App* app_);
+    Port(App* app_, int id);
 
     bool isActive() const;
     void plugController(int id, ControllersData& cd);

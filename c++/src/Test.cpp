@@ -11,7 +11,7 @@ void App::startTestGame(){
 
 	Debug::log("=====Starting game=====");
 
-	ports[0].plugController(-1, this->controllersData());
+	ports[0].plugController(4, this->controllersData());
 	
 	Champion* acid = game_data->getChampion("acid");
 
@@ -21,6 +21,4 @@ void App::startTestGame(){
 	config.addPlayer(nullptr, *acid);
 
 	Game& game = game_manager.start(config);
-
-	Debug::log(game_manager.get());
 }

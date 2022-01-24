@@ -10,8 +10,9 @@
 
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
 
-Port::Port(App* app_) :
+Port::Port(App* app_, int id_) :
     app(app_),
+    id(id_),
     active(false),
     controller(nullptr),
     joystick_id(-1),
@@ -213,24 +214,31 @@ void Port::plugController_(int controller_id){
     unregisterController();
 
     if (controller_id == JOSTICKID_KEYBOARD){
+        //REGISTERING CONTROLLER (see below)
         joystick_id = JOSTICKID_KEYBOARD;
         app->keyboard = this;
     } else {
-        if (controller)
-            SDL_GameControllerClose(controller);
+        if (controller) SDL_GameControllerClose(controller);
 
         controller = SDL_GameControllerOpen(controller_id);
         joystick = SDL_GameControllerGetJoystick(controller);
         SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
 
+        Debug::log("open controller");
+        Debug::log(controller);
+        Debug::log(joystick);
+
         if (instance_id < 0) {
+            cout << "Error while trying to plug controller " << controller_id << " into port " << id << " : ";
             Debug::log(SDL_GetError());
             return;
         }
 
-        cout << "Controller plugged ( " << instance_id << ") to port " << id << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
+        cout << "Controller plugged ( " << instance_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
 
         unregisterController();
+
+        //REGISTERING CONTROLLER (pas mis dans une fonction à part cart impossible de factoriser avec la procédure pour le clavier, flemme de faire 2 fonctions)
         joystick_id = instance_id;
         app->controllers[instance_id] = this;
     }
@@ -279,6 +287,8 @@ void Port::deactivate(){
     unregisterController();
     active = false;
 }
+
+
 /*
 void closeSDLInstance(){
     if (controller){

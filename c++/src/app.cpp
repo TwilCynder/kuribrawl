@@ -18,6 +18,8 @@
 #include "Random.h"
 #include "Text/TextDisplayer.h"
 
+#define PORTS_NB 4
+
 using namespace std;
 
 /**
@@ -35,9 +37,11 @@ App::App(int framerate):
 	quit(false),
 	game_data(std::make_unique<GameData>()),
 	controllers_data(std::make_unique<ControllersData>()),
-	ports{Port(this), Port(this), Port(this), Port(this)},
 	last_frames_wait(std::numeric_limits<Duration>::max())
 {
+	for (int i = 0; i< PORTS_NB; i++){
+		ports.emplace_back(this, i);
+	} 
 	setFrameRate(framerate);
 }
 
@@ -116,7 +120,8 @@ void App::initSDL(){
 		exit(1);
 	}
 
-	SDL_JoystickEventState(SDL_ENABLE);
+	//SDL_JoystickEventState(SDL_ENABLE);
+	SDL_GameControllerEventState(SDL_ENABLE);
 	keyboard_state = SDL_GetKeyboardState(nullptr);
 }
 
@@ -221,6 +226,7 @@ void App::render(){
 
 void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
 	Port* port = controllers[evt->which];
+	Debug::log(evt->button);
 	if (port != nullptr && port->isActive()){
 		port->handleButtonPress(evt->button);
 	}
@@ -278,6 +284,8 @@ void App::stop(){
 void App::handleEvents(){
 	SDL_Event event;
 
+	SDL_GameControllerUpdate();
+
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
@@ -286,6 +294,7 @@ void App::handleEvents(){
 				stop();
 				break;
 			case SDL_CONTROLLERBUTTONDOWN:
+					
 				handleButtonEvent(&event.jbutton);
 				break;
 			case SDL_KEYDOWN:
