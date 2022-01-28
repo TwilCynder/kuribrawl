@@ -302,6 +302,8 @@ void App::handleEvents(){
 			case SDL_CONTROLLERBUTTONDOWN:
 				handleButtonEvent(&event.cbutton);
 				break;
+			case SDL_CONTROLLERAXISMOTION:
+				Debug::log("lol");
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.scancode){
 					case SDL_SCANCODE_ESCAPE:
