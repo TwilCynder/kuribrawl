@@ -83,6 +83,7 @@ class Port {
     PortOptimizationData pod;
 
     //State;
+    std::array<bool, SDL_CONTROLLER_BUTTON_MAX> buttons;
     StickState control_stick;
     StickState secondary_stick; //TODO supporter plusieurs sticks secondaires ?
     TriggerState left_trigger;

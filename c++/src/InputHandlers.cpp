@@ -78,7 +78,7 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
 }
 
 int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
-    if (!grounded && speed.y < 0.0){
+    if (!grounded && (speed.y < 0.0 || paused)){
         speed.y = - (getChampion().val.fast_fall_speed);
     }
     return InputHandlerResult::HANDLED;

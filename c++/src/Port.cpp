@@ -16,8 +16,12 @@ Port::Port(App* app_, int id_) :
     active(false),
     controller(nullptr),
     joystick_id(-1),
+    fighter(nullptr),
     current_dpad_state({0, 0})
 {
+    for (int i = 0; i < buttons.size(); i++){
+        buttons[i] = false;
+    }
 }
 
 bool Port::isActive() const{
@@ -153,6 +157,7 @@ void Port::readController(){
             left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
             right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
         } else {
+
             control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
             control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
             secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);

@@ -30,6 +30,9 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->direction_control_mode = Binding::DirectionControlMode::STICK_ONLY;
     input_binding->tap_jump = true;
 
+    mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";
+    SDL_GameControllerAddMapping(mapping_string);
+
     c = data.getKeyboardController();
     ControllerLayout& layout = c->addElementLayout();
     layout.direction_buttons = {
@@ -45,6 +48,9 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->direction_control_mode = Binding::DirectionControlMode::DPAD_ONLY;
     input_binding->analog_modifier_button = SDL_SCANCODE_LSHIFT;
     input_binding->tap_jump = true;
+
+    mapping_string = "0300000034120000adbe000000000000,Gamecube Controller vJoy,platform:Windows,a:b0,b:b1,y:b2,x:b3,start:b7,rightshoulder:b4,dpup:b8,dpleft:b10,dpdown:b9,dpright:b11,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5";
+    SDL_GameControllerAddMapping(mapping_string);
 }
 
 /**
