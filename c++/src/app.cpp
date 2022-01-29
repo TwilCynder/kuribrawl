@@ -230,11 +230,11 @@ void App::render(){
  * @param evt The event structure containing all the info on the button press.
  */
 
-void App::handleButtonEvent(const SDL_ControllerButtonEvent* evt){
-	Port* port = controllers[evt->which];
-	Debug::log(evt->button);
+void App::handleButtonEvent(const SDL_JoyButtonEvent& evt){
+	Port* port = controllers[evt.which];
+	Debug::log(evt.button);
 	if (port != nullptr && port->isActive()){
-		port->handleButtonPress(evt->button);
+		port->handleJoystickButtonPress(evt.button);
 	}
 }
 
@@ -299,8 +299,8 @@ void App::handleEvents(){
 			case SDL_QUIT:
 				stop();
 				break;
-			case SDL_CONTROLLERBUTTONDOWN:
-				handleButtonEvent(&event.cbutton);
+			case SDL_JOYBUTTONDOWN:
+				handleButtonEvent(event.jbutton);
 				break;
 			case SDL_CONTROLLERAXISMOTION:
 				Debug::log("lol");

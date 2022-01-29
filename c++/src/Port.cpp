@@ -5,9 +5,10 @@
 #include "app.h"
 #include "Binding.h"
 #include "ControllersData.h"
-#include <stdlib.h>
 #include "controllerElements.h"
+#include "defs.h"
 
+#define MAPPING_NORMAL_SIZE 32
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
 
 Port::Port(App* app_, int id_) :
@@ -19,9 +20,6 @@ Port::Port(App* app_, int id_) :
     fighter(nullptr),
     current_dpad_state({0, 0})
 {
-    for (int i = 0; i < buttons.size(); i++){
-        buttons[i] = false;
-    }
 }
 
 bool Port::isActive() const{
@@ -37,10 +35,20 @@ void Port::setControllerType(const ControllerType* c){
     current_controller_layout = c->getElementLayout();
 }
 
-void Port::handleButtonPress(int button){
+void Port::handleJoystickButtonPress(Uint8 jbutton){
+    if (jbutton >= controller_buttons_mapping.size()){
+        return;
+    }
+    SDL_GameControllerButton cbutton = controller_buttons_mapping[jbutton];
+    if (cbutton != SDL_CONTROLLER_BUTTON_INVALID){
+        handleButtonPress(cbutton);
+    }
+}
+
+inline void Port::handleButtonPress(Uint8 cbutton){
     if (!fighter) return;
 
-    fighter->handleButtonPress(button);
+    fighter->handleButtonPress(cbutton);
 }
 
 ///SDL GAMECONTROLLER
@@ -157,12 +165,10 @@ void Port::readController(){
             left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
             right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
         } else {
-
             control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
             control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
             secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
             secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
-
             
             left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
             right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
@@ -210,12 +216,51 @@ const Kuribrawl::VectorT<int8_t>& Port::getDpadState() const{
 }
 
 /**
+ * @brief Initializes controller_buttons_mapping with the current SDL Mapping for the current controller.  
+ * Assumes the controller attribute is valid.
+ * 
+ * @return true 
+ * @return false 
+ */
+bool Port::initButtonMapping(){
+    size_t needed_size = MAPPING_NORMAL_SIZE;
+    
+    for (unsigned int i = 0; i < controller_buttons_mapping.size(); i++){
+        controller_buttons_mapping[i] = SDL_CONTROLLER_BUTTON_INVALID;
+    }
+
+
+    Debug::log(SDL_GameControllerMapping(controller));
+    for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++){
+        SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForButton(controller, static_cast<SDL_GameControllerButton>(i));
+        cout << bind.bindType << " " << bind.value.button << " " << i << '\n';
+        if (bind.bindType == SDL_CONTROLLER_BINDTYPE_NONE) continue;
+        if (bind.bindType != SDL_CONTROLLER_BINDTYPE_BUTTON){
+            return false;
+        }
+        unsigned int jbutton = bind.value.button;
+        if (jbutton >= controller_buttons_mapping.size()){
+            controller_buttons_mapping.resize(jbutton + 1, SDL_CONTROLLER_BUTTON_INVALID);
+        }
+        if (jbutton + 1 > needed_size) needed_size = jbutton + 1;
+
+        controller_buttons_mapping[jbutton] = static_cast<SDL_GameControllerButton>(i);
+    }
+
+    if (controller_buttons_mapping.size() > needed_size){
+        controller_buttons_mapping.resize(needed_size);
+    }
+    Debug::log(controller_buttons_mapping[3]);
+    return true;
+}
+
+/**
  * @brief Binds this port to a controller (keyboard included)
  * Handles the creation of a SDL_GameController, and registers itself as the port for that joystick
  * @param id numerical ID given by the OS to the controller, or -1 for the keyboard
+ * @returns false if a problem occured (in which case the port remains inactive), true otherwise
  */
-///SDL GAMECONTROLLER
-void Port::plugController_(int controller_id){
+bool Port::plugController_(int controller_id){
     unregisterController();
 
     if (controller_id == JOSTICKID_KEYBOARD){
@@ -236,18 +281,30 @@ void Port::plugController_(int controller_id){
         if (instance_id < 0) {
             cout << "Error while trying to plug controller " << controller_id << " into port " << id << " : ";
             Debug::log(SDL_GetError());
-            return;
+            controller = nullptr;
+            joystick = nullptr;
+            return false;
         }
-
-        cout << "Controller plugged ( " << instance_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
 
         unregisterController();
 
-        //REGISTERING CONTROLLER (pas mis dans une fonction à part cart impossible de factoriser avec la procédure pour le clavier, flemme de faire 2 fonctions)
+        //REGISTERING CONTROLLER (pas mis dans une fonction à part car impossible de factoriser avec la procédure pour le clavier, flemme de faire 2 fonctions)
+        /**
+         * @todo remplacer le système de app->controllers[] par celui de player-index de SDL 
+         */
         joystick_id = instance_id;
         app->controllers[instance_id] = this;
+        
+        //STORING THE BUTTON MAPPING
+        if (!initButtonMapping()){
+            cout << "Error while trying to plug controller " << controller_id << " into port : the SDL mapping is ill-formed.\n";
+            return false;
+        }
+
+        cout << "Controller plugged ( " << controller_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
     }
     active = true;
+    return true;
 }
 
 /**

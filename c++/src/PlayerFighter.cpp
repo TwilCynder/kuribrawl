@@ -285,6 +285,7 @@ void PlayerFighter::updateInputsStates(){
     if (secondary_stick.current_state.y > current_controller_vals.analogStickThreshold && secondary_stick.previous_state.y < current_controller_vals.analogStickThreshold){
         handleStickFlick(Direction::DOWN);
     } else if (secondary_stick.current_state.y < -current_controller_vals.analogStickThreshold && secondary_stick.previous_state.y > -current_controller_vals.analogStickThreshold){
+        Debug::log("flick");
         handleStickFlick(Direction::UP);
     } 
 }

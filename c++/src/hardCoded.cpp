@@ -27,7 +27,8 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = Input::GRAB;
     input_binding->triggers[TRIGGER_LEFT] = Input::GUARD;
     input_binding->triggers[TRIGGER_RIGHT] = Input::JUMP;
-    input_binding->direction_control_mode = Binding::DirectionControlMode::STICK_ONLY;
+    input_binding->second_stick = Input::ATTACK;
+    input_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
     input_binding->tap_jump = true;
 
     mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";

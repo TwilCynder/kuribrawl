@@ -1,6 +1,7 @@
 #pragma once
 
 #include <forward_list>
+#include <vector>
 #include "PlayerFighter.h"
 #include "ControllerType.h"
 #include "inputs.h"
@@ -45,7 +46,8 @@ class Port {
     void setControllerType(const ControllerType* c);
     const ControllerType* getControllerType() const;
 
-    void handleButtonPress(int button);
+    void handleButtonPress(Uint8);
+    void handleJoystickButtonPress(Uint8);
     bool isButtonPressed(int button) const;
     bool isJoystickButtonPressed(int button) const;
     bool isTriggerPressed(int trigger) const;
@@ -63,8 +65,11 @@ class Port {
     using DpadState = Kuribrawl::VectorT<int8_t>;
     const DpadState& getDpadState() const;
 
+    using ButtonsMapping = std::vector<SDL_GameControllerButton>;
+
     private:
-    void plugController_(int id);
+    bool plugController_(int id);
+    bool initButtonMapping();
     void unregisterController();
 
     App* app;   ///< The app that opened this Port
@@ -78,12 +83,12 @@ class Port {
 	SDL_Joystick* joystick;
     int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.
     const ControllerLayout* current_controller_layout;    ///< The controller layout of the current controller, if any.
+    ButtonsMapping controller_buttons_mapping;
 
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of its normal functioning.
     PortOptimizationData pod;
 
     //State;
-    std::array<bool, SDL_CONTROLLER_BUTTON_MAX> buttons;
     StickState control_stick;
     StickState secondary_stick; //TODO supporter plusieurs sticks secondaires ?
     TriggerState left_trigger;

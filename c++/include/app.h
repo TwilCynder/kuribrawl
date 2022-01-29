@@ -70,7 +70,7 @@ class App
     void loadRessources();
     bool loadGameFile(const char* name);
     void handleEvents();
-    void handleButtonEvent(const SDL_ControllerButtonEvent* evt);
+    void handleButtonEvent(const SDL_JoyButtonEvent& evt);
     void readPorts();
     void render();
 
