@@ -42,7 +42,7 @@ Game::Game(GameConfSPtr& config_sptr) :
 }
 
 Game::~Game(){
-    Debug::log("Game destroyed");
+    Debug::log("Game destroyed with facts and logic.");
 }
 
 void Game::applyConfig(GameConfiguration& config){

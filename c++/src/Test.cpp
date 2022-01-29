@@ -6,9 +6,10 @@
 #include "Port.h"
 #include "ControllersData.h"
 #include "GameConfiguration.h"
+#include "sdlHelper.h"
 
 void App::startTestGame(){
-
+	SDLHelper::printJoysticks(cout);
 	Debug::log("=====Starting game=====");
 
 	ports[0].plugController(0, this->controllersData());

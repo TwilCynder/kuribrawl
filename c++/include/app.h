@@ -14,6 +14,7 @@
 #include "Util/StaticFullQueue.h"
 
 #define NB_PORTS 4
+#define NB_CONTROLLERS 16
 
 class Port;
 class Game;
@@ -55,7 +56,7 @@ class App
     //SDL functions
     SDL_Texture* LoadTexture(const char *file);
 
-    Port* controllers[16];    ///<An array associating each joystick numerical id with a Port. 
+    Port* controllers[NB_CONTROLLERS];    ///<An array associating each joystick numerical id with a Port. 
                             /**<Pointer validity : can be invalidated if a Port is deleted or moved */
     Port* keyboard; ///<Port associated with the keyboard
     const Uint8* keyboard_state;
@@ -69,7 +70,7 @@ class App
     void loadRessources();
     bool loadGameFile(const char* name);
     void handleEvents();
-    void handleButtonEvent(const SDL_JoyButtonEvent* evt);
+    void handleButtonEvent(const SDL_JoyButtonEvent& evt);
     void readPorts();
     void render();
 

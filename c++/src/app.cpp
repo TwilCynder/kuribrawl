@@ -40,9 +40,15 @@ App::App(int framerate):
 	last_frames_wait(std::numeric_limits<Duration>::max())
 {
 	ports.reserve(PORTS_NB);
-	for (int i = 0; i < PORTS_NB; i++){
+	for (int i = 0; i< PORTS_NB; i++){
 		ports.emplace_back(this, i);
 	} 
+
+	for (int i = 0; i < NB_CONTROLLERS; i++){
+		controllers[i] = nullptr;
+	}
+	keyboard = nullptr;
+
 	setFrameRate(framerate);
 }
 
@@ -121,7 +127,7 @@ void App::initSDL(){
 		exit(1);
 	}
 
-	//SDL_JoystickEventState(SDL_ENABLE);
+	SDL_JoystickEventState(SDL_ENABLE);
 	SDL_GameControllerEventState(SDL_ENABLE);
 	keyboard_state = SDL_GetKeyboardState(nullptr);
 }
@@ -225,11 +231,11 @@ void App::render(){
  * @param evt The event structure containing all the info on the button press.
  */
 
-void App::handleButtonEvent(const SDL_JoyButtonEvent* evt){
-	Port* port = controllers[evt->which];
-	Debug::log(evt->button);
+void App::handleButtonEvent(const SDL_JoyButtonEvent& evt){
+	Port* port = controllers[evt.which];
+	Debug::log(evt.button);
 	if (port != nullptr && port->isActive()){
-		port->handleButtonPress(evt->button);
+		port->handleJoystickButtonPress(evt.button);
 	}
 }
 
@@ -294,10 +300,11 @@ void App::handleEvents(){
 			case SDL_QUIT:
 				stop();
 				break;
-			case SDL_CONTROLLERBUTTONDOWN:
-					
-				handleButtonEvent(&event.jbutton);
+			case SDL_JOYBUTTONDOWN:
+				handleButtonEvent(event.jbutton);
 				break;
+			case SDL_CONTROLLERAXISMOTION:
+				Debug::log("lol");
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.scancode){
 					case SDL_SCANCODE_ESCAPE:
@@ -319,7 +326,7 @@ void App::handleEvents(){
 						setFrameRate(framerate + 5);
 						break;
 					default:
-						if (!event.key.repeat)
+						if (keyboard && !event.key.repeat)
 							keyboard->handleButtonPress(event.key.keysym.scancode);
 						break;
 				}
