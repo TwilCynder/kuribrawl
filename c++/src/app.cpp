@@ -39,7 +39,8 @@ App::App(int framerate):
 	controllers_data(std::make_unique<ControllersData>()),
 	last_frames_wait(std::numeric_limits<Duration>::max())
 {
-	for (int i = 0; i< PORTS_NB; i++){
+	ports.reserve(PORTS_NB);
+	for (int i = 0; i < PORTS_NB; i++){
 		ports.emplace_back(this, i);
 	} 
 	setFrameRate(framerate);
