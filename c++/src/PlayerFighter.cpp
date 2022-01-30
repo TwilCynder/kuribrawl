@@ -14,9 +14,11 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model):
     Fighter(game, model),
     port(nullptr),
     valid_port(false),
-    input_manager(this)
+    input_manager(this),
+    control_stick_buffer(std::piecewise_construct, std::forward_as_tuple(7), std::forward_as_tuple(7))
 {
     init_control_stick_buffer();
+    new std::pair<int, int>();
 }
 
 
@@ -24,7 +26,8 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     Fighter(game, model, x, y),
     port(nullptr),
     valid_port(false),
-    input_manager(this)
+    input_manager(this),
+    control_stick_buffer(std::piecewise_construct, std::forward_as_tuple(7), std::forward_as_tuple(7))
 {
     init_control_stick_buffer();
 }
@@ -101,10 +104,7 @@ void PlayerFighter::swap_control_stick_buffer(){
 }
 
 void PlayerFighter::init_control_stick_buffer(){
-    for(int i = 0; i < CONTROL_STICK_FRAME_BUFFER; i++){
-        control_stick_buffer[i].x = 0;
-        control_stick_buffer[i].y = 0;
-    }
+    //unused
 }
 
 void PlayerFighter::handleButtonPress(int button){
@@ -129,30 +129,31 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     //At this point we assume the buffer is actually containing the position of the stick 2 frames ago
     if (current_state.x > current_controller_vals.analogStickSmashThreshold
         && previous_state.x < current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer[0].x != 1)
+        && control_stick_buffer.x.head() != 1)
     {
         //Smash input right
 		Debug::log("Smash Input Right");
         input_manager.registerInput(Input::RIGHT, port, -1, ElementType::STICK);
     } else if (current_state.x < -current_controller_vals.analogStickSmashThreshold
         && previous_state.x > -current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer[0].x != -1)
+        && control_stick_buffer.x.head() != -1)
     {
         //Smash input left
 		Debug::log("Smash Input Left");
         input_manager.registerInput(Input::LEFT, port, -1, ElementType::STICK);
     }
 
+    cout << current_state.y << " " << previous_state.y << " " << control_stick_buffer.y.head() << '\n' << std::flush;
     if (current_state.y > current_controller_vals.analogStickSmashThreshold
         && previous_state.y < current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer[0].y != 1)
+        && control_stick_buffer.y.head() != 1)
     {
         //Smash input right
 		Debug::log("Smash Input Down");
         input_manager.registerInput(Input::DOWN, port, -1, ElementType::STICK);
     } else if (current_state.y < -current_controller_vals.analogStickSmashThreshold
         && previous_state.y > -current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer[0].y != -1)
+        && control_stick_buffer.y.head() != -1)
     {
         //Smash input left
 		Debug::log("Smash Input UP");
@@ -160,11 +161,19 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     }
 
     if (current_state.x > current_controller_vals.analogStickThreshold){
-        control_stick_buffer[0].x = 1;
+        control_stick_buffer.x.add(1);
     } else if (current_state.x < -current_controller_vals.analogStickThreshold) {
-        control_stick_buffer[0].x = -1;
+        control_stick_buffer.x.add(-1);
     } else {
-        control_stick_buffer[0].x = 0;
+        control_stick_buffer.x.add(0);
+    }
+
+    if (current_state.y > current_controller_vals.analogStickThreshold){
+        control_stick_buffer.y.add(1);
+    } else if (current_state.y < -current_controller_vals.analogStickThreshold) {
+        control_stick_buffer.y.add(-1);
+    } else {
+        control_stick_buffer.y.add(0);
     }
 
 }

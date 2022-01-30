@@ -1,5 +1,7 @@
+#pragma once
 #include <iostream>
 #include <memory>
+#include "../KBDebug/Debug.h"
 using namespace std;
 
 /**
@@ -13,17 +15,18 @@ template <typename T, int SIZE>
 class StaticFullQueue {
     protected:
     T elements[SIZE];
-    int head;   //index where a value is GOING to be written (OLDEST index (FIRST in iteration))
-                //tail is head-1
+    int head_;   //index where a value is GOING to be written (OLDEST index (FIRST in iteration))
+                //tail is head_-1
     public:
     StaticFullQueue() : 
-        head(0) 
+        head_(0) 
     {}
 
     StaticFullQueue(T initial_value) : 
         StaticFullQueue()
     {  
         //stupid dumb C ass for loop idk how to do it better
+        Debug::log(initial_value);
         for (T* i = elements; i < elements + SIZE; i++){
             *i = initial_value;
         }
@@ -33,16 +36,24 @@ class StaticFullQueue {
         return (i + 1 >= SIZE) ? 0 : i + 1; 
     }
     inline int tail() {
-        return (head - 1 < 0) ? SIZE - 1 : head - 1;
+        return (head_ - 1 < 0) ? SIZE - 1 : head_ - 1;
     }
 
     void add(T element){
-        elements[head] = element;
-        head = inc(head);
+        elements[head_] = element;
+        head_ = inc(head_);
     }
 
-    const T* getElements() const {
+    const T* data() const {
         return elements;
+    }
+
+    T head(){
+        return elements[head_];
+    }
+
+    const T operator[](std::size_t i){
+        return elements[(head_ + i) % SIZE];
     }
 
     class Iterator;
@@ -83,7 +94,7 @@ class StaticFullQueue<T, SIZE>::Iterator {
     {}
 
     Iterator(SFQ& sfq_) : 
-        Iterator(sfq_, sfq_.head)
+        Iterator(sfq_, sfq_.head_)
     {}
     public:
     inline void advance(){

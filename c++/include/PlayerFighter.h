@@ -2,9 +2,10 @@
 #include "Fighter.h"
 #include "ControllerType.h"
 #include "Util/util.h"
+#include "Util/StaticFullQueue.h"
 #include "inputs.h"
 
-#define CONTROL_STICK_FRAME_BUFFER 1 //TODO make it customizable ?
+#define CONTROL_STICK_FRAME_BUFFER 3 //TODO make it customizable ?
 
 class Port;
 class InputManager;
@@ -43,6 +44,7 @@ class PlayerFighter : public Fighter {
 
     static void initInputHandlers(); 
     using InputHandler = int (PlayerFighter::*)(RegisteredInput&); ///< Function applying the effect of an Input to a Fighter.  
+    using StickBuffer = StaticFullQueue<Uint8, CONTROL_STICK_FRAME_BUFFER>;
 
     private:
     const InputManager* getInputManager() const;
@@ -69,7 +71,7 @@ class PlayerFighter : public Fighter {
     bool valid_port;
     friend class InputManager;
     InputManager input_manager;    ///< InputManager used to process the input made by the Port.
-    Vector control_stick_buffer[CONTROL_STICK_FRAME_BUFFER];
+    VectorT<StickBuffer> control_stick_buffer;
     Vector current_direction_control_state;
 
     static InputHandler input_handlers[Input::TOTAL];   ///< Array associating every Input to an InputHandler function that will apply the effect of this Input to a Fighter.

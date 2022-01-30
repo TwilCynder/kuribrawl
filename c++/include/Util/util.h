@@ -33,6 +33,15 @@ namespace Kuribrawl {
     struct VectorT {
         T x;
         T y;
+        template< class... Args1, class... Args2 >
+        VectorT( std::piecewise_construct_t t,
+            std::tuple<Args1...> first_args,
+            std::tuple<Args2...> second_args ) :
+            x(first_args),
+            y(second_args)
+        {}
+
+        VectorT(){}
     };
 
     struct Rect {
