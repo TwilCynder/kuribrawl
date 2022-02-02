@@ -215,6 +215,14 @@ const Port::DpadState& Port::getDpadState() const{
     return current_dpad_state;
 }
 
+inline double Port::normalizeStickValue(int value){
+    return value / (double)ANALOG_MAX_VALUE;
+}
+
+Kuribrawl::Vec2<double> Port::normalizeStickVector(Kuribrawl::Vector& value){
+    return {normalizeStickValue(value.x), normalizeStickValue(value.y)};
+}
+
 /**
  * @brief Initializes controller_buttons_mapping with the current SDL Mapping for the current controller.  
  * Assumes the controller attribute is valid.

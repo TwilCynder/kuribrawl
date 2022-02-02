@@ -402,7 +402,7 @@ void App::loop() try {
 			SDLHelper::prepareRender(renderer);
 			if (game_manager.get() && game_manager->is_running()){
 				game_manager->step(renderer);
-				game_manager->drawDebugInfo(*debugFont);
+				game_manager->drawDebugInfo(*debugFont, renderer);
 			}
 			drawDebugInfo();
 			SDLHelper::render(renderer);

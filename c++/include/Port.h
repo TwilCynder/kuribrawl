@@ -10,6 +10,8 @@
 
 #define JOSTICKID_KEYBOARD -1
 
+#define ANALOG_MAX_VALUE 32000
+
 class App;
 class Binding;
 class ControllersData;
@@ -64,6 +66,9 @@ class Port {
     inline signed char getDpadStateY() const;
     using DpadState = Kuribrawl::Vec2<int8_t>;
     const DpadState& getDpadState() const;
+
+    static double normalizeStickValue(int);
+    static Kuribrawl::Vec2<double> normalizeStickVector(Kuribrawl::Vector&);
 
     using ButtonsMapping = std::vector<SDL_GameControllerButton>;
 

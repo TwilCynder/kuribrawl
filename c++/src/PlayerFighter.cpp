@@ -15,7 +15,8 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model):
     port(nullptr),
     valid_port(false),
     input_manager(this),
-    control_stick_buffer(StickBuffer(7), StickBuffer(7))
+    control_stick_buffer(StickBuffer(7), StickBuffer(7)),
+    current_direction_control_state{0, 0}
 {
     init_control_stick_buffer();
 }
@@ -381,18 +382,42 @@ int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
  * @return false if this method only drew on the area indicated by displayArea.
  */
 bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
-    const int radius = Kuribrawl::min(displayArea.w, displayArea.h) * 0.8;
-    Vector center = { displayArea.w / 2, displayArea.h / 2 };
+    const int radius = Kuribrawl::min(displayArea.w, displayArea.h) * 0.4;
+    Vector center = {displayArea.x + displayArea.w / 2, displayArea.y + displayArea.h / 2 };
+
+    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
 
     SDL_Rect box = {
         center.x - radius,
         center.y - radius,
-        displayArea.w,
-        displayArea.h
+        radius * 2,
+        radius * 2
     };
 
     //can you believe there is no function in sdl to render a fucking circle
-    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
     SDL_RenderDrawRect(target, &box);
+
+    double analogThreshold = Port::normalizeStickValue(current_controller_vals.analogStickThreshold);
+    double analogSmashThreshold = Port::normalizeStickValue(current_controller_vals.analogStickSmashThreshold);
+    box = {
+        (int)(center.x - analogThreshold * radius),
+        (int)(center.y - analogThreshold * radius),
+        (int)(analogThreshold * radius * 2),
+        (int)(analogThreshold * radius * 2)
+    };
+    SDL_SetRenderDrawColor(target, 255, 0, 255, 150);
+    SDL_RenderDrawRect(target, &box);
+    box = {
+        (int)(center.x - analogSmashThreshold * radius),
+        (int)(center.y - analogSmashThreshold * radius),
+        (int)(analogSmashThreshold * radius * 2),
+        (int)(analogSmashThreshold * radius * 2)
+    };
+    SDL_SetRenderDrawColor(target, 255, 0, 0, 150);
+    SDL_RenderDrawRect(target, &box);
+
+    Vec2<double> pos = Port::normalizeStickVector(current_direction_control_state);
+    SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
+    SDL_RenderDrawLine(target, center.x, center.y, center.x + pos.x * radius, center.y + pos.y * radius);
     return false;
 }

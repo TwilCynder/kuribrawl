@@ -234,18 +234,24 @@ void Game::hitDetection(){
     }
 }
 
-void Game::drawDebugInfo(TextureFont& font){
+void Game::drawDebugInfo(TextureFont& font, SDL_Renderer* target){
     Fighteriterator it;
     int y = 20;
     int i = 1;
-    
-    
 
     for (it = fighters.begin(); it != fighters.end(); ++it){
         AdvancedTextDisplayer td = AdvancedTextDisplayer(20, y, font) << "Fighter " << i << " : " ;
         it->writeDebugInfo(td);
         y += 20;
         i++;
+    }
+
+    SDL_Rect box = {20, y, 100, 100};
+    for (PlayerFighter& fighter : fighters){
+        fighter.drawDebugInfo(target, box);
+        box.x += box.w;
+        box.w = 100;
+        box.h = 100;
     }
 }
 
