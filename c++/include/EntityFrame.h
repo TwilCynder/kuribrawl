@@ -13,7 +13,7 @@ struct EntityFrame{
         bool whole_frame; //if false, set/added only when transitioning to this frame
         double value;
     };
-    using FrameMovement = VectorT<FrameMovementAxis>;
+    using FrameMovement = Vec2<FrameMovementAxis>;
 
     std::vector<Hurtbox> hurtboxes; 
     std::vector<Hitbox> hitboxes;

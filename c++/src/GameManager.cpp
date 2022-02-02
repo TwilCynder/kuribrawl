@@ -44,5 +44,4 @@ void GameManager::restart(){
     destroy();
     Debug::log("About to start new game ; previous game destroyed");
     start(config_sptr);
-    Debug::log("What the fuck");
 }

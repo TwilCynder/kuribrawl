@@ -46,6 +46,9 @@ class PlayerFighter : public Fighter {
     using InputHandler = int (PlayerFighter::*)(RegisteredInput&); ///< Function applying the effect of an Input to a Fighter.  
     using StickBuffer = StaticFullQueue<Uint8, CONTROL_STICK_FRAME_BUFFER>;
 
+    //Debug
+    bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
+
     private:
     const InputManager* getInputManager() const;
     //Inputs
@@ -55,12 +58,11 @@ class PlayerFighter : public Fighter {
     void update_control_stick_buffer(const Vector&, const Vector&);
     void updateDirectionControlState();
 
+    Direction getDirection4(const Kuribrawl::Vector& stick_state) const;
+    DirectionIG getDirection4IG(const Kuribrawl::Vector& stick_state) const;
 
-    Kuribrawl::Direction getDirection4(const Kuribrawl::Vector& stick_state) const;
-    Kuribrawl::DirectionIG getDirection4IG(const Kuribrawl::Vector& stick_state) const;
-
-    Kuribrawl::Direction getControlDirection4() const;
-    Kuribrawl::DirectionIG getControlDirection4IG() const;
+    Direction getControlDirection4() const;
+    DirectionIG getControlDirection4IG() const;
 
 	jumpY decideGroundedJumpYType() const override;
     jumpX decideJumpXType() const override;
@@ -71,7 +73,7 @@ class PlayerFighter : public Fighter {
     bool valid_port;
     friend class InputManager;
     InputManager input_manager;    ///< InputManager used to process the input made by the Port.
-    VectorT<StickBuffer> control_stick_buffer;
+    Vec2<StickBuffer> control_stick_buffer;
     Vector current_direction_control_state;
 
     static InputHandler input_handlers[Input::TOTAL];   ///< Array associating every Input to an InputHandler function that will apply the effect of this Input to a Fighter.

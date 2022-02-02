@@ -60,7 +60,6 @@ void Game::applyConfig(GameConfiguration& config){
         }
         x += step;
     }
-
 }
 
 /**
@@ -84,6 +83,7 @@ PlayerFighter* Game::addFighter(Champion* model){
  * @return Fighter* the Fighter created (and added).
  */
 PlayerFighter* Game::addFighter(Champion* model, int x, int y){
+    Debug::log("added fighter");
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y);
     return &(*it);
@@ -238,9 +238,12 @@ void Game::drawDebugInfo(TextureFont& font){
     Fighteriterator it;
     int y = 20;
     int i = 1;
+    
+    
+
     for (it = fighters.begin(); it != fighters.end(); ++it){
         AdvancedTextDisplayer td = AdvancedTextDisplayer(20, y, font) << "Fighter " << i << " : " ;
-        it->drawDebugInfo(td);
+        it->writeDebugInfo(td);
         y += 20;
         i++;
     }

@@ -26,7 +26,7 @@ class StaticFullQueue {
         StaticFullQueue()
     {  
         //stupid dumb C ass for loop idk how to do it better
-        Debug::log(initial_value);
+        Debug::log((int)initial_value);
         for (T* i = elements; i < elements + SIZE; i++){
             *i = initial_value;
         }

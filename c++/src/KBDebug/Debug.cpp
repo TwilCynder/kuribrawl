@@ -8,5 +8,5 @@
  */
 template<>
 void Debug::log(bool b){
-    cout << ((b) ? "True" : "False") << '\n' << std::flush;
+    std::cout << ((b) ? "True" : "False") << '\n' << std::flush;
 }

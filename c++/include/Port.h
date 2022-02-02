@@ -62,7 +62,7 @@ class Port {
     void updateDpadState(); //NOT USED YET
     inline signed char getDpadStateX() const;
     inline signed char getDpadStateY() const;
-    using DpadState = Kuribrawl::VectorT<int8_t>;
+    using DpadState = Kuribrawl::Vec2<int8_t>;
     const DpadState& getDpadState() const;
 
     using ButtonsMapping = std::vector<SDL_GameControllerButton>;

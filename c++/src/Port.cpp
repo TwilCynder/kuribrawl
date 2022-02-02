@@ -211,7 +211,7 @@ signed char Port::getDpadStateY() const{
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
 }
 
-const Kuribrawl::VectorT<int8_t>& Port::getDpadState() const{
+const Port::DpadState& Port::getDpadState() const{
     return current_dpad_state;
 }
 

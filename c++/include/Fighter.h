@@ -47,7 +47,8 @@ class Fighter {
     void updateState();
     void checkUpdateAnimation();
     //Debug
-    void drawDebugInfo(AdvancedTextDisplayer& out);
+    void writeDebugInfo(AdvancedTextDisplayer& out);
+    bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
 
     //Hitboxes
     const HurtboxVector& getCurrentHurtboxes() const;

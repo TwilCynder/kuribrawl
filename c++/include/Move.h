@@ -28,8 +28,8 @@ struct Move {
     const EntityAnimation* animation; //nullptr if no animation
 
     //Keep in mind that with the right edgeBehavior/landBehavior, any grounded move can be done airborne, and any aerial move can be done on the ground
-    int landing_lag;
     EdgeBehavior edge_behavior;
     LandBehavior land_behavior;
     EndBehavior  end_behavior ;
+    int landing_lag;
 };

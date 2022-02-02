@@ -224,12 +224,13 @@ void Fighter::draw(SDL_Renderer* target){
         SDL_RenderDrawRect(target, &box);
     }
 
+    //Drawing position
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
     SDL_RenderDrawLine(target, position.x - 10, SCREEN_HEIGHT - position.y, position.x + 10, SCREEN_HEIGHT - position.y);
     SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
 }
 
-void Fighter::drawDebugInfo(AdvancedTextDisplayer& out){
+void Fighter::writeDebugInfo(AdvancedTextDisplayer& out){
     out 
         << "Speed X : " << speed.x << (int)250
         << "   Speed Y : " << speed.y << AdvancedTextDisplayer::force_advance(80)

@@ -15,10 +15,9 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model):
     port(nullptr),
     valid_port(false),
     input_manager(this),
-    control_stick_buffer(std::piecewise_construct, std::forward_as_tuple(7), std::forward_as_tuple(7))
+    control_stick_buffer(StickBuffer(7), StickBuffer(7))
 {
     init_control_stick_buffer();
-    new std::pair<int, int>();
 }
 
 
@@ -27,7 +26,7 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     port(nullptr),
     valid_port(false),
     input_manager(this),
-    control_stick_buffer(std::piecewise_construct, std::forward_as_tuple(7), std::forward_as_tuple(7))
+    control_stick_buffer(StickBuffer(7), StickBuffer(7))
 {
     init_control_stick_buffer();
 }
@@ -142,8 +141,7 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
 		Debug::log("Smash Input Left");
         input_manager.registerInput(Input::LEFT, port, -1, ElementType::STICK);
     }
-
-    cout << current_state.y << " " << previous_state.y << " " << control_stick_buffer.y.head() << '\n' << std::flush;
+    
     if (current_state.y > current_controller_vals.analogStickSmashThreshold
         && previous_state.y < current_controller_vals.analogStickSmashThreshold
         && control_stick_buffer.y.head() != 1)
@@ -371,4 +369,30 @@ int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
     }
 
     return 0;
+}
+
+//DEBUG
+
+/**
+ * @brief Displays visual debug info.  
+ * @param displayArea : an indicator of the area that should be used ; if this method uses a different area (position or size) it must update displayArea and retur true.
+ * w and h fields can be -1 : in this case drawDebugInfo MUST set them (and return true)
+ * @return true if displayArea was changed
+ * @return false if this method only drew on the area indicated by displayArea.
+ */
+bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
+    const int radius = Kuribrawl::min(displayArea.w, displayArea.h) * 0.8;
+    Vector center = { displayArea.w / 2, displayArea.h / 2 };
+
+    SDL_Rect box = {
+        center.x - radius,
+        center.y - radius,
+        displayArea.w,
+        displayArea.h
+    };
+
+    //can you believe there is no function in sdl to render a fucking circle
+    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    SDL_RenderDrawRect(target, &box);
+    return false;
 }
