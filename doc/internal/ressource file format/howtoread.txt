@@ -1,0 +1,5 @@
+La documentation de format de ressources suit les règles indiquées dans ../file format docs fora.txt, en plus des suivantes
+- tout texte entre <> est remplacé par la valeur qu'il décrit
+- tout autre texte doit être présent texto, à l'exception des caractères utilisés pour le formattage. 
+
+Dans les descriptions de fichier "Descripteur", un "-" correspond à une ligne
