@@ -18,7 +18,8 @@ Port::Port(App* app_, int id_) :
     controller(nullptr),
     joystick_id(-1),
     fighter(nullptr),
-    current_dpad_state({0, 0})
+    control_stick{0, 0},
+    current_dpad_state{0, 0}
 {
 }
 

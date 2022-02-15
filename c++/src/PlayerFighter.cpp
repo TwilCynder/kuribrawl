@@ -27,7 +27,8 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     port(nullptr),
     valid_port(false),
     input_manager(this),
-    control_stick_buffer(StickBuffer(7), StickBuffer(7))
+    control_stick_buffer(StickBuffer(7), StickBuffer(7)),
+    current_direction_control_state{0, 0}
 {
     init_control_stick_buffer();
 }
@@ -129,14 +130,14 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     //At this point we assume the buffer is actually containing the position of the stick 2 frames ago
     if (current_state.x > current_controller_vals.analogStickSmashThreshold
         && previous_state.x < current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer.x.head() != 1)
+        && control_stick_buffer.x.containsNot(1))
     {
         //Smash input right
 		Debug::log("Smash Input Right");
         input_manager.registerInput(Input::RIGHT, port, -1, ElementType::STICK);
     } else if (current_state.x < -current_controller_vals.analogStickSmashThreshold
         && previous_state.x > -current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer.x.head() != -1)
+        && control_stick_buffer.x.containsNot(-1))
     {
         //Smash input left
 		Debug::log("Smash Input Left");
@@ -145,19 +146,21 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     
     if (current_state.y > current_controller_vals.analogStickSmashThreshold
         && previous_state.y < current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer.y.head() != 1)
+        && control_stick_buffer.y.containsNot(1))
     {
         //Smash input right
 		Debug::log("Smash Input Down");
         input_manager.registerInput(Input::DOWN, port, -1, ElementType::STICK);
     } else if (current_state.y < -current_controller_vals.analogStickSmashThreshold
         && previous_state.y > -current_controller_vals.analogStickSmashThreshold
-        && control_stick_buffer.y.head() != -1)
+        && control_stick_buffer.y.containsNot(-1))
     {
         //Smash input left
 		Debug::log("Smash Input UP");
         input_manager.registerInput(Input::UP, port, -1, ElementType::STICK);
     }
+
+    std::cout << control_stick_buffer.y << '\n' << std::flush;
 
     if (current_state.x > current_controller_vals.analogStickThreshold){
         control_stick_buffer.x.add(1);

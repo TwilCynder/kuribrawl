@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <memory>
-#include "../KBDebug/Debug.h"
 using namespace std;
 
 /**
@@ -11,11 +10,11 @@ using namespace std;
  * @tparam T 
  * @tparam SIZE 
  */
-template <typename T, int SIZE>
+template <typename T, size_t SIZE>
 class StaticFullQueue {
     protected:
     T elements[SIZE];
-    int head_;   //index where a value is GOING to be written (OLDEST index (FIRST in iteration))
+    size_t head_;   //index where a value is GOING to be written (OLDEST index (FIRST in iteration))
                 //tail is head_-1
     public:
     StaticFullQueue() : 
@@ -26,16 +25,15 @@ class StaticFullQueue {
         StaticFullQueue()
     {  
         //stupid dumb C ass for loop idk how to do it better
-        Debug::log((int)initial_value);
         for (T* i = elements; i < elements + SIZE; i++){
             *i = initial_value;
         }
     }
 
-    inline int inc(int i) {
+    inline static size_t inc(size_t i) {
         return (i + 1 >= SIZE) ? 0 : i + 1; 
     }
-    inline int tail() {
+    inline size_t tail() {
         return (head_ - 1 < 0) ? SIZE - 1 : head_ - 1;
     }
 
@@ -72,9 +70,35 @@ class StaticFullQueue {
     inline Iterator end(){
         return Iterator(*this, nullptr);
     }
+
+    bool contains(const T& val) const {
+        for (const T& v : elements){
+            if (val == v) return true;
+        }
+        return false;
+    }
+    
+    bool containsNot(const T& val) const {
+        for (const T& v : elements){
+            if (val != v) return true;
+        }
+        return false;
+    }
+
+    void print(std::ostream& out, const std::string& separator){
+        for (const T& v : *this){
+            out << v << separator;
+        }
+    }
 };
 
-template<typename T, int SIZE>
+template<typename T, size_t size>
+ostream& operator<<(ostream& out, StaticFullQueue<T, size> sfq){
+    sfq.print(out, " ");
+    return out;
+}
+
+template<typename T, size_t SIZE>
 class StaticFullQueue<T, SIZE>::Iterator {
     friend class StaticFullQueue<T, SIZE>;
 

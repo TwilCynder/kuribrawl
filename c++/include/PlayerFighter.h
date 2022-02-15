@@ -44,7 +44,7 @@ class PlayerFighter : public Fighter {
 
     static void initInputHandlers(); 
     using InputHandler = int (PlayerFighter::*)(RegisteredInput&); ///< Function applying the effect of an Input to a Fighter.  
-    using StickBuffer = StaticFullQueue<Uint8, CONTROL_STICK_FRAME_BUFFER>;
+    using StickBuffer = StaticFullQueue<int, CONTROL_STICK_FRAME_BUFFER>;
 
     //Debug
     bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
