@@ -19,7 +19,7 @@ FICHIER ANIMATION : A
 Le fichier est l'image source (contenant toutes les frames). 
 
 Sémantique de file_info : 
-A:[<domaine>/]<nom> {<nb_frames> [<speed> [cbox all]] | <descriptor_filename>}
+A:[<domaine>/]<nom> {<nb_frames> [<speed> [c]] | <descriptor_filename>}
 
 - Domaine : élément de gamplay auquel l'animation appartient (un champion, un stage, ...).
 - descriptor_filename est le nom d'un fichier texte contenant des infos sur l'anim (Descripteur d'animation)

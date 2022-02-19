@@ -6,7 +6,7 @@ jumpstart.png
 A:acid/jumpsquat 1 -1 c
 walk.png
 A:acid/walking 6 0.15 c
-dash.png 
+dash.png
 A:acid/dash 4 0.18 c
 dash_start.png
 A:acid/dash_start 2 8 c
