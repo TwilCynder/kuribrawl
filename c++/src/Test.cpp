@@ -12,7 +12,7 @@ void App::startTestGame(){
 	SDLHelper::printJoysticks(cout);
 	Debug::log("=====Starting game=====");
 
-	ports[0].plugController(-1, this->controllersData());
+	ports[0].plugController(3, this->controllersData());
 	
 	Champion* acid = game_data->getChampion("acid");
 
