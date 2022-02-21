@@ -8,4 +8,4 @@ Dashes can be cancelled by jumps, crouchs and shields. It is important to note t
 ## Jump
 Jump is the most common dash cancel option, as it will always be available when running.  
 The most important thing aabout the viability of jumps as a dash-cancelling option is what the jumpsquat can be cancelled into, and what can be performed immediately after leaving the ground, since all of these options will be available out of dash.  
-It is also important to define how much X speed can be kept/gained when jumping, as fixed and/or low X speeds after a jump significantly hinders the mobility oh a fighter using this option.  
+It is also important to define how much X speed can be kept/gained when jumping, as fixed and/or low X speeds after a jump significantly hinders the mobility of a fighter using this option.  

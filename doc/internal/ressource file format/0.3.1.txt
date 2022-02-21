@@ -30,7 +30,7 @@ Descripteur de fichier d'animation (un "-" = une ligne)
 - <nb frames>
 - [s<speed>] (vitesse de l'animation)
 {
-- f<n° de frame> [d<durée>] [o<x origine> <y origine>] (infos de frame) |
+- f<n° de frame> [d<durée>] [o<x origine> <y origine>] [m<frame movement mode> <x movement> <y movement>] (infos de frame) |
 - c[<n° de frame>] <x> <y> <w> <h> <invincible> (info de hurtbox) |
 - h[<n° de frame>] <x> <y> <w> <h> <damages> <angle> (info de hitbox)
 }*

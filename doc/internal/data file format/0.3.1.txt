@@ -32,6 +32,11 @@ Version du format : 0.3.0
 - - - [0x21
 - - - 4 octets : x origine
 - - - 4 octets : y origine]
+- - - [0x22
+- - - 1 octet mode
+- - - 8 octets composante x
+- - - 8 octets composante y
+- - - ]
 - |
 - infos de hurtbox : 
 - - - 0x03

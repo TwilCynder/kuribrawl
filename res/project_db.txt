@@ -1,7 +1,7 @@
 idle.png
 A:acid/idle idle.dat
 nair.png
-A:acid/nair nair_acid.dat
+A:acid/nair  nair_acid.dat
 jumpstart.png
 A:acid/jumpsquat 1 -1 c
 walk.png
