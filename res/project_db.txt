@@ -19,7 +19,7 @@ A:acid/air_idle 1 -1 c
 hurt.png
 A:acid/hurt 1 -1 c
 jump.png
-A:acid/jump 5 16 c
+A:acid/jump jump.dat
 landing.png
 A:acid/landing 2 5 c
 air_jump.png

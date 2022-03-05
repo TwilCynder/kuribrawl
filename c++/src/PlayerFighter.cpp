@@ -16,7 +16,7 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model):
     valid_port(false),
     input_manager(this),
     control_stick_buffer(StickBuffer(7), StickBuffer(7)),
-    current_direction_control_state{0, 0}
+    current_direction_control_state{0, 0} 
 {
     init_control_stick_buffer();
 }
@@ -27,7 +27,7 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     port(nullptr),
     valid_port(false),
     input_manager(this),
-    control_stick_buffer(StickBuffer(7), StickBuffer(7)),
+    control_stick_buffer(StickBuffer(7), StickBuffer(7)),   
     current_direction_control_state{0, 0}
 {
     init_control_stick_buffer();
@@ -160,7 +160,7 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
         input_manager.registerInput(Input::UP, port, -1, ElementType::STICK);
     }
 
-    std::cout << control_stick_buffer.y << '\n' << std::flush;
+    //std::cout << control_stick_buffer.y << '\n' << std::flush;      
 
     if (current_state.x > current_controller_vals.analogStickThreshold){
         control_stick_buffer.x.add(1);
@@ -177,7 +177,6 @@ void PlayerFighter::update_control_stick_buffer(const Vector& current_state, con
     } else {
         control_stick_buffer.y.add(0);
     }
-
 }
 
 /**

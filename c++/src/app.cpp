@@ -260,6 +260,7 @@ void App::print_report(std::ostream& out){
 Duration App::getLowestWait(){
 	Duration min = std::numeric_limits<Duration>::max();
 	for (Duration d : last_frames_wait){
+		Debug::log("uukb");
 		if (d < min) min = d;
 	}
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <memory>
+#include "../KBDebug/Debug.h"
 using namespace std;
 
 /**
@@ -34,7 +35,7 @@ class StaticFullQueue {
         return (i + 1 >= SIZE) ? 0 : i + 1; 
     }
     inline size_t tail() {
-        return (head_ - 1 < 0) ? SIZE - 1 : head_ - 1;
+        return ((ptrdiff_t)head_ - 1 < 0) ? SIZE - 1 : head_ - 1;
     }
 
     void add(T element){
