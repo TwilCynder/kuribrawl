@@ -1,36 +1,36 @@
-idle.png
-A:acid/idle idle.dat
-nair.png
-A:acid/nair  nair_acid.dat
-jumpstart.png
-A:acid/jumpsquat 1 -1 c
-walk.png
-A:acid/walking 6 0.15 c
+oracle.png
+I:font_oracle
+acid_rainbows.dat
+C:acid
+air_hurt_to_idle.png
+A:acid/air_hurt_to_idle 7 0.4 c
+air_idle.png
+A:acid/air_idle 1 -1.0 c
+air_idle_after_hurt.png
+A:acid/air_idle_after_hurt 1 -1.0 c
+air_jump.png
+A:acid/air_jump 8 0.25 c
 dash.png
 A:acid/dash 4 0.18 c
 dash_start.png
-A:acid/dash_start 2 8 c
+A:acid/dash_start 2 8.0 c
 dash_stop.png
-A:acid/dash_stop 2 5 c
+A:acid/dash_stop 2 5.0 c
 dash_turn.png
-A:acid/dash_turn 3 14 c
-air_idle.png
-A:acid/air_idle 1 -1 c
+A:acid/dash_turn 3 14.0 c
 hurt.png
-A:acid/hurt 1 -1 c
+A:acid/hurt 1 -1.0 c
+idle.png
+A:acid/idle 4 0.05 c
 jump.png
-A:acid/jump jump.dat
+A:acid/jump 5 0.0 c
+jumpstart.png
+A:acid/jumpsquat 1 -1.0 c
 landing.png
-A:acid/landing 2 5 c
-air_jump.png
-A:acid/air_jump 8 0.25 c
+A:acid/landing 2 5.0 c
+nair.png
+A:acid/nair nair_acid.dat
 uair.png
 A:acid/uair uair.dat
-air_hurt_to_idle.png
-A:acid/air_hurt_to_idle 7 0.4 c
-air_idle_after_hurt.png
-A:acid/air_idle_after_hurt 1 -1 c
-acid_rainbows.dat
-C:acid
-oracle.png
-I:font_oracle
+walk.png
+A:acid/walking 6 0.15 c

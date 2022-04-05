@@ -17,8 +17,8 @@ void App::startTestGame(){
 
 	GameConfiguration config;
 	config.addPlayer(&ports[0], *acid);
-	config.addPlayer(nullptr, *acid);
-	config.addPlayer(nullptr, *acid);
+	//config.addPlayer(nullptr, *acid);
+	//config.addPlayer(nullptr, *acid);
 
 	Game& game = game_manager.start(config);
 }

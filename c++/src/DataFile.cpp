@@ -254,10 +254,12 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         current_frame->duration = word;
                         break;
                     case FILEMARKER_FRAMEORIGIN:
+                        cout << std::hex << ftell(file) << std::dec << '\n';
                         readLong(&value);
                         current_frame->origin.x = value;
                         readLong(&value);
-                        current_frame->origin.x = value;
+                        current_frame->origin.y = value;
+                        cout << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
                         break;
                     case FILEMARKER_FRAMEMOVEMENT:
                         readByte(&byte);

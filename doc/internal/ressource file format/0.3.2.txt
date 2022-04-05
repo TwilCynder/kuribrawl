@@ -31,7 +31,7 @@ Descripteur de fichier d'animation (un "-" = une ligne)
 - [s<speed>] (vitesse de l'animation)
 {
 - f<n° de frame> [d<durée>] [o<x origine> <y origine>] [m[<x mode>:<x value>],[<y mode>:<y value>]] (infos de frame) |
-- c{{[<n° de frame>] <x> <y> <w> <h> <invincible> (info de hurtbox) | whole} | all } |
+- c{[[<n° de frame>] <x> <y> <w> <h> <invincible> (info de hurtbox) | whole] | all } |
 - h[<n° de frame>] <x> <y> <w> <h> <damages> <angle> (info de hitbox)
 }*
 
