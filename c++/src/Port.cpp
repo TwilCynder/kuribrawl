@@ -334,10 +334,8 @@ void Port::plugController(int id, ControllersData& cd){
             ct = cd.getDefaultController();
         }
 
-        controller_type = ct;
+        setControllerType(ct);
     }
-
-    current_controller_layout = controller_type->getElementLayout();
 }
 
 void Port::setFighter(PlayerFighter* fighter_){

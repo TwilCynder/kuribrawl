@@ -27,24 +27,24 @@ class PlayerFighter : public Fighter {
     PlayerFighter(Game&, Champion* model_, int x, int y, Port& port);
     ~PlayerFighter();
 
-    //Inputs
+    //Input handling
     void updateInputsStates();
     void resolveInputs();
     void handleButtonPress (int button );
     void handleTriggerPress(int trigger);
     void handleStickFlick(Kuribrawl::Direction direction); //currently only for the second stick
+    
+    int  handleInput(RegisteredInput& input);
+    static void initInputHandlers(); 
+    using InputHandler = int (PlayerFighter::*)(RegisteredInput&); ///< Function applying the effect of an Input to a Fighter.  
+    using StickBuffer = StaticFullQueue<int, CONTROL_STICK_FRAME_BUFFER>;
 
+    //Port
     Port* getPort() const;
     void setPort(Port* port);
     void unsetPort();
     Binding* getInputBinding() const;
     void initPortOptimizationData(PortOptimizationData& pod) const;
-
-    int  handleInput(RegisteredInput& input);
-
-    static void initInputHandlers(); 
-    using InputHandler = int (PlayerFighter::*)(RegisteredInput&); ///< Function applying the effect of an Input to a Fighter.  
-    using StickBuffer = StaticFullQueue<int, CONTROL_STICK_FRAME_BUFFER>;
 
     //Debug
     bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);

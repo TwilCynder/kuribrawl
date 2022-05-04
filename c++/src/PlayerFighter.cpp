@@ -78,14 +78,16 @@ void PlayerFighter::setPort(Port* port_){
     valid_port = true;
     port = port_;
 
+    //see below
     const ControllerType* controller_type = port->getControllerType();
     if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
 
     input_binding = &controller_type->getDefaultBinding();
     if (!input_binding) throw KBFatalDetailed("PlayerFighter assigned to port, ended up with no input binding", "oula");
 
-    current_controller_vals = ((!input_binding->override_controller_vals) && port->getControllerType()) ? 
-        port->getControllerType()->getControllerVals() :
+    ///\todo At some point we'lle have to make a decision regarding whether ports need to have a valid controller type (currently, yes)
+    current_controller_vals = ((!input_binding->override_controller_vals)/* && port->getControllerType()*/) ? //check is currently unnecessary since port->getControllerType() must be non-null anyways
+        controller_type->getControllerVals() :
         input_binding->controller_vals;
 }
 
@@ -387,39 +389,55 @@ bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
     const int radius = Kuribrawl::min(displayArea.w, displayArea.h) * 0.4;
     Vector center = {displayArea.x + displayArea.w / 2, displayArea.y + displayArea.h / 2 };
 
-    SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
+    if (valid_port){
+        SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
 
-    SDL_Rect box = {
-        center.x - radius,
-        center.y - radius,
-        radius * 2,
-        radius * 2
-    };
+        SDL_Rect box = {
+            center.x - radius,
+            center.y - radius,
+            radius * 2,
+            radius * 2
+        };
 
-    //can you believe there is no function in sdl to render a fucking circle
-    SDL_RenderDrawRect(target, &box);
+        //can you believe there is no function in sdl to render a fucking circle
+        //damn i forgot about that and i still can't believe it
+        SDL_RenderDrawRect(target, &box);
 
-    double analogThreshold = Port::normalizeStickValue(current_controller_vals.analogStickThreshold);
-    double analogSmashThreshold = Port::normalizeStickValue(current_controller_vals.analogStickSmashThreshold);
-    box = {
-        (int)(center.x - analogThreshold * radius),
-        (int)(center.y - analogThreshold * radius),
-        (int)(analogThreshold * radius * 2),
-        (int)(analogThreshold * radius * 2)
-    };
-    SDL_SetRenderDrawColor(target, 255, 0, 255, 150);
-    SDL_RenderDrawRect(target, &box);
-    box = {
-        (int)(center.x - analogSmashThreshold * radius),
-        (int)(center.y - analogSmashThreshold * radius),
-        (int)(analogSmashThreshold * radius * 2),
-        (int)(analogSmashThreshold * radius * 2)
-    };
-    SDL_SetRenderDrawColor(target, 255, 0, 0, 150);
-    SDL_RenderDrawRect(target, &box);
+        double analogThreshold = Port::normalizeStickValue(current_controller_vals.analogStickThreshold);
+        double analogSmashThreshold = Port::normalizeStickValue(current_controller_vals.analogStickSmashThreshold);
+        Debug::log("=============");
+        Debug::log(&current_controller_vals);
 
-    Vec2<double> pos = Port::normalizeStickVector(current_direction_control_state);
-    SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
-    SDL_RenderDrawLine(target, center.x, center.y, center.x + pos.x * radius, center.y + pos.y * radius);
+        box = {
+            (int)(center.x - analogThreshold * radius),
+            (int)(center.y - analogThreshold * radius),
+            (int)(analogThreshold * radius * 2),
+            (int)(analogThreshold * radius * 2)
+        };
+        SDL_SetRenderDrawColor(target, 255, 0, 255, 150);
+        SDL_RenderDrawRect(target, &box);
+        box = {
+            (int)(center.x - analogSmashThreshold * radius),
+            (int)(center.y - analogSmashThreshold * radius),
+            (int)(analogSmashThreshold * radius * 2),
+            (int)(analogSmashThreshold * radius * 2)
+        };
+        SDL_SetRenderDrawColor(target, 255, 0, 0, 150);
+        SDL_RenderDrawRect(target, &box);
+
+        Vec2<double> pos = Port::normalizeStickVector(current_direction_control_state);
+        SDL_SetRenderDrawColor(target, 0, 255, 0, 255);
+        SDL_RenderDrawLine(target, center.x, center.y, center.x + pos.x * radius, center.y + pos.y * radius);
+    } else {
+         SDL_Rect box = {
+            center.x - radius,
+            center.y - radius,
+            radius * 2,
+            radius * 2
+        };
+        SDL_SetRenderDrawColor(target, 127, 127, 127, 255);
+        SDL_RenderDrawRect(target, &box);
+    }
+
     return false;
 }
