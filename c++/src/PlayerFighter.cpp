@@ -405,8 +405,6 @@ bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
 
         double analogThreshold = Port::normalizeStickValue(current_controller_vals.analogStickThreshold);
         double analogSmashThreshold = Port::normalizeStickValue(current_controller_vals.analogStickSmashThreshold);
-        Debug::log("=============");
-        Debug::log(&current_controller_vals);
 
         box = {
             (int)(center.x - analogThreshold * radius),
