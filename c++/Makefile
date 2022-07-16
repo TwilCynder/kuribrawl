@@ -34,8 +34,11 @@ clean: clear all
 doc:
 	doxygen
 
-doc_light:
-	doxygen DoxyfileLight
+docG:
+	doxygen DoxyfileGraph
+
+docGF:
+	doxygen DoxyfileGraphFull
 
 start: 
 	@if [ -z "$(NOCLEAR)" ]; then\
