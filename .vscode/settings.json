@@ -67,5 +67,12 @@
         "lib/**/*.jar",
         "tools/editor/javaEditor/src/jgoodies-common-1.8.1.jar",
         "tools/editor/javaEditor/src/jgoodies-forms-1.8.0.jar"
+    ],
+    "java.completion.filteredTypes": [
+        "com.sun.*",
+        "sun.*",
+        "jdk.*",
+        "org.graalvm.*",
+        "io.micrometer.shaded.*"
     ]
 }
