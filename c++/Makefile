@@ -31,13 +31,16 @@ launch: all
 
 clean: clear all
 
-doc:
+_create_doc_dir:
+	mkdir -p doc
+
+doc: _create_doc_dir
 	doxygen
 
-docG:
+docG: _create_doc_dir
 	doxygen DoxyfileGraph
 
-docGF:
+docGF: _create_doc_dir
 	doxygen DoxyfileGraphFull
 
 start: 

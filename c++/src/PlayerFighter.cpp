@@ -362,10 +362,17 @@ int PlayerFighter::handleInput(RegisteredInput& input){
     return (handler) ? (this->*handler)(input) : 0;
 }
 
+/**
+ * @brief Called by the input handlers of jump inputs  
+ * (Input::JUMP and Input::SHORTHOP)
+ * @param input 
+ * @param type 
+ * @return int 
+ */
 int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
     if (grounded){
-        if (state == Fighter::State::JUMPSQUAT){
-            state_info |= 0b100;
+        if (state == Fighter::State::JUMPSQUAT && input.element_type != ElementType::STICK){ //if we pressed a second jump button/trigger basically
+            state_info |= 0b100;  //set the jump Y type to short hop
         } else {
             setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue((Uint8)(type == jumpY::Short) ? 1 : 0, 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
         }

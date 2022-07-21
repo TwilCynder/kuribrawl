@@ -278,6 +278,7 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
 
 
 //Returns int to make jump_manager able to return its return value directly
+//
 int Fighter::air_jump(jumpX x_type){
 	if (air_jumps > 0) {    
 		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
