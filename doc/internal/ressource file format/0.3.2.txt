@@ -1,0 +1,71 @@
+Structure des fichiers ressource utilisés pour générer le datafile.
+Systèmes affectés par cette specification : 
+- datafile maker
+- kuribrawl
+
+Fichiers utilisés listés dans project_db.txt. Structure :
+
+{
+<filename>
+<file_info>
+}*
+
+file_info est de forme 
+<Type>:<tag> <info>
+Type étant une lettre indiquant le type de fichier (qui déterminera la manière dont DFM interprétera cette ligne et les champs info et encodera le fichier)  
+
+========================================================
+FICHIER ANIMATION : A
+Le fichier est l'image source (contenant toutes les frames). 
+
+Sémantique de file_info : 
+A:[<domaine>/]<nom> {<nb_frames> [<speed> [c]] | <descriptor_filename>}
+
+- Domaine : élément de gamplay auquel l'animation appartient (un champion, un stage, ...).
+- descriptor_filename est le nom d'un fichier texte contenant des infos sur l'anim (Descripteur d'animation)
+
+Contenu du descripteur d'animation
+
+Descripteur de fichier d'animation (un "-" = une ligne)
+- <nb frames>
+- [s<speed>] (vitesse de l'animation)
+{
+- f<n° de frame> [d<durée>] [o<x origine> <y origine>] [m[<x mode>:<x value>],[<y mode>:<y value>]] (infos de frame) |
+- c{[[<n° de frame>] <x> <y> <w> <h> <invincible> (info de hurtbox) | whole] | all } |
+- h[<n° de frame>] <x> <y> <w> <h> <damages> <angle> (info de hitbox)
+}*
+
+=========================================================
+FICHIER LEFTANIM : L
+Ne sera pas encodé, n'existe que pour la legacy
+
+=========================================================
+FICHIER DE CHAMPION : C
+
+Fichier texte interprété comme un Descripteur.
+
+- <Nom d'affichage>
+- <variables de gameplay séparées par espaces>
+{
+- m<nom du move> [l<landing lag>] (infos de move) |
+- u<nom du move> {<frame de fin de part> <frame de début de part>}* (info de multimove) : 
+}*
+
+=========================================================
+FICHIER DE STAGE : S
+
+Fichier texte interprété comme un Descripteur.
+
+- <Nom d'affichage>
+- <variables de gameplay séparées par des espaces>
+{
+- p <x> <y> <width> [<animation>] (infos de plateforme)
+}*
+
+==========================================================
+FICHIER IMAGE : I
+Fichier image qui sera encodé tel quel et chargé comme texture, le tag correspond au rôle de cette image.  
+
+==========================================================
+FICHIER DIVERS : X
+Fichier qui sera encodé tel quel, le tag correspond à son rôle. I est juste un cas spécial de X, qui a son propre type juste pour des questions de simplicité.

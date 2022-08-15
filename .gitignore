@@ -1,0 +1,6 @@
+"src/kuribrawl log.txt"
+*.o
+c++/doc/*
+c++/kuribrawl.exe
+*.exe
+*.dll

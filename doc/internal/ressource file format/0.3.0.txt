@@ -1,0 +1,36 @@
+Fichiers utilisés pour générer le datafile listés dans project_db.txt. Structure :
+
+{
+filename
+file_info
+}*
+
+file_info est de forme 
+X:tag {info}*
+X étant une lettre indiquant le type de fichier (qui déterminera la manière dont DFM interprétera cette ligne et les champs info et encodera le fichier)  
+
+========================================================
+FICHIER ANIMATION : A
+Sémantique de file_info : 
+A:[domaine]/nom {nb_frames [speed ["cbox all"]] | descriptor_filename}
+
+
+
+Descripteur de fichier d'animation (format texte, ligne par ligne)
+- nombre de frames
+- vitesse (facultatif) : s<speed>
+- info de frame (facultatif) : f<n° de frame> [d<durée>] [o<x origine> <y origine>]
+- info de hurtbox : c <x> <y> <w> <h> <invincible>
+- info d'hitbox : h <x> <y> <w> <h> <damages> <angle>
+
+Descripteur de champion
+- Nom
+- variables sur la même lignes (séparées par espaces)
+- infos de move (facultatif) : m <nom du move> [l<landing lag>]
+- info de multimove (facultatif) : u<id du move> {<frame de fin de part> <frame de début de part>}
+
+Descripteur de stage
+- Nom
+- variables 
+- infos de plateforme
+- info de plateforme (facultatif) : p <x> <y> <width> [<animation>]

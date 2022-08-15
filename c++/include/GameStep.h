@@ -1,0 +1,10 @@
+#pragma once
+enum GameStep{
+    START,
+    UPDATED_STATES,
+    UPDATED_INPUTS,
+    UPDATED_PHYSICS,
+    UPDATED_ANIMATIONS,
+    DREW,
+    ADVANCED_ANIMATIONS
+};
