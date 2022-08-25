@@ -35,8 +35,10 @@ Procedure logState(state.b, facing.b = 0, previousTime.u = 0)
     SetGadgetColor(stateGadget, #PB_Gadget_BackColor,  #Cyan)
   ElseIf facing = -1
     SetGadgetColor(stateGadget, #PB_Gadget_BackColor,  #Red)
-  EndIf 
+  EndIf
 EndProcedure
+
+
 ; IDE Options = PureBasic 5.72 (Windows - x64)
 ; Folding = -
 ; EnableXP

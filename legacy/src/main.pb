@@ -42,23 +42,23 @@ Define main.MainData, window.l
 Procedure startTestGame()
   Shared main, window
   *game.Game = main\currentGame
-  
+
   If *game
     Debug "A game is already running. (game object adress : " + Hex(*game) + ")"
     endGame(*game)
-  EndIf 
-  
+  EndIf
+
   setPort(0, 0)
   ;setPort(1, 2)
-  
+
   *game = startGame(window, "Snowdin")
   addFighter(*game, "Acid", *game\currentStage\model\w / 2 -200, 300, 0, "TwilCynder")
   addFighter(*game, "Acid", *game\currentStage\model\w / 2 +200, 300, 2 , "Naelink")
-  
+
   initFighters(*game)
-  
+
   setCurrentGame(@main, *game)
-EndProcedure  
+EndProcedure
 
 ;- Game window
 window = OpenWindow(-1, 0, 0, #SCREEN_W + 210, #SCREEN_H, "test", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
@@ -67,7 +67,7 @@ SetWindowColor(window, $aaaaaa)
 CompilerIf #DEBUG
   InputLogGadget(#SCREEN_W + 5, 5, 200, #SCREEN_H - 120)
   StatesGadgets(#SCREEN_W + 5, #SCREEN_H - 100, 180)
-CompilerEndIf 
+CompilerEndIf
   CreateMenu(0, WindowID(window))
   AddKeyboardShortcut(window, #PB_Shortcut_F5, 0)
   BindMenuEvent(0, 0, @startTestGame())
@@ -75,21 +75,21 @@ CompilerEndIf
   BindMenuEvent(0, 1, @lowerFrameRate())
   AddKeyboardShortcut(window, #PB_Shortcut_F7, 2)
   BindMenuEvent(0, 2, @increaseFrameRate())
-  
+
 ;- loading game data
 CompilerIf #DEBUG
   loadGameData("data.twl")
   For i = 1 To availableJosticks
     Debug Str(i - 1) + JoystickName(i - 1)
   Next
-CompilerElse 
+CompilerElse
   loadGameData("data.twl")
 CompilerEndIf
 
 ;- Initialization
 ForEach kuribrawl\characters()
   initChampion(kuribrawl\characters())
-Next 
+Next
 initHUD()
 initStartMenu()
 
@@ -111,11 +111,11 @@ Repeat
   startTime = endTime
   nextFrame = nextFrame + frameDuration
   startTime = ElapsedMilliseconds()
-  
+
   readInputs(*game)
   If *game
     manageStates(*game)
-    updateInputs(*game)  
+    updateInputs(*game)
     manageHitboxes(*game)
     applyPhysics(*game)
     updateAnimations(*game)
@@ -123,31 +123,31 @@ Repeat
     advanceAnimations(*game)
   ElseIf main\currentMenu
     renderMenu(main\currentMenu)
-  EndIf 
-  
+  EndIf
+
   SetWindowTitle(window, Str(lastFrameDuration))
-  
+
   currentTime = ElapsedMilliseconds()
   frameWait = nextFrame - currentTime
   totalFrameWait + frameWait
    If frameWait < 0
      nextFrame = currentTime
-     Debug "/!\Can't keep up !"
-   Else 
+     Debug "/!\Can't keep up ! Frame lasted " + Str(frameDuration - frameWait)
+   Else
      CompilerIf Not #DEBUG
        If frameWait < 8
-         bgc = #Red 
+         bgc = #Red
          Debug "/!\Frame process lasted more than 6.6ms !"
-       EndIf 
+       EndIf
      CompilerEndIf
      Delay(frameWait)
-   EndIf 
+   EndIf
   frame + 1
   endTime = ElapsedMilliseconds()
 
   lastFrameDuration = endTime - startTime
 Until WindowEvent() = #PB_Event_CloseWindow
-  
+
 CreateFile(0, "kuribrawl log.txt")
 totalTime = ElapsedMilliseconds() - launchTime
 WriteString(0, "Execution lasted " + Str(totalTime) + "ms  and " + Str(frame) + " frames were displayed (average framewait : " + Str(totalFrameWait / frame) + ").")

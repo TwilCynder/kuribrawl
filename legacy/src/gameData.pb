@@ -14,7 +14,6 @@ stateDefaultAnimation(#STATE_GUARD) = "shield"
 stateDefaultAnimation(#STATE_GUARD_START) = "shieldstart"
 stateDefaultAnimation(#STATE_GUARD_STOP) = "shieldend"
 
-
 commandDefaultAnimation(#COMMAND_NAir) = "nair"
 commandDefaultAnimation(#COMMAND_FAir) = "fair"
 commandDefaultAnimation(#COMMAND_UAir) = "uair"
