@@ -159,6 +159,7 @@ bool App::loadGameFile(const char* name){
     DataFile data_file(name, renderer);
     if (data_file.ready()) {
         data_file.read(*this);
+		cout << "Successfully loaded data from " << name << '\n' << std::flush;
         return true;
     }
     return false;

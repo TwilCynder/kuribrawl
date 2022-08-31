@@ -48,7 +48,7 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->buttons[SDL_SCANCODE_O] = Input::JUMP;
     input_binding->direction_control_mode = Binding::DirectionControlMode::DPAD_ONLY;
     input_binding->analog_modifier_button = SDL_SCANCODE_LSHIFT;
-    input_binding->tap_jump = true;
+    input_binding->tap_jump = false;
 
     mapping_string = "0300000034120000adbe000000000000,Gamecube Controller vJoy,platform:Windows,a:b0,b:b1,y:b2,x:b3,start:b7,rightshoulder:b4,dpup:b8,dpleft:b10,dpdown:b9,dpright:b11,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5";
     SDL_GameControllerAddMapping(mapping_string);
