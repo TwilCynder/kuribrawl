@@ -13,7 +13,7 @@ A:acid/air_jump 8 0.25 c
 dash.png
 A:acid/dash 4 0.18 c
 dash_start.png
-A:acid/dash_start 2 0.0 c
+A:acid/dash_start 2 8.0 c
 dash_stop.png
 A:acid/dash_stop 2 5.0 c
 dash_turn.png
