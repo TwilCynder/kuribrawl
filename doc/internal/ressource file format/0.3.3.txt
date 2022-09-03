@@ -15,7 +15,7 @@ file_info est de forme
 Type étant une lettre indiquant le type de fichier (qui déterminera la manière dont DFM interprétera cette ligne et les champs info et encodera le fichier)  
 
 ========================================================
-FICHIER ANIMATION : A
+FICHIER ANIMATION D'ENTITÉ : A
 Le fichier est l'image source (contenant toutes les frames). 
 
 Sémantique de file_info : 
@@ -32,8 +32,23 @@ Descripteur de fichier d'animation (un "-" = une ligne)
 {
 - f<n° de frame> [d<durée>] [o<x origine> <y origine>] [m[<x mode>:<x value>],[<y mode>:<y value>]] (infos de frame) |
 - c{[[<n° de frame>] <x> <y> <w> <h> <invincible> (info de hurtbox) | whole] | all } |
-- h[<n° de frame>] <x> <y> <w> <h> <damages> <angle> (info de hitbox)
+- h[<n° de frame>] <x> <y> <w> <h> <type> <infos spécifiques au type> (info de hitbox)
 }*
+
+Infos de hitbox spécifiques au type : 
+- Damage hitbox : <damage> <angle> <hitID> <priority>
+
+=========================================================
+FICHIER ANIMATION BACKGROUND : B 
+(animation sans intéraction avec les entités)
+Le fichier est l'image source (contenant toutes les frames). 
+
+Les fichiers d'animation background se lisent comme les fichiers d'animation d'entité, à l'exception que tout élément d'interaction (voir plus bas)
+génèrera une erreur.
+
+Éléments d'interaction :
+- hitboxes
+- hurtboxes
 
 =========================================================
 FICHIER LEFTANIM : L
@@ -44,12 +59,12 @@ FICHIER DE CHAMPION : C
 
 Fichier texte interprété comme un Descripteur.
 
-- <Nom d'affichage>
-- <variables de gameplay séparées par espaces>
-{
-- m<nom du move> [l<landing lag>] (infos de move) |
-- u<nom du move> {<frame de fin de part> <frame de début de part>}* (info de multimove) : 
-}*
+- <Nom d'affichage> 
+- <variables de gameplay séparées par espaces> 
+{ 
+- m<nom du move> [l<landing lag>] (infos de move) | 
+- u<nom du move> {<frame de fin de part> <frame de début de part>}* (info de multimove) :  
+}* 
 
 =========================================================
 FICHIER DE STAGE : S
@@ -60,6 +75,7 @@ Fichier texte interprété comme un Descripteur.
 - <variables de gameplay séparées par des espaces>
 {
 - p <x> <y> <width> [<animation>] (infos de plateforme)
+- b <animation> <x> <y> [<profondeur>]
 }*
 
 ==========================================================

@@ -1,3 +1,4 @@
 [abc] = facultatif  
 {abc|bcd} = abc OU bcd
 * après un {} indique répétition (0 à n fois)
+(commentaires)
