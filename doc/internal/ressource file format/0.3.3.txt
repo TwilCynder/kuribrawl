@@ -60,24 +60,26 @@ FICHIER DE CHAMPION : C
 Fichier texte interprété comme un Descripteur.
 
 - <Nom d'affichage> 
-- <variables de gameplay séparées par espaces> 
+- <attributs de gameplay séparées par espaces> 
 { 
 - m<nom du move> [l<landing lag>] (infos de move) | 
-- u<nom du move> {<frame de fin de part> <frame de début de part>}* (info de multimove) :  
+- u<nom du move> {<frame de fin de part> <frame de début de part>}* (info de multimove NI) :  
 }* 
 
+attributs de gameplay : voir annexe
 =========================================================
 FICHIER DE STAGE : S
 
 Fichier texte interprété comme un Descripteur.
 
 - <Nom d'affichage>
-- <variables de gameplay séparées par des espaces>
+- <attributs de gameplay séparées par des espaces>
 {
 - p <x> <y> <width> [<animation>] (infos de plateforme)
 - b <animation> <x> <y> [<profondeur>]
 }*
 
+attributs de gameplay : voir annexe
 ==========================================================
 FICHIER IMAGE : I
 Fichier image qui sera encodé tel quel et chargé comme texture, le tag correspond au rôle de cette image.  
@@ -85,3 +87,53 @@ Fichier image qui sera encodé tel quel et chargé comme texture, le tag corresp
 ==========================================================
 FICHIER DIVERS : X
 Fichier qui sera encodé tel quel, le tag correspond à son rôle. I est juste un cas spécial de X, qui a son propre type juste pour des questions de simplicité.
+
+
+
+============ ANNEXE ======================================
+Values with the mention "default : <value>" will take the indicated value if replaced by a "x".
+
+It is important to note that for every gameplay attribute indicating the duration of a state, 
+a value of -1 means that the duration of that state's animation should be used.
+The default value (noted x) for most of those attributes is -1.
+
+Attributs de gameplay champion : 
+- 0 : Walk Speed
+- 1 : Dash Speed
+- 2 : Initial Dash Speed
+- 3 : Dash Turn Acceleration (backwards acceleration aaplied during a dash turn)
+- 4 : Dash stop Decceleration
+- 5 : Traction (deceleration/backwards acceleration applied while on the ground)
+- 6 : Max Air Speed (maximum air drift horizontal speed)
+- 7 : Air Acceleration (acceleration applied when air drifting)
+- 8 : Air Friction (deceleration/backwards acceleration applied when airborne)
+- 9 : Jump Speed (full hop starting vertical speed)
+- 10 : Short Hop Speed (short hop starting vertical speed)
+- 11 : Double Jump Speed (double jump starting vertical speed)
+- 12 : Grounded forward jump H speed
+- 13 : Grounded backward jump H speed
+- 14 : Air forward jump H speed
+- 15 : Air backward jump H speed
+- 16 : Gravity
+- 17 : Max Fall Speed (maximum vertical speed when falling)
+- 18 : Fast Fall Speed
+- 19 : Weight
+- 20 : Jumpsquat Duration (duration of the jumpsquat, in frames. Leave at 0 to set it to the jumpsquat animation length)
+- 21 : Dash Start Duration (duration of the dash stop state. Leave at 0 to set it to the dashstop animation length)
+- 22 : Dash Stop Duration (duration of the initial dash state. Leave at 0 to set it to the dashstart animation length)
+- 23 : Dash Turn Duration (duration of the dash turn state. Leave at 0 to set it to the dashturn animation length)
+- 24 : Landing duration (duration of the landing state. Leave to 0 to set it to the duration of the lading animation)  
+- 25 : Shield Startup : number of frames between the frame you press Guard and the frame your shield appears.
+- 26 : Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.  
+- 27 : Shield size
+- 28 : Shield x
+- 29 : Shield y
+- 30 : Jumps
+
+Attributs de gameplay stage : 
+- 0 : Blastzone w
+- 1 : Blastzone h
+- 2 : Camera limit box x offset (relative to a position where the camera limit box is centered in the stage)
+- 3 : Camera limit box y offset (relative to a position where the camera limit box is centered in the stage)
+- 4 : Camera limit box w
+- 5 : Camera limit box h

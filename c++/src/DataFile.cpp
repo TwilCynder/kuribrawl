@@ -255,9 +255,9 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         break;
                     case FILEMARKER_FRAMEORIGIN:
                         cout << std::hex << ftell(file) << std::dec << '\n';
-                        readLong(&value);
+                        readWord(&value);
                         current_frame->origin.x = value;
-                        readLong(&value);
+                        readWord(&value);
                         current_frame->origin.y = value;
                         cout << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
                         break;

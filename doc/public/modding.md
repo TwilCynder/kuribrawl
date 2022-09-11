@@ -59,8 +59,8 @@ C:Tag
     - Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.  
 
 It is important to note that for every value indicating a duration, two special values can be used :  
--    -1 : indicates that the duration of the animation should be used  
--    x  : indicates that the default duration should be used
+- -1 : indicates that the duration of the animation should be used  
+- x  : indicates that the default duration should be used
 
 After the first 2 lines, all lines indicate facultative info, and can be included in any order.
 
