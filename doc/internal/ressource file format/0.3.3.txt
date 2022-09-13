@@ -15,6 +15,11 @@ file_info est de forme
 Type étant une lettre indiquant le type de fichier (qui déterminera la manière dont DFM interprétera cette ligne et les champs info et encodera le fichier)  
 
 ========================================================
+NOTES GÉNÉRALES
+Nom d'animation : alphanumérique [a-zA-Z_0-9] ou \w 
+
+
+========================================================
 FICHIER ANIMATION D'ENTITÉ : A
 Le fichier est l'image source (contenant toutes les frames). 
 
