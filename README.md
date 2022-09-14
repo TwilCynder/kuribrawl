@@ -6,3 +6,6 @@ Written in C++ with my own engine (only me, my gcc and the SDL library), the gam
 Gameplay-wise, Kuribrawl aims to be "fun while technical", like some kind of a bit more technical Rivals of Aether. 
 The game (and by that i mean a decent gaming exeprience, fun-wise) should be accessible for anyone without experience of fighting games, however the goal is to
 reward high levels of skill at platform fighters if the game is played with a competitive intent, with a high skill ceiling.
+
+## Installing
+Of course, proper packaged releases with a ready-to-run executable will be published. For now, kuribrawl can be built from its source code by following the [installation guide](./doc/internal/install-build.md#Kuribrawl)
