@@ -10,7 +10,7 @@
 
 void App::startTestGame(){
 	Debug::log("=====Starting game=====");
-
+	
 	ports[0].plugController(-1, this->controllersData());
 	
 	Champion* acid = game_data->getChampion("acid");
