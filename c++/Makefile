@@ -1,9 +1,9 @@
 EXEC = kuribrawl
 
 ifdef RELEASE
-	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=c++17 -O3
+	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=c++20 -O3
 else
-	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=c++17 -DDEBUG=1
+	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=c++20 -DDEBUG=1
 endif 
 
 

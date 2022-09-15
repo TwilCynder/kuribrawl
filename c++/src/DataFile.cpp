@@ -205,7 +205,12 @@ SDL_Texture* DataFile::readTexture(){
     int fileEnd;
     readLong(&fileEnd);
     fileEnd += ftell(file); //Value is the file adress right after the image
+    cout << "Reading texture at : " << std::hex << ftell(file) << std::dec << '\n';
     SDL_Texture* result = IMG_LoadTexture_RW(renderer, sdl_stream, 0);
+    if (result == nullptr){
+        throw KBFatal(std::format());
+    }
+    Debug::log(SDL_GetError());
     fseek(file, fileEnd, SEEK_SET);
     return result;
 }
@@ -254,7 +259,6 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         current_frame->duration = word;
                         break;
                     case FILEMARKER_FRAMEORIGIN:
-                        cout << std::hex << ftell(file) << std::dec << '\n';
                         readWord(&value);
                         current_frame->origin.x = value;
                         readWord(&value);

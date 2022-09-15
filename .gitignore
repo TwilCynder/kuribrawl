@@ -4,3 +4,4 @@ c++/doc/*
 c++/kuribrawl.exe
 *.exe
 *.dll
+*.twl
