@@ -208,7 +208,7 @@ SDL_Texture* DataFile::readTexture(){
     cout << "Reading texture at : " << std::hex << ftell(file) << std::dec << '\n';
     SDL_Texture* result = IMG_LoadTexture_RW(renderer, sdl_stream, 0);
     if (result == nullptr){
-        throw KBFatal(std::format());
+        //throw KBFatal(std::format());
     }
     Debug::log(SDL_GetError());
     fseek(file, fileEnd, SEEK_SET);
