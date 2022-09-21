@@ -81,7 +81,7 @@ Fichier texte interprété comme un Descripteur.
 - <attributs de gameplay séparées par des espaces>
 {
 - p <x> <y> <width> [<animation>] (infos de plateforme)
-- b <animation> <x> <y> [<profondeur>]
+- b <animation> <x> <y> [<profondeur>]  (info d'élément de bacground NI)
 }*
 
 attributs de gameplay : voir annexe
