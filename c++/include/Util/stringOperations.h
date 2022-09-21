@@ -67,10 +67,12 @@ namespace Kuribrawl {
     using string = basic_string<char>;
 
     template<typename... Args>
-    std::string formatString(const std::string& format, Args... args){
-        int size = snprintf(nullptr, 0, format.c_str(), ...);
-        if( size_s <= 0 ) throw std::runtime_error( "Error during formatting." );
+    std::string formatString(const std::string_view& format, Args... args){
+        int size = std::snprintf(nullptr, 0, format.data(), args...);
+        if( size <= 0 ) throw std::runtime_error( "Error during formatting." );
 
-        //std::string_view
+        std::unique_ptr<char[]> buf = std::make_unique<char[]>(size);
+        std::snprintf( buf.get(), size + 1, format.data(), args ... );
+        return std::string( buf.get(), buf.get() + size);  
     }
 }

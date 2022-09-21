@@ -7,6 +7,7 @@
 #include "app.h"
 #include "GameData.h"
 #include "Util/util.h"
+#include "Util/stringOperations.h"
 #include "KBDebug/Debug.h"
 #include "KBDebug/DebugTime.h"
 
@@ -204,13 +205,19 @@ void DataFile::readChampionFile(Champion& champion){
 SDL_Texture* DataFile::readTexture(){
     int fileEnd;
     readLong(&fileEnd);
+
+    #ifdef DEBUG
+        cout << "Reading texture at 0x" << std::hex << ftell(file) << std::dec << 
+        ", of size " << fileEnd << '\n';
+    #endif
+
     fileEnd += ftell(file); //Value is the file adress right after the image
-    cout << "Reading texture at : " << std::hex << ftell(file) << std::dec << '\n';
+
     SDL_Texture* result = IMG_LoadTexture_RW(renderer, sdl_stream, 0);
     if (result == nullptr){
-        //throw KBFatal(std::format());
+        throw KBFatal(Kuribrawl::formatString("Could not read texture file : %s", IMG_GetError()));
     }
-    Debug::log(SDL_GetError());
+    Debug::log(IMG_GetError());
     fseek(file, fileEnd, SEEK_SET);
     return result;
 }
@@ -231,6 +238,8 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     EntityFrame* current_entity_frame = nullptr;
     Hurtbox* hurtbox = nullptr;
     Hitbox* hitbox = nullptr;
+
+    Debug::log("----Reading animation----");
 
     anim.setSpritesheet(readTexture());
     readByte(&byte);
