@@ -133,8 +133,8 @@ void TextDisplayer::advance(int x_){
  * @param y 
  * @return TextDisplayer::SetPositionData 
  */
-TextDisplayer::SetPositionData&& TextDisplayer::position(int x, int y){
-    return {x, y};
+TextDisplayer::SetPositionData TextDisplayer::position(int x, int y){
+    return  TextDisplayer::SetPositionData{x, y};
 }
 
 /**

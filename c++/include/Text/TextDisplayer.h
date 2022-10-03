@@ -56,7 +56,7 @@ class TextDisplayer {
     /** Object passed to a TextDisplayer through the << operator to change the current write position.
      */
     using SetPositionData = Kuribrawl::Vector;
-    static SetPositionData&& position(int x, int y);
+    static SetPositionData position(int x, int y);
     TextDisplayer& operator<<(SetPositionData&&);
 };
 
