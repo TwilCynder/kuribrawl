@@ -171,6 +171,10 @@ bool App::loadGameFile(const char* name){
  * Tries different locations for the data.twl file.
  */
 void App::loadRessources(){
+	//SDL_i
+	SDL_Texture* test = IMG_LoadTexture(renderer, "oracle.png");
+	Debug::log(test);
+
 	if (!loadGameFile("data.twl"))
 	if (!loadGameFile("../res/data.twl"))
 	if (!loadGameFile("../gamefile manager/data.twl"))
@@ -354,9 +358,17 @@ void App::setFrameRate(int fr){
  * @brief On OSes that support it, show an OS-native popup message.
  * App::InitSDL must have been successfully called before calling this method.
  */
+
+#ifdef _WIN32
 void App::viewPopupMessage(LPCSTR title, LPCSTR message){
 	Kuribrawl::errorPopup(win_info.info.win.window, title, message);
 }
+#else 
+void App::viewPopupMessage(const char* title, const char* message){
+	Kuribrawl::errorPopup(nullptr, title, message);
+}
+
+#endif
 
 /**
  * @brief Update the duration of a a frame based on the framerate.
@@ -382,6 +394,12 @@ void App::loop_timer(){
 	total_frame_wait += wait;
 }
 
+void inline App::handleExcept(KBFatal& ex){
+#ifdef _WIN32
+ex.setData(win_info.info.win.window);
+#else
+#endif
+}
 /**
  * @brief Main loop of the game.
  * Never returns ; the loop is infinite and stops only when exit() is called.
@@ -413,6 +431,6 @@ void App::loop() try {
         loop_timer();
     }
 } catch (KBFatal& exception){
-	exception.setData(win_info.info.win.window);
+	handleExcept(exception);
 	throw;
 }

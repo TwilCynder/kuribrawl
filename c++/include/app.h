@@ -12,6 +12,7 @@
 #include "Text/TextureFont.h"
 #include "Text/TextDisplayer.h"
 #include "Util/StaticFullQueue.h"
+#include "KBException.h"
 
 #define NB_PORTS 4
 #define NB_CONTROLLERS 16
@@ -87,6 +88,8 @@ class App
     bool advance;
 
     bool quit;
+
+    void handleExcept(KBFatal& ex);
 
     //Data singletons
     std::unique_ptr<GameData> game_data; //*< the GameData (all the data related to gameplay) that will be used for games ran by this App.

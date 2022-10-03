@@ -94,11 +94,11 @@ int PlayerFighter::InputHandler_SmashStickUp(RegisteredInput& input){
 PlayerFighter::InputHandler PlayerFighter::input_handlers[Input::TOTAL];
 
 void PlayerFighter::initInputHandlers(){
-    input_handlers[Input::JUMP] = &InputHandler_Jump;
-    input_handlers[Input::SHORTHOP] = &InputHandler_ShortHop;
-    input_handlers[Input::RIGHT] = &InputHandler_SmashStickSide;
-    input_handlers[Input::LEFT] = &InputHandler_SmashStickSide;
-    input_handlers[Input::DOWN] = &InputHandler_SmashStickDown;
-    input_handlers[Input::UP] = &InputHandler_SmashStickUp;
-    input_handlers[Input::ATTACK] = &InputHandler_Attack;
+    input_handlers[Input::JUMP] = &PlayerFighter::InputHandler_Jump;
+    input_handlers[Input::SHORTHOP] = &PlayerFighter::InputHandler_ShortHop;
+    input_handlers[Input::RIGHT] = &PlayerFighter::InputHandler_SmashStickSide;
+    input_handlers[Input::LEFT] = &PlayerFighter::InputHandler_SmashStickSide;
+    input_handlers[Input::DOWN] = &PlayerFighter::InputHandler_SmashStickDown;
+    input_handlers[Input::UP] = &PlayerFighter::InputHandler_SmashStickUp;
+    input_handlers[Input::ATTACK] = &PlayerFighter::InputHandler_Attack;
 }

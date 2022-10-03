@@ -1,4 +1,5 @@
 #include "sdlHelper.h"
+#include "KBException.h"
 
 namespace SDLHelper {
 
@@ -9,7 +10,9 @@ void initSDL()
 		exit(1);
 	}
 
-	IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+	if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) < 0) {
+		throw new KBFatal("Couldn't initialize SDL: %s\n", SDL_GetError());
+	};
 }
 
 void closeSDL(){

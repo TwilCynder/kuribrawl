@@ -59,12 +59,12 @@ namespace Kuribrawl {
     template<typename T>
     struct ArithVec2 : public Vec2<T> {
         template<typename U>
-        operator+(ArithVec2<U>&& other){
+        ArithVec2<U> operator+(ArithVec2<U>&& other){
             return ArithVec2(this->x + other.x, this->y + other.y);
         }
 
         template<typename U>
-        operator+(U&& other){
+        ArithVec2<U> operator+(U&& other){
             return ArithVec2(this->x + other, this->y + other);
         }
     };

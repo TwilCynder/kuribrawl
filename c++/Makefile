@@ -1,9 +1,9 @@
 EXEC = kuribrawl
 
 ifdef RELEASE
-	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=c++20 -O3
+	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=gnu++2a -O3
 else
-	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=c++20 -DDEBUG=1
+	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=gnu++2a -DDEBUG=1
 endif 
 
 
@@ -57,6 +57,7 @@ bin/%.o: %.cpp #$(SRC)
 	g++ $(CFLAGS) -c $< -o $@
 
 clear:
+	touch bin/d
 	rm -r bin/*
 
 $(EXEC): $(OBJS)

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <exception>
+#include "Util/stringOperations.h"
 
 /**
  * \brief Exception representing a fatal error that stops Kuribrawl.
@@ -14,6 +15,11 @@ class KBFatal : public std::exception {
     void setData(void*);
     void* getData();
     virtual const char* userMessage() const;
+
+    template<typename... Args>
+    explicit KBFatal(const std::string_view& format, Args... args) : 
+      KBFatal(Kuribrawl::formatString(format, args...))
+    {}
 
   private:
     void* data;
