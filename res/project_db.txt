@@ -1,8 +1,8 @@
 #JPGTest.jpg
-acid\air_hurt_to_idle.png
-A:acid/air_hurt_to_idle 7 0.4 c
 oracle.png
 I:font_oracle
+acid\air_hurt_to_idle.png
+A:acid/air_hurt_to_idle 7 0.4 c
 acid\acid_rainbows.dat
 C:acid
 acid\air_idle.png
