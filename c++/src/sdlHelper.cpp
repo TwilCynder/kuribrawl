@@ -1,17 +1,25 @@
 #include "sdlHelper.h"
 #include "KBException.h"
+#include "KBDebug/Debug.h"
 
 namespace SDLHelper {
 
 void initSDL()
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0){
-		printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+
+	int res = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
+
+	Debug::log(res);
+	if ( res < 0){
+		printf("Couldn't initialize SDL (%d): %s\n", res, SDL_GetError());
 		exit(1);
 	}
 
-	if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) < 0) {
-		throw new KBFatal("Couldn't initialize SDL: %s\n", SDL_GetError());
+	res = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+
+	Debug::log(res);
+	if (res < 0) {
+		throw new KBFatal(Kuribrawl::formatString("Couldn't initialize SDL Image (%d): %s\n", res, SDL_GetError()));
 	};
 }
 
