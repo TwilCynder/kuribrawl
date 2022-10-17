@@ -14,9 +14,9 @@
 
 #pragma once
 
-#include "Util/util.h"
 #include <string>
-
+#include "Util/util.h"
+#include "Util/type_wrapper.h"
 
 class TextureFont;
 
@@ -41,7 +41,7 @@ class TextDisplayer {
     TextDisplayer& operator<<(long double);
 
     /**Function that can be used with the << operator, returning nothing. Will be called with the current TextDisplayer, see operator<<(TextDisplayerFunctor).*/
-    using TextDisplayerFunctor = void (*)(TextDisplayer&); 
+    using TextDisplayerFunctor = void (*)(TextDisplayer&);  //maybe remplacer * par &
     TextDisplayer& operator<<(TextDisplayerFunctor);
 
     /**Function that can be used with the << operator, returning a reference to potentially another TextDisplayer. 
@@ -61,7 +61,7 @@ class TextDisplayer {
 };
 
 /**
- * @brief AdvancedTextDisplayer that remembers its starting point.
+ * @brief TextDisplayer that remembers its starting point.
  */
 class AnchoredTextDisplayer : public TextDisplayer {
     Kuribrawl::Vector orig_pos; /**Origin point of this textdisplayer, the position can be reset to this point.*/
@@ -76,7 +76,7 @@ class AnchoredTextDisplayer : public TextDisplayer {
 };
 
 /**
- * @brief A TextDisplayer, but, you know, more good.
+ * @brief A (anchored) TextDisplayer, but, you know, more good.
  * 
  */
 class AdvancedTextDisplayer : public AnchoredTextDisplayer {
