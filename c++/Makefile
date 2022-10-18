@@ -58,7 +58,8 @@ bin/%.o: %.cpp #$(SRC)
 
 clear:
 	touch bin/d
-	rm -r bin/*
+	-rm -r bin/*
+	-rm *.exe
 
 $(EXEC): $(OBJS)
 	@printf "\033[1;33m[Linking]\033[0m "
