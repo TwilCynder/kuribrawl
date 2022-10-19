@@ -1,6 +1,0 @@
-Uncaught exception : [0;31mCould not read texture file : [0m
- data file at data.twl
-Using data file at ../res/data.twl
-====== Reading data file ==============
-Version : 0.3.2
-Reading texture at 0x18, of size 3866
