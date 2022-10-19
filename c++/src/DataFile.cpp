@@ -215,7 +215,7 @@ SDL_Texture* DataFile::readTexture(){
 
     SDL_Texture* result = IMG_LoadTexture_RW(renderer, sdl_stream, 0);
     if (result == nullptr){
-        throw KBFatal(Kuribrawl::formatString("Could not read texture file : %s", IMG_GetError()));
+        throw KBFatalDetailed(Kuribrawl::formatString("Could not read texture file : %s", IMG_GetError()), "Missing or corrupted file in data file");
     }
     Debug::log(IMG_GetError());
     fseek(file, fileEnd, SEEK_SET);
