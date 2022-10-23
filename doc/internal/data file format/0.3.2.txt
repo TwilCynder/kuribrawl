@@ -3,6 +3,8 @@ Systèmes affectés par cette spécification :
 - datafile maker
 - kuribrawl
 
+Notes : Une valeur équivalente au maximum du type de la valeur signifie la valeur par défaut (quand applicable, selon indications du document format fichier source)
+
 Version du format : 0.3.0
 
 - Signature : 0x54 54 54 54
