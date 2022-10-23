@@ -13,4 +13,4 @@ class KBVector : public std::vector<T>{
             this[i] = value;
         }
     }
-}
+};
