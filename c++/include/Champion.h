@@ -113,7 +113,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     void setDisplayName(const char* display_name);
     const std::string& getDisplayName() const;
 
-    Champion::Values val;
+    Values val;
 
     private:
     /**
