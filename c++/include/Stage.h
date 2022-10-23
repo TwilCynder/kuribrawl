@@ -19,6 +19,8 @@ class Stage : public AnimationsPool<Animation> {
     void setDisplayName(const char* name_);
     const std::string& getDisplayName() const;
 
+    Platform& addPlatform(int w, int x, int y);
+
     private:
     Stage(const std::string name_);
 

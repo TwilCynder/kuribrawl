@@ -6,7 +6,7 @@ struct Platform {
     Kuribrawl::Vector pos;
 
     Platform();
-    Platform(int w, int x, int y);
+    Platform(int w, int x = 0, int y = 0);
     Platform(int w, int x, int y, const Animation*);
 
     private:
