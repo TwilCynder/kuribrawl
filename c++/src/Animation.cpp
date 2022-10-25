@@ -53,7 +53,7 @@ Animation::~Animation(){
 
 void Animation::setSpritesheet(SDL_Texture* spritesheet_){
     if (!spritesheet_){
-        throw KBFatal("SetSpritesheet : spritesheet texture pointer is null");
+        throw KBFatal(Kuribrawl::formatString("SetSpritesheet : spritesheet texture pointer is null"));
     }
     this->spritesheet = spritesheet_;
     SDL_QueryTexture(spritesheet, NULL, NULL, &this->display.x, &this->display.y);
@@ -170,7 +170,7 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
 
     Frame& source = frames[frame];
@@ -188,7 +188,7 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame, int facing)c
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
 
     Frame& source = frames[frame];

@@ -14,7 +14,7 @@ A* AnimationsPool<A>::addAnimation(const std::string& name){
     auto [node, success] = animations.try_emplace(name);
 
     if (!success) {
-        throw KBFatal("Could not create champion");
+        throw KBFatal("Could not create animation %s", name);
     }
 
     A& anim = node->second;

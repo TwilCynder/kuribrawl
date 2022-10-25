@@ -206,10 +206,10 @@ void App::init(){
 	startTestGame();
 	initialized = true;
 
-	SDL_Texture* debug_font = assets_.textures.get("font_oracle");
+	SDL_Texture* debug_font_texture = assets_.textures.get("font_oracle");
 	//SDL_Texture* debug_font = IMG_LoadTexture(renderer, "oracle.png");
-	if (!debug_font) throw KBFatalDetailed("Missing font",  Kuribrawl::formatString("Cannot find the debug font: %s", IMG_GetError()));
-	debugFont = make_unique<TextureFont>(TextureFont(debug_font, renderer, {8, 11}));
+	if (!debug_font_texture) throw KBFatalDetailed(Kuribrawl::formatString("Cannot find the debug font: %s", IMG_GetError()), "Missing font");
+	debugFont = make_unique<TextureFont>(TextureFont(debug_font_texture, renderer, {8, 11}));
 	debug_text_displayer = make_unique<AnchoredTextDisplayer>(SCREEN_WIDTH - 88, 20, *debugFont);
 }
 
@@ -349,7 +349,7 @@ void App::handleEvents(){
  */
 void App::setFrameRate(int fr){
 	if (fr < 0 && fr != -1){
-		throw KBFatal("Attemp to use invalid framerate");
+		throw KBFatal("Attemp to use invalid framerate %d", fr);
 	}
 	framerate = fr;
 	update_frame_duration();

@@ -43,7 +43,7 @@ EntityFrame* EntityAnimation::getEntityFrame(int n){
 
 const EntityFrame& EntityAnimation::getEntityFrame(int n) const{
     if (n > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", n);
     }
     return entity_frames[n];
 }
@@ -102,28 +102,28 @@ bool EntityAnimation::hasHitboxes() const {
 
 const std::vector<Hitbox>&  EntityAnimation::getHitboxes(int frame) const {
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
     return entity_frames[frame].hitboxes;
 }
 
 const std::vector<Hurtbox>& EntityAnimation::getHurtboxes(int frame) const {
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
     return entity_frames[frame].hurtboxes;
 }
 
 const EntityFrame::FrameMovement& EntityAnimation::getFrameMovement(int frame) const {
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
     return entity_frames[frame].movement; 
 }
 
 Hitbox* EntityAnimation::addHitbox(int frame){
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
     return &entity_frames[frame].hitboxes.emplace_back();
 }
@@ -140,7 +140,7 @@ void EntityAnimation::addHitbox(int frame, int x, int y, int w, int h){
 
 Hurtbox* EntityAnimation::addHurtbox(int frame){
     if (frame > nb_frames) {
-        throw KBFatal("Frame index out of bounds");
+        throw KBFatal("Frame index %d out of bounds", frame);
     }
     return &entity_frames[frame].hurtboxes.emplace_back();
 }

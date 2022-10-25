@@ -83,7 +83,7 @@ void PlayerFighter::setPort(Port* port_){
     if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
 
     input_binding = &controller_type->getDefaultBinding();
-    if (!input_binding) throw KBFatalDetailed("PlayerFighter assigned to port, ended up with no input binding", "oula");
+    if (!input_binding) throw KBFatalDetailed("Unrecognized Controller", "PlayerFighter assigned to port, ended up with no input binding");
 
     ///\todo At some point we'lle have to make a decision regarding whether ports need to have a valid controller type (currently, yes)
     current_controller_vals = ((!input_binding->override_controller_vals)/* && port->getControllerType()*/) ? //check is currently unnecessary since port->getControllerType() must be non-null anyways
