@@ -1,0 +1,6 @@
+Test Stage 
+1200 1000 # Blastzone dimensions
+0 0 # Camera limit box offsets
+1000 800 # Camera limit box size
+
+p 0 0 800

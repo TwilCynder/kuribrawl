@@ -67,10 +67,8 @@ bool Port::isButtonPressed(int button) const {
 
 /**
  * @brief DEPRECATED Checks if a trigger is pressed
- * 
+ * @deprecated user the overload that takes a ControllerVals& now
  * @param trigger 
- * @return true 
- * @return false 
  */
 
 bool Port::isTriggerPressed(int trigger) const {
@@ -82,8 +80,7 @@ bool Port::isTriggerPressed(int trigger) const {
  * 
  * @param trigger 
  * @param controller_vals 
- * @return true 
- * @return false 
+ * @return whether the trigger is pressed (beyond the given threshold)
  */
 
 bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) const{
@@ -100,6 +97,13 @@ bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) 
     }
 }
 
+/**
+ * @brief DEPRECATED checks if an element (button or trigger) is pressed
+ * @deprecated user the overload that takes a ControllerVals& now
+ * @param type 
+ * @param element 
+ * @return whether the element is pressed
+ */
 bool Port::isElementPressed(ElementType type, int element) const{
     switch(type){
         case ElementType::BUTTON:
@@ -111,6 +115,14 @@ bool Port::isElementPressed(ElementType type, int element) const{
     }
 }
 
+/**
+ * @brief Checks if an element (button or trigger) is pressed, given certain ControllerVals
+ * 
+ * @param type type of element to check
+ * @param element id of element to check
+ * @param controller_vals controllerVals to base the answer on (most importantly, threshold for triggers)
+ * @return whether the element is pressed
+ */
 bool Port::isElementPressed(ElementType type, int element, const ControllerVals& controller_vals) const{
     switch(type){
         case ElementType::BUTTON:
