@@ -12,10 +12,18 @@ Champion::Champion(const std::string& name_):
     name(name_),
     default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL)),
     default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL))
-{
-    this->val.gravity = DEFAULT_GRAVITY;
-    initDefaultMoves();
-}
+{}
+
+/**
+ * @brief Construct a new Champion:: Champion object
+ *
+ * @param name_ The internal name.
+ */
+Champion::Champion(const std::string&& name_):
+    name(std::move(name_)),
+    default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL)),
+    default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL))
+{}
 
 /**
  * @brief Construct a new Champion::Values object
