@@ -3,12 +3,16 @@
 #include "SDL2/SDL_types.h"
 #include <iostream>
 #include <bitset>
+#include "Util/Logger.h"
 
 /**
  * @brief Set of functions aimed at printing stuff to a debug output.
  * 
  */
 namespace Debug {
+    Logger out(std::cout);
+    Logger err(std::cerr);
+
     /**
      * @brief Logs a value to the debug output
      * Currently uses stdout

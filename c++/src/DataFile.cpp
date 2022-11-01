@@ -182,7 +182,7 @@ void DataFile::readChampionFile(Champion& champion){
                 break;
             case FILEMARKER_LANDINGLAG:
                 if (!current_move){
-                    throw KBFatalDetailed("File Loading : invalid data file content", "Landing lag info present before any move info");
+                    throw KBFatalDetailed("Landing lag info present before any move info", "File Loading : invalid data file content");
                 }
                 readByte(&byte);
                 current_move->landing_lag = byte;
@@ -195,7 +195,8 @@ void DataFile::readChampionFile(Champion& champion){
             default:
                 fseek(file, -1, SEEK_CUR);
                 cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
-                throw KBFatalExplicit("File Loading : invalid data file content");
+                throw KBFatalDetailed("File Loading : invalid data file content", 
+                    Kuribrawl::formatString("Unexpected byte at 0x%x, expected champion information type identifier, found %d\n", ftell(file), (int)getc(file)));
                 break;
         }
     } while (!leave_loop);
@@ -347,7 +348,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                                 hitbox->priority = byte;
                                 break;
                             default:
-                                throw KBFatalDetailed("File Loading : invalid data file content", "Unsupported or invalid hitbox type");
+                                throw KBFatalDetailed("Unsupported or invalid hitbox type", "File Loading : invalid data file content");
                         }
 
                         break;
@@ -358,14 +359,16 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                     default:
                         fseek(file, -1, SEEK_CUR);
                         cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
-                        throw KBFatalExplicit("File Loading : invalid data file content");
+                        throw KBFatalDetailed("File Loading : invalid data file content",
+                            Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", ftell(file), (int)getc(file)));
                 }
             } while (!leave_loop);
             
             break;
         default:
             cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
-            throw KBFatalExplicit("File Loading : invalid data file content");
+            throw KBFatalDetailed("File Loading : invalid data file content", 
+                Kuribrawl::formatString("Unexpected byte at 0x%x, expected 0xFF or 0xFE", (ftell(file) - 1)));
     }
 }
 

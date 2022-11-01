@@ -25,7 +25,7 @@ Champion* GameData::getChampion(const char* name){
 Champion* GameData::addChampion(const char* name) {
     auto [node, success] = champions.try_emplace(name, name);
     if (!success) {
-        throw KBFatal("Could not create champion");
+        throw KBFatal(Kuribrawl::formatString("Could not create champion %s", name));
     }
 
     Champion& champion = node->second;

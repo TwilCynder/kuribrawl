@@ -1,3 +1,5 @@
+#pragma once
+
 template <typename T, typename tag>
 struct type_wrapper {
     T v;
