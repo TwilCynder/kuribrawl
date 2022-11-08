@@ -97,6 +97,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     };
 
     Champion(const std::string& name_);
+    Champion(const std::string&& name_);
     const std::string& getName();
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
     void setDefaultAnimation(const DefaultAnimation state, const EntityAnimation* anim);

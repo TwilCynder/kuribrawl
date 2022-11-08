@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include "Champion.h"
+#include "Stage.h"
 
 class App;
 
@@ -22,4 +23,7 @@ class GameData {
     private:
     using ChampionsMap = std::map<std::string, Champion>;
     ChampionsMap champions; ///< Map containing all Champions and associating them with a string ID (= name).
+
+    using StagesMap = std::map<std::string, Stage>;
+    StagesMap maps;
 };

@@ -14,7 +14,11 @@ const std::string& Stage::getDisplayName() const {
 }
 
 Platform& Stage::addPlatform(int w, int x, int y){
-    platforms.emplace_back(w, x, y);
+    return platforms.emplace_back(w, x, y);
+}
+
+Stage::PlatformConstIterator Stage::getPlatforms() const {
+    return platforms.begin();
 }
 
 Stage::Values::Values() : 
