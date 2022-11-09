@@ -12,9 +12,12 @@ class AnimationsPool {
     public:
     A* addAnimation(const std::string& name);
     A* addAnimation(const char* name, SDL_Texture* spritesheet);
+
+    
+
     const A* getAnimation(const std::string& name) const;
     const A* getAnimation(const char* name) const;
     A& tryAnimation(const char* name);
     protected:
-    std::map<std::string, A> animations;    ///< Map containing all the Animations of this Champion.
+    std::map<std::string, A, std::less<>> animations;    ///< Map containing all the Animations of this Champion.
 };
