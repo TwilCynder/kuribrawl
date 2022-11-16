@@ -76,5 +76,4 @@
         "org.graalvm.*",
         "io.micrometer.shaded.*"
     ],
-    "java.project.outputPath": "tools\\editor\\javaEditor\\bin"
 }
