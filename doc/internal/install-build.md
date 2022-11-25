@@ -27,7 +27,7 @@ The Kuribrawl project includes the game itself as well as several smaller progra
 The Kuribrawl GameData Editor, written in Java, is located in the `tools/editor/javaEditor` subdirectory. It is an unmanaged project (pure source code, no Gradle, Maven or Eclipse); there are many ways to run and build the project, depending on what you have. In any case, you will need [Java (JDK) 17 or more](https://www.oracle.com/fr/java/technologies/downloads/). 
 
 ### VSCode
-Developping (including running and building) unmanaged projects works just fine in VSCode, as long as you install the [Java Extension Pack by Red Hat](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack). As long as your JDK is correctly configured, VSCode should be able to find it ; in that case, you can simply open a Java source file (and notice the Eclipse-like project explorer opening on the left bar), press F5 to run it, and use the `>Java: Export Jar` command to build an executable Jar.  
+Developping (including running and building) unmanaged projects works just fine in VSCode, as long as you install the [Java Extension Pack by Red Hat](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack). As long as your JDK is correctly configured, VSCode should be able to find it ; in that case, you can simply open a Java source file (and notice the Eclipse-like project explorer opening on the left bar), press F5 to run the project, and use the `>Java: Export Jar` command to build an executable Jar.  
 
 If you do not wish to use VSCode as your IDE, you can use whatever editor you want and follow the the following build/run instructions.  
 
