@@ -77,7 +77,7 @@ void PlayerFighter::setPort(Port* port_){
 
     valid_port = true;
     port = port_;
-
+    
     //see below
     const ControllerType* controller_type = port->getControllerType();
     if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
