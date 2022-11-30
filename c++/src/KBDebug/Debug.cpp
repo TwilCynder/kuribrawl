@@ -11,5 +11,7 @@ Logger err(std::cerr);
  */
 template<>
 void Debug::log(bool b){
+    #ifdef DEBUG
     std::cout << ((b) ? "True" : "False") << '\n' << std::flush;
+    #endif 
 }

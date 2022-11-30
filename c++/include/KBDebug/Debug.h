@@ -21,7 +21,9 @@ namespace Debug {
      */
     template <typename T>
     void log(T value){
-        std::cout << value << '\n' << std::flush;
+        #ifdef DEBUG
+        out << value << '\n' << std::flush;
+        #endif
     }
 
     template<>
@@ -35,7 +37,9 @@ namespace Debug {
      */
     template <typename T>
     void logHex(T value){
-        std::cout << std::hex << value << '\n' << std::dec << std::flush;
+        #ifdef DEBUG
+        out << std::hex << value << '\n' << std::dec << std::flush;
+        #endif 
     }
 
     /**
@@ -46,6 +50,8 @@ namespace Debug {
      */
     template <typename T>
     void logBin(T value){
-        std::cout << std::bitset<sizeof(T) * 8>(value) << '\n' << std::flush;
+        #ifdef DEBUG
+        out << std::bitset<sizeof(T) * 8>(value) << '\n' << std::flush;
+        #endif
     }
 }

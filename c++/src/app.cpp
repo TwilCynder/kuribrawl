@@ -111,8 +111,7 @@ void App::initSDL(){
 	this->window = SDL_CreateWindow("KuriX", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, windowFlags);
 
 	if (!this->window){
-		printf("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
-		exit(1);
+		throw KBFatal(Kuribrawl::formatString("Failed to open %d x %d window: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError()));
 	}
 
 	SDL_VERSION(&win_info.version);
@@ -123,8 +122,7 @@ void App::initSDL(){
 	this->renderer = SDL_CreateRenderer(this->window, -1, rendererFlags);
 
 	if (!this->renderer){
-		printf("Failed to create renderer: %s\n", SDL_GetError());
-		exit(1);
+		throw KBFatal(Kuribrawl::formatString("Failed to create renderer: %s\n", SDL_GetError()));
 	}
 
 	SDL_JoystickEventState(SDL_ENABLE);
@@ -174,6 +172,7 @@ void App::loadRessources(){
 	//SDL_i
 	SDL_Texture* test = IMG_LoadTexture(renderer, "oracle.png");
 	Debug::log(test);
+	Debug::log("--66--");
 
 	if (!loadGameFile("data.twl"))
 	if (!loadGameFile("../res/data.twl"))
