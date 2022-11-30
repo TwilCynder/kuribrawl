@@ -26,7 +26,7 @@ release: all
 	cp kuribrawl.exe ../release/files/kuribrawl.exe
 	cp ../res/data.twl ../release/files/data.twl
 
-launch: all
+run: all
 	./kuribrawl.exe
 
 clean: clear all
