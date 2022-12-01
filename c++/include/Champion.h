@@ -106,9 +106,11 @@ class Champion : public AnimationsPool<EntityAnimation> {
     void finalizeMoves();
 
     Move& addMove(const std::string& name);
+    Move& addMove(std::string&& name);
     const Move* getMove(const char* name) const;
     const Move* getMove(const std::string& name) const;
     Move& tryMove(const char* name);
+    Move& tryMove(std::string&& name);
     const Move* getDefaultMove(DefaultMoves) const;
 
     void setDisplayName(const char* display_name);
