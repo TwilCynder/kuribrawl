@@ -73,6 +73,16 @@ Move& Champion::addMove(const std::string& name){
     return node->second;
 }
 
+Move& Champion::addMove(std::string&& name){
+    auto [node, success] = moves.try_emplace(std::move(name));
+
+    if (!success) {
+        throw KBFatal("Could not create move");
+    }
+
+    return node->second;
+}
+
 /**
  * @brief Returns a Move of this Champion.
  *
@@ -110,6 +120,17 @@ const Move* Champion::getMove(const char* name) const{
 
 Move& Champion::tryMove(const char* name){
     auto [node, success] = moves.try_emplace(name);
+    return node->second;
+}
+
+/**
+ * @brief Returns a Move, or create it if it doesn't exist yet. The key here is a temporary string.
+ * Unlike getMove, always returns a valid Animation. If the Animation didn't exist, it is \ref Move::Move() "default constructed".
+ * @param name the name
+ * @return Move&
+ */
+Move& Champion::tryMove(std::string&& name){
+    auto [node, success] = moves.try_emplace(std::move(name));
     return node->second;
 }
 
