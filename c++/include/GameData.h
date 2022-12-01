@@ -14,8 +14,10 @@ class GameData {
     public:
 
     Champion* getChampion(const char* name);
-    Champion* addChampion(const char* name);
+    Champion& addChampion(const std::string& name);
+    Champion& addChampion(std::string&& name);
     Champion& tryChampion(const char* name);
+    Champion& tryChampion(std::string&& name);
 
     void readDataFile();
     void finalizeChampionsInitialization();

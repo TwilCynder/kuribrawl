@@ -22,15 +22,26 @@ Champion* GameData::getChampion(const char* name){
  * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Champion#name "name attribute".
  * @return Champion* the created Champion (can't be NULL since the method throws if it could be created)
  */
-Champion* GameData::addChampion(const char* name) {
+Champion& GameData::addChampion(const std::string& name) {
     auto [node, success] = champions.try_emplace(name, name);
     if (!success) {
         throw KBFatal(Kuribrawl::formatString("Could not create champion %s", name));
     }
 
     Champion& champion = node->second;
-    return &champion;
+    return champion;
 }
+
+Champion& GameData::addChampion(std::string&& name) {
+    auto [node, success] = champions.try_emplace(name, name);
+    if (!success) {
+        throw KBFatal(Kuribrawl::formatString("Could not create champion %s", name));
+    }
+
+    Champion& champion = node->second;
+    return champion;
+}
+
 
 /**
  * @brief Returns a Champion associated with the given name, creating it if there was none.
@@ -40,6 +51,11 @@ Champion* GameData::addChampion(const char* name) {
  */
 Champion& GameData::tryChampion(const char* name){
     auto [node, success] = champions.try_emplace(name, name);
+    return node->second;
+}
+
+Champion& GameData::tryChampion(std::string&& name){
+    auto [node, success] = champions.try_emplace(std::move(name), name);
     return node->second;
 }
 
