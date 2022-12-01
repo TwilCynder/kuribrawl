@@ -22,7 +22,7 @@ namespace Debug {
     template <typename T>
     void log(T value){
         #ifdef DEBUG
-        out << value << '\n' << std::flush;
+        std::out << value << '\n' << std::flush;
         #endif
     }
 

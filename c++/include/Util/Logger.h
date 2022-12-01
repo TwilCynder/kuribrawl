@@ -22,6 +22,12 @@ class Logger {
         return *this;
     }
 
+    template<typename T>
+    Logger& operator<<(const T& v){
+        stream << v;
+        return *this;
+    }
+
     static constexpr std::string_view escapeBegin = "\033[";
     static constexpr char espaceEnd = 'm';
     static constexpr std::string_view changeColorSequence = "38;5;";
