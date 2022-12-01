@@ -120,9 +120,11 @@ class Champion : public AnimationsPool<EntityAnimation> {
 
     private:
     /**
-     * @brief Map associating each DefaultAnimation with the name (=string key) is is supposed to have in the animation map.
+     * @brief Map associating each DefaultAnimation with the name (=string key) is is supposed to have in the animation map.  
+     * Used only once on initialization to construct the ::default_animations array.
      */
     static const std::map<DefaultAnimation, std::string> default_animation_name;
+    /** @brief Same as ::default_animation_name for Moves*/
     static const std::map<DefaultMoves, std::string> default_move_name;
 
     const std::string name;   ///< Internal identifier of this Champion.
@@ -131,6 +133,6 @@ class Champion : public AnimationsPool<EntityAnimation> {
                                                     Pointer validity : can be invalidated if an Animation is moved or deleted*/
     std::unique_ptr<const Move*[]> default_moves;
     
-    std::map<std::string, Move> moves;
+    std::map<std::string, Move, std::less<>> moves;
 };
 

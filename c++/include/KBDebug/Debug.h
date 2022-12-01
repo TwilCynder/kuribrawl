@@ -10,8 +10,8 @@
  * 
  */
 namespace Debug {
-    Logger out(std::cout);
-    Logger err(std::cerr);
+    extern Logger out;
+    extern Logger err;
 
     /**
      * @brief Logs a value to the debug output

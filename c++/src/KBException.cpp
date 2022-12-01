@@ -14,9 +14,9 @@ KBFatal::KBFatal(const std::string_view& error_message_):
  * \brief Creates a fatal error that should stop the game.
  * \param error_message A message describing the error.
  */
-KBFatal::KBFatal(const std::string&& error_message):
+KBFatal::KBFatal(const std::string&& error_message_):
     data(nullptr),
-    error_message(std::move(error_message))
+    error_message(std::move(error_message_))
 {
 }
 

@@ -1,5 +1,8 @@
 #include "KBDebug/Debug.h"
 
+Logger out(std::cout);
+Logger err(std::cerr);
+
 /**
  * @brief Logs a boolean value
  * 

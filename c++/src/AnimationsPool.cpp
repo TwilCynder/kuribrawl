@@ -16,7 +16,7 @@ A* AnimationsPool<A>::addAnimation(const std::string& name){
     if (!success) {
         throw KBFatal("Could not create animation %s", name);
     }
-
+    
     A& anim = node->second;
     return &anim;
 }

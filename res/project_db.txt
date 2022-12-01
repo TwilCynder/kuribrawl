@@ -35,5 +35,5 @@ acid\uair.png
 A:acid/uair acid\uair.dat
 acid\walk.png
 A:acid/walking 6 0.15 c
-testStage\testStage.dat
+testStage\testStage.dat #testComment
 S:testStage
