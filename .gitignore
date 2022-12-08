@@ -8,3 +8,4 @@ c++/kuribrawl.exe
 log.txt
 out.txt
 kuribrawl
+*.log
