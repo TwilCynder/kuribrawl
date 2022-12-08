@@ -38,16 +38,16 @@ class Logger {
     inline void resetColor();
 
     static changeColorData color(int c);
-
     Logger& operator<<(changeColorData d);
 
     static resetColorData reset();
-
     Logger& operator<<(resetColorData&&);
 
     static constexpr std::string_view intColor = "220";
-
     Logger& operator<<(int i);
+
+    using ostreamFunction = std::ostream& (*)(std::ostream&);
+    Logger& operator<<(ostreamFunction);
 
     constexpr static auto col = color;
     constexpr static auto rst = reset;

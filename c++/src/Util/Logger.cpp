@@ -40,3 +40,8 @@ Logger& Logger::operator<<(int i){
     resetColor();
     return *this;
 }
+
+Logger& Logger::operator<<(Logger::ostreamFunction f){
+    stream << f;
+    return *this;
+}
