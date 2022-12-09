@@ -60,13 +60,13 @@ bool DataFile::checkSignature(){
 
 void DataFile::readVersion(){
     Uint8 buffer;
-    cout << "Version : ";
+    Debug::out << "Version : ";
     SDL_RWread(sdl_stream, &buffer, 1, 1);
-    cout << (int)buffer << '.';
+    Debug::out << (int)buffer << '.';
     SDL_RWread(sdl_stream, &buffer, 1, 1);
-    cout << (int)buffer << '.';
+    Debug::out << (int)buffer << '.';
     SDL_RWread(sdl_stream, &buffer, 1, 1);
-    cout << (int)buffer << '\n' << std::flush;
+    Debug::out << (int)buffer << '\n' << std::flush;
 }
 
 /**
@@ -164,7 +164,7 @@ void DataFile::readChampionValues(Champion& champion){
 void DataFile::readChampionFile(Champion& champion){
     readString();
     champion.setDisplayName(readBuffer);
-    cout << "Display name " << (champion.getDisplayName()) << '\n';
+    Debug::out << "Display name " << (champion.getDisplayName()) << '\n';
 
     readChampionValues(champion);
 
@@ -178,7 +178,7 @@ void DataFile::readChampionFile(Champion& champion){
             case FILEMARKER_MOVEINFO:
                 readString();
                 current_move = &champion.tryMove(readBuffer);
-                cout << "Move : " << readBuffer << '\n' << std::flush;
+                Debug::out << "Move : " << readBuffer << '\n' << std::flush;
                 break;
             case FILEMARKER_LANDINGLAG:
                 if (!current_move){
@@ -186,7 +186,7 @@ void DataFile::readChampionFile(Champion& champion){
                 }
                 readByte(&byte);
                 current_move->landing_lag = byte;
-                cout << "Landing lag : " << (int)byte << '\n' << std::flush;
+                Debug::out << "Landing lag : " << (int)byte << '\n' << std::flush;
                 break;
             case FILEMARKER_INTERFILE:
                 Debug::log("Interfile");
@@ -194,7 +194,7 @@ void DataFile::readChampionFile(Champion& champion){
                 break;
             default:
                 fseek(file, -1, SEEK_CUR);
-                cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
+                Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
                 throw KBFatalDetailed("File Loading : invalid data file content", 
                     Kuribrawl::formatString("Unexpected byte at 0x%x, expected champion information type identifier, found %d\n", ftell(file), (int)getc(file)));
                 break;
@@ -208,7 +208,7 @@ SDL_Texture* DataFile::readTexture(){
     readLong(&fileEnd);
 
     #ifdef DEBUG
-        cout << "Reading texture at 0x" << std::hex << ftell(file) << std::dec << 
+        Debug::out << "Reading texture at 0x" << std::hex << ftell(file) << std::dec << 
         ", of size " << fileEnd << '\n';
     #endif
 
@@ -273,7 +273,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         current_frame->origin.x = value;
                         readWord(&value);
                         current_frame->origin.y = value;
-                        cout << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
+                        Debug::out << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
                         break;
                     case FILEMARKER_FRAMEMOVEMENT:
                         readByte(&byte);
@@ -330,7 +330,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         readData(&byte);
                         hitbox->type = (Hitbox::Type)byte;
 
-                        cout << "Hitbox : " << hitbox->x << " " << hitbox->y << " " << hitbox->w << " " << hitbox->h << '\n' << std::flush;
+                        Debug::out << "Hitbox : " << hitbox->x << " " << hitbox->y << " " << hitbox->w << " " << hitbox->h << '\n' << std::flush;
 
                         switch (hitbox->type){
                             case Hitbox::Type::DAMAGE:
@@ -358,7 +358,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         break;
                     default:
                         fseek(file, -1, SEEK_CUR);
-                        cout << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
+                        Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
                         throw KBFatalDetailed("File Loading : invalid data file content",
                             Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", ftell(file), (int)getc(file)));
                 }
@@ -366,7 +366,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
             
             break;
         default:
-            cout << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
+            Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
             throw KBFatalDetailed("File Loading : invalid data file content", 
                 Kuribrawl::formatString("Unexpected byte at 0x%x, expected 0xFF or 0xFE", (ftell(file) - 1)));
     }
@@ -380,7 +380,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 char* DataFile::separateTag(char* tag){
     char* res = strchr(tag, '/');
     if (!res){
-        cout << "At " << std::hex << ftell(file) << '\n';
+        Debug::out << "At " << std::hex << ftell(file) << '\n';
         throw KBFatal("Data chunk tag doesn't contain a '/'");
     }
 
@@ -441,7 +441,7 @@ void DataFile::read(App& app){
                 break;
         }
     }
-    cout << "Loading time : " << chrono.endSec() << " secs.\n";
+    Debug::out << "Loading time : " << chrono.endSec() << " secs.\n";
     Debug::log("=========== Data file loading finished ==============");
 }
 

@@ -254,7 +254,7 @@ bool Port::initButtonMapping(){
     Debug::log(SDL_GameControllerMapping(controller));
     for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++){
         SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForButton(controller, static_cast<SDL_GameControllerButton>(i));
-        cout << bind.bindType << " " << bind.value.button << " " << i << '\n';
+        Debug::out << bind.bindType << " " << bind.value.button << " " << i << '\n';
         if (bind.bindType == SDL_CONTROLLER_BINDTYPE_NONE) continue;
         if (bind.bindType != SDL_CONTROLLER_BINDTYPE_BUTTON){
             return false;
@@ -300,7 +300,7 @@ bool Port::plugController_(int controller_id){
         Debug::log(joystick);
 
         if (instance_id < 0) {
-            cout << "Error while trying to plug controller " << controller_id << " into port " << id << " : ";
+            Debug::out << "Error while trying to plug controller " << controller_id << " into port " << id << " : ";
             Debug::log(SDL_GetError());
             controller = nullptr;
             joystick = nullptr;
@@ -318,11 +318,11 @@ bool Port::plugController_(int controller_id){
         
         //STORING THE BUTTON MAPPING
         if (!initButtonMapping()){
-            cout << "Error while trying to plug controller " << controller_id << " into port : the SDL mapping is ill-formed.\n";
+            Debug::out << "Error while trying to plug controller " << controller_id << " into port : the SDL mapping is ill-formed.\n";
             return false;
         }
 
-        cout << "Controller plugged ( " << controller_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
+        Debug::out << "Controller plugged ( " << controller_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
     }
     active = true;
     return true;

@@ -72,7 +72,7 @@ void Debug::log(Fighter::State state){
  * @param frame 
  */
 void Debug::log(Fighter::State state, int frame){
-    std::cout << '[' << frame << "] ";
+    cout << '[' << frame << "] ";
     log(state);
 }
 

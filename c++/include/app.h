@@ -110,7 +110,7 @@ class App
     Duration getLowestWait();
     int frame; ///< Number of frames displayed since the loop was started.
     int total_frame_wait;
-    void print_report(std::ostream& out);
+    void print_report(Logger&);
 
     //Debug
     std::unique_ptr<TextureFont> debugFont;

@@ -39,7 +39,7 @@ void render(SDL_Renderer* target)
 	SDL_RenderPresent(target);
 }
 
-void printJoysticks(std::ostream& out){
+void printJoysticks(Logger& out){
 	SDL_Joystick* joy;
 	Debug::log("---- Available joysticks -----");
 	for (int i = 0; i < SDL_NumJoysticks(); i++){

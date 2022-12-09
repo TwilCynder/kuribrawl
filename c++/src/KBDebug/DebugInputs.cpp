@@ -30,8 +30,8 @@ namespace Debug {
 void Debug::log(Input input){
     auto it = input_name.find(input);
     if (it == input_name.end()){
-        std::cout << (int)input << " (enum name not found)\n" << std::flush;
+        out << (int)input << " (enum name not found)\n" << std::flush;
     } else {
-        std::cout << it->second << '\n' << std::flush;
+        out << it->second << '\n' << std::flush;
     }
 }

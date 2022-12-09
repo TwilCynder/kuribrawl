@@ -152,12 +152,12 @@ void App::initGameData(){
 }
 
 bool App::loadGameFile(const char* name){
-	cout << "Using data file at " << name << '\n' << std::flush;
+	Debug::out << "Using data file at " << name << '\n' << std::flush;
 
     DataFile data_file(name, renderer);
     if (data_file.ready()) {
         data_file.read(*this);
-		cout << "Successfully loaded data from " << name << '\n' << std::flush;
+		Debug::out << "Successfully loaded data from " << name << '\n' << std::flush;
         return true;
     }
     return false;
@@ -197,7 +197,7 @@ void App::initControllersData(){
 
 void App::init(){
 	initSDL();
-	SDLHelper::printJoysticks(cout);
+	SDLHelper::printJoysticks(Debug::out);
 	PlayerFighter::initInputHandlers();
 	initControllersData();
 	loadRessources();
@@ -257,7 +257,7 @@ void App::readPorts(){
 	}
 }
 
-void App::print_report(std::ostream& out){
+void App::print_report(Logger& out){
 	Uint32 app_duration = System::now() - start_time;
 	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame) << '\n';
 }
@@ -282,7 +282,7 @@ void App::drawDebugInfo(){
  * @param code the exit code.
  */
 void App::stop(){
-	print_report(cout);
+	print_report(Debug::out);
 	quit = true;
 }
 

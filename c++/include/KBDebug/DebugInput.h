@@ -1,4 +1,5 @@
 #pragma once
+#include "Debug.h"
 #include "inputs.h"
 #include <iostream>
 
