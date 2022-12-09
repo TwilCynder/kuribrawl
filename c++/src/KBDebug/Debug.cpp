@@ -1,7 +1,7 @@
 #include "KBDebug/Debug.h"
 
-Logger out(std::cout);
-Logger err(std::cerr);
+Logger Debug::out(std::cout);
+Logger Debug::err(std::cerr);
 
 /**
  * @brief Logs a boolean value
@@ -12,6 +12,6 @@ Logger err(std::cerr);
 template<>
 void Debug::log(bool b){
     #ifdef DEBUG
-    std::cout << ((b) ? "True" : "False") << '\n' << std::flush;
+    out << ((b) ? "True" : "False") << '\n' << std::flush;
     #endif 
 }
