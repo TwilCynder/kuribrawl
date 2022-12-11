@@ -26,6 +26,15 @@ Champion::Champion(const std::string&& name_):
 {}
 
 /**
+ * @brief Construct a new Champion:: Champion object
+ *
+ * @param name_ The internal name.
+ */
+Champion::Champion(const std::string_view& name_):
+    Champion((std::string)name_)
+{}
+
+/**
  * @brief Construct a new Champion::Values object
  * Uses Acid Rainbows as default values.
  */

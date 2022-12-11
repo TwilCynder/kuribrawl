@@ -20,20 +20,15 @@ Champion* GameData::getChampion(const char* name){
  * @brief Adds a new Champion to the GameData.
  * Contructs the Champion in-place.
  * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Champion#name "name attribute".
- * @return Champion* the created Champion (can't be NULL since the method throws if it could be created)
+ * @return Champion* the newly added Champion (can't be NULL since the method throws if it couldn't be created)
  */
-Champion& GameData::addChampion(const std::string& name) {
-    auto [node, success] = champions.try_emplace(name, name);
-    if (!success) {
-        throw KBFatal(Kuribrawl::formatString("Could not create champion %s", name));
-    }
-
-    Champion& champion = node->second;
-    return champion;
+Champion& GameData::addChampion(const std::string_view& name) {
+    return addChampion((std::string)name);
 }
 
 Champion& GameData::addChampion(std::string&& name) {
-    auto [node, success] = champions.try_emplace(name, name);
+    std::string name_copy = name; //string's gonna be copied at some point so i'm trying to control when
+    auto [node, success] = champions.try_emplace(std::move(name), std::move(name_copy));
     if (!success) {
         throw KBFatal(Kuribrawl::formatString("Could not create champion %s", name));
     }
@@ -57,6 +52,20 @@ Champion& GameData::tryChampion(const char* name){
 Champion& GameData::tryChampion(std::string&& name){
     auto [node, success] = champions.try_emplace(std::move(name), name);
     return node->second;
+}
+
+/**
+ * @brief Returns the Stage associated with the given name.
+ *
+ * @param name the string identifier of the wanted Stage
+ * @return Stage* the Stage, or NULL if no Stage had this name.
+ */
+Stage* GameData::getStage(const char* name){
+    auto it = stages.find(name);
+    if (it == stages.end()){
+      return NULL;
+    }
+    return &(it->second);
 }
 
 void GameData::finalizeChampionsInitialization(){
