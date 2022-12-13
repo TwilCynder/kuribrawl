@@ -37,20 +37,18 @@ Champion& GameData::addChampion(std::string&& name) {
     return champion;
 }
 
-
 /**
  * @brief Returns a Champion associated with the given name, creating it if there was none.
  *
  * @param name the name of the wanted Champion.
  * @return Champion& a reference to the Champion.
  */
-Champion& GameData::tryChampion(const char* name){
-    auto [node, success] = champions.try_emplace(name, name);
-    return node->second;
+Champion& GameData::tryChampion(const std::string_view& name){
+    return tryChampion((std::string)name);
 }
 
 Champion& GameData::tryChampion(std::string&& name){
-    auto [node, success] = champions.try_emplace(std::move(name), name);
+    auto [node, success] = champions.try_emplace(name, std::move(name)); 
     return node->second;
 }
 
@@ -66,6 +64,42 @@ Stage* GameData::getStage(const char* name){
       return NULL;
     }
     return &(it->second);
+}
+
+/**
+ * @brief Adds a new Stage to the GameData.
+ * Contructs the Stage in-place.
+ * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Stage#name "name attribute".
+ * @return Stage* the newly added Stage (can't be NULL since the method throws if it couldn't be created)
+ */
+Stage& GameData::addStage(const std::string_view& name) {
+    return addStage((std::string)name);
+}
+
+Stage& GameData::addStage(std::string&& name) {
+    std::string name_copy = name; //string's gonna be copied at some point so i'm trying to control when
+    auto [node, success] = stages.try_emplace(std::move(name), std::move(name_copy));
+    if (!success) {
+        throw KBFatal(Kuribrawl::formatString("Could not create stage %s", name));
+    }
+
+    Stage& stage = node->second;
+    return stage;
+}
+
+/**
+ * @brief Returns a Stage associated with the given name, creating it if there was none.
+ *
+ * @param name the name of the wanted Stage.
+ * @return Stage& a reference to the Stage.
+ */
+Stage& GameData::tryStage(const std::string_view& name){
+    return tryStage((std::string)name);
+}
+
+Stage& GameData::tryStage(std::string&& name){
+    auto [node, success] = stages.try_emplace(name, std::move(name)); 
+    return node->second;
 }
 
 void GameData::finalizeChampionsInitialization(){
