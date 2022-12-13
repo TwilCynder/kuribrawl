@@ -34,7 +34,7 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     paused(false),
     facing(1),
     grounded(false),
-	air_jumps(model_->val.air_jumps),
+	air_jumps(model_->values.air_jumps),
     model(model_),
     game(game_),
     current_move(nullptr),
@@ -247,10 +247,10 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
 
     switch (y_type){
         case jumpY::Full:
-            speed.y += model->val.jump_speed;
+            speed.y += model->values.jump_speed;
             break;
         case jumpY::Short:
-            speed.y += model->val.short_hop_speed;
+            speed.y += model->values.short_hop_speed;
             break;
         default:
             break;
@@ -258,13 +258,13 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
     
     switch(x_type){
         case jumpX::Forward:
-            if (speed.x * facing < model->val.ground_forward_jump_speed){
-                speed.x = model->val.ground_forward_jump_speed * facing;
+            if (speed.x * facing < model->values.ground_forward_jump_speed){
+                speed.x = model->values.ground_forward_jump_speed * facing;
             }
             break;
         case jumpX::Backwards:
-            if (speed.x * -facing < model->val.ground_backward_jump_speed){
-                speed.x = model->val.ground_backward_jump_speed * -facing;
+            if (speed.x * -facing < model->values.ground_backward_jump_speed){
+                speed.x = model->values.ground_backward_jump_speed * -facing;
             }
             break;
         default:
@@ -285,20 +285,20 @@ int Fighter::air_jump(jumpX x_type){
 	
 	    switch(x_type){
             case jumpX::Forward:
-                if (speed.x * facing < model->val.air_forward_jump_speed){
-                    speed.x = model->val.air_forward_jump_speed * facing;
+                if (speed.x * facing < model->values.air_forward_jump_speed){
+                    speed.x = model->values.air_forward_jump_speed * facing;
                 }
                 break;
             case jumpX::Backwards:
-                if (speed.x * -facing < model->val.air_backward_jump_speed){
-                    speed.x = model->val.air_backward_jump_speed * -facing;
+                if (speed.x * -facing < model->values.air_backward_jump_speed){
+                    speed.x = model->values.air_backward_jump_speed * -facing;
                 }
                 break;
             default:
                 break;
         }
 		
-        speed.y = model->val.air_jump_speed;
+        speed.y = model->values.air_jump_speed;
 		air_jumps--;
 		setState(Fighter::State::IDLE, 0, 0, false);
         setAnimation(Champion::DefaultAnimation::AIR_JUMP);
@@ -323,27 +323,27 @@ bool Fighter::isStateFinished(int duration){
 void Fighter::checkStateDuration(){
     switch (state){
         case State::JUMPSQUAT:
-            if (!model->val.jump_squat_duration){
+            if (!model->values.jump_squat_duration){
                 ground_jump();
             }
             break;
         case State::DASH_START:
-            if (!model->val.dash_start_duration){
+            if (!model->values.dash_start_duration){
                 setState(State::DASH);
             }
             break;
         case State::DASH_STOP:
-            if (!model->val.dash_stop_duration){
+            if (!model->values.dash_stop_duration){
                 setState(State::IDLE);
             }
             break;
         case State::DASH_TURN:
-            if (!model->val.dash_turn_duration){
+            if (!model->values.dash_turn_duration){
                 setState(State::DASH);
             }
             break;
         case State::LANDING:
-            if (!model->val.landing_duration){
+            if (!model->values.landing_duration){
                 setState(State::IDLE);
             }
             break;
@@ -367,27 +367,27 @@ void Fighter::updateState(){
 
     switch (state){
         case State::JUMPSQUAT:
-            if (isStateFinished(model->val.jump_squat_duration)){
+            if (isStateFinished(model->values.jump_squat_duration)){
                 ground_jump();
             }
             break;
         case State::DASH_START:
-            if (isStateFinished(model->val.dash_start_duration)){
+            if (isStateFinished(model->values.dash_start_duration)){
                 setState(State::DASH);
             }
             break;
         case State::DASH_STOP:
-            if (isStateFinished(model->val.dash_stop_duration)){
+            if (isStateFinished(model->values.dash_stop_duration)){
                 setState(State::IDLE);
             }
             break;
         case State::DASH_TURN:
-            if (isStateFinished(model->val.dash_turn_duration)){
+            if (isStateFinished(model->values.dash_turn_duration)){
                 setState(State::DASH);
             }
             break;
         case State::LANDING:
-            if (isStateFinished(model->val.landing_duration)){
+            if (isStateFinished(model->values.landing_duration)){
                 setState(State::IDLE);
             }
             break;

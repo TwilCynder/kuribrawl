@@ -10,9 +10,9 @@ class Stage : public AnimationsPool<Animation> {
 
     public:
     struct Values {
-        Kuribrawl::Rect size;
+        Kuribrawl::Size size;
         Kuribrawl::Vector camera_limits_offset;
-        Kuribrawl::Rect camera_limits_size;
+        Kuribrawl::Size camera_limits_size;
 
         Values();
     };
@@ -24,13 +24,13 @@ class Stage : public AnimationsPool<Animation> {
     Platform& addPlatform(int w, int x, int y);
     PlatformConstIterator getPlatforms() const;
 
+    Values values;
 
     private:
     Stage(const std::string name_);
 
     const std::string name;   ///< Internal identifier of this Stage.
     std::string display_name;   ///< Name that will be displayed for this Stage.
-    Values values;
 
     std::vector<Platform> platforms;
 };

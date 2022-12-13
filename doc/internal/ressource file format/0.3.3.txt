@@ -100,7 +100,7 @@ Values with the mention "default : <value>" will take the indicated value if rep
 
 It is important to note that for every gameplay attribute indicating the duration of a state, 
 a value of -1 means that the duration of that state's animation should be used.
-The default value (noted x) for most of those attributes is -1.
+The default value (noted x) for most of those attributes is -1, even if not indicated. 
 
 Attributs de gameplay champion : 
 - 0 : Walk Speed

@@ -127,38 +127,44 @@ void DataFile::readString(){
     readBuffer[strlen(readBuffer) - 1] = '\0';
 }
 
+void DataFile::readStageValues(Stage& stage){
+    readData(&stage.values.size.w);
+    readData(&stage.values.size.h);
+    //To finish
+}
+
 void DataFile::readChampionValues(Champion& champion){
-    readData(&champion.val.walk_speed);
-    readData(&champion.val.dash_speed);
-    readData(&champion.val.dash_start_speed);
-    readData(&champion.val.dash_turn_accel);
-    readData(&champion.val.dash_stop_deceleration);
-    readData(&champion.val.traction);
-    readData(&champion.val.max_air_speed);
-    readData(&champion.val.air_acceleration);
-    readData(&champion.val.air_friction);
-    readData(&champion.val.jump_speed);
-    readData(&champion.val.short_hop_speed);
-    readData(&champion.val.air_jump_speed);
-    readData(&champion.val.ground_forward_jump_speed);
-    readData(&champion.val.ground_backward_jump_speed);
-    readData(&champion.val.air_forward_jump_speed);
-    readData(&champion.val.air_backward_jump_speed);
-    readData(&champion.val.gravity);
-    readData(&champion.val.max_fall_speed);
-    readData(&champion.val.fast_fall_speed);
-    readData(&champion.val.weight);
-    readData(&champion.val.jump_squat_duration);
-    readData(&champion.val.dash_start_duration);
-    readData(&champion.val.dash_stop_duration);
-    readData(&champion.val.dash_turn_duration);
-    readData(&champion.val.landing_duration);
-    readData(&champion.val.guard_start_duration);
-    readData(&champion.val.guard_stop_duration);
-    readData(&champion.val.shield_info.size);
-    readData(&champion.val.shield_info.x);
-    readData(&champion.val.shield_info.y);
-    readData(&champion.val.air_jumps);
+    readData(&champion.values.walk_speed);
+    readData(&champion.values.dash_speed);
+    readData(&champion.values.dash_start_speed);
+    readData(&champion.values.dash_turn_accel);
+    readData(&champion.values.dash_stop_deceleration);
+    readData(&champion.values.traction);
+    readData(&champion.values.max_air_speed);
+    readData(&champion.values.air_acceleration);
+    readData(&champion.values.air_friction);
+    readData(&champion.values.jump_speed);
+    readData(&champion.values.short_hop_speed);
+    readData(&champion.values.air_jump_speed);
+    readData(&champion.values.ground_forward_jump_speed);
+    readData(&champion.values.ground_backward_jump_speed);
+    readData(&champion.values.air_forward_jump_speed);
+    readData(&champion.values.air_backward_jump_speed);
+    readData(&champion.values.gravity);
+    readData(&champion.values.max_fall_speed);
+    readData(&champion.values.fast_fall_speed);
+    readData(&champion.values.weight);
+    readData(&champion.values.jump_squat_duration);
+    readData(&champion.values.dash_start_duration);
+    readData(&champion.values.dash_stop_duration);
+    readData(&champion.values.dash_turn_duration);
+    readData(&champion.values.landing_duration);
+    readData(&champion.values.guard_start_duration);
+    readData(&champion.values.guard_stop_duration);
+    readData(&champion.values.shield_info.size);
+    readData(&champion.values.shield_info.x);
+    readData(&champion.values.shield_info.y);
+    readData(&champion.values.air_jumps);
 }
 
 void DataFile::readChampionFile(Champion& champion){
@@ -435,6 +441,12 @@ void DataFile::read(App& app){
                     Debug::log(elt.first);
                     Debug::log(elt.second);
                 }
+            case DataFile::DataType::STAGE:
+                tag = readFileTag();
+                Debug::log("-Reading Stage");
+                Debug::log(tag);
+                readChampionFile(app.gameData().tryChampion(tag));
+                break;
             case DataFile::DataType::NONE:
                 Debug::log("-None");
             default:

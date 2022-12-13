@@ -69,10 +69,15 @@ namespace Kuribrawl {
         }
     };
 
-    struct Rect {
-        int w;
-        int h;
+    template<typename T>
+    struct SizeT {
+        T w;
+        T h;
     };
+    using Size = SizeT<int>;
+
+    
+
 
     struct VectorDouble {
         double x;

@@ -7,12 +7,12 @@
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
 void Fighter::applyAirAccel(int direction){
-	if (!(Kuribrawl::sign(speed.x) == direction && abs(speed.x) > model->val.max_air_speed)){
-		speed.x += model->val.air_acceleration * direction;
-		if (speed.x > model->val.max_air_speed)
-			speed.x = model->val.max_air_speed;
-		else if (speed.x < -model->val.max_air_speed)
-			speed.x = -model->val.max_air_speed;
+	if (!(Kuribrawl::sign(speed.x) == direction && abs(speed.x) > model->values.max_air_speed)){
+		speed.x += model->values.air_acceleration * direction;
+		if (speed.x > model->values.max_air_speed)
+			speed.x = model->values.max_air_speed;
+		else if (speed.x < -model->values.max_air_speed)
+			speed.x = -model->values.max_air_speed;
 	}
 }
 
@@ -43,7 +43,7 @@ void Fighter::groundToAir(){
 
 void Fighter::land(){
     grounded = true;
-    air_jumps = model->val.air_jumps;
+    air_jumps = model->values.air_jumps;
 }
 
 /**
@@ -64,11 +64,11 @@ void Fighter::applyPhysics(){
 
 
 
-if (speed.y > -model->val.max_fall_speed){
-    speed.y -= model->val.gravity;
+if (speed.y > -model->values.max_fall_speed){
+    speed.y -= model->values.gravity;
 
-    if (speed.y < -model->val.max_fall_speed){
-        speed.y = -model->val.max_fall_speed;
+    if (speed.y < -model->values.max_fall_speed){
+        speed.y = -model->values.max_fall_speed;
     } 
 }/*
       If *fighter\state = #STATE_HITSTUN
@@ -86,25 +86,25 @@ if (speed.y > -model->val.max_fall_speed){
     //Application des frictions
 
     if (grounded) {
-        Kuribrawl::substractValue(&speed.x, model->val.traction);
+        Kuribrawl::substractValue(&speed.x, model->values.traction);
     } else {
-        Kuribrawl::substractValue(&speed.x, model->val.air_friction);
+        Kuribrawl::substractValue(&speed.x, model->values.air_friction);
     }
 
     //Applications des vitesses dues aux states
 
     switch (state) {
         case State::WALK:
-            speed.x = model->val.walk_speed * facing;
+            speed.x = model->values.walk_speed * facing;
             break;
         case State::DASH:
-            speed.x = model->val.dash_speed * facing;
+            speed.x = model->values.dash_speed * facing;
             break;
         case State::DASH_START:
-            speed.x = model->val.dash_start_speed * facing;
+            speed.x = model->values.dash_start_speed * facing;
             break;
         case State::DASH_TURN:
-            speed.x += model->val.dash_turn_accel * facing;
+            speed.x += model->values.dash_turn_accel * facing;
         default:
             break;
     }

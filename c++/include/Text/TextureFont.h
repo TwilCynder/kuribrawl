@@ -12,7 +12,7 @@
 class TextureFont {
     public:
     SDL_Texture* char_sheet;    /**<Image used as the source, containing all the glyphs/visuals for characters, organized in a table-like structure*/
-    Kuribrawl::Rect char_size;  /**<Size of glyphs on the source image*/
+    Kuribrawl::Size char_size;  /**<Size of glyphs on the source image*/
     int chars_per_line;         /**<Number of characters on each line*/
     SDL_Renderer* renderer;     /**<Renderer the source image is bound to.*/
     bool is_init;
@@ -20,8 +20,8 @@ class TextureFont {
     void displayChar(char c, int x, int y, SDL_Renderer* target) const;
 
     public:
-    TextureFont(SDL_Texture* sheet, SDL_Renderer* renderer, const Kuribrawl::Rect& char_size);
-    TextureFont(const char* filename, SDL_Renderer* renderer, const Kuribrawl::Rect& char_size);
+    TextureFont(SDL_Texture* sheet, SDL_Renderer* renderer, const Kuribrawl::Size& char_size);
+    TextureFont(const char* filename, SDL_Renderer* renderer, const Kuribrawl::Size& char_size);
 
     void getCharPos(char c, SDL_Rect& result) const;
 

@@ -48,7 +48,6 @@ class DataFile {
     DataType readDataType();
     char* readFileTag();
     char* separateTag(char* tag);
-    SDL_Texture* LoadImageFromDatafile();
 
     void readByte(void* res);
     void readWord(void* res);
@@ -63,6 +62,8 @@ class DataFile {
     void readEntityAnimationFile(EntityAnimation& anim);
     void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
+    void readStageValues(Stage& stage);
+    void readStageFile(Stage& stage);
 
     template<typename T>
     void readData(T* res);

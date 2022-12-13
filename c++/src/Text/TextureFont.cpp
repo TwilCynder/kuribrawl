@@ -8,7 +8,7 @@
  * @param renderer_ 
  * @param char_size_ Size of glyphs on the image
  */
-TextureFont::TextureFont(SDL_Texture* sheet_, SDL_Renderer* renderer_, const Kuribrawl::Rect& char_size_):
+TextureFont::TextureFont(SDL_Texture* sheet_, SDL_Renderer* renderer_, const Kuribrawl::Size& char_size_):
     char_sheet(sheet_),
     char_size(char_size_),
     renderer(renderer_)
@@ -25,7 +25,7 @@ TextureFont::TextureFont(SDL_Texture* sheet_, SDL_Renderer* renderer_, const Kur
  * @param renderer Renderer that will be used to load the image.
  * @param char_size Size of glyphs on the image
  */
-TextureFont::TextureFont(const char* filename, SDL_Renderer* renderer, const Kuribrawl::Rect& char_size) : 
+TextureFont::TextureFont(const char* filename, SDL_Renderer* renderer, const Kuribrawl::Size& char_size) : 
     TextureFont(IMG_LoadTexture(renderer, filename), renderer, char_size)
 {
 }
