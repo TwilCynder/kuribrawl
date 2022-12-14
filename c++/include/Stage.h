@@ -11,8 +11,7 @@ class Stage : public AnimationsPool<Animation> {
     public:
     struct Values {
         Kuribrawl::Size size;
-        Kuribrawl::Vector camera_limits_offset;
-        Kuribrawl::Size camera_limits_size;
+        Kuribrawl::Rectangle camera_bounds;
 
         Values();
     };

@@ -28,5 +28,5 @@ struct ControllerLayout {
     Kuribrawl::Vector control_stick       /**< UNUSED WHILE WE RELY ON SDL MAPPING. Numerical id of the control stick (the main stick)*/;
     Kuribrawl::Vector secondary_stick;    /**< UNUSED WHILE WE RELY ON SDL MAPPING*/
     DPadButtons direction_buttons;  /**< UNUSED WHILE WE RELY ON SDL MAPPING .AKA the dpad (will contain the SDL button IDs of the dpad)*/
-    Kuribrawl::SideH<int8_t> triggers;
+    Kuribrawl::bipair<int8_t> triggers;
 };
