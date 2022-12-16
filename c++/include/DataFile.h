@@ -49,12 +49,15 @@ class DataFile {
     char* readFileTag();
     char* separateTag(char* tag);
 
-    void readByte(void* res);
-    void readWord(void* res);
-    void readLong(void* res);
-    void readDouble(void* res);
+    void readByteData(void* res);
+    void readWordData(void* res);
+    void readLongData(void* res);
+    void readDoubleData(void* res);
     void readString();
     
+    int16_t readWord();
+    int16_t readWord(int16_t& buffer);
+
     //SDL-Specific
     SDL_Texture* readTexture();
 

@@ -18,8 +18,19 @@
 #include "fileMarkers.h"
 
 template <typename T>
-void DataFile::readData(T* res){
+inline void DataFile::readData(T* res){
     SDL_RWread(sdl_stream, res, sizeof(T), 1);
+}
+
+int16_t DataFile::readWord(){
+    int16_t word;
+    DataFile::readData(&word);
+    return word;
+}
+
+int16_t DataFile::readWord(int16_t& buffer){
+    readData(&buffer);
+    return buffer;
 }
 
 /**
@@ -102,19 +113,19 @@ bool DataFile::eof(){
     return feof(file);
 }
 
-void DataFile::readByte(void* res){
+void DataFile::readByteData(void* res){
     SDL_RWread(sdl_stream, res, 1, 1);
 }
 
-void DataFile::readWord(void* res){
+void DataFile::readWordData(void* res){
     SDL_RWread(sdl_stream, res, 2, 1);
 }
 
-void DataFile::readLong (void* res){
+void DataFile::readLongData (void* res){
     SDL_RWread(sdl_stream, res, 4, 1);
 }
 
-void DataFile::readDouble (void* res){
+void DataFile::readDoubleData (void* res){
     SDL_RWread(sdl_stream, res, 8, 1);
 }
 
@@ -125,12 +136,6 @@ void DataFile::readDouble (void* res){
 void DataFile::readString(){
     fgets(readBuffer, BUFFER_SIZE, file);
     readBuffer[strlen(readBuffer) - 1] = '\0';
-}
-
-void DataFile::readStageValues(Stage& stage){
-    readData(&stage.values.size.w);
-    readData(&stage.values.size.h);
-    //To finish
 }
 
 void DataFile::readChampionValues(Champion& champion){
@@ -179,7 +184,7 @@ void DataFile::readChampionFile(Champion& champion){
     bool leave_loop = false;
 
     do {
-        readByte(&byte);
+        readData(&byte);
         switch (byte){
             case FILEMARKER_MOVEINFO:
                 readString();
@@ -190,7 +195,7 @@ void DataFile::readChampionFile(Champion& champion){
                 if (!current_move){
                     throw KBFatalDetailed("Landing lag info present before any move info", "File Loading : invalid data file content");
                 }
-                readByte(&byte);
+                readData(&byte);
                 current_move->landing_lag = byte;
                 Debug::out << "Landing lag : " << (int)byte << '\n' << std::flush;
                 break;
@@ -209,9 +214,39 @@ void DataFile::readChampionFile(Champion& champion){
 
 }
 
+void DataFile::readStageValues(Stage& stage){
+    readData(&stage.values.size.w);
+    readData(&stage.values.size.h);
+    readData(&stage.values.camera_bounds.x);
+    readData(&stage.values.camera_bounds.y);
+    readData(&stage.values.camera_bounds.w);
+    readData(&stage.values.camera_bounds.h);
+}
+
+void DataFile::readStageFile(Stage& stage){
+    readString();
+    stage.setDisplayName(readBuffer);
+    Debug::out << "Display name " << (stage.getDisplayName()) << '\n';
+
+    readStageValues(stage);
+
+    Uint8 byte;
+    Platform* current_platform = nullptr;
+    bool leave_loop = false;
+
+    do {
+        readData(&byte);
+        switch (byte){
+            case FILEMARKER_PLATFORMINFO:
+                //stage.addPlatform();
+                break;
+        }
+    } while (!leave_loop);
+}
+
 SDL_Texture* DataFile::readTexture(){
     int fileEnd;
-    readLong(&fileEnd);
+    readLongData(&fileEnd);
 
     #ifdef DEBUG
         Debug::out << "Reading texture at 0x" << std::hex << ftell(file) << std::dec << 
@@ -249,40 +284,40 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     Debug::log("----Reading animation----");
 
     anim.setSpritesheet(readTexture());
-    readByte(&byte);
+    readData(&byte);
     switch (byte){
         case FILEMARKER_INTERFILE:
             return;
         case FILEMARKER_DESCRIPTORSTART:
-            readByte(&byte);
+            readData(&byte);
             anim.initFrames(byte);
             
             leave_loop = false;
             do {
-                readByte(&byte);
+                readData(&byte);
                 switch (byte){
                     case FILEMARKER_ANIMSPEED:
                         readData(&valueD);
                         anim.setBaseSpeed(valueD);
                         break;
                     case FILEMARKER_FRAMEINFO:
-                        readByte(&byte);
+                        readData(&byte);
                         current_frame = anim.getFrame(byte);
                         current_entity_frame = anim.getEntityFrame(byte);
                         break;
                     case FILEMARKER_FRAMEDURATION:
-                        readWord(&word);
+                        readData(&word);
                         current_frame->duration = word;
                         break;
                     case FILEMARKER_FRAMEORIGIN:
-                        readWord(&value);
+                        readWordData(&value);
                         current_frame->origin.x = value;
-                        readWord(&value);
+                        readWordData(&value);
                         current_frame->origin.y = value;
                         Debug::out << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
                         break;
                     case FILEMARKER_FRAMEMOVEMENT:
-                        readByte(&byte);
+                        readData(&byte);
 
                         current_entity_frame->movement.x.enabled = byte & 1;
                         current_entity_frame->movement.x.set_speed = getBit(byte, 1);
@@ -302,7 +337,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         }
                         hurtbox = &(current_entity_frame->hurtboxes.emplace_back());
                         
-                        readWord(&word);
+                        readData(&word);
                         hurtbox->x = word;
                         if (hurtbox->x == MAX_VALUE_USHORT){  
                             hurtbox->x = -(current_frame->origin.x);
@@ -311,13 +346,13 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                             hurtbox->h = current_frame->display.h;
                             hurtbox->type = Hurtbox::Type::NORMAL;
                         } else {
-                            readWord(&word);
+                            readData(&word);
                             hurtbox->y = word;
-                            readWord(&word);
+                            readData(&word);
                             hurtbox->w = word;
-                            readWord(&word);
+                            readData(&word);
                             hurtbox->h = word;
-                            readByte(&byte);
+                            readData(&byte);
                             hurtbox->type = (Hurtbox::Type)byte;
                         }
 

@@ -3,7 +3,10 @@ List of changes on one part of the project that have consequences on other parts
 ## File format
 - DFM
 - DataFile.cpp
-- Java Editor
+
+## Source files format
+- DFM
+- Java editor
 
 ## Champion data structure
 ANY change in the Champion, EntityAnimation, EntityFrame classes PROBABLY requires changing the file format.  
