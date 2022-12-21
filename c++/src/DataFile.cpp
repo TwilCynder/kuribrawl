@@ -4,6 +4,7 @@
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Champion.h"
+#include "Stage.h"
 #include "app.h"
 #include "GameData.h"
 #include "Util/util.h"
@@ -133,9 +134,21 @@ void DataFile::readDoubleData (void* res){
  * @brief Reads a c-string from the file.
  * Copies the string into the readBuffer array.
  */
+
+/*
 void DataFile::readString(){
     fgets(readBuffer, BUFFER_SIZE, file);
     readBuffer[strlen(readBuffer) - 1] = '\0';
+}
+*/
+
+size_t DataFile::readString(){
+    size_t count = 0;
+    for (int c = getc(file); c != '\n' && count < BUFFER_SIZE && c < 256; ++count){
+        c = getc(file);
+    }
+    readBuffer[count - 1] = '\0';
+    return count;
 }
 
 void DataFile::readChampionValues(Champion& champion){
@@ -238,7 +251,7 @@ void DataFile::readStageFile(Stage& stage){
         readData(&byte);
         switch (byte){
             case FILEMARKER_PLATFORMINFO:
-                //stage.addPlatform();
+                stage.addPlatform(readWord(), readWord(), readWord());
                 break;
         }
     } while (!leave_loop);
@@ -459,14 +472,14 @@ void DataFile::read(App& app){
 
                 switch(entity[0]){
                     default:
-                        readEntityAnimationFile(app.gameData().tryChampion(entity).tryAnimation(element));
+                        readEntityAnimationFile(app.gameData().tryChampion((std::string_view)entity).tryAnimation(element));
                 }
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();
                 Debug::log("-Reading CHampion");
                 Debug::log(tag);
-                readChampionFile(app.gameData().tryChampion(tag));
+                readChampionFile(app.gameData().tryChampion((std::string_view)tag));
                 break;
             case DataFile::DataType::IMAGE:
                 tag = readFileTag();
@@ -480,7 +493,7 @@ void DataFile::read(App& app){
                 tag = readFileTag();
                 Debug::log("-Reading Stage");
                 Debug::log(tag);
-                readChampionFile(app.gameData().tryChampion(tag));
+                readStageFile(app.gameData().tryStage((std::string_view)tag));
                 break;
             case DataFile::DataType::NONE:
                 Debug::log("-None");

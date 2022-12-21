@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Util/util.h"
 #include "Animation.h"
 

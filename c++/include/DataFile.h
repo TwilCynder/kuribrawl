@@ -9,6 +9,7 @@
 
 class EntityAnimation;
 class Champion;
+class Stage;
 class App;
 
 /**
@@ -53,8 +54,10 @@ class DataFile {
     void readWordData(void* res);
     void readLongData(void* res);
     void readDoubleData(void* res);
-    void readString();
-    
+    //void readString();
+    size_t readString();
+    void readString(std::string_view& );
+
     int16_t readWord();
     int16_t readWord(int16_t& buffer);
 
