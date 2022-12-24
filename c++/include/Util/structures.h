@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <utility>
 
 namespace Kuribrawl
 {
@@ -9,11 +10,16 @@ namespace Kuribrawl
 
     template <typename T, typename Enabler = void>
     struct Vec2 {
-        T x;
-        T y;
-    };
+        union {
+            T x; 
+            T left; 
+        };
+        union {
+            T y;
+            T right;
+        };
 
-    using Vector = Vec2<int>;
+    };
     
     template <typename T>
     struct Vec2 <T, enable_if_t<is_class_v<T> && !is_aggregate_v<T>>> {
@@ -33,6 +39,9 @@ namespace Kuribrawl
         Vec2(T&& x_, T&& y_) : x(move(x_)), y(move(y_))
         {}
 
+        Vec2(const T& x_, const T& y_) : x(x_), y(y_)
+        {}
+
         Vec2()
         {}
     };
@@ -49,6 +58,9 @@ namespace Kuribrawl
             return ArithVec2(this->x + other, this->y + other);
         }
     };
+
+    
+    using Vector = ArithVec2<int>;
 
     template<typename T>
     struct SizeT {
@@ -68,6 +80,12 @@ namespace Kuribrawl
             return *((Vec2<T>*)this);
         }
 
+        Rect(T x_, T y_, T w_, T h_) : 
+            x(x_), y(y_), w(w_), h(h_)
+        {
+            //#pragma message "Coucou je suis la !"
+        }
+
         Rect(Vec2<T> position, SizeT<T> size) :
             x(position.x), y(position.y), w(size.w), h(size.h)
         {}
@@ -75,6 +93,15 @@ namespace Kuribrawl
         Rect(Vec2<T> position, T w_, T h_) :
             x(position.x), y(position.y), w(w_), h(h_)
         {}
+
+        Rect<T> operator+ (const Vec2<T>& vec){
+            return Rect<T>(x + vec.x, y + vec.y, w, h);
+        }
+
+        template<typename U>
+        Rect<T> operator*(const U& coef){
+            return Rect<T>(x, y, w * coef, h * coef);
+        }
     };
 
     using Rectangle = Rect<int>;

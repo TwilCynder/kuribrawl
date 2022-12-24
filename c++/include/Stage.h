@@ -18,6 +18,8 @@ class Stage : public AnimationsPool<Animation> {
         Values();
     };
 
+    Stage(const std::string name_);
+
     void setDisplayName(const char* name_);
     const std::string& getDisplayName() const;
 
@@ -28,7 +30,6 @@ class Stage : public AnimationsPool<Animation> {
     Values values;
 
     private:
-    Stage(const std::string name_);
 
     const std::string name;   ///< Internal identifier of this Stage.
     std::string display_name;   ///< Name that will be displayed for this Stage.

@@ -60,17 +60,16 @@ void Fighter::applyPhysics(){
     if (abs(speed.x) < MAX_SPEED_PRECISION) speed.x = 0;
     if (abs(speed.y) < MAX_SPEED_PRECISION) speed.y = 0;
 
-    
 
 
+    if (speed.y > -model->values.max_fall_speed){
+        speed.y -= model->values.gravity;
 
-if (speed.y > -model->values.max_fall_speed){
-    speed.y -= model->values.gravity;
-
-    if (speed.y < -model->values.max_fall_speed){
-        speed.y = -model->values.max_fall_speed;
-    } 
-}/*
+        if (speed.y < -model->values.max_fall_speed){
+            speed.y = -model->values.max_fall_speed;
+        } 
+    }
+/*
       If *fighter\state = #STATE_HITSTUN
         *fighter\physics\v\y - #HITSTUN_GRAVITY
       Else

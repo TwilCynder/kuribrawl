@@ -76,4 +76,5 @@
         "org.graalvm.*",
         "io.micrometer.shaded.*"
     ],
+    "C_Cpp.intelliSenseCacheSize": 2500,
 }

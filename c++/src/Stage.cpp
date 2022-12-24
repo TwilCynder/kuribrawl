@@ -22,6 +22,6 @@ Stage::PlatformConstIterator Stage::getPlatforms() const {
 }
 
 Stage::Values::Values() : 
-    size{0, 0}
+    size{0, 0}, camera_bounds{0, 0, 0, 0}
 {
 }

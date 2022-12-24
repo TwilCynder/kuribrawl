@@ -29,6 +29,9 @@ int main(int argc, char** argv) try {
 
     Kuribrawl::errorPopup(exception.getData(), "Kuribrawl - Erreur", exception.userMessage());
     exit(1);
+} catch (std::exception& exception){
+    cerr << "Uncaught exception : \033[0;31m" << exception.what() << "\033[0m\n";
+    exit(1);
 }
 
 /**
