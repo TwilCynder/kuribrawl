@@ -3,6 +3,7 @@
 #include <string>
 #include "Champion.h"
 #include "Stage.h"
+#include "util/stringOperations.h"
 
 class App;
 
@@ -16,13 +17,13 @@ class GameData {
     Champion* getChampion(const char* name);
     Champion& addChampion(const std::string_view& name);
     Champion& addChampion(std::string&& name);
-    Champion& tryChampion(const std::string_view& name);
+    Champion& tryChampion(const Kuribrawl::string_view& name);
     Champion& tryChampion(std::string&& name);
 
     Stage* getStage(const char* name);
     Stage& addStage(const std::string_view& name);
     Stage& addStage(std::string&& name);
-    Stage& tryStage(const std::string_view& name);
+    Stage& tryStage(const Kuribrawl::string_view& name);
     Stage& tryStage(std::string&& name);
 
     void finalizeChampionsInitialization();

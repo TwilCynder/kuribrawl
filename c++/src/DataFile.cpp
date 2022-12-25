@@ -18,6 +18,8 @@
 #define FILEFORMAT_REVISION 0
 #include "fileMarkers.h"
 
+constexpr bool string_pointers_assumptions = true;
+
 template <typename T>
 inline void DataFile::readData(T* res){
     SDL_RWread(sdl_stream, res, sizeof(T), 1);
@@ -114,6 +116,10 @@ bool DataFile::eof(){
     return feof(file);
 }
 
+long DataFile::tell(){
+    return ftell(file);
+}
+
 void DataFile::readByteData(void* res){
     SDL_RWread(sdl_stream, res, 1, 1);
 }
@@ -144,11 +150,30 @@ void DataFile::readString(){
 
 size_t DataFile::readString(){
     size_t count = 0;
-    for (int c = getc(file); c != '\n' && count < BUFFER_SIZE && c < 256; ++count){
+    for (int c = getc(file); c != '\n' && count < BUFFER_SIZE && c < 256;){
+        readBuffer[count] = c;
+        ++count;
         c = getc(file);
     }
-    readBuffer[count - 1] = '\0';
+    readBuffer[count] = '\0';  
     return count;
+}
+
+void DataFile::readString(Kuribrawl::string_view& sv){
+    if constexpr(string_pointers_assumptions){
+        sv.set(readString());
+    } else {
+        sv.set(readBuffer, readString());
+    }
+}
+
+Kuribrawl::string_view DataFile::readString_sv(){
+    return Kuribrawl::string_view(readBuffer, readString());
+}
+
+char* DataFile::readString_get(){
+    readString();
+    return readBuffer;
 }
 
 void DataFile::readChampionValues(Champion& champion){
@@ -434,12 +459,42 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 char* DataFile::separateTag(char* tag){
     char* res = strchr(tag, '/');
     if (!res){
-        Debug::out << "At " << std::hex << ftell(file) << '\n';
         throw KBFatal("Data chunk tag doesn't contain a '/'");
     }
 
     *res = '\0';
     return res + 1;
+}
+
+/**
+ * @brief Finds a separating '/' in a tag string, sets the 
+ * If string_pointers_assumptions is set to true, assumes that left points on the same char as tag.
+ *
+ * @param tag full string to search in 
+ * @param left will be set to the part before /
+ * @param right will be set to the part after /
+ */
+void DataFile::separateTag(const Kuribrawl::string_view& tag, Kuribrawl::string_view& left, Kuribrawl::string_view& right){
+    const char* res = tag.find('/');
+    if (!res)
+        throw KBFatal("Data chunk tag doesn't contain a '/'");
+
+    ptrdiff_t diff = res - tag.cdata();
+    left.set(diff);
+    right.set(res + 1, tag.size() - diff - 1);
+
+    if constexpr(!string_pointers_assumptions){
+        left.set(tag.data());
+    }
+
+    //abcde/abcd
+    // tag = 0, 10
+    // left = 0, ??
+    // right = ??, ??
+    // res = 5
+    // diff = 5
+    // left = 0, 5 YES !
+    // right = 6, 4
 }
 
 /**
@@ -456,44 +511,47 @@ void DataFile::read(App& app){
 
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
-    char* tag;
-    char *entity, *element;
+    //char* tag;
+    //char *entity, *element;
+
+    Kuribrawl::string_view tag(readBuffer, 0);
+    Kuribrawl::string_view entity(tag);
+    Kuribrawl::string_view element;
 
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
 
-                tag = readFileTag();
-                entity = tag;
-                element = separateTag(tag);
+                //tag = readFileTag();
+                readString(tag);
+                //entity = tag;
+                //element = separateTag(tag);
+                separateTag(tag, entity, element);
                 Debug::log("-Reading animation");
                 Debug::log(entity);
                 Debug::log(element);
 
                 switch(entity[0]){
                     default:
-                        readEntityAnimationFile(app.gameData().tryChampion((std::string_view)entity).tryAnimation(element));
+                        readEntityAnimationFile(app.gameData().tryChampion(entity).tryAnimation(element.data()));
                 }
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();
                 Debug::log("-Reading CHampion");
                 Debug::log(tag);
-                readChampionFile(app.gameData().tryChampion((std::string_view)tag));
+                readChampionFile(app.gameData().tryChampion(tag));
                 break;
             case DataFile::DataType::IMAGE:
                 tag = readFileTag();
-                app.assets().textures.add(tag, readTexture());
-                Debug::log("Image");
-                for (auto elt : app.assets().textures.elements){
-                    Debug::log(elt.first);
-                    Debug::log(elt.second);
-                }
+                Debug::out << "Image : " << tag << '\n';
+                app.assets().textures.add(tag.data() , readTexture());
+
             case DataFile::DataType::STAGE:
                 tag = readFileTag();
                 Debug::log("-Reading Stage");
                 Debug::log(tag);
-                readStageFile(app.gameData().tryStage((std::string_view)tag));
+                readStageFile(app.gameData().tryStage(tag));
                 break;
             case DataFile::DataType::NONE:
                 Debug::log("-None");

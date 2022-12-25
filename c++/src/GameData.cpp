@@ -43,7 +43,7 @@ Champion& GameData::addChampion(std::string&& name) {
  * @param name the name of the wanted Champion.
  * @return Champion& a reference to the Champion.
  */
-Champion& GameData::tryChampion(const std::string_view& name){
+Champion& GameData::tryChampion(const Kuribrawl::string_view& name){
     return tryChampion((std::string)name);
 }
 
@@ -93,7 +93,7 @@ Stage& GameData::addStage(std::string&& name) {
  * @param name the name of the wanted Stage.
  * @return Stage& a reference to the Stage.
  */
-Stage& GameData::tryStage(const std::string_view& name){
+Stage& GameData::tryStage(const Kuribrawl::string_view& name){
     return tryStage((std::string)name);
 }
 
