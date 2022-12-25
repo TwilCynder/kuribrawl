@@ -14,18 +14,18 @@ namespace Kuribrawl {
         size_t len;
 
         public:
-        using iterator = CharT*;
+        using iterator = const CharT*;
         using const_iterator = const CharT*;
 
         basic_string_view():
             str(nullptr), len(0)
         {}
 
-        basic_string_view(CharT* data){
+        basic_string_view(const CharT* data){
             set(data);
         }
 
-        basic_string_view(CharT* data, size_t l){
+        basic_string_view(const CharT* data, size_t l){
             set(data, l);
         }
 
@@ -33,12 +33,12 @@ namespace Kuribrawl {
             str(sv.str), len(sv.len)
         {}
 
-        operator=(CharT* data){
+        basic_string_view& operator=(const CharT* data){
             set(data);
             return *this;
         }
 
-        operator=(const basic_string_view& sv){
+        basic_string_view& operator=(const basic_string_view& sv){
             set(sv.str, sv.len);
             return *this;
         }
@@ -59,7 +59,11 @@ namespace Kuribrawl {
             return str + len;
         }
 
-        CharT* data(){
+        const CharT* data() const {
+            return str;
+        }
+
+        const CharT* cdata() const {
             return str;
         }
 
@@ -82,12 +86,12 @@ namespace Kuribrawl {
             return str[i];
         }
 
-        void set(CharT* data, size_t l){
+        void set(const CharT* data, const size_t l){
             str = data;
             len = l;
         }
 
-        void set(CharT* data){
+        void set(const CharT* data){
             str = data;
             len = Traits::length(data);
         }
@@ -106,7 +110,7 @@ namespace Kuribrawl {
             return basic_string_view(new CharT[len], len);
         }
 
-        void copy(CharT* dest) const {
+        void copy(const CharT* dest) const {
             memcpy(dest, str, len);
         }
 
@@ -116,16 +120,21 @@ namespace Kuribrawl {
          * @param c character to find
          * @return CharT* 
          */
-        CharT* find(const CharT& c) {
+        const CharT* find(const CharT& c) const {
             return Traits::find(str, len, c);
+            /*for (CharT* ptr = str; ptr < (str + len); ptr++)
+                if (*ptr == c)
+                    return ptr;
+
+            return nullptr;
+            */
         }
 
         int pos(const CharT& c) const {
-            for (size_t i = 0; i < len; i++){
-                if (str[i] == c){
+            for (size_t i = 0; i < len; i++)
+                if (str[i] == c)
                     return i;
-                }
-            }
+                    
             return -1;
         }
 
@@ -162,17 +171,29 @@ namespace Kuribrawl {
             return compare(s.c_str(), s.size());
         }
 
-        operator std::basic_string<CharT>(){
-            return std::basic_string(str, len);
+        operator std::basic_string<CharT>() const{
+            return std::basic_string<CharT>(str, len);
         }
 
-        operator std::basic_string_view<CharT>(){
+        operator std::basic_string_view<CharT>() const{
             return std::basic_string_view<CharT>(str, len);
         }
 
+        template<typename C>
+        friend std::ostream& operator<<(std::basic_ostream<C>& os, basic_string_view<C>& sv);
+
     };
     using string_view = basic_string_view<char>;
+    
+    template <typename C>
+    using const_basic_string_view = basic_string_view<const C>;
+    using string_viewC = const_basic_string_view<char>;
 
+    template<typename C>
+    std::ostream& operator<<(std::basic_ostream<C>& os, basic_string_view<C>& sv){
+        os << sv.str;
+        return os;
+    }
 
     //reminder : y a la classe string alternative dans le dosser tests sur le pc noir si j'en ai beosin un jour 
 
@@ -187,4 +208,6 @@ namespace Kuribrawl {
         std::snprintf( buf.get(), size + 1, format, arg1, args ... );
         return std::string( buf.get(), buf.get() + size);  
     }
+
+    const char* getEscape(const char);
 }

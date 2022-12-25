@@ -1,8 +1,13 @@
 #include "Util/Logger.h"
+#include "Util/streamUtil.h"
 
 Logger::Logger(std::ostream& stream_):
     stream(stream_)
 {}
+
+void Logger::newline(){
+    stream << '\n';
+}
 
 inline void Logger::changeColor(const std::string_view& color){
     stream << escapeBegin << changeColorSequence << color << espaceEnd;
@@ -44,4 +49,20 @@ Logger& Logger::operator<<(int i){
 Logger& Logger::operator<<(Logger::ostreamFunction f){
     stream << f;
     return *this;
+}
+
+void Logger::printFixed(const char* str, size_t len){
+    Kuribrawl::printFixed(stream, str, len);
+}
+
+void Logger::printBytes(const char* str, size_t len){
+    Kuribrawl::printBytes(stream, str, len);
+}
+
+void Logger::printReadable(const char c){
+    Kuribrawl::printReadable(stream, c);
+}
+
+void Logger::printReadable(const char* str, size_t len){
+    Kuribrawl::printReadable(stream, str, len);
 }

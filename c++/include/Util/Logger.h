@@ -28,6 +28,8 @@ class Logger {
         return *this;
     }
 
+    void newline();
+
     static constexpr std::string_view escapeBegin = "\033[";
     static constexpr char espaceEnd = 'm';
     static constexpr std::string_view changeColorSequence = "38;5;";
@@ -51,6 +53,11 @@ class Logger {
 
     constexpr static auto col = color;
     constexpr static auto rst = reset;
+
+    void printFixed(const char*, size_t);
+    void printBytes(const char*, size_t);
+    void printReadable(const char);
+    void printReadable(const char*, size_t len);
 };
 
 using Log = Logger;
