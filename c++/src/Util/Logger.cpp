@@ -51,6 +51,17 @@ Logger& Logger::operator<<(Logger::ostreamFunction f){
     return *this;
 }
 
+Logger& Logger::operator<<(loggerFunction f){
+    f(*this);
+    return *this;
+}
+
+Logger &Logger::operator<<(lambda&& l)
+{
+    l(*this);
+    return *this;
+}
+
 void Logger::printFixed(const char* str, size_t len){
     Kuribrawl::printFixed(stream, str, len);
 }
@@ -66,3 +77,4 @@ void Logger::printReadable(const char c){
 void Logger::printReadable(const char* str, size_t len){
     Kuribrawl::printReadable(stream, str, len);
 }
+

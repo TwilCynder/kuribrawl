@@ -4,6 +4,7 @@
 #include <ostream>
 #include <string>
 #include <string_view>
+#include <functional>
 #include "type_wrapper.h"
 
 class Logger {
@@ -15,18 +16,6 @@ class Logger {
 
     public:
     Logger(std::ostream&);
-
-    template<typename T>
-    Logger& operator<<(T&& v){
-        stream << v;
-        return *this;
-    }
-
-    template<typename T>
-    Logger& operator<<(const T& v){
-        stream << v;
-        return *this;
-    }
 
     void newline();
 
@@ -51,6 +40,34 @@ class Logger {
     using ostreamFunction = std::ostream& (*)(std::ostream&);
     Logger& operator<<(ostreamFunction);
 
+    using loggerFunction = void (*)(Logger &);
+    Logger& operator<<(loggerFunction);
+
+    using lambda = std::function<void(Logger&)>;
+    Logger& operator<<(lambda&&);
+
+
+    template<typename T>
+    static lambda hex(const T& val){
+        return [val](Logger& l){
+            l << std::hex;
+            l << val;
+            l << std::dec;
+        };
+    }
+
+    template<typename T>
+    Logger& operator<<(T&& v){
+        stream << v;
+        return *this;
+    }
+
+    template<typename T>
+    Logger& operator<<(const T& v){
+        stream << v;
+        return *this;
+    }
+
     constexpr static auto col = color;
     constexpr static auto rst = reset;
 
@@ -58,6 +75,7 @@ class Logger {
     void printBytes(const char*, size_t);
     void printReadable(const char);
     void printReadable(const char*, size_t len);
+
 };
 
 using Log = Logger;

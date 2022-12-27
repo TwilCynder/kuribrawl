@@ -148,14 +148,22 @@ void DataFile::readString(){
 }
 */
 
+void DataFile::printStringBuffer() const {
+    Debug::out.printReadable(readBuffer, BUFFER_SIZE);
+    Debug::out.newline();
+}
+
 size_t DataFile::readString(){
+    Debug::out << "Reading at 0x" << Logger::hex(tell()) << '/' << tell() << '\n';
     size_t count = 0;
     for (int c = getc(file); c != '\n' && count < BUFFER_SIZE && c < 256;){
+        //Debug::out << (char)c  << ':' <<  c << '\n';
         readBuffer[count] = c;
         ++count;
         c = getc(file);
     }
     readBuffer[count] = '\0';  
+    printStringBuffer();
     return count;
 }
 
@@ -297,7 +305,6 @@ SDL_Texture* DataFile::readTexture(){
     if (result == nullptr){
         throw KBFatalDetailed(Kuribrawl::formatString("Could not read texture file : %s", IMG_GetError()), "Missing or corrupted file in data file");
     }
-    Debug::log(IMG_GetError());
     fseek(file, fileEnd, SEEK_SET);
     return result;
 }
@@ -546,9 +553,10 @@ void DataFile::read(App& app){
                 tag = readFileTag();
                 Debug::out << "Image : " << tag << '\n';
                 app.assets().textures.add(tag.data() , readTexture());
+                break;
             case DataFile::DataType::STAGE:
-                tag = readFileTag();
                 Debug::log("-Reading Stage");
+                tag = readFileTag();
                 Debug::log(tag);
                 readStageFile(app.gameData().tryStage(tag));
                 break;

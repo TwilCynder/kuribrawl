@@ -56,3 +56,10 @@ Temporary result :
 ![LaTeX Equation (via Codecogs)](https://latex.codecogs.com/png.latex?{\color{White}b+\(\(p\times%20\frac{200}{w+100}+10\)\times%20s\times0.12\)})
 
 ## Hitstun
+A voir
+
+## Stale moves
+
+### Implémentation
+
+Melee : queue de n elements, staleness d'un move = nombre de fois qu'il apparaît dans la queue

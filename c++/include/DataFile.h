@@ -82,6 +82,9 @@ class DataFile {
     static char* separateTag(char* tag);
     static void separateTag(const Kuribrawl::string_view& tag, Kuribrawl::string_view&, Kuribrawl::string_view&);
 
+    //Debug
+    void printStringBuffer() const;
+
     FILE* file;             ///< The underlying C-style File pointer that is used to read from the Data file.
     SDL_RWops* sdl_stream;  ///< An SDL stream created from the \ref DataFile#file "FILE*", to use SDL file-reading functions.
                             /**This structure will use the \ref DataFile#file "FILE*" as its underlying FILE*. */
