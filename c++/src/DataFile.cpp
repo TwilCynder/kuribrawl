@@ -546,7 +546,6 @@ void DataFile::read(App& app){
                 tag = readFileTag();
                 Debug::out << "Image : " << tag << '\n';
                 app.assets().textures.add(tag.data() , readTexture());
-
             case DataFile::DataType::STAGE:
                 tag = readFileTag();
                 Debug::log("-Reading Stage");

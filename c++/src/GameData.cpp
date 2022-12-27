@@ -17,6 +17,20 @@ Champion* GameData::getChampion(const char* name){
 }
 
 /**
+ * @brief Returns the Champion associated with the given name.
+ *
+ * @param name the string identifier of the wanted Champion
+ * @return Champion* the Champion, or NULL if no Champion had this name.
+ */
+Champion* GameData::getChampion(const std::string& name){
+    auto it = champions.find(name);
+    if (it == champions.end()){
+      return NULL;
+    }
+    return &(it->second);
+}
+
+/**
  * @brief Adds a new Champion to the GameData.
  * Contructs the Champion in-place.
  * @param name the name of the new Champion ; will be both its key in the GameData and its \ref Champion#name "name attribute".
@@ -52,6 +66,11 @@ Champion& GameData::tryChampion(std::string&& name){
     return node->second;
 }
 
+Champion& GameData::tryChampion(const std::string& name){
+    auto [node, success] = champions.try_emplace(name, name); 
+    return node->second;
+}
+
 /**
  * @brief Returns the Stage associated with the given name.
  *
@@ -59,6 +78,20 @@ Champion& GameData::tryChampion(std::string&& name){
  * @return Stage* the Stage, or NULL if no Stage had this name.
  */
 Stage* GameData::getStage(const char* name){
+    auto it = stages.find(name);
+    if (it == stages.end()){
+      return NULL;
+    }
+    return &(it->second);
+}
+
+/**
+ * @brief Returns the Stage associated with the given name.
+ *
+ * @param name the string identifier of the wanted Stage
+ * @return Stage* the Stage, or NULL if no Stage had this name.
+ */
+Stage* GameData::getStage(const std::string& name){
     auto it = stages.find(name);
     if (it == stages.end()){
       return NULL;
@@ -99,6 +132,11 @@ Stage& GameData::tryStage(const Kuribrawl::string_view& name){
 
 Stage& GameData::tryStage(std::string&& name){
     auto [node, success] = stages.try_emplace(name, std::move(name)); 
+    return node->second;
+}
+
+Stage& GameData::tryStage(const std::string& name){
+    auto [node, success] = stages.try_emplace(name, name); 
     return node->second;
 }
 

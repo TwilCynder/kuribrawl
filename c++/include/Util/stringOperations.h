@@ -151,14 +151,14 @@ namespace Kuribrawl {
             return len < 1;
         }
 
-        int8_t compare(const CharT* const ostr, size_t olen){
+        int8_t compare(const CharT* const ostr, size_t olen) const{
             size_t rlen = std::min(len, olen);
             int8_t comparison = Traits::compare(str, ostr, rlen);
             if (comparison == 0)
                 return len - olen;
             return comparison;
         }
-
+    
         int8_t operator<=>(const basic_string_view& sv) const {
             return compare(sv.str, sv.len);
         }
