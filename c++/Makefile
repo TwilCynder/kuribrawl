@@ -6,7 +6,6 @@ else
 	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=gnu++2a -DDEBUG=1
 endif 
 
-
 LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
 SRC= $(wildcard src/*.cpp src/**/*.cpp)
 _OBJS= $(SRC:.cpp=.o)
@@ -49,12 +48,14 @@ start:
 	fi
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 	@mkdir -p bin
+	@printf "Compiling with command \033[0;36mg++ $(CFLAGS) -c xxx.cpp -o xxx.o\033[0m\n"
 
 bin/%.o: %.cpp #$(SRC)
 	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
 	@printf "\033[1;33m[$(CURRENT_NB)/$(NB_FILES)]\033[0m "
 	@mkdir -p $(dir $@)
-	g++ $(CFLAGS) -c $< -o $@
+	@echo "Compiling $< into $@"
+	@g++ $(CFLAGS) -c $< -o $@
 
 clear:
 	touch bin/d
@@ -62,6 +63,6 @@ clear:
 	-rm *.exe
 
 $(EXEC): $(OBJS)
-	@printf "\033[1;33m[Linking]\033[0m "
-	g++ $^ -o $@ $(LDFLAGS) 
+	@printf "\033[1;33m[Linking]\033[0m with command \033[0;36mg++ [all of the above] -o $@ $(LDFLAGS) \033[0m\n"
+	@g++ $^ -o $@ $(LDFLAGS) 
 	@printf "\033[0;32mCompilation finished successfully !\n\033[0m"
