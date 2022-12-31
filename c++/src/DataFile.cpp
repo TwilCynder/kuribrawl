@@ -25,6 +25,26 @@ inline void DataFile::readData(T* res){
     SDL_RWread(sdl_stream, res, sizeof(T), 1);
 }
 
+template <typename T>
+inline void DataFile::readData(T* res, T def){
+    readData(res);
+    if (*res == max_value<T>) 
+        *res = def;
+}
+
+template<typename T>
+inline T DataFile::readValue(){
+    T val;
+    DataFile::readData(&val);
+    return val;
+}
+
+template<typename T>
+inline T DataFile::readValue(T def){
+    T val = readValue<T>();
+    return (val == max_value<T>) ? def : val;
+}
+
 int16_t DataFile::readWord(){
     int16_t word;
     DataFile::readData(&word);
@@ -163,7 +183,7 @@ size_t DataFile::readString(){
         c = getc(file);
     }
     readBuffer[count] = '\0';  
-    printStringBuffer();
+    //printStringBuffer();
     return count;
 }
 
@@ -261,18 +281,25 @@ void DataFile::readChampionFile(Champion& champion){
 }
 
 void DataFile::readStageValues(Stage& stage){
-    readData(&stage.values.size.w);
-    readData(&stage.values.size.h);
-    readData(&stage.values.camera_bounds.x);
-    readData(&stage.values.camera_bounds.y);
-    readData(&stage.values.camera_bounds.w);
-    readData(&stage.values.camera_bounds.h);
+    stage.values.size.w = readWord();
+    stage.values.size.h = readWord();
+    stage.values.camera_bounds.x = readWord();
+    stage.values.camera_bounds.y = readWord();
+    stage.values.camera_bounds.w = readWord();
+    stage.values.camera_bounds.h = readWord();
+}
+
+Platform& DataFile::readPlatformData(Stage& stage){
+    int16_t x = readValue<int16_t>(0);
+    int16_t y = readValue<int16_t>(0);
+    int16_t w = readValue<int16_t>(0);
+    return stage.addPlatform(w, x, y);
 }
 
 void DataFile::readStageFile(Stage& stage){
     readString();
     stage.setDisplayName(readBuffer);
-    Debug::out << "Display name " << (stage.getDisplayName()) << '\n';
+    Debug::out << "Display name : " << (stage.getDisplayName()) << '\n';
 
     readStageValues(stage);
 
@@ -284,7 +311,16 @@ void DataFile::readStageFile(Stage& stage){
         readData(&byte);
         switch (byte){
             case FILEMARKER_PLATFORMINFO:
-                stage.addPlatform(readWord(), readWord(), readWord());
+                current_platform = &readPlatformData(stage);
+
+                Debug::log(current_platform->pos.x);
+                Debug::log(current_platform->pos.y);
+                Debug::log(current_platform->w);
+
+                break;
+            case FILEMARKER_INTERFILE:
+                Debug::log("Interfile");
+                leave_loop = true;
                 break;
         }
     } while (!leave_loop);
@@ -295,7 +331,7 @@ SDL_Texture* DataFile::readTexture(){
     readLongData(&fileEnd);
 
     #ifdef DEBUG
-        Debug::out << "Reading texture at 0x" << std::hex << ftell(file) << std::dec << 
+        Debug::out << "Reading texture at 0x" << std::hex << tell() << std::dec << 
         ", of size " << fileEnd << '\n';
     #endif
 
@@ -316,7 +352,7 @@ SDL_Texture* DataFile::readTexture(){
  */
 
 void DataFile::readEntityAnimationFile(EntityAnimation& anim){
-    int value;
+    //int value;
     Uint8 byte;
     int16_t word;
     double valueD;
@@ -332,8 +368,11 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     readData(&byte);
     switch (byte){
         case FILEMARKER_INTERFILE:
+            anim.initFrames(1);
             return;
         case FILEMARKER_DESCRIPTORSTART:
+            Debug::out << "Reading animation descriptor at 0x" << Log::hex(tell()) << '\n';
+
             readData(&byte);
             anim.initFrames(byte);
             
@@ -346,6 +385,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         anim.setBaseSpeed(valueD);
                         break;
                     case FILEMARKER_FRAMEINFO:
+                        Debug::out << "Reading frame info at 0x" << Log::hex(tell()) << '\n';
                         readData(&byte);
                         current_frame = anim.getFrame(byte);
                         current_entity_frame = anim.getEntityFrame(byte);
@@ -355,11 +395,11 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         current_frame->duration = word;
                         break;
                     case FILEMARKER_FRAMEORIGIN:
-                        readWordData(&value);
-                        current_frame->origin.x = value;
-                        readWordData(&value);
-                        current_frame->origin.y = value;
-                        Debug::out << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
+                        readWordData(&word);
+                        current_frame->origin.x = word;
+                        readWordData(&word);
+                        current_frame->origin.y = word;
+                        Debug::out << "Frame origin : " << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
                         break;
                     case FILEMARKER_FRAMEMOVEMENT:
                         readData(&byte);
@@ -377,6 +417,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         current_entity_frame->movement.y.value = valueD;
                         break;
                     case FILEMARKER_HURTBOXINFO:
+                        Debug::out << "Reading hurtbox info at 0x" << Log::hex(tell()) << '\n';
                         if (!current_entity_frame){
                             throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
                         }
@@ -384,7 +425,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                         
                         readData(&word);
                         hurtbox->x = word;
-                        if (hurtbox->x == MAX_VALUE_USHORT){  
+                        if (hurtbox->x == MAX_VALUE_SHORT){  
                             hurtbox->x = -(current_frame->origin.x);
                             hurtbox->y =  (current_frame->origin.y);
                             hurtbox->w = current_frame->display.w;
@@ -423,7 +464,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
                                 readData(&valueD);
                                 hitbox->damage = valueD;
                                 readData(&word);
-                                hitbox->angle = value;
+                                hitbox->angle = word;
                                 readData(&valueD);
                                 hitbox->base_knockback = valueD;
                                 readData(&valueD);
@@ -534,9 +575,8 @@ void DataFile::read(App& app){
                 //entity = tag;
                 //element = separateTag(tag);
                 separateTag(tag, entity, element);
-                Debug::log("-Reading animation");
-                Debug::log(entity);
-                Debug::log(element);
+                Debug::log(entity.length());
+                Debug::out << "- Reading Animation  : " << entity << " / " << element << '\n';
 
                 switch(entity[0]){
                     default:
@@ -545,19 +585,17 @@ void DataFile::read(App& app){
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();
-                Debug::log("-Reading CHampion");
-                Debug::log(tag);
+                Debug::out << "- Reading Champions : " << tag << '\n';
                 readChampionFile(app.gameData().tryChampion(tag));
                 break;
             case DataFile::DataType::IMAGE:
                 tag = readFileTag();
-                Debug::out << "Image : " << tag << '\n';
+                Debug::out << "- Reading Image : " << tag << '\n';
                 app.assets().textures.add(tag.data() , readTexture());
                 break;
             case DataFile::DataType::STAGE:
-                Debug::log("-Reading Stage");
                 tag = readFileTag();
-                Debug::log(tag);
+                Debug::out << "- Reading Stage : " << tag << '\n';
                 readStageFile(app.gameData().tryStage(tag));
                 break;
             case DataFile::DataType::NONE:

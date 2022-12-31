@@ -23,6 +23,15 @@
 //Stage
 #define FILEMARKER_PLATFORMINFO 1
 
-#define MAX_VALUE_BYTE  255
-#define MAX_VALUE_SHORT 65535
-#define MAX_VALUE_USHORT 32767
+#define MAX_VALUE_BYTE  127
+#define MAX_VALUE_UCHAR 255
+#define MAX_VALUE_USHORT 65535
+#define MAX_VALUE_SHORT 32767
+
+template <typename T>
+constexpr T max_value;
+
+template<> constexpr int8_t max_value<int8_t> = MAX_VALUE_BYTE;
+template<> constexpr uint8_t max_value<uint8_t> = MAX_VALUE_UCHAR;
+template<> constexpr int16_t max_value<int16_t> = MAX_VALUE_SHORT;
+template<> constexpr uint16_t max_value<uint16_t> = MAX_VALUE_USHORT;

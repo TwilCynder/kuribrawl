@@ -13,6 +13,8 @@ namespace Debug {
     extern Logger out;
     extern Logger err;
 
+    extern SpacedLogger sout;
+
     /**
      * @brief Logs a value to the debug output
      * Currently uses stdout

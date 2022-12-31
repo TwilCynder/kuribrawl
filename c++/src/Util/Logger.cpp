@@ -46,6 +46,13 @@ Logger& Logger::operator<<(int i){
     return *this;
 }
 
+Logger& Logger::operator<<(long i){
+    changeColor(intColor);
+    stream << i;
+    resetColor();
+    return *this;
+}
+
 Logger& Logger::operator<<(Logger::ostreamFunction f){
     stream << f;
     return *this;
@@ -78,3 +85,12 @@ void Logger::printReadable(const char* str, size_t len){
     Kuribrawl::printReadable(stream, str, len);
 }
 
+SpacedLogger& SpacedLogger::operator<<(char c)
+{
+    if (c == '\n'){
+        log << c;
+    } else {
+        log << c << ' ';
+    }
+    return *this;
+}

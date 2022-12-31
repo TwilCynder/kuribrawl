@@ -191,7 +191,30 @@ namespace Kuribrawl {
 
     template<typename C>
     std::ostream& operator<<(std::basic_ostream<C>& os, basic_string_view<C>& sv){
-        os << sv.str;
+        // Function from : 
+        // https://codereview.stackexchange.com/q/242428?stw=2 
+        std::ostream::sentry sentry{os};
+        if (!sentry) return os;
+
+        // Ideas from:
+        // https://stackoverflow.com/q/39653508
+
+        /*size_t padding = 0;
+        char filler = os.fill();
+        if (s.size() < os.width()) {
+            padding = os.width() - s.size();
+        }
+
+        bool align_left = os.flags() & std::ios_base::left;
+        if (padding > 0 && !align_left) {
+            while (padding--) os.put(filler);
+        }*/
+        os.write(sv.str, sv.len);
+        /*if (padding > 0 && align_left) {
+            while (padding--) os.put(filler);
+        }
+
+        os.width(0);*/
         return os;
     }
 

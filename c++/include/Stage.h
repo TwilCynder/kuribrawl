@@ -22,7 +22,7 @@ class Stage : public AnimationsPool<Animation> {
 
     void setDisplayName(const char* name_);
     const std::string& getDisplayName() const;
-
+    
     using PlatformConstIterator = std::vector<Platform>::const_iterator;
     Platform& addPlatform(int w, int x, int y);
     PlatformConstIterator getPlatforms() const;

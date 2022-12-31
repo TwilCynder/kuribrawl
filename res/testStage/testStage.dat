@@ -3,4 +3,4 @@ Test Stage
 0 0 # Camera limit box offsets
 1000 800 # Camera limit box size
 
-p 0 0 800
+p x x 800

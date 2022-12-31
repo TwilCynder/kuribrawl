@@ -3,6 +3,8 @@
 Logger Debug::out(std::cout);
 Logger Debug::err(std::cerr);
 
+SpacedLogger Debug::sout(Debug::out);
+
 /**
  * @brief Logs a boolean value
  * 

@@ -91,7 +91,7 @@ Version du format : 0.3.0
 {
 - Infos de plateforme : 
 - - - 0x01
-- - - 2 octets x (-1 si centré)
+- - - 2 octets x
 - - - 2 octets y
 - - - 2 octets w
 - - - [0x10

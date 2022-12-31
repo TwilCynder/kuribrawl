@@ -36,6 +36,7 @@ class Logger {
 
     static constexpr std::string_view intColor = "220";
     Logger& operator<<(int i);
+    Logger& operator<<(long i);
 
     using ostreamFunction = std::ostream& (*)(std::ostream&);
     Logger& operator<<(ostreamFunction);
@@ -45,7 +46,6 @@ class Logger {
 
     using lambda = std::function<void(Logger&)>;
     Logger& operator<<(lambda&&);
-
 
     template<typename T>
     static lambda hex(const T& val){
@@ -78,4 +78,23 @@ class Logger {
 
 };
 
+class SpacedLogger {
+    Logger& log;
+
+    public:
+
+    SpacedLogger(Logger& log_) : 
+        log(log_)
+    {}
+
+    template<typename T>
+    SpacedLogger& operator<<(T arg){
+        log << arg << ' ';
+        return *this;
+    }
+    
+    SpacedLogger& operator<<(char);
+};
+
 using Log = Logger;
+using SLog = SpacedLogger;

@@ -11,6 +11,7 @@
 class EntityAnimation;
 class Champion;
 class Stage;
+class Platform;
 class App;
 
 /**
@@ -75,9 +76,16 @@ class DataFile {
     void readChampionFile(Champion& champion);
     void readStageValues(Stage& stage);
     void readStageFile(Stage& stage);
+    Platform& readPlatformData(Stage& stage);
 
     template<typename T>
     void readData(T* res);
+    template<typename T>
+    void readData(T* res, T default_);
+    template<typename T>
+    T readValue();
+    template<typename T>
+    T readValue(T default_);
 
     static char* separateTag(char* tag);
     static void separateTag(const Kuribrawl::string_view& tag, Kuribrawl::string_view&, Kuribrawl::string_view&);
