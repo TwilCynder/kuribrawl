@@ -4,7 +4,7 @@
 #include "AnimationsPool.h"
 #include "EntityAnimation.h"
 #include "Champion.h"
-#include "Stage.h"
+#include "StageModel.h"
 #include "app.h"
 #include "GameData.h"
 #include "Util/util.h"
