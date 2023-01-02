@@ -6,6 +6,7 @@
 
 class Champion;
 class StageModel;
+class Stage;
 class TextureFont;
 class GameConfiguration;
 
@@ -58,7 +59,7 @@ class Game {
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
 
     std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
-    StageModel& stage;
+    std::unique_ptr<Stage> stage;
 
     int frame;
     SDL_Rect camera;    ///< The area of the Stage that should be displayed.
@@ -66,5 +67,8 @@ class Game {
 
     GameConfSPtr original_config;     ///< Releases on call to stop().
     //Debug
+
+    //Invariants : 
+    // running => stage.get() != nullptr : Si la game est lancée, le pointeur stage doit être valide
 
 };

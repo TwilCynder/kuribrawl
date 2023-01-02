@@ -3,6 +3,8 @@
 #include "Game.h"
 #include "Util/util.h"
 #include "Champion.h"
+#include "Stage.h"
+#include "StageModel.h"
 #include "KBDebug/Debug.h"
 #include "CollisionBoxes.h"
 #include "KBDebug/DebugTime.h"
@@ -51,6 +53,10 @@ void Game::applyConfig(GameConfiguration& config){
     int w = SCREEN_WIDTH;
     int step = w / config.players.size();
     int x = step / 2;
+
+    const StageModel* stageModel = config.stage;
+    if (!stageModel) throw KBFatal("Starting game will null stage");
+    stage = std::make_unique<Stage>(*stageModel);
 
     for (PlayerConfiguration& player : config.players){
         if (player.port != nullptr){
@@ -173,6 +179,8 @@ void Game::updateAnimations(){
  * This includes modifying speed based on states, applying speed, and detecting collisions and terrain interaction.
  */
 void Game::applyPhysics(){
+    const StageModel& stageModel = stage.get()->getModel();
+
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->applyPhysics();

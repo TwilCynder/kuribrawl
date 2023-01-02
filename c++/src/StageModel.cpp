@@ -17,8 +17,8 @@ PlatformModel& StageModel::addPlatform(int w, int x, int y){
     return platforms.emplace_back(w, x, y);
 }
 
-StageModel::PlatformModelConstIterator StageModel::getPlatforms() const {
-    return platforms.begin();
+const std::vector<PlatformModel>& StageModel::getPlatforms() const {
+    return platforms;
 }
 
 StageModel::Values::Values() : 

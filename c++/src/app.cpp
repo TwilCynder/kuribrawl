@@ -415,7 +415,7 @@ void App::loop() try {
 		next_frame_date += frame_duration;
         handleEvents();
 
-		if (!paused || advance){
+		if ((!paused || advance)){
 			advance = false;
 			readPorts();
 			SDLHelper::prepareRender(renderer);

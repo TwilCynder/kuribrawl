@@ -2,7 +2,7 @@
 #include <map>
 #include <string>
 #include "Champion.h"
-#include "Stage.h"
+#include "StageModel.h"
 #include "util/stringOperations.h"
 
 class App;

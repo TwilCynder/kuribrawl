@@ -25,7 +25,9 @@ class StageModel : public AnimationsPool<Animation> {
     
     using PlatformModelConstIterator = std::vector<PlatformModel>::const_iterator;
     PlatformModel& addPlatform(int w, int x, int y);
-    PlatformModelConstIterator getPlatforms() const;
+    const std::vector<PlatformModel>& getPlatforms() const;
+
+
 
     Values values;
 

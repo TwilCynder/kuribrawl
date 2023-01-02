@@ -4,3 +4,7 @@
 Stage::Stage(const StageModel& m) :
     model(m)
 {}
+
+const StageModel& Stage::getModel() const {
+    return model;
+}
