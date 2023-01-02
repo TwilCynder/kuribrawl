@@ -35,9 +35,9 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
 
-    using Move = Champion::DefaultMoves;
+    using MoveID = Champion::DefaultMoves;
     DirectionIG direction;
-    Move move;
+    MoveID moveID;
     if (state == State::JUMPSQUAT || state == State::LANDING){
         return InputHandlerResult::DISMISSED;
     }
@@ -49,29 +49,31 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
         switch (direction){
             case DirectionIG::NONE:
                 Debug::log("Nair");
-                move = Move::Nair;
+                moveID = MoveID::Nair;
                 break;
             case DirectionIG::UP:
                 Debug::log("Uair");
-                move = Move::UAir;
+                moveID = MoveID::UAir;
                 break;
             case DirectionIG::DOWN:
-                move = Move::Nair;
+                moveID = MoveID::DAir;
                 Debug::log("Dair");
                 break;
             case DirectionIG::FORWARD:
-                move = Move::Nair;
+                moveID = MoveID::Fair;
                 Debug::log("Fair");
                 break;
             case DirectionIG::BACK:
-                move = Move::Nair;
+                moveID = MoveID::BAir;
                 Debug::log("Bair");
                 break;
             default:
                 break;
         }
 
-        attack(*getChampion().getDefaultMove(move));
+        const Move* move = getChampion().getDefaultMove(moveID);
+        Debug::out << "Move : " << move << '\n';
+        attack(*move);
     }
 
     return InputHandlerResult::HANDLED;
