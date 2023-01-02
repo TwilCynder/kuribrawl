@@ -59,7 +59,7 @@ class Fighter {
     State getState() const;
     void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
     void setState(const State s, int facing, int info, Champion::DefaultAnimation anim);
-    void attack(const Move&);
+    bool attack(const Move&);
     const EntityAnimation* getCurrentAnimation() const;
     void setAnimation(Champion::DefaultAnimation);
     void setAnimation(Champion::DefaultAnimation, double speed);
@@ -110,7 +110,7 @@ class Fighter {
 
     void setAnimation(const EntityAnimation* anim);
     void setAnimation(const EntityAnimation* anim, double speed);
-    void startMove(const Move&);
+    bool startMove(const Move&);
     bool isStateFinished(int stateDuration);
     void checkStateDuration();
 	virtual jumpY decideGroundedJumpYType() const = 0;

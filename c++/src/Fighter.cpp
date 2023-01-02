@@ -504,14 +504,28 @@ void Fighter::setState(const Fighter::State s, int facing, int info, Champion::D
     setState(s, facing, info, false);
 }
 
-void Fighter::startMove(const Move& move){
+bool Fighter::startMove(const Move& move){
     current_move = &move;
     if (move.animation){
         setAnimation(move.animation);
+        return true;
     }
+    return false;
 }
 
-void Fighter::attack(const Move& move){
-    setState(Fighter::State::ATTACK);
-    startMove(move);
+/**
+ * @brief Starts an attack.
+ * 
+ * Sets the current state to "Attack" and starts a move. 
+ * 
+ * @param move 
+ * @return true if the attack could be started
+ * @return false otherwise
+ */
+bool Fighter::attack(const Move& move){
+    if (startMove(move)){
+        setState(Fighter::State::ATTACK);
+        return true;
+    }
+    return false;
 }
