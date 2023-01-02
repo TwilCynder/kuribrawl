@@ -5,6 +5,7 @@
 #include "PlayerFighter.h"
 
 class Champion;
+class StageModel;
 class TextureFont;
 class GameConfiguration;
 
@@ -54,9 +55,12 @@ class Game {
     const GameConfSPtr& getOriginalConfigurationSharedPtr() const;
 
     private:
-    int frame;
-    std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
+
+    std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
+    StageModel& stage;
+
+    int frame;
     SDL_Rect camera;    ///< The area of the Stage that should be displayed.
     bool running;       ///Indicates if the game is actually running or not.
 

@@ -8,7 +8,7 @@
 
 //class Platform;
 
-class Stage : public AnimationsPool<Animation> {
+class StageModel : public AnimationsPool<Animation> {
 
     public:
     struct Values {
@@ -18,21 +18,21 @@ class Stage : public AnimationsPool<Animation> {
         Values();
     };
 
-    Stage(const std::string name_);
+    StageModel(const std::string name_);
 
     void setDisplayName(const char* name_);
     const std::string& getDisplayName() const;
     
-    using PlatformConstIterator = std::vector<Platform>::const_iterator;
-    Platform& addPlatform(int w, int x, int y);
-    PlatformConstIterator getPlatforms() const;
+    using PlatformModelConstIterator = std::vector<PlatformModel>::const_iterator;
+    PlatformModel& addPlatform(int w, int x, int y);
+    PlatformModelConstIterator getPlatforms() const;
 
     Values values;
 
     private:
 
-    const std::string name;   ///< Internal identifier of this Stage.
-    std::string display_name;   ///< Name that will be displayed for this Stage.
+    const std::string name;   ///< Internal identifier of this StageModel.
+    std::string display_name;   ///< Name that will be displayed for this StageModel.
 
-    std::vector<Platform> platforms;
+    std::vector<PlatformModel> platforms;
 };

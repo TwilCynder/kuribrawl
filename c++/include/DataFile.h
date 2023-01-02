@@ -10,8 +10,8 @@
 
 class EntityAnimation;
 class Champion;
-class Stage;
-class Platform;
+class StageModel;
+class PlatformModel;
 class App;
 
 /**
@@ -39,7 +39,7 @@ class DataFile {
         ANIMATION, ///< An Animation source image + info data chunk.
         LEFTANIM, ///< An Animation \ref Animation#spritesheet_left "left image".
         CHAMPION, ///< Info about a Champion.
-        STAGE, ///< Info about a Stage.
+        STAGE, ///< Info about a StageModel.
         IMAGE, ///< A simple lone image.
         NONE   ///< Used when eof was read instead of a data type
     };
@@ -74,9 +74,9 @@ class DataFile {
     void readEntityAnimationFile(EntityAnimation& anim);
     void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
-    void readStageValues(Stage& stage);
-    void readStageFile(Stage& stage);
-    Platform& readPlatformData(Stage& stage);
+    void readStageValues(StageModel& stage);
+    void readStageFile(StageModel& stage);
+    PlatformModel& readPlatformData(StageModel& stage);
 
     template<typename T>
     void readData(T* res);

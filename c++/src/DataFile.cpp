@@ -280,7 +280,7 @@ void DataFile::readChampionFile(Champion& champion){
 
 }
 
-void DataFile::readStageValues(Stage& stage){
+void DataFile::readStageValues(StageModel& stage){
     stage.values.size.w = readWord();
     stage.values.size.h = readWord();
     stage.values.camera_bounds.x = readWord();
@@ -289,14 +289,14 @@ void DataFile::readStageValues(Stage& stage){
     stage.values.camera_bounds.h = readWord();
 }
 
-Platform& DataFile::readPlatformData(Stage& stage){
+PlatformModel& DataFile::readPlatformData(StageModel& stage){
     int16_t x = readValue<int16_t>(0);
     int16_t y = readValue<int16_t>(0);
     int16_t w = readValue<int16_t>(0);
     return stage.addPlatform(w, x, y);
 }
 
-void DataFile::readStageFile(Stage& stage){
+void DataFile::readStageFile(StageModel& stage){
     readString();
     stage.setDisplayName(readBuffer);
     Debug::out << "Display name : " << (stage.getDisplayName()) << '\n';
@@ -304,7 +304,7 @@ void DataFile::readStageFile(Stage& stage){
     readStageValues(stage);
 
     Uint8 byte;
-    Platform* current_platform = nullptr;
+    PlatformModel* current_platform = nullptr;
     bool leave_loop = false;
 
     do {
@@ -595,7 +595,7 @@ void DataFile::read(App& app){
                 break;
             case DataFile::DataType::STAGE:
                 tag = readFileTag();
-                Debug::out << "- Reading Stage : " << tag << '\n';
+                Debug::out << "- Reading StageModel : " << tag << '\n';
                 readStageFile(app.gameData().tryStage(tag));
                 break;
             case DataFile::DataType::NONE:

@@ -3,13 +3,13 @@
 #include "Util/util.h"
 #include "Animation.h"
 
-struct Platform {
+struct PlatformModel {
     int w;
     Kuribrawl::Vector pos;
 
-    Platform();
-    Platform(int w, int x = 0, int y = 0);
-    Platform(int w, int x, int y, const Animation*);
+    PlatformModel();
+    PlatformModel(int w, int x = 0, int y = 0);
+    PlatformModel(int w, int x, int y, const Animation*);
 
     private:
     const Animation* animation;
