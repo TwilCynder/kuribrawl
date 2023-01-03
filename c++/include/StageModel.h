@@ -18,6 +18,12 @@ class StageModel : public AnimationsPool<Animation> {
         Values();
     };
 
+    struct BackgroundElement {
+        const Animation& anim;
+        Kuribrawl::Vector position;
+        int depth;
+    };
+
     StageModel(const std::string name_);
 
     void setDisplayName(const char* name_);
@@ -26,7 +32,6 @@ class StageModel : public AnimationsPool<Animation> {
     using PlatformModelConstIterator = std::vector<PlatformModel>::const_iterator;
     PlatformModel& addPlatform(int w, int x, int y);
     const std::vector<PlatformModel>& getPlatforms() const;
-
 
 
     Values values;

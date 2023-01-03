@@ -81,7 +81,7 @@ Fichier texte interprété comme un Descripteur.
 - <attributs de gameplay séparées par des espaces>
 {
 - p <x> <y> <width> [<animation>] (infos de plateforme)
-- b <animation> <x> <y> [<profondeur>]  (info d'élément de bacground NI)
+- b <animation> [<x> <y> [<profondeur>]]  (NI info d'élément de bacground)
 }*
 
 attributs de gameplay : voir annexe
@@ -96,7 +96,7 @@ Fichier qui sera encodé tel quel, le tag correspond à son rôle. I est juste u
 
 
 ============ ANNEXE ======================================
-Values with the mention "default : <value>" will take the indicated value if replaced by a "x".
+Values with the mention "default : <value>", or written in the form "\<value_description=<value>\>" will take the indicated value if replaced by a "x".
 
 It is important to note that for every gameplay attribute indicating the duration of a state, 
 a value of -1 means that the duration of that state's animation should be used.

@@ -4,3 +4,4 @@ Test Stage
 1000 800 # Camera limit box size
 
 p x x 800
+b bg
