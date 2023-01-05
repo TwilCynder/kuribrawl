@@ -19,7 +19,7 @@ class StageModel : public AnimationsPool<Animation> {
     };
 
     struct BackgroundElement {
-        const Animation& anim;
+        const Animation* anim;
         Kuribrawl::Vector position;
         int depth;
     };

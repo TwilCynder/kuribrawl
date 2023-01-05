@@ -8,17 +8,20 @@ class EntityAnimation;
 
 class AnimationResolver {
 
+    public:
     template <class A>
     struct Binding {
-        const AnimationPool<A>& pool;
+        const AnimationsPool<A>& pool;
         const std::string animation_name;
         A** target;
+
+        Binding(const AnimationsPool<A>& pool, const std::string&& animation_name, A** target);
     };
 
+    template<class A>
+    void add(const AnimationsPool<A>& pool, const std::string&& name, A** target);
+
+    private:
     std::forward_list<Binding<Animation>> animations;
     std::forward_list<Binding<EntityAnimation>> entity_animations;
-
-    public:
-    template<class A>
-    void add(const AnimationsPool<A>& pool, std::string&& name, A** target);
 };
