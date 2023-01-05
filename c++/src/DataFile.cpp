@@ -296,6 +296,10 @@ PlatformModel& DataFile::readPlatformData(StageModel& stage){
     return stage.addPlatform(w, x, y);
 }
 
+StageModel::BackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
+    
+}
+
 void DataFile::readStageFile(StageModel& stage){
     readString();
     stage.setDisplayName(readBuffer);
@@ -306,6 +310,7 @@ void DataFile::readStageFile(StageModel& stage){
     Uint8 byte;
     PlatformModel* current_platform = nullptr;
     bool leave_loop = false;
+    Kuribrawl::string_view animation_name;
 
     do {
         readData(&byte);
@@ -313,9 +318,11 @@ void DataFile::readStageFile(StageModel& stage){
             case FILEMARKER_PLATFORMINFO:
                 current_platform = &readPlatformData(stage);
 
-                Debug::log(current_platform->pos.x);
-                Debug::log(current_platform->pos.y);
-                Debug::log(current_platform->w);
+                break;
+            case FILEMARKER_BACKGROUNDELEMENT:
+                Debug::out << "Reading background element at 0x" << Log::hex(tell()) << '\n';
+                readString(animation_name);
+
 
                 break;
             case FILEMARKER_INTERFILE:

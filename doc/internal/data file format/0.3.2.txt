@@ -95,14 +95,15 @@ Version du format : 0.3.0
 - - - 2 octets y
 - - - 2 octets w
 - - - [0x10
-- - - animation (null-terminated string, peut être vide)]
+- - - animation (null-terminated string, NI)]
 - |
 - Infos d'élément de background (facultatif) (NI)
 - - - 0x02
-- - - animation (null-terminated string, peut être vide)
+- - - animation (null-terminated string)
+- - - {MAX_SHORT_VALUE (2 octets) |
 - - - 2 octets x
 - - - 2 octets y
-- - - 2 octets profondeur (parallax)
+- - - 2 octets profondeur (parallax)}
 }
 
 

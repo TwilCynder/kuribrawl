@@ -77,6 +77,7 @@ class DataFile {
     void readStageValues(StageModel& stage);
     void readStageFile(StageModel& stage);
     PlatformModel& readPlatformData(StageModel& stage);
+    StageModel::BackgroundElement& readBackgroundElementData(StageModel& stage);
 
     template<typename T>
     void readData(T* res);

@@ -31,8 +31,10 @@ class StageModel : public AnimationsPool<Animation> {
     
     using PlatformModelConstIterator = std::vector<PlatformModel>::const_iterator;
     PlatformModel& addPlatform(int w, int x, int y);
+    PlatformModel& addPlatform(int w, int x, int y, std::string&& animation_name);
     const std::vector<PlatformModel>& getPlatforms() const;
 
+    BackgroundElement& addBackgroundElement(std::string&& animation_name);
 
     Values values;
 
@@ -42,4 +44,5 @@ class StageModel : public AnimationsPool<Animation> {
     std::string display_name;   ///< Name that will be displayed for this StageModel.
 
     std::vector<PlatformModel> platforms;
+    std::vector<BackgroundElement> backgroung_elements;
 };
