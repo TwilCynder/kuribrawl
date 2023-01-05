@@ -13,13 +13,13 @@ class AnimationResolver {
     struct Binding {
         const AnimationsPool<A>& pool;
         const std::string animation_name;
-        A** target;
+        A&;
 
-        Binding(const AnimationsPool<A>& pool, const std::string&& animation_name, A** target);
+        Binding(const AnimationsPool<A>& pool, const std::string&& animation_name, A& target, int nbFrames);
     };
 
     template<class A>
-    void add(const AnimationsPool<A>& pool, const std::string&& name, A** target);
+    void add(const AnimationsPool<A>& pool, const std::string&& name, A& target);
 
     private:
     std::forward_list<Binding<Animation>> animations;
