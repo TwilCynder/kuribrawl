@@ -56,6 +56,11 @@ int16_t DataFile::readWord(int16_t& buffer){
     return buffer;
 }
 
+template<typename T>
+inline bool isMax(T v){
+    return v == max_value<T>;
+}
+
 /**
  * @brief Construct a new Data File object from a file path.
  * The file is directly opened.
@@ -63,6 +68,7 @@ int16_t DataFile::readWord(int16_t& buffer){
  */
 DataFile::DataFile(const char* filename, SDL_Renderer* renderer_):
 	sdl_stream(nullptr),
+    string_read(readBuffer, 0),
     renderer(renderer_)
 {
     file = fopen(filename, "rb");
@@ -173,6 +179,11 @@ void DataFile::printStringBuffer() const {
     Debug::out.newline();
 }
 
+/**
+ * @brief Reads a string from the datafile into the internal buffer of this Datafile
+ * 
+ * @return size_t number of characters read
+ */
 size_t DataFile::readString(){
     Debug::out << "Reading at 0x" << Logger::hex(tell()) << '/' << tell() << '\n';
     size_t count = 0;
@@ -187,6 +198,11 @@ size_t DataFile::readString(){
     return count;
 }
 
+/**
+ * @brief Reads a string and updates the given string view to represent this string
+ * 
+ * @param sv The string view to update ; will represent the string read after this call.
+ */
 void DataFile::readString(Kuribrawl::string_view& sv){
     if constexpr(string_pointers_assumptions){
         sv.set(readString());
@@ -195,13 +211,31 @@ void DataFile::readString(Kuribrawl::string_view& sv){
     }
 }
 
+/**
+ * @brief Reads a string and returns it as a new string view
+ * 
+ * @return Kuribrawl::string_view that represents the string read
+ */
 Kuribrawl::string_view DataFile::readString_sv(){
     return Kuribrawl::string_view(readBuffer, readString());
 }
 
+/**
+ * @brief Reads a string and returns it as a C string (char*)
+ * 
+ * @return char* 
+ */
 char* DataFile::readString_get(){
     readString();
     return readBuffer;
+}
+
+/**
+ * @brief Reads a string and sets the internal string view string_read to represent it.
+ * 
+ */
+void DataFile::readString_(){
+    string_read.set(readString());
 }
 
 void DataFile::readChampionValues(Champion& champion){
@@ -296,8 +330,20 @@ PlatformModel& DataFile::readPlatformData(StageModel& stage){
     return stage.addPlatform(w, x, y);
 }
 
-StageModel::BackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
-    
+StageBackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
+    readString_();
+    StageBackgroundElement& element = stage.addBackgroundElement(string_read);
+
+    int16_t x = readValue<int16_t>();
+
+    if (isMax(x)){
+        element.position.set(0, 0);
+        element.depth = -1;
+    } else {
+        element.position.set(x, readValue<int16_t>());
+        element.depth = readValue<int16_t>();
+    }
+    return element;
 }
 
 void DataFile::readStageFile(StageModel& stage){
@@ -321,8 +367,21 @@ void DataFile::readStageFile(StageModel& stage){
                 break;
             case FILEMARKER_BACKGROUNDELEMENT:
                 Debug::out << "Reading background element at 0x" << Log::hex(tell()) << '\n';
-                readString(animation_name);
+                readBackgroundElementData(stage);
+                
+                for (const auto & [name, animation] : stage){
+                    Debug::out << name << '\n';
+                }
 
+                break;
+            case FILEMARKER_PLATFORMANIMATION:
+                readString_();
+
+                if (!current_platform){
+                    throw KBFatalDetailed("Platform animation name info present before any platform info", "File Loading : invalid data file content");
+                }
+
+                current_platform->animation = &stage.tryAnimation(string_read);
 
                 break;
             case FILEMARKER_INTERFILE:
@@ -352,6 +411,150 @@ SDL_Texture* DataFile::readTexture(){
     return result;
 }
 
+
+bool DataFile::readAnimationData(Animation& anim, Uint8 marker, bool& leave_loop, DataFile::AnimationParsingData& context){
+    switch (marker){
+        case FILEMARKER_ANIMSPEED: {
+            double valueD = readValue<double>();
+            anim.setBaseSpeed(valueD);
+            break;
+        }
+        
+        case FILEMARKER_FRAMEINFO: {
+            Debug::out << "Reading frame info at 0x" << Log::hex(tell()) << '\n';
+            Uint8 byte = readValue<Uint8>();
+            readData(&byte);
+            context.current_frame = anim.getFrame(byte);
+            //context.current_entity_frame = anim.getEntityFrame(byte);
+            break;
+        }
+        
+        case FILEMARKER_FRAMEDURATION: {
+            if (!context.current_frame){
+                throw KBFatalDetailed("Found frame duration data info before any frame info", "Error in the data file");
+            }
+            int16_t word = readValue<int16_t>();
+            context.current_frame->duration = word;
+            break;
+        }
+        case FILEMARKER_INTERFILE:
+            Debug::log("Interfile");
+            leave_loop = true;
+            break;
+        default:
+            return false;        
+    }
+}
+
+/**
+            fseek(file, -1, SEEK_CUR);
+            Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
+            throw KBFatalDetailed("File Loading : invalid data file content",
+                Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", ftell(file), (int)getc(file)));
+
+ */
+
+void DataFile::readEntityAnimationData(EntityAnimation&, Uint8 marker, DataFile::EntityAnimationParsingData& context){
+    switch (marker){
+
+        case FILEMARKER_FRAMEORIGIN: {
+            if (!context.current_frame){
+                throw KBFatalDetailed("Found frame duration data info before any frame info", "Error in the data file");
+            }
+            int16_t word = readValue<int16_t>();
+            context.current_frame->origin.x = word;
+            readWordData(&word);
+            context.current_frame->origin.y = word;
+            Debug::out << "Frame origin : " << context.current_frame->origin.x << " " << context.current_frame->origin.y << '\n' << std::flush;
+            break;
+        }
+        case FILEMARKER_FRAMEMOVEMENT: {
+            if (!context.current_frame){
+                throw KBFatalDetailed("Found frame duration data info before any frame info", "Error in the data file");
+            }
+
+            Uint8 byte = readValue<Uint8>();
+
+            context.current_entity_frame->movement.x.enabled = byte & 1;
+            context.current_entity_frame->movement.x.set_speed = getBit(byte, 1);
+            context.current_entity_frame->movement.x.whole_frame = getBit(byte, 2);
+            context.current_entity_frame->movement.y.enabled = getBit(byte, 3);
+            context.current_entity_frame->movement.y.set_speed = getBit(byte, 4);
+            context.current_entity_frame->movement.y.whole_frame = getBit(byte, 5);
+
+            readData(&valueD);
+            current_entity_frame->movement.x.value = valueD;
+            readData(&valueD);
+            current_entity_frame->movement.y.value = valueD;
+            break;
+        }
+        case FILEMARKER_HURTBOXINFO:
+            Debug::out << "Reading hurtbox info at 0x" << Log::hex(tell()) << '\n';
+            if (!current_entity_frame){
+                throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
+            }
+            hurtbox = &(current_entity_frame->hurtboxes.emplace_back());
+            
+            readData(&word);
+            hurtbox->x = word;
+            if (hurtbox->x == max_value<short>){  
+                hurtbox->x = -(current_frame->origin.x);
+                hurtbox->y =  (current_frame->origin.y);
+                hurtbox->w = current_frame->display.w;
+                hurtbox->h = current_frame->display.h;
+                hurtbox->type = Hurtbox::Type::NORMAL;
+            } else {
+                readData(&word);
+                hurtbox->y = word;
+                readData(&word);
+                hurtbox->w = word;
+                readData(&word);
+                hurtbox->h = word;
+                readData(&byte);
+                hurtbox->type = (Hurtbox::Type)byte;
+            }
+
+            break;
+        case FILEMARKER_HITBOXINFO:      
+            hitbox = &current_entity_frame->hitboxes.emplace_back();
+            
+            readData(&word);
+            hitbox->x = word;
+            readData(&word);
+            hitbox->y = word;
+            readData(&word);
+            hitbox->w = word;
+            readData(&word);
+            hitbox->h = word;
+            readData(&byte);
+            hitbox->type = (Hitbox::Type)byte;
+
+            Debug::out << "Hitbox : " << hitbox->x << " " << hitbox->y << " " << hitbox->w << " " << hitbox->h << '\n' << std::flush;
+
+            switch (hitbox->type){
+                case Hitbox::Type::DAMAGE:
+                    readData(&valueD);
+                    hitbox->damage = valueD;
+                    readData(&word);
+                    hitbox->angle = word;
+                    readData(&valueD);
+                    hitbox->base_knockback = valueD;
+                    readData(&valueD);
+                    hitbox->scalink_knockback = valueD;
+                    readData(&byte);
+                    hitbox->hit = byte;
+                    readData(&byte);
+                    hitbox->priority = byte;
+                    break;
+                default:
+                    throw KBFatalDetailed("Unsupported or invalid hitbox type", "File Loading : invalid data file content");
+            }
+
+            break;
+
+    }
+}
+
 /**
  * @brief Reads an Animation Data Chunk
  *
@@ -360,9 +563,6 @@ SDL_Texture* DataFile::readTexture(){
 
 void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     //int value;
-    Uint8 byte;
-    int16_t word;
-    double valueD;
     bool leave_loop;
     Frame* current_frame;
     EntityFrame* current_entity_frame = nullptr;
@@ -386,116 +586,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
             leave_loop = false;
             do {
                 readData(&byte);
-                switch (byte){
-                    case FILEMARKER_ANIMSPEED:
-                        readData(&valueD);
-                        anim.setBaseSpeed(valueD);
-                        break;
-                    case FILEMARKER_FRAMEINFO:
-                        Debug::out << "Reading frame info at 0x" << Log::hex(tell()) << '\n';
-                        readData(&byte);
-                        current_frame = anim.getFrame(byte);
-                        current_entity_frame = anim.getEntityFrame(byte);
-                        break;
-                    case FILEMARKER_FRAMEDURATION:
-                        readData(&word);
-                        current_frame->duration = word;
-                        break;
-                    case FILEMARKER_FRAMEORIGIN:
-                        readWordData(&word);
-                        current_frame->origin.x = word;
-                        readWordData(&word);
-                        current_frame->origin.y = word;
-                        Debug::out << "Frame origin : " << current_frame->origin.x << " " << current_frame->origin.y << '\n' << std::flush;
-                        break;
-                    case FILEMARKER_FRAMEMOVEMENT:
-                        readData(&byte);
-
-                        current_entity_frame->movement.x.enabled = byte & 1;
-                        current_entity_frame->movement.x.set_speed = getBit(byte, 1);
-                        current_entity_frame->movement.x.whole_frame = getBit(byte, 2);
-                        current_entity_frame->movement.y.enabled = getBit(byte, 3);
-                        current_entity_frame->movement.y.set_speed = getBit(byte, 4);
-                        current_entity_frame->movement.y.whole_frame = getBit(byte, 5);
-
-                        readData(&valueD);
-                        current_entity_frame->movement.x.value = valueD;
-                        readData(&valueD);
-                        current_entity_frame->movement.y.value = valueD;
-                        break;
-                    case FILEMARKER_HURTBOXINFO:
-                        Debug::out << "Reading hurtbox info at 0x" << Log::hex(tell()) << '\n';
-                        if (!current_entity_frame){
-                            throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
-                        }
-                        hurtbox = &(current_entity_frame->hurtboxes.emplace_back());
-                        
-                        readData(&word);
-                        hurtbox->x = word;
-                        if (hurtbox->x == MAX_VALUE_SHORT){  
-                            hurtbox->x = -(current_frame->origin.x);
-                            hurtbox->y =  (current_frame->origin.y);
-                            hurtbox->w = current_frame->display.w;
-                            hurtbox->h = current_frame->display.h;
-                            hurtbox->type = Hurtbox::Type::NORMAL;
-                        } else {
-                            readData(&word);
-                            hurtbox->y = word;
-                            readData(&word);
-                            hurtbox->w = word;
-                            readData(&word);
-                            hurtbox->h = word;
-                            readData(&byte);
-                            hurtbox->type = (Hurtbox::Type)byte;
-                        }
-
-                        break;
-                    case FILEMARKER_HITBOXINFO:      
-                        hitbox = &current_entity_frame->hitboxes.emplace_back();
-                        
-                        readData(&word);
-                        hitbox->x = word;
-                        readData(&word);
-                        hitbox->y = word;
-                        readData(&word);
-                        hitbox->w = word;
-                        readData(&word);
-                        hitbox->h = word;
-                        readData(&byte);
-                        hitbox->type = (Hitbox::Type)byte;
-
-                        Debug::out << "Hitbox : " << hitbox->x << " " << hitbox->y << " " << hitbox->w << " " << hitbox->h << '\n' << std::flush;
-
-                        switch (hitbox->type){
-                            case Hitbox::Type::DAMAGE:
-                                readData(&valueD);
-                                hitbox->damage = valueD;
-                                readData(&word);
-                                hitbox->angle = word;
-                                readData(&valueD);
-                                hitbox->base_knockback = valueD;
-                                readData(&valueD);
-                                hitbox->scalink_knockback = valueD;
-                                readData(&byte);
-                                hitbox->hit = byte;
-                                readData(&byte);
-                                hitbox->priority = byte;
-                                break;
-                            default:
-                                throw KBFatalDetailed("Unsupported or invalid hitbox type", "File Loading : invalid data file content");
-                        }
-
-                        break;
-                    case FILEMARKER_INTERFILE:
-                        Debug::log("Interfile");
-                        leave_loop = true;
-                        break;
-                    default:
-                        fseek(file, -1, SEEK_CUR);
-                        Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
-                        throw KBFatalDetailed("File Loading : invalid data file content",
-                            Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", ftell(file), (int)getc(file)));
-                }
+                
             } while (!leave_loop);
             
             break;

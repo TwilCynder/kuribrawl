@@ -95,7 +95,7 @@ Version du format : 0.3.0
 - - - 2 octets y
 - - - 2 octets w
 - - - [0x10
-- - - animation (null-terminated string, NI)]
+- - - animation (null-terminated string)]
 - |
 - Infos d'élément de background (facultatif) (NI)
 - - - 0x02

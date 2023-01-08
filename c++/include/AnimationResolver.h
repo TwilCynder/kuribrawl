@@ -13,9 +13,9 @@ class AnimationResolver {
     struct Binding {
         const AnimationsPool<A>& pool;
         const std::string animation_name;
-        A&;
+        A& target;
 
-        Binding(const AnimationsPool<A>& pool, const std::string&& animation_name, A& target, int nbFrames);
+        Binding(const AnimationsPool<A>& pool, const std::string&& animation_name, A& target);
     };
 
     template<class A>

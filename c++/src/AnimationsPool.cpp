@@ -112,6 +112,16 @@ const A* AnimationsPool<A>::getAnimation(const Kuribrawl::string_view& name) con
     return &(it->second);
 }
 
+template <class A>
+AnimationsPool<A>::Iterator AnimationsPool<A>::begin() const {
+    return animations.cbegin();
+}
+
+template <class A>
+AnimationsPool<A>::Iterator AnimationsPool<A>::end() const {
+    return animations.cend();
+}
+
 template<class A>
 A& AnimationsPool<A>::tryAnimation(const char* name){
     return tryAnimation((std::string)name);

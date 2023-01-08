@@ -10,6 +10,11 @@
  */
 template <class A>
 class AnimationsPool {
+
+    protected:
+    using AnimationMap = std::map<std::string, A, std::less<>>;
+    AnimationMap animations;    ///< Map containing all the Animations of this Champion.
+
     public:
     A& addAnimation(std::string&& name, SDL_Texture* spritesheet);
     A& addAnimation(const char* name, SDL_Texture* spritesheet);
@@ -22,6 +27,8 @@ class AnimationsPool {
     A& tryAnimation(const std::string& name);
     A& tryAnimation(std::string&& name);
 
-    protected:
-    std::map<std::string, A, std::less<>> animations;    ///< Map containing all the Animations of this Champion.
+    using Iterator = AnimationMap::const_iterator;
+    Iterator begin() const;
+    Iterator end() const;
+
 };

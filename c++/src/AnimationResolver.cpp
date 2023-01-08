@@ -1,6 +1,5 @@
 #include "AnimationResolver.h"
 
-
 template <class A>
 AnimationResolver::Binding<A>::Binding(const AnimationsPool<A>& pool_, const std::string&& animation_name_, A& target_) :
     pool(pool_), animation_name(std::move(animation_name_)), target(target_)

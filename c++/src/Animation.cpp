@@ -10,8 +10,8 @@
 Animation::Animation():
     nb_frames(0),
     loop(true),
-    frames(nullptr),
     spritesheet(nullptr),
+    frames(nullptr),
     base_speed(1)
 {
 }

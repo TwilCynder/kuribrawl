@@ -10,8 +10,8 @@
  * 
  */
 namespace Debug {
-    extern Logger out;
-    extern Logger err;
+    extern Logger out; ///< Logger using standard output
+    extern Logger err; ///< Logger using standard error output
 
     extern SpacedLogger sout;
 

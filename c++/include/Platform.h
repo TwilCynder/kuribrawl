@@ -11,6 +11,5 @@ struct PlatformModel {
     PlatformModel(int w, int x = 0, int y = 0);
     PlatformModel(int w, int x, int y, const Animation*);
 
-    private:
     const Animation* animation;
 };

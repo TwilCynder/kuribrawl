@@ -11,6 +11,7 @@
 class EntityAnimation;
 class Champion;
 class StageModel;
+class StageBackgroundElement;
 class PlatformModel;
 class App;
 
@@ -28,6 +29,16 @@ class DataFile {
 
     void read(App& data);
     bool ready();
+
+    struct AnimationParsingData {
+        Frame* current_frame = nullptr;
+    };
+
+    struct EntityAnimationParsingData {
+        EntityFrame* current_entity_frame = nullptr;
+        Hurtbox* hurtbox = nullptr;
+        Hitbox* hitbox = nullptr;
+    };
 
     private:
 
@@ -58,26 +69,29 @@ class DataFile {
     void readString(Kuribrawl::string_view&);
     Kuribrawl::string_view readString_sv();
     char*   readString_get();
+    void readString_();
 
     int16_t readWord();
     int16_t readWord(int16_t& buffer);
-
-    bool checkSignature(); 
-    void readVersion();
-    DataType readDataType();
-    char* readFileTag();
 
     //SDL-Specific
     SDL_Texture* readTexture();
 
     //Kuribrawl-Specific
+    bool checkSignature(); 
+    void readVersion();
+    DataType readDataType();
+    char* readFileTag();
     void readEntityAnimationFile(EntityAnimation& anim);
     void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
     void readStageValues(StageModel& stage);
     void readStageFile(StageModel& stage);
     PlatformModel& readPlatformData(StageModel& stage);
-    StageModel::BackgroundElement& readBackgroundElementData(StageModel& stage);
+    StageBackgroundElement& readBackgroundElementData(StageModel& stage);
+
+    bool readAnimationData(Animation&, Uint8 marker, bool& leave_loop, AnimationParsingData& );
+    void readEntityAnimationData(EntityAnimation&, Uint8 marker, EntityAnimationParsingData& );
 
     template<typename T>
     void readData(T* res);
@@ -98,5 +112,6 @@ class DataFile {
     SDL_RWops* sdl_stream;  ///< An SDL stream created from the \ref DataFile#file "FILE*", to use SDL file-reading functions.
                             /**This structure will use the \ref DataFile#file "FILE*" as its underlying FILE*. */
     char readBuffer[BUFFER_SIZE];   ///< Buffer used to read strings.
+    Kuribrawl::string_view string_read;
     SDL_Renderer* renderer; ///< The Renderer that will be used for textures (texture are bound to a renderer from creation so we need it when loading them)
 };

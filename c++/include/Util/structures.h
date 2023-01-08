@@ -19,8 +19,12 @@ namespace Kuribrawl
             T right;
         };
 
+        void set(T x_, T y_){
+            x = x_;
+            y = y_;
+        }
     };
-    
+
     template <typename T>
     struct Vec2 <T, enable_if_t<is_class_v<T> && !is_aggregate_v<T>>> {
         T x;
@@ -44,6 +48,7 @@ namespace Kuribrawl
 
         Vec2()
         {}
+
     };
 
     template<typename T>
@@ -56,6 +61,11 @@ namespace Kuribrawl
         template<typename U>
         ArithVec2<U> operator+(U&& other){
             return ArithVec2(this->x + other, this->y + other);
+        }
+
+        ArithVec2<T>& operator=(const Vec2<T>& v){
+            this->x = v.x;
+            this->y = v.y;
         }
     };
 

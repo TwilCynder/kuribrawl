@@ -4,6 +4,7 @@
 #include "AnimationsPool.h"
 #include "Animation.h"
 #include "Platform.h"
+#include "StageBackgroundElement.h"
 #include "Util/util.h"
 
 //class Platform;
@@ -18,12 +19,6 @@ class StageModel : public AnimationsPool<Animation> {
         Values();
     };
 
-    struct BackgroundElement {
-        const Animation* anim;
-        Kuribrawl::Vector position;
-        int depth;
-    };
-
     StageModel(const std::string name_);
 
     void setDisplayName(const char* name_);
@@ -34,7 +29,7 @@ class StageModel : public AnimationsPool<Animation> {
     PlatformModel& addPlatform(int w, int x, int y, std::string&& animation_name);
     const std::vector<PlatformModel>& getPlatforms() const;
 
-    BackgroundElement& addBackgroundElement(std::string&& animation_name);
+    StageBackgroundElement& addBackgroundElement(std::string&& animation_name);
 
     Values values;
 
@@ -44,5 +39,5 @@ class StageModel : public AnimationsPool<Animation> {
     std::string display_name;   ///< Name that will be displayed for this StageModel.
 
     std::vector<PlatformModel> platforms;
-    std::vector<BackgroundElement> backgroung_elements;
+    std::vector<StageBackgroundElement> backgroung_elements;
 };
