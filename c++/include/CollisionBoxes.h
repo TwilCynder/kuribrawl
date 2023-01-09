@@ -32,6 +32,7 @@ struct Hitbox : CollisionBox {
         WIND,
         SPECIAL
     } type;
+    
     double damage;
     double base_knockback;
     double scalink_knockback;

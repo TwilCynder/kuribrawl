@@ -412,22 +412,21 @@ SDL_Texture* DataFile::readTexture(){
 }
 
 
-bool DataFile::readAnimationData(Animation& anim, Uint8 marker, bool& leave_loop, DataFile::AnimationParsingData& context){
+DataFile::DataReadingResult DataFile::readAnimationData(Animation& anim, Uint8 marker, DataFile::AnimationParsingData& context){
     switch (marker){
         case FILEMARKER_ANIMSPEED: {
             double valueD = readValue<double>();
             anim.setBaseSpeed(valueD);
-            break;
         }
+        break;
         
         case FILEMARKER_FRAMEINFO: {
             Debug::out << "Reading frame info at 0x" << Log::hex(tell()) << '\n';
             Uint8 byte = readValue<Uint8>();
-            readData(&byte);
             context.current_frame = anim.getFrame(byte);
-            //context.current_entity_frame = anim.getEntityFrame(byte);
-            break;
+            context.frame_id = byte;
         }
+        return DataReadingResult::SET_FRAME;
         
         case FILEMARKER_FRAMEDURATION: {
             if (!context.current_frame){
@@ -435,15 +434,28 @@ bool DataFile::readAnimationData(Animation& anim, Uint8 marker, bool& leave_loop
             }
             int16_t word = readValue<int16_t>();
             context.current_frame->duration = word;
-            break;
         }
+        break;
+
+        case FILEMARKER_FRAMEORIGIN: {
+            if (!context.current_frame){
+                throw KBFatalDetailed("Found frame duration data info before any frame info", "Error in the data file");
+            }
+            int16_t word = readValue<int16_t>();
+            context.current_frame->origin.x = word;
+            readData(&word);
+            context.current_frame->origin.y = word;
+            Debug::out << "Frame origin : " << context.current_frame->origin.x << " " << context.current_frame->origin.y << '\n' << std::flush;
+        }
+        break;
         case FILEMARKER_INTERFILE:
             Debug::log("Interfile");
-            leave_loop = true;
-            break;
+            return DataReadingResult::LEAVE_lOOP;
         default:
-            return false;        
+            return DataReadingResult::NOTHING_DONE;        
     }
+
+    return DataReadingResult::READ;
 }
 
 /**
@@ -454,26 +466,30 @@ bool DataFile::readAnimationData(Animation& anim, Uint8 marker, bool& leave_loop
 
  */
 
-void DataFile::readEntityAnimationData(EntityAnimation&, Uint8 marker, DataFile::EntityAnimationParsingData& context){
+bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataFile::AnimationParsingData& anim_context, DataFile::EntityAnimationParsingData& context){
+    Debug::out << "READ : " << (int)marker << '|' << Log::hex(tell() - 1) << '\n';
+    DataReadingResult result = readAnimationData(anim, marker, anim_context);
+
+
+    switch (result){
+        case DataReadingResult::LEAVE_lOOP:
+            return true;
+        case DataReadingResult::READ:
+            return false;
+        case DataReadingResult::SET_FRAME:
+            context.current_entity_frame = anim.getEntityFrame(anim_context.frame_id);
+            return false;
+    }
+
     switch (marker){
-
-        case FILEMARKER_FRAMEORIGIN: {
-            if (!context.current_frame){
-                throw KBFatalDetailed("Found frame duration data info before any frame info", "Error in the data file");
-            }
-            int16_t word = readValue<int16_t>();
-            context.current_frame->origin.x = word;
-            readWordData(&word);
-            context.current_frame->origin.y = word;
-            Debug::out << "Frame origin : " << context.current_frame->origin.x << " " << context.current_frame->origin.y << '\n' << std::flush;
-            break;
-        }
         case FILEMARKER_FRAMEMOVEMENT: {
-            if (!context.current_frame){
+            if (!context.current_entity_frame){
                 throw KBFatalDetailed("Found frame duration data info before any frame info", "Error in the data file");
             }
 
-            Uint8 byte = readValue<Uint8>();
+            Uint8 byte; double valueD;
+
+            readData(&byte);
 
             context.current_entity_frame->movement.x.enabled = byte & 1;
             context.current_entity_frame->movement.x.set_speed = getBit(byte, 1);
@@ -483,77 +499,90 @@ void DataFile::readEntityAnimationData(EntityAnimation&, Uint8 marker, DataFile:
             context.current_entity_frame->movement.y.whole_frame = getBit(byte, 5);
 
             readData(&valueD);
-            current_entity_frame->movement.x.value = valueD;
+            context.current_entity_frame->movement.x.value = valueD;
             readData(&valueD);
-            current_entity_frame->movement.y.value = valueD;
+            context.current_entity_frame->movement.y.value = valueD;
             break;
         }
-        case FILEMARKER_HURTBOXINFO:
+        case FILEMARKER_HURTBOXINFO: {
             Debug::out << "Reading hurtbox info at 0x" << Log::hex(tell()) << '\n';
-            if (!current_entity_frame){
+            if (!context.current_entity_frame){
                 throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
             }
-            hurtbox = &(current_entity_frame->hurtboxes.emplace_back());
+            int16_t word; Uint8 byte;
+            Hurtbox& hurtbox = context.current_entity_frame->hurtboxes.emplace_back();
             
             readData(&word);
-            hurtbox->x = word;
-            if (hurtbox->x == max_value<short>){  
-                hurtbox->x = -(current_frame->origin.x);
-                hurtbox->y =  (current_frame->origin.y);
-                hurtbox->w = current_frame->display.w;
-                hurtbox->h = current_frame->display.h;
-                hurtbox->type = Hurtbox::Type::NORMAL;
+            hurtbox.x = word;
+            if (hurtbox.x == max_value<short>){  
+                hurtbox.x = -(anim_context.current_frame->origin.x);
+                hurtbox.y =  (anim_context.current_frame->origin.y);
+                hurtbox.w = anim_context.current_frame->display.w;
+                hurtbox.h = anim_context.current_frame->display.h;
+                hurtbox.type = Hurtbox::Type::NORMAL;
             } else {
                 readData(&word);
-                hurtbox->y = word;
+                hurtbox.y = word;
                 readData(&word);
-                hurtbox->w = word;
+                hurtbox.w = word;
                 readData(&word);
-                hurtbox->h = word;
+                hurtbox.h = word;
                 readData(&byte);
-                hurtbox->type = (Hurtbox::Type)byte;
+                hurtbox.type = (Hurtbox::Type)byte;
             }
+        }
+        break;
+        case FILEMARKER_HITBOXINFO: { 
+            if (!context.current_entity_frame){
+                throw KBFatalDetailed("Data file : found hurtbox info before any frame info", "Error in the data file");
+            }
+            int16_t word; Uint8 byte; double valueD;
 
-            break;
-        case FILEMARKER_HITBOXINFO:      
-            hitbox = &current_entity_frame->hitboxes.emplace_back();
+            Hitbox& hitbox = context.current_entity_frame->hitboxes.emplace_back();
             
             readData(&word);
-            hitbox->x = word;
+            hitbox.x = word;
             readData(&word);
-            hitbox->y = word;
+            hitbox.y = word;
             readData(&word);
-            hitbox->w = word;
+            hitbox.w = word;
             readData(&word);
-            hitbox->h = word;
+            hitbox.h = word;
             readData(&byte);
-            hitbox->type = (Hitbox::Type)byte;
+            hitbox.type = (Hitbox::Type)byte;
 
-            Debug::out << "Hitbox : " << hitbox->x << " " << hitbox->y << " " << hitbox->w << " " << hitbox->h << '\n' << std::flush;
+            Debug::out << "Hitbox : " << hitbox.x << " " << hitbox.y << " " << hitbox.w << " " << hitbox.h << '\n' << std::flush;
 
-            switch (hitbox->type){
+            switch (hitbox.type){
                 case Hitbox::Type::DAMAGE:
                     readData(&valueD);
-                    hitbox->damage = valueD;
+                    hitbox.damage = valueD;
                     readData(&word);
-                    hitbox->angle = word;
+                    hitbox.angle = word;
                     readData(&valueD);
-                    hitbox->base_knockback = valueD;
+                    hitbox.base_knockback = valueD;
                     readData(&valueD);
-                    hitbox->scalink_knockback = valueD;
+                    hitbox.scalink_knockback = valueD;
                     readData(&byte);
-                    hitbox->hit = byte;
+                    hitbox.hit = byte;
                     readData(&byte);
-                    hitbox->priority = byte;
+                    hitbox.priority = byte;
                     break;
                 default:
                     throw KBFatalDetailed("Unsupported or invalid hitbox type", "File Loading : invalid data file content");
             }
-
-            break;
-
+        }
+        break;
+        default:
+            Debug::out << "READ : Unexpected byte at 0x" << std::hex << (tell() - 1) << ", expected animation information type identifier, found " << (int)marker << '\n';
+            throw KBFatalDetailed(
+                Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", (tell() - 1), (int)marker),
+                "File Loading : invalid data file content"
+            );
     }
+    return false;
 }
+
 
 /**
  * @brief Reads an Animation Data Chunk
@@ -561,18 +590,14 @@ void DataFile::readEntityAnimationData(EntityAnimation&, Uint8 marker, DataFile:
  * @param anim the anim that was created or updated based on this Data Chunk
  */
 
-void DataFile::readEntityAnimationFile(EntityAnimation& anim){
-    //int value;
-    bool leave_loop;
-    Frame* current_frame;
-    EntityFrame* current_entity_frame = nullptr;
-    Hurtbox* hurtbox = nullptr;
-    Hitbox* hitbox = nullptr;
-
+void DataFile::readAnimationFile(Animation& anim){
+    bool leave_loop = false;
+    AnimationParsingData anim_context;
     Debug::log("----Reading animation----");
 
     anim.setSpritesheet(readTexture());
-    readData(&byte);
+
+    Uint8 byte = readValue<Uint8>();
     switch (byte){
         case FILEMARKER_INTERFILE:
             anim.initFrames(1);
@@ -583,9 +608,62 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
             readData(&byte);
             anim.initFrames(byte);
             
-            leave_loop = false;
             do {
                 readData(&byte);
+                DataReadingResult result = readAnimationData(anim, byte, anim_context);
+                
+                if (result == DataReadingResult::NOTHING_DONE){
+                    fseek(file, -1, SEEK_CUR);
+                    Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
+                    throw KBFatalDetailed(
+                        Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", ftell(file), (int)getc(file)),
+                        "File Loading : invalid data file content"
+                    );
+
+                }
+
+                leave_loop = (result == DataReadingResult::LEAVE_lOOP);
+
+            } while (!leave_loop);
+            
+            break;
+        default:
+            Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
+            throw KBFatalDetailed("File Loading : invalid data file content", 
+                Kuribrawl::formatString("Unexpected byte at 0x%x, expected 0xFF or 0xFE", (ftell(file) - 1)));
+    }
+}
+
+
+/**
+ * @brief Reads an EntityAnimation Data Chunk
+ *
+ * @param anim the anim that was created or updated based on this Data Chunk
+ */
+
+void DataFile::readEntityAnimationFile(EntityAnimation& anim){
+    //int value;
+    bool leave_loop = false;
+    EntityAnimationParsingData entity_anim_context;
+    AnimationParsingData anim_context;
+    Debug::log("----Reading animation----");
+
+    anim.setSpritesheet(readTexture());
+
+    Uint8 byte = readValue<Uint8>();
+    switch (byte){
+        case FILEMARKER_INTERFILE:
+            anim.initFrames(1);
+            return;
+        case FILEMARKER_DESCRIPTORSTART:
+            Debug::out << "Reading animation descriptor at 0x" << Log::hex(tell()) << '\n';
+
+            readData(&byte);
+            anim.initFrames(byte);
+            
+            do {
+                readData(&byte);
+                leave_loop = readEntityAnimationData(anim, byte, anim_context, entity_anim_context);
                 
             } while (!leave_loop);
             

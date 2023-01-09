@@ -9,10 +9,15 @@
 #define BUFFER_SIZE 64
 
 class EntityAnimation;
+class Animation;
 class Champion;
 class StageModel;
 class StageBackgroundElement;
 class PlatformModel;
+class Frame;
+class EntityFrame;
+class Hitbox;
+class Hurtbox;
 class App;
 
 /**
@@ -32,6 +37,7 @@ class DataFile {
 
     struct AnimationParsingData {
         Frame* current_frame = nullptr;
+        int frame_id = 0;
     };
 
     struct EntityAnimationParsingData {
@@ -82,6 +88,7 @@ class DataFile {
     void readVersion();
     DataType readDataType();
     char* readFileTag();
+    void readAnimationFile(Animation& anim);
     void readEntityAnimationFile(EntityAnimation& anim);
     void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
@@ -90,8 +97,12 @@ class DataFile {
     PlatformModel& readPlatformData(StageModel& stage);
     StageBackgroundElement& readBackgroundElementData(StageModel& stage);
 
-    bool readAnimationData(Animation&, Uint8 marker, bool& leave_loop, AnimationParsingData& );
-    void readEntityAnimationData(EntityAnimation&, Uint8 marker, EntityAnimationParsingData& );
+    enum class DataReadingResult {
+        READ, NOTHING_DONE, LEAVE_lOOP, SET_FRAME
+    };
+
+    DataReadingResult readAnimationData(Animation&, Uint8 marker, AnimationParsingData& );
+    bool readEntityAnimationData(EntityAnimation&, Uint8 marker, AnimationParsingData&, EntityAnimationParsingData& );
 
     template<typename T>
     void readData(T* res);
