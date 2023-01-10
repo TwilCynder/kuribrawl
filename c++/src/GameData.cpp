@@ -148,3 +148,20 @@ void GameData::finalizeChampionsInitialization(){
         it->second.finalizeMoves();
     }
 }
+
+void GameData::checkData() const {
+    Debug::log("Verifying champions : ");
+    for (const auto & [name, champion] : champions){
+        Debug::out << "- " << name << '\n';
+        for (const auto & [name, animation] : champion){
+            Debug::out << "  - " << name << " : " << animation.getSpritesheet() << '\n';
+        }
+    }
+    Debug::log("Verifying stages : ");
+    for (const auto & [name, stage] : stages){
+        Debug::out << "- " << name << '\n';
+        for (const auto & [name, animation] : stage){
+            Debug::out << "  - " << name << " : " << animation.getSpritesheet() << '\n';
+        }
+    }
+}

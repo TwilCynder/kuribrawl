@@ -31,6 +31,7 @@ class GameData {
     StageModel& tryStage(const std::string& name);
 
     void finalizeChampionsInitialization();
+    void checkData() const;
 
     private:
     using ChampionsMap = std::map<std::string, Champion, std::less<>>;

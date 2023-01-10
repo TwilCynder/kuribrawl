@@ -782,6 +782,8 @@ void DataFile::read(App& app){
     }
     Debug::out << "Loading time : " << chrono.endSec() << " secs.\n";
     Debug::log("=========== Data file loading finished ==============");
+
+    app.gameData().checkData();
 }
 
 bool DataFile::ready(){
