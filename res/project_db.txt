@@ -38,4 +38,4 @@ A:acid/walking 6 0.15 c
 testStage\testStage.dat #testComment
 S:testStage
 testStage\bg.png 
-A:$testStage/bg 1 -1
+A:Stage/testStage/bg 1 -1

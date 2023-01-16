@@ -20,18 +20,49 @@
 
 constexpr bool string_pointers_assumptions = true;
 
+/**
+ * @brief Reads data to the given buffer.
+ * @tparam T data type. The size of this type is how much data is read.
+ * @param res buffer
+ */
 template <typename T>
 inline void DataFile::readData(T* res){
     SDL_RWread(sdl_stream, res, sizeof(T), 1);
 }
 
+/**
+ * @brief Reads data to a buffer, writing the given default value instead if the data read
+ * was max_value<T>
+ * @tparam T data type. The size of this type is how much data is read.
+ * @param res buffer
+ * @param def value to use if the max value was read
+ */
 template <typename T>
 inline void DataFile::readData(T* res, T def){
-    readData(res);
-    if (*res == max_value<T>) 
-        *res = def;
+    readData(res, def, max_value<T>);
 }
 
+/**
+ * @brief Reads data to a buffer, substituting a given value to another ; in other terms, if the value
+ * read is A (the "indicator"), B (the "default value") is written instead
+ * @tparam T data type. The size of this type is how much data is read.
+ * @param res buffer
+ * @param default value written if the value read was the indicator value
+ * @param indicator if this value is read, the result is the default value instead
+ */
+template<typename T>
+void DataFile::readData(T* res, T def, T ind){
+    readData(res);
+    if (*res == ind){
+        *res = def;
+    }
+}
+
+/**
+ * @brief Reads data and returns it
+ * @tparam T data type. The size of this type is how much data is read.
+ * @return T data from the input stream.
+ */
 template<typename T>
 inline T DataFile::readValue(){
     T val;
@@ -39,10 +70,22 @@ inline T DataFile::readValue(){
     return val;
 }
 
+/**
+ * @brief Reads data and returs it, or the given default value if the data read is the max_value
+ * for this data type
+ * @tparam T data type. The size of this type is how much data is read.
+ * @param def default value, for if max_value<T> is read
+ * @return T data from the input stream or def
+ */
 template<typename T>
 inline T DataFile::readValue(T def){
+    return readValue(def, max_value<T>);
+}
+
+template<typename T>
+inline T DataFile::readValue(T def, T ind){
     T val = readValue<T>();
-    return (val == max_value<T>) ? def : val;
+    return (val == ind) ? def : val;
 }
 
 int16_t DataFile::readWord(){
@@ -94,10 +137,9 @@ bool DataFile::checkSignature(){
 }
 
 /**
- * @brief Reads a few bytes as the data file format version and prints it..
+ * @brief Reads a bytes as the data file format version and prints it.
  *
  */
-
 void DataFile::readVersion(){
     Uint8 buffer;
     Debug::out << "Version : ";
@@ -124,8 +166,8 @@ DataFile::DataType DataFile::readDataType(){
 }
 
 /**
+ * @deprecated Use readString_ and get the result in string_read or readBuffer instead
  * @brief Reads a Data Chunk tag (name) from the file.
- *
  * @return const char* the string identifier (tag or name) of a data chunk.
  */
 
@@ -137,11 +179,14 @@ char* DataFile::readFileTag(){
 /**
  * @brief Returns whether the end of the file was reached
  */
-
 bool DataFile::eof(){
     return feof(file);
 }
 
+/**
+ * @brief Returns the current position in the file
+ * @return long 
+ */
 long DataFile::tell(){
     return ftell(file);
 }
@@ -174,14 +219,17 @@ void DataFile::readString(){
 }
 */
 
+/**
+ * @brief Prints the string read buffer to the Debug output (usually stdout)
+ * in a human-readable-way (non-printable characters escaped as unicode code points)
+ */
 void DataFile::printStringBuffer() const {
     Debug::out.printReadable(readBuffer, BUFFER_SIZE);
     Debug::out.newline();
 }
 
 /**
- * @brief Reads a string from the datafile into the internal buffer of this Datafile
- * 
+ * @brief Reads a string from the file into the internal buffer of this Datafile
  * @return size_t number of characters read
  */
 size_t DataFile::readString(){
@@ -232,12 +280,15 @@ char* DataFile::readString_get(){
 
 /**
  * @brief Reads a string and sets the internal string view string_read to represent it.
- * 
  */
 void DataFile::readString_(){
     string_read.set(readString());
 }
 
+/**
+ * @brief Reads and updates the gameplay values of a champion.
+ * @param champion 
+ */
 void DataFile::readChampionValues(Champion& champion){
     readData(&champion.values.walk_speed);
     readData(&champion.values.dash_speed);
@@ -272,6 +323,10 @@ void DataFile::readChampionValues(Champion& champion){
     readData(&champion.values.air_jumps);
 }
 
+/**
+ * @brief Read a data chunk describing a Champion, updating an existing Champion object.
+ * @param champion 
+ */
 void DataFile::readChampionFile(Champion& champion){
     readString();
     champion.setDisplayName(readBuffer);
@@ -314,6 +369,10 @@ void DataFile::readChampionFile(Champion& champion){
 
 }
 
+/**
+ * @brief Reads and updates the gameplay values of a Stage.
+ * @param stage 
+ */
 void DataFile::readStageValues(StageModel& stage){
     stage.values.size.w = readWord();
     stage.values.size.h = readWord();
@@ -323,6 +382,11 @@ void DataFile::readStageValues(StageModel& stage){
     stage.values.camera_bounds.h = readWord();
 }
 
+/**
+ * @brief Reads data describing a platform and adds a platform based on these informations to the given Stage.
+ * @param stage 
+ * @return PlatformModel& the newly created platform.
+ */
 PlatformModel& DataFile::readPlatformData(StageModel& stage){
     int16_t x = readValue<int16_t>(0);
     int16_t y = readValue<int16_t>(0);
@@ -330,6 +394,11 @@ PlatformModel& DataFile::readPlatformData(StageModel& stage){
     return stage.addPlatform(w, x, y);
 }
 
+/**
+ * @brief Reads data describing a stage beackground element and adds one to the given stage based on these informations.
+ * @param stage 
+ * @return StageBackgroundElement& the newly created background element.
+ */
 StageBackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
     readString_();
     StageBackgroundElement& element = stage.addBackgroundElement(string_read);
@@ -346,6 +415,10 @@ StageBackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
     return element;
 }
 
+/**
+ * @brief Read a data chunk describing a StageModel, updating an existing StageModel object.
+ * @param stage 
+ */
 void DataFile::readStageFile(StageModel& stage){
     readString();
     stage.setDisplayName(readBuffer);
@@ -392,6 +465,10 @@ void DataFile::readStageFile(StageModel& stage){
     } while (!leave_loop);
 }
 
+/**
+ * @brief Reads an image as a SDL texture.
+ * @return SDL_Texture* the newly created texture.
+ */
 SDL_Texture* DataFile::readTexture(){
     int fileEnd;
     readLongData(&fileEnd);
@@ -411,7 +488,14 @@ SDL_Texture* DataFile::readTexture(){
     return result;
 }
 
-
+/**
+ * @brief Read a data fragment in an Animation data chunk, updating a given animation, based on the
+ * previously read data marker.
+ * @param anim the animation to update
+ * @param marker the data marker found just before, indicating the type of data to be read now.
+ * @param context persistent data
+ * @return DataFile::DataReadingResult 
+ */
 DataFile::DataReadingResult DataFile::readAnimationData(Animation& anim, Uint8 marker, DataFile::AnimationParsingData& context){
     switch (marker){
         case FILEMARKER_ANIMSPEED: {
@@ -583,7 +667,6 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
     return false;
 }
 
-
 /**
  * @brief Reads an Animation Data Chunk
  *
@@ -675,6 +758,25 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     }
 }
 
+void DataFile::readAnimation(GameData& gd){
+    //tag = readFileTag();
+    //entity = tag;
+    //element = separateTag(tag);
+    Debug::out << "Prefix : " << (int)readValue<Uint8>() << '\n';
+    readString_();
+
+    Kuribrawl::string_view entity(string_read);
+    Kuribrawl::string_view element;
+
+    separateTag(string_read, entity, element);
+    Debug::out << "- Reading Animation  : " << entity << " / " << element << '\n';
+
+    switch(entity[0]){
+        default:
+            readEntityAnimationFile(gd.tryChampion(entity).tryAnimation(element.data()));
+    }
+}
+
 /**
  * @brief Transforms a string containing a '/' into two strings.
  * The input string is now the first string.
@@ -739,25 +841,13 @@ void DataFile::read(App& app){
     //char *entity, *element;
 
     Kuribrawl::string_view tag(readBuffer, 0);
-    Kuribrawl::string_view entity(tag);
-    Kuribrawl::string_view element;
+    //Kuribrawl::string_view entity(tag);
+    //Kuribrawl::string_view element;
 
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
-
-                //tag = readFileTag();
-                readString(tag);
-                //entity = tag;
-                //element = separateTag(tag);
-                separateTag(tag, entity, element);
-                Debug::log(entity.length());
-                Debug::out << "- Reading Animation  : " << entity << " / " << element << '\n';
-
-                switch(entity[0]){
-                    default:
-                        readEntityAnimationFile(app.gameData().tryChampion(entity).tryAnimation(element.data()));
-                }
+                readAnimation(app.gameData());
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();

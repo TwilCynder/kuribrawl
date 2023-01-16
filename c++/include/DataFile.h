@@ -8,6 +8,8 @@
 
 #define BUFFER_SIZE 64
 
+class App;
+class GameData;
 class EntityAnimation;
 class Animation;
 class Champion;
@@ -18,7 +20,6 @@ class Frame;
 class EntityFrame;
 class Hitbox;
 class Hurtbox;
-class App;
 
 /**
  * @brief An opened file, treated as a Kuribrawl Data File.
@@ -88,6 +89,7 @@ class DataFile {
     void readVersion();
     DataType readDataType();
     char* readFileTag();
+    void readAnimation(GameData&);
     void readAnimationFile(Animation& anim);
     void readEntityAnimationFile(EntityAnimation& anim);
     void readChampionValues(Champion& champion);
@@ -109,9 +111,13 @@ class DataFile {
     template<typename T>
     void readData(T* res, T default_);
     template<typename T>
+    void readData(T* res, T default_, T indicator);
+    template<typename T>
     T readValue();
     template<typename T>
     T readValue(T default_);
+    template<typename T>
+    T readValue(T default_, T indicator);
 
     static char* separateTag(char* tag);
     static void separateTag(const Kuribrawl::string_view& tag, Kuribrawl::string_view&, Kuribrawl::string_view&);
