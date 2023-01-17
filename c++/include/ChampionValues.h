@@ -2,6 +2,11 @@
 #include "Champion.h"
 
 /**
+ * @todo Check if we actually do this
+ * 
+ */
+
+/**
  * @brief Contains all the fixed (numerical) values of a Character (speeds, weight, lags ...)
  *
  */
@@ -55,6 +60,17 @@ struct Values {
         AIR_FORWARD_JUMP_SPEED,
         GROUND_BACKWARD_JUMP_SPEED,
         AIR_BACKWARD_JUMP_SPEED,
-        
+        TOTAL
+    };
+
+    const std::array<size_t, (size_t)Indexes::TOTAL> offsets = {
+        offsetof(Values, walk_speed),
+        offsetof(Values, dash_speed),
+        offsetof(Values, dash_start_speed),
+        offsetof(Values, dash_turn_accel),
+        offsetof(Values, dash_stop_deceleration),
+        offsetof(Values, traction),
+        offsetof(Values, max_air_speed),
+        offsetof(Values, air_acceleration),
     };
 };
