@@ -9,4 +9,5 @@ class Stage {
     Stage(const StageModel&);
     const StageModel& getModel() const;
 
+    
 };

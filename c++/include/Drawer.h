@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include "Util/structures.h"
 
 class Animation;
 class EntityAnimation;
@@ -12,12 +13,23 @@ class Drawer {
             ENTITY_ANIMATION
         };
 
-        Type type;
+        enum class PositionMode {
+            INTEGER,
+            DOUBLE
+        };
 
+        Type type;
         union {
             const Animation& anim;
             const EntityAnimation& eanim;
         };
+
+        PositionMode position_mode;
+        union {
+            const Kuribrawl::Vector& pos;
+            const Kuribrawl::VectorDouble& posD;
+        }
+
         int depth;
 
         int operator<=>(const Drawable& other) const{
@@ -27,6 +39,6 @@ class Drawer {
     
     std::set<Drawable> drawables;
 
-    
+
 
 };
