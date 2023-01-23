@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "SDL2/SDL.h"
+#include "Drawable.h"
 #include "EntityAnimationPlayer.h"
 #include "Util/util.h"
 #include "InputManager.h"
@@ -21,7 +22,7 @@ class AdvancedTextDisplayer;
  * @brief An in-game character ("instance" of a Champion).
  * A Fighter is an in-game entity that can be player-controlled, and bases its animation, properties, and overall gameplay on a Champion.
  */
-class Fighter {
+class Fighter : public Drawable {
     public:
 
     /**
@@ -40,7 +41,7 @@ class Fighter {
     Fighter(Game& game, Champion* model_);
     Fighter(Game& game, Champion* model_, int x, int y);
 
-    void draw(SDL_Renderer* target);
+    void draw(SDL_Renderer* target) const;
     //Physics
     void applyPhysics();
     //States

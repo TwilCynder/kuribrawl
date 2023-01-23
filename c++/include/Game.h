@@ -3,6 +3,7 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "PlayerFighter.h"
+#include "Drawer.h"
 
 class Champion;
 class StageModel;
@@ -56,6 +57,10 @@ class Game {
     const GameConfSPtr& getOriginalConfigurationSharedPtr() const;
 
     private:
+    void onFighterAdded(const Fighter&);
+
+    Drawer graphics;
+
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
 
     std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.

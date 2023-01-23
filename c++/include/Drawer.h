@@ -2,12 +2,32 @@
 
 #include <set>
 #include "Util/structures.h"
+#include "Drawable.h"
 
-class Animation;
-class EntityAnimation;
+class SDL_Renderer;
 
 class Drawer {
+
+    struct Element {
+        const Drawable& drawable;
+        const int depth;
+
+        int operator<=>(const Element& other) const{
+            return depth - other.depth;
+        }
+    };
+
+    std::set<Element> drawables;
+
+    public:
+    void add(const Drawable&, const int depth);
+    void add(const Drawable&);
+
+    void draw(SDL_Renderer*);
+
+        /*
     struct Drawable {
+        
         enum class Type {
             ANIMATION,
             ENTITY_ANIMATION
@@ -28,7 +48,7 @@ class Drawer {
         union {
             const Kuribrawl::Vector& pos;
             const Kuribrawl::VectorDouble& posD;
-        }
+        };
 
         int depth;
 
@@ -36,9 +56,8 @@ class Drawer {
             return depth - other.depth;
         }
     };
-    
-    std::set<Drawable> drawables;
-
-
-
+    */
 };
+
+
+    

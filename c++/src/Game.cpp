@@ -110,6 +110,10 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
     return &(*it);
 }
 
+void Game::onFighterAdded(const Fighter& fighter){
+    graphics.add(fighter);
+}
+
 /**
  * @brief Returns whether the Game is actually running
  * @return bool

@@ -17,8 +17,8 @@ class AnimationPlayer {
     AnimationPlayer();
     AnimationPlayer(Animation* animation);
 
-    void draw(SDL_Renderer* target, int x, int y);
-    void draw(SDL_Renderer* target, int x, int y, int facing);
+    void draw(SDL_Renderer* target, int x, int y) const; 
+    void draw(SDL_Renderer* target, int x, int y, int facing) const;
 
     bool is_initialized() const;
     bool is_finished() const;

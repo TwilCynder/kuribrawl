@@ -63,6 +63,7 @@ struct Values {
         TOTAL
     };
 
+    /*
     const std::array<size_t, (size_t)Indexes::TOTAL> offsets = {
         offsetof(Values, walk_speed),
         offsetof(Values, dash_speed),
@@ -73,4 +74,5 @@ struct Values {
         offsetof(Values, max_air_speed),
         offsetof(Values, air_acceleration),
     };
+    */
 };

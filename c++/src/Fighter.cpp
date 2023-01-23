@@ -193,7 +193,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
  * Simply displays the AnimationPlayer.
  * @param target the renderer the frame will be drawn to.
  */
-void Fighter::draw(SDL_Renderer* target){
+void Fighter::draw(SDL_Renderer* target) const{
     current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y, facing);
 
     SDL_Rect box;
