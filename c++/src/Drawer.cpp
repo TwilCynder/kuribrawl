@@ -1,5 +1,7 @@
 #include "Drawer.h"
 
+#include "KBDebug/Debug.h"
+
 void Drawer::add(const Drawable& d, const int depth){
     drawables.emplace(Element(d, depth));
 }

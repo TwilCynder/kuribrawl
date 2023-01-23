@@ -27,7 +27,7 @@ AnimationPlayer::AnimationPlayer():
  * @param animation the Animation that will be ran at first.
  */
 
-AnimationPlayer::AnimationPlayer(Animation* animation):
+AnimationPlayer::AnimationPlayer(const Animation* animation):
     AnimationPlayer()
 {
     setAnimation(animation);

@@ -400,9 +400,9 @@ PlatformModel& DataFile::readPlatformData(StageModel& stage){
  * @param stage 
  * @return StageBackgroundElement& the newly created background element.
  */
-StageBackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
+StageBackgroundElementModel& DataFile::readBackgroundElementData(StageModel& stage){
     readString_();
-    StageBackgroundElement& element = stage.addBackgroundElement(string_read);
+    StageBackgroundElementModel& element = stage.addBackgroundElement(string_read);
 
     int16_t x = readValue<int16_t>();
 

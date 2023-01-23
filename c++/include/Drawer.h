@@ -17,7 +17,7 @@ class Drawer {
         }
     };
 
-    std::set<Element> drawables;
+    std::multiset<Element> drawables;
 
     public:
     void add(const Drawable&, const int depth);

@@ -15,7 +15,7 @@ class AnimationPlayer {
     public:
 
     AnimationPlayer();
-    AnimationPlayer(Animation* animation);
+    AnimationPlayer(const Animation* animation);
 
     void draw(SDL_Renderer* target, int x, int y) const; 
     void draw(SDL_Renderer* target, int x, int y, int facing) const;
@@ -51,7 +51,7 @@ class AnimationPlayer {
 
     void nextFrame();
     void reset();
-    void startFrame();
+    //void startFrame();
     void init();
     void start();
 };

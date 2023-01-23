@@ -66,6 +66,10 @@ void Game::applyConfig(GameConfiguration& config){
         }
         x += step;
     }
+
+    for (const StageBackgroundElement& background_element : stage->getBackgroundElements()){
+        graphics.add(background_element, background_element.getModel().depth);
+    }
 }
 
 /**
@@ -77,6 +81,9 @@ void Game::applyConfig(GameConfiguration& config){
 PlayerFighter* Game::addFighter(Champion* model){
     Fighteriterator it = fighters.begin();
     it = fighters.emplace_after(it, *this, model);
+
+    onFighterAdded(*it);
+
     return &(*it);
 }
 
@@ -92,6 +99,9 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y){
     Debug::log("added fighter");
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y);
+
+    onFighterAdded(*it);
+
     return &(*it);
 }
 
@@ -107,6 +117,9 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y){
 PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y, port);
+
+    onFighterAdded(*it);
+
     return &(*it);
 }
 
@@ -128,10 +141,12 @@ bool Game::is_running(){
  * @param target the renderer the Game will be displayed on.
  */
 void Game::draw(SDL_Renderer* target){
-    Fighteriterator it;
+    /*Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->draw(target);
-    }
+    }*/
+
+    graphics.draw(target);
 }
 
 /**
