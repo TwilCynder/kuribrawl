@@ -167,6 +167,8 @@ bool Fighter::hitFighter(Fighter& defender, const Hitbox& hitbox, const Hurtbox&
 }
 
 void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox) {
+    if (state  == State::HITSTUN) Debug::log("Combo !");
+
     double knockback = GameCalc::getKnockback(0, 0, 0, 0) * 2;
     double angle = PI * 3 / 8;
     if (attacker.facing < 0){
