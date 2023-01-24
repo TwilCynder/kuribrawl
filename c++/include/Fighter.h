@@ -41,7 +41,7 @@ class Fighter : public Drawable {
     Fighter(Game& game, Champion* model_);
     Fighter(Game& game, Champion* model_, int x, int y);
 
-    void draw(SDL_Renderer* target) const;
+    void draw(SDL_Renderer* target, const Camera&) const;
     //Physics
     void applyPhysics();
     //States

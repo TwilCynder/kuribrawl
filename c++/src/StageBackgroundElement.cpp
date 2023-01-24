@@ -1,6 +1,7 @@
 #include "StageBackgroundElement.h"
 #include "StageBackgroundElementModel.h"
 #include "defs.h"
+#include "Camera.h"
 
 #include "KBDebug/Debug.h"
 
@@ -12,8 +13,8 @@ void StageBackgroundElement::advanceAnimation(){
     animation_player.advance();
 }
 
-void StageBackgroundElement::draw(SDL_Renderer* target) const {
-    animation_player.draw(target, model.position.x, SCREEN_HEIGHT - model.position.y);
+void StageBackgroundElement::draw(SDL_Renderer* target, const Camera& cam) const {
+    animation_player.draw(target, cam.getXOnScreen(model.position.x), cam.getYOnScreen(model.position.y));
 }
 
 const StageBackgroundElementModel& StageBackgroundElement::getModel() const {

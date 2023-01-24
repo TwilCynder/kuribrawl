@@ -16,6 +16,6 @@ class StageBackgroundElement : public Drawable {
     const StageBackgroundElementModel& getModel() const;
 
     void advanceAnimation();
-    void draw(SDL_Renderer*) const;
+    void draw(SDL_Renderer*, const Camera&) const;
 
 };

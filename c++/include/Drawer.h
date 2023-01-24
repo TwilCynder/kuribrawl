@@ -23,7 +23,7 @@ class Drawer {
     void add(const Drawable&, const int depth);
     void add(const Drawable&);
 
-    void draw(SDL_Renderer*);
+    void draw(SDL_Renderer*, const Camera&);
 
         /*
     struct Drawable {

@@ -52,7 +52,7 @@ void Game::applyConfig(GameConfiguration& config){
 
     int w = SCREEN_WIDTH;
     int step = w / config.players.size();
-    int x = step / 2;
+    int x = -((config.players.size() - 1) * step / 2.0);
 
     const StageModel* stageModel = config.stage;
     if (!stageModel) throw KBFatal("Starting game will null stage");
@@ -146,7 +146,7 @@ void Game::draw(SDL_Renderer* target){
         it->draw(target);
     }*/
 
-    graphics.draw(target);
+    graphics.draw(target, camera);
 }
 
 /**

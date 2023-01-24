@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "PlayerFighter.h"
 #include "Drawer.h"
+#include "Camera.h"
 
 class Champion;
 class StageModel;
@@ -60,6 +61,7 @@ class Game {
     void onFighterAdded(const Fighter&);
 
     Drawer graphics;
+    Camera camera;
 
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
 
@@ -67,7 +69,6 @@ class Game {
     std::unique_ptr<Stage> stage;
 
     int frame;
-    SDL_Rect camera;    ///< The area of the Stage that should be displayed.
     bool running;       ///Indicates if the game is actually running or not.
 
     GameConfSPtr original_config;     ///< Releases on call to stop().

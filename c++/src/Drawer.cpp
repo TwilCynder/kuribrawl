@@ -10,8 +10,8 @@ void Drawer::add(const Drawable& d){
     add(d, 0);
 }
 
-void Drawer::draw(SDL_Renderer* target){
+void Drawer::draw(SDL_Renderer* target, const Camera& camera){
     for (const Element& e : drawables){
-        e.drawable.draw(target);
+        e.drawable.draw(target, camera);
     }
 }

@@ -1,5 +1,4 @@
-#include "KBDebug/Debug.h"
-#include "KBDebug/DebugState.h"
+#include <math.h>
 #include "Fighter.h"
 #include "defs.h"
 #include "Util/util.h"
@@ -9,7 +8,10 @@
 #include "Random.h"
 #include "gameCalculations.h"
 #include "Text/TextDisplayer.h"
-#include <math.h>
+#include "Camera.h"
+
+#include "KBDebug/Debug.h"
+#include "KBDebug/DebugState.h"
 
 /**
  * @brief Construct a new Fighter at position 0, 0
@@ -195,8 +197,8 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
  * Simply displays the AnimationPlayer.
  * @param target the renderer the frame will be drawn to.
  */
-void Fighter::draw(SDL_Renderer* target) const{
-    current_animation.draw(target, position.x , SCREEN_HEIGHT - position.y, facing);
+void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
+    current_animation.draw(target, cam.getXOnScreen(position.x) , cam.getYOnScreen(position.y), facing);
 
     SDL_Rect box;
 
@@ -210,8 +212,8 @@ void Fighter::draw(SDL_Renderer* target) const{
     for (unsigned int i = 0; i < hurtboxes.size(); i++){
         box.w = hurtboxes[i].w;
         box.h = hurtboxes[i].h;
-        box.x = this->position.x + hurtboxes[i].getRealXPos(facing);
-        box.y = SCREEN_HEIGHT - (this->position.y + hurtboxes[i].y);
+        box.x = cam.getXOnScreen(this->position.x + hurtboxes[i].getRealXPos(facing));
+        box.y = cam.getYOnScreen(this->position.y + hurtboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
 
@@ -221,15 +223,15 @@ void Fighter::draw(SDL_Renderer* target) const{
     for (unsigned int i = 0; i < hitboxes.size(); i++){
         box.w = hitboxes[i].w;
         box.h = hitboxes[i].h;
-        box.x = this->position.x + hitboxes[i].getRealXPos(facing);
-        box.y = SCREEN_HEIGHT - (this->position.y + hitboxes[i].y);
+        box.x = cam.getXOnScreen(this->position.x + hitboxes[i].getRealXPos(facing));
+        box.y = cam.getYOnScreen(this->position.y + hitboxes[i].y);
         SDL_RenderDrawRect(target, &box);
     }
 
     //Drawing position
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
-    SDL_RenderDrawLine(target, position.x - 10, SCREEN_HEIGHT - position.y, position.x + 10, SCREEN_HEIGHT - position.y);
-    SDL_RenderDrawLine(target, position.x, SCREEN_HEIGHT - position.y - 10, position.x, SCREEN_HEIGHT - position.y + 10);
+    SDL_RenderDrawLine(target, cam.getXOnScreen(position.x - 10), SCREEN_HEIGHT - position.y, cam.getXOnScreen(position.x + 10), SCREEN_HEIGHT - position.y);
+    SDL_RenderDrawLine(target, cam.getXOnScreen(position.x), cam.getYOnScreen(position.y - 10), cam.getXOnScreen(position.x), cam.getYOnScreen(position.y + 10));
 }
 
 void Fighter::writeDebugInfo(AdvancedTextDisplayer& out){
