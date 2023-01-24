@@ -17,6 +17,11 @@ PlatformModel& StageModel::addPlatform(int w, int x, int y){
     return platforms.emplace_back(w, x, y);
 }
 
+PlatformModel& StageModel::addPlatform(int w, int x, int y, std::string&& animation_name){
+    const Animation& anim = tryAnimation(animation_name);
+    return platforms.emplace_back(w, x, y, anim);
+}
+
 const std::vector<PlatformModel>& StageModel::getPlatforms() const {
     return platforms;
 }

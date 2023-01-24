@@ -40,7 +40,7 @@ class AnimationPlayer {
     bool frame_changed; ///< True if the frame just changed
                         /**<Guarantees that the current frame has been set, but does not guaranteed that it actuzlly changed (the old value may be the new value)*/
    
-
+    
     private:
     int timeleft; ///<Time remaining *on the current frame*.
     double speed; ///<Current \ref Animation#base_speed "speed" at which the animation runs (will override the base speed of the Animation).

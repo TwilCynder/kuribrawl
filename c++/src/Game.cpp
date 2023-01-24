@@ -58,6 +58,14 @@ void Game::applyConfig(GameConfiguration& config){
     if (!stageModel) throw KBFatal("Starting game will null stage");
     stage = std::make_unique<Stage>(*stageModel);
 
+    for (const StageBackgroundElement& background_element : stage->getBackgroundElements()){
+        graphics.add(background_element, background_element.getModel().depth);
+    }
+
+    for (const Platform& platform : stage->getPlatforms()){
+        graphics.add(platform);
+    }
+
     for (PlayerConfiguration& player : config.players){
         if (player.port != nullptr){
             addFighter(&player.champion, x, 100, *player.port);
@@ -65,10 +73,6 @@ void Game::applyConfig(GameConfiguration& config){
             addFighter(&player.champion, x, 100);
         }
         x += step;
-    }
-
-    for (const StageBackgroundElement& background_element : stage->getBackgroundElements()){
-        graphics.add(background_element, background_element.getModel().depth);
     }
 }
 
