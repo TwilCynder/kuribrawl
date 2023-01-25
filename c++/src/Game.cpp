@@ -199,14 +199,15 @@ void Game::updateAnimations(){
 
 /**
  * @brief \ref Fighter#applyPhysics "Processes physics mechanics " on every Fighter.
- * This includes modifying speed based on states, applying speed, and detecting collisions and terrain interaction.
+ * This includes modifying speed based on states, applying speed, and detecting collisions and terrain interaction.  
+ * May only be called if `running` is true
  */
 void Game::applyPhysics(){
     const StageModel& stageModel = stage.get()->getModel();
 
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->applyPhysics();
+        it->applyPhysics(*this);
     }
 }
 
@@ -329,4 +330,14 @@ const GameConfSPtr& Game::getOriginalConfigurationSharedPtr() const {
 
 int Game::getFrame(){
     return frame;
+}
+
+/**
+ * @brief Returns the current Stage.  
+ * Cannot return null if all invariant are respected. 
+ * 
+ * @return const Stage* 
+ */
+const Stage* Game::getStage() const {
+    return stage.get();
 }

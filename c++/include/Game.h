@@ -43,6 +43,8 @@ class Game {
     void updateAnimations();
     void hitDetection();
 
+    const Stage* getStage() const;
+
     //Debug
     void drawDebugInfo(TextureFont& font, SDL_Renderer* target);
     int getFrame();

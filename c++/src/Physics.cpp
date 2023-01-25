@@ -3,6 +3,8 @@
 #include "Champion.h"
 #include "KBDebug/Debug.h"
 #include "Util/util.h"
+#include "Game.h"
+#include "Stage.h"
 
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
@@ -50,7 +52,7 @@ void Fighter::land(){
  * @brief Apply physics-related mechanics.
  *
  */
-void Fighter::applyPhysics(){
+void Fighter::applyPhysics(Game& game){
     if (paused) return;
 
     Kuribrawl::VectorDouble new_pos;
@@ -59,8 +61,6 @@ void Fighter::applyPhysics(){
 
     if (abs(speed.x) < MAX_SPEED_PRECISION) speed.x = 0;
     if (abs(speed.y) < MAX_SPEED_PRECISION) speed.y = 0;
-
-
 
     if (speed.y > -model->values.max_fall_speed){
         speed.y -= model->values.gravity;
@@ -114,6 +114,11 @@ void Fighter::applyPhysics(){
 
     new_pos.x = position.x + speed.x;
     new_pos.y = position.y + speed.y;
+
+    //Calcul des collisions
+
+    const Stage* stage = game.getStage();
+    //Maybe test if stage isn't null ? Shouldn't happen tho
 
     if (new_pos.y <= 0){
         new_pos.y = 0;

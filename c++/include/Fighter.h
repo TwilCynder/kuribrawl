@@ -43,7 +43,7 @@ class Fighter : public Drawable {
 
     void draw(SDL_Renderer* target, const Camera&) const;
     //Physics
-    void applyPhysics();
+    void applyPhysics(Game&);
     //States
     void updateState();
     void checkUpdateAnimation();
