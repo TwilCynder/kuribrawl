@@ -4,7 +4,7 @@
 #include "Animation.h"
 
 struct PlatformModel {
-    int w;
+    int half_w;
     Kuribrawl::Vector pos;
 
     PlatformModel();

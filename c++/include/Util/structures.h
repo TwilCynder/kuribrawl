@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <utility>
+#include <ostream>
 
 namespace Kuribrawl
 {
@@ -69,6 +70,10 @@ namespace Kuribrawl
         }
     };
 
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, Vec2<T>& vec){
+        return os << vec.left << ", " << vec.right;
+    }
     
     using Vector = ArithVec2<int>;
 

@@ -17,6 +17,8 @@ class Game;
 struct Move;
 
 class AdvancedTextDisplayer;
+class Platform;
+class Stage;
 
 /**
  * @brief An in-game character ("instance" of a Champion).
@@ -121,4 +123,5 @@ class Fighter : public Drawable {
     void groundCollision();
     void groundToAir();
 	void land();
+    const Platform* checkGroundCollision(const Stage*, Kuribrawl::VectorDouble& new_pos);
 };

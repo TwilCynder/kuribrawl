@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "Util/structures.h"
 #include "AnimationPlayer.h"
 #include "Drawable.h"
 
@@ -10,6 +11,7 @@ class SDL_Renderer;
 class Platform : public Drawable {
     const PlatformModel& model;
     std::unique_ptr<AnimationPlayer> animation_player;
+    Kuribrawl::Vector position;
 
     public:
     Platform(const PlatformModel&);
@@ -17,4 +19,7 @@ class Platform : public Drawable {
     void advanceAnimation();
     void draw(SDL_Renderer*, const Camera&) const;
     bool hasAnimation() const;
+    const Kuribrawl::Vector& getPosition() const;
+    const int getWidth() const;
+    const int getHalfWidth() const;
 };
