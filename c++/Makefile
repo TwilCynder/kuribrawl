@@ -2,12 +2,14 @@ EXEC = kuribrawl
 
 ifdef RELEASE
 	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=gnu++2a -O3
-	LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
 else
 	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=gnu++2a -DDEBUG=1
 endif 
 
 LDFLAGS = `sdl2-config --libs` -lSDL2_image -lm
+LDFLAGS_STATIC = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
+
+#`sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
 
 SRC= $(wildcard src/*.cpp src/**/*.cpp)
 _OBJS= $(SRC:.cpp=.o)
@@ -23,9 +25,17 @@ CURRENT_NB = 0
 
 all: start $(EXEC)
 
-release: all
+relstart:
+	@printf "\n\033[1;Building in release mode\n\033[0m"
+	$(eval LDFLAGS := $(LDFLAGS_STATIC))
+
+deploy:
 	cp kuribrawl.exe ../release/kuribrawl/kuribrawl.exe
 	cp ../res/data.twl ../release/kuribrawl/data.twl
+
+release: relstart all deploy
+
+cl-release: relstart clean deploy
 
 run: all
 	./kuribrawl.exe
