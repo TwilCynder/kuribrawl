@@ -2,11 +2,13 @@ EXEC = kuribrawl
 
 ifdef RELEASE
 	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=gnu++2a -O3
+	LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
 else
 	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=gnu++2a -DDEBUG=1
 endif 
 
-LDFLAGS = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
+LDFLAGS = `sdl2-config --libs` -lSDL2_image -lm
+
 SRC= $(wildcard src/*.cpp src/**/*.cpp)
 _OBJS= $(SRC:.cpp=.o)
 
