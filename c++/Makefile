@@ -22,8 +22,8 @@ CURRENT_NB = 0
 all: start $(EXEC)
 
 release: all
-	cp kuribrawl.exe ../release/files/kuribrawl.exe
-	cp ../res/data.twl ../release/files/data.twl
+	cp kuribrawl.exe ../release/kuribrawl/kuribrawl.exe
+	cp ../res/data.twl ../release/kuribrawl/data.twl
 
 run: all
 	./kuribrawl.exe
