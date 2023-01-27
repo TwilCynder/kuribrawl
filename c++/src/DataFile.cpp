@@ -18,6 +18,7 @@
 #define FILEFORMAT_REVISION 0
 #include "fileMarkers.h"
 
+constexpr std::string_view error_message = "File Loading : invalid data file content";
 constexpr bool string_pointers_assumptions = true;
 
 /**
@@ -348,7 +349,7 @@ void DataFile::readChampionFile(Champion& champion){
                 break;
             case FILEMARKER_LANDINGLAG:
                 if (!current_move){
-                    throw KBFatalDetailed("Landing lag info present before any move info", "File Loading : invalid data file content");
+                    throw KBFatalDetailed("Landing lag info present before any move info"s, error_message);
                 }
                 readData(&byte);
                 current_move->landing_lag = byte;
@@ -361,7 +362,7 @@ void DataFile::readChampionFile(Champion& champion){
             default:
                 fseek(file, -1, SEEK_CUR);
                 Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected champion information type identifier, found " << (int)getc(file) << '\n';
-                throw KBFatalDetailed("File Loading : invalid data file content", 
+                throw KBFatalDetailed(error_message, 
                     Kuribrawl::formatString("Unexpected byte at 0x%x, expected champion information type identifier, found %d\n", ftell(file), (int)getc(file)));
                 break;
         }
@@ -399,9 +400,9 @@ PlatformModel& DataFile::readPlatformData(StageModel& stage){
  * @param stage 
  * @return StageBackgroundElement& the newly created background element.
  */
-StageBackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
+StageBackgroundElementModel& DataFile::readBackgroundElementData(StageModel& stage){
     readString_();
-    StageBackgroundElement& element = stage.addBackgroundElement(string_read);
+    StageBackgroundElementModel& element = stage.addBackgroundElement(string_read);
 
     int16_t x = readValue<int16_t>();
 
@@ -412,6 +413,8 @@ StageBackgroundElement& DataFile::readBackgroundElementData(StageModel& stage){
         element.position.set(x, readValue<int16_t>());
         element.depth = readValue<int16_t>();
     }
+
+    Debug::sout << "Background element :" << element.position.x << element.position.y << element.depth << '\n';
     return element;
 }
 
@@ -451,7 +454,7 @@ void DataFile::readStageFile(StageModel& stage){
                 readString_();
 
                 if (!current_platform){
-                    throw KBFatalDetailed("Platform animation name info present before any platform info", "File Loading : invalid data file content");
+                    throw KBFatalDetailed("Platform animation name info present before any platform info"s, error_message);
                 }
 
                 current_platform->animation = &stage.tryAnimation(string_read);
@@ -551,7 +554,6 @@ DataFile::DataReadingResult DataFile::readAnimationData(Animation& anim, Uint8 m
  */
 
 bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataFile::AnimationParsingData& anim_context, DataFile::EntityAnimationParsingData& context){
-    Debug::out << "READ : " << (int)marker << '|' << Log::hex(tell() - 1) << '\n';
     DataReadingResult result = readAnimationData(anim, marker, anim_context);
 
 
@@ -653,7 +655,7 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
                     hitbox.priority = byte;
                     break;
                 default:
-                    throw KBFatalDetailed("Unsupported or invalid hitbox type", "File Loading : invalid data file content");
+                    throw KBFatalDetailed("Unsupported or invalid hitbox type"s, error_message);
             }
         }
         break;
@@ -661,7 +663,7 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
             Debug::out << "READ : Unexpected byte at 0x" << std::hex << (tell() - 1) << ", expected animation information type identifier, found " << (int)marker << '\n';
             throw KBFatalDetailed(
                 Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", (tell() - 1), (int)marker),
-                "File Loading : invalid data file content"
+                error_message
             );
     }
     return false;
@@ -700,7 +702,7 @@ void DataFile::readAnimationFile(Animation& anim){
                     Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file)) << ", expected animation information type identifier, found " << (int)getc(file) << '\n';
                     throw KBFatalDetailed(
                         Kuribrawl::formatString("Unexpected byte at 0x%x, expected animation information type identifier, found %d", ftell(file), (int)getc(file)),
-                        "File Loading : invalid data file content"
+                        error_message
                     );
 
                 }
@@ -712,7 +714,7 @@ void DataFile::readAnimationFile(Animation& anim){
             break;
         default:
             Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
-            throw KBFatalDetailed("File Loading : invalid data file content", 
+            throw KBFatalDetailed(error_message, 
                 Kuribrawl::formatString("Unexpected byte at 0x%x, expected 0xFF or 0xFE", (ftell(file) - 1)));
     }
 }
@@ -753,7 +755,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
             break;
         default:
             Debug::out << "Unexpected byte at 0x" << std::hex << (ftell(file) - 1) << " , expected 0xFF or 0xFE\n";
-            throw KBFatalDetailed("File Loading : invalid data file content", 
+            throw KBFatalDetailed(error_message, 
                 Kuribrawl::formatString("Unexpected byte at 0x%x, expected 0xFF or 0xFE", (ftell(file) - 1)));
     }
 }
@@ -762,8 +764,10 @@ void DataFile::readAnimation(GameData& gd){
     //tag = readFileTag();
     //entity = tag;
     //element = separateTag(tag);
-    Debug::out << "Prefix : " << (int)readValue<Uint8>() << '\n';
+    Uint8 prefix = readValue<Uint8>();
     readString_();
+
+    Debug::out << "Prefix : " << (int)prefix << '\n';
 
     Kuribrawl::string_view entity(string_read);
     Kuribrawl::string_view element;
@@ -771,10 +775,22 @@ void DataFile::readAnimation(GameData& gd){
     separateTag(string_read, entity, element);
     Debug::out << "- Reading Animation  : " << entity << " / " << element << '\n';
 
+    switch (prefix){
+        case FILEMARKER_ANIMATIONPOOL_CHAMPION:
+            readEntityAnimationFile(gd.tryChampion(entity).tryAnimation(element));
+            break;
+        case FILEMARKER_ANIMATIONPOOL_STAGE:
+            readAnimationFile(gd.tryStage(entity).tryAnimation(element.data()));
+            break;
+        default:
+            throw KBFatalDetailed("Unsupported animation tag prefix"s, error_message);
+    }
+
+    /*
     switch(entity[0]){
         default:
-            readEntityAnimationFile(gd.tryChampion(entity).tryAnimation(element.data()));
-    }
+            readEntityAnimationFile(gd.tryChampion(entity).tryAnimation(element));
+    }*/
 }
 
 /**

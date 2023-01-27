@@ -39,3 +39,5 @@ testStage\testStage.dat #testComment
 S:testStage
 testStage\bg.png 
 A:Stage/testStage/bg 1 -1
+testStage\platform.png
+A:Stage/testStage/platform 1 -1

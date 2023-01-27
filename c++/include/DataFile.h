@@ -14,7 +14,7 @@ class EntityAnimation;
 class Animation;
 class Champion;
 class StageModel;
-class StageBackgroundElement;
+class StageBackgroundElementModel;
 class PlatformModel;
 class Frame;
 class EntityFrame;
@@ -97,7 +97,7 @@ class DataFile {
     void readStageValues(StageModel& stage);
     void readStageFile(StageModel& stage);
     PlatformModel& readPlatformData(StageModel& stage);
-    StageBackgroundElement& readBackgroundElementData(StageModel& stage);
+    StageBackgroundElementModel& readBackgroundElementData(StageModel& stage);
 
     enum class DataReadingResult {
         READ, NOTHING_DONE, LEAVE_lOOP, SET_FRAME

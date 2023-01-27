@@ -50,7 +50,7 @@ start:
 	fi
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 	@mkdir -p bin
-	@printf "Compiling with command \033[0;36mg++ $(CFLAGS) -c xxx.cpp -o xxx.o\033[0m\n"
+	@printf "Compiling with command \033[0;36mg++ $(CFLAGS) -c \033[0;34mx.cpp\033[0;36m -o \033[0;34mx.o\033[0m\n"
 
 bin/%.o: %.cpp #$(SRC)
 	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
@@ -65,6 +65,6 @@ clear:
 	-rm *.exe
 
 $(EXEC): $(OBJS)
-	@printf "\033[1;33m[Linking]\033[0m with command \033[0;36mg++ [all of the above] -o $@ $(LDFLAGS) \033[0m\n"
+	@printf "\033[1;33m[Linking]\033[0m with command \033[0;36mg++ \033[0;34m<all of the .o above>\033[0;36m -o $@ $(LDFLAGS) \033[0m\n"
 	@g++ $^ -o $@ $(LDFLAGS) 
 	@printf "\033[0;32mCompilation finished successfully !\n\033[0m"

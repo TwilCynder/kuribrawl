@@ -15,10 +15,10 @@ class AnimationPlayer {
     public:
 
     AnimationPlayer();
-    AnimationPlayer(Animation* animation);
+    AnimationPlayer(const Animation* animation);
 
-    void draw(SDL_Renderer* target, int x, int y);
-    void draw(SDL_Renderer* target, int x, int y, int facing);
+    void draw(SDL_Renderer* target, int x, int y) const; 
+    void draw(SDL_Renderer* target, int x, int y, int facing) const;
 
     bool is_initialized() const;
     bool is_finished() const;
@@ -40,7 +40,7 @@ class AnimationPlayer {
     bool frame_changed; ///< True if the frame just changed
                         /**<Guarantees that the current frame has been set, but does not guaranteed that it actuzlly changed (the old value may be the new value)*/
    
-
+    
     private:
     int timeleft; ///<Time remaining *on the current frame*.
     double speed; ///<Current \ref Animation#base_speed "speed" at which the animation runs (will override the base speed of the Animation).
@@ -51,7 +51,7 @@ class AnimationPlayer {
 
     void nextFrame();
     void reset();
-    void startFrame();
+    //void startFrame();
     void init();
     void start();
 };

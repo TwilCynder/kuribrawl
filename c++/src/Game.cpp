@@ -52,11 +52,19 @@ void Game::applyConfig(GameConfiguration& config){
 
     int w = SCREEN_WIDTH;
     int step = w / config.players.size();
-    int x = step / 2;
+    int x = -((config.players.size() - 1) * step / 2.0);
 
     const StageModel* stageModel = config.stage;
     if (!stageModel) throw KBFatal("Starting game will null stage");
     stage = std::make_unique<Stage>(*stageModel);
+
+    for (const StageBackgroundElement& background_element : stage->getBackgroundElements()){
+        graphics.add(background_element, background_element.getModel().depth);
+    }
+
+    for (const Platform& platform : stage->getPlatforms()){
+        graphics.add(platform);
+    }
 
     for (PlayerConfiguration& player : config.players){
         if (player.port != nullptr){
@@ -77,6 +85,9 @@ void Game::applyConfig(GameConfiguration& config){
 PlayerFighter* Game::addFighter(Champion* model){
     Fighteriterator it = fighters.begin();
     it = fighters.emplace_after(it, *this, model);
+
+    onFighterAdded(*it);
+
     return &(*it);
 }
 
@@ -92,6 +103,9 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y){
     Debug::log("added fighter");
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y);
+
+    onFighterAdded(*it);
+
     return &(*it);
 }
 
@@ -107,7 +121,14 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y){
 PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y, port);
+
+    onFighterAdded(*it);
+
     return &(*it);
+}
+
+void Game::onFighterAdded(const Fighter& fighter){
+    graphics.add(fighter);
 }
 
 /**
@@ -124,10 +145,12 @@ bool Game::is_running(){
  * @param target the renderer the Game will be displayed on.
  */
 void Game::draw(SDL_Renderer* target){
-    Fighteriterator it;
+    /*Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->draw(target);
-    }
+    }*/
+
+    graphics.draw(target, camera);
 }
 
 /**
@@ -176,14 +199,15 @@ void Game::updateAnimations(){
 
 /**
  * @brief \ref Fighter#applyPhysics "Processes physics mechanics " on every Fighter.
- * This includes modifying speed based on states, applying speed, and detecting collisions and terrain interaction.
+ * This includes modifying speed based on states, applying speed, and detecting collisions and terrain interaction.  
+ * May only be called if `running` is true
  */
 void Game::applyPhysics(){
     const StageModel& stageModel = stage.get()->getModel();
 
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->applyPhysics();
+        it->applyPhysics(*this);
     }
 }
 
@@ -306,4 +330,14 @@ const GameConfSPtr& Game::getOriginalConfigurationSharedPtr() const {
 
 int Game::getFrame(){
     return frame;
+}
+
+/**
+ * @brief Returns the current Stage.  
+ * Cannot return null if all invariant are respected. 
+ * 
+ * @return const Stage* 
+ */
+const Stage* Game::getStage() const {
+    return stage.get();
 }

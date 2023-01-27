@@ -27,7 +27,7 @@ AnimationPlayer::AnimationPlayer():
  * @param animation the Animation that will be ran at first.
  */
 
-AnimationPlayer::AnimationPlayer(Animation* animation):
+AnimationPlayer::AnimationPlayer(const Animation* animation):
     AnimationPlayer()
 {
     setAnimation(animation);
@@ -226,7 +226,7 @@ void AnimationPlayer::nextFrame(){
  * @param y y position on the destination.
  */
 
-void AnimationPlayer::draw(SDL_Renderer* target, int x, int y){
+void AnimationPlayer::draw(SDL_Renderer* target, int x, int y) const {
     if (!model){
         throw KBFatal("Tried to draw non-initalized AnimationPlayer");
     }
@@ -234,7 +234,7 @@ void AnimationPlayer::draw(SDL_Renderer* target, int x, int y){
     model->draw(target, x, y, current_frame);
 }
 
-void AnimationPlayer::draw(SDL_Renderer* target, int x, int y, int facing){
+void AnimationPlayer::draw(SDL_Renderer* target, int x, int y, int facing) const {
     if (!model){
         throw KBFatal("Tried to draw non-initalized AnimationPlayer");
     }

@@ -1,6 +1,7 @@
 {
     "hexdump.littleEndian": true,
     "files.associations": {
+        "*.ejs": "html",
         "list": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -59,7 +60,8 @@
         "*.enum": "cpp",
         "bitset": "cpp",
         "*.h": "cpp",
-        "numbers": "cpp"
+        "numbers": "cpp",
+        "set": "cpp"
     },
     "java.project.sourcePaths": [
         "tools\\editor\\javaEditor\\src"

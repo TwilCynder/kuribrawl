@@ -1,12 +1,21 @@
 #pragma once
-#include "Util/structures.h"
 
-class Animation;
+#include "AnimationPlayer.h"
+#include "Drawable.h"
 
-struct StageBackgroundElement {
-    const Animation& animation;
-    Kuribrawl::Vector position;
-    int depth;
+class StageBackgroundElementModel;
+class SDL_Renderer;
 
-    StageBackgroundElement(const Animation& anim);
+class StageBackgroundElement : public Drawable {
+    const StageBackgroundElementModel& model;
+    AnimationPlayer animation_player;
+
+    public:
+    StageBackgroundElement(const StageBackgroundElementModel& model);
+
+    const StageBackgroundElementModel& getModel() const;
+
+    void advanceAnimation();
+    void draw(SDL_Renderer*, const Camera&) const;
+
 };

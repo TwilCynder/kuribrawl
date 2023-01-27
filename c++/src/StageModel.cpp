@@ -17,13 +17,22 @@ PlatformModel& StageModel::addPlatform(int w, int x, int y){
     return platforms.emplace_back(w, x, y);
 }
 
-StageBackgroundElement& StageModel::addBackgroundElement(std::string&& animation_name){
+PlatformModel& StageModel::addPlatform(int w, int x, int y, std::string&& animation_name){
     const Animation& anim = tryAnimation(animation_name);
-    return backgroung_elements.emplace_back(anim);
+    return platforms.emplace_back(w, x, y, anim);
 }
 
 const std::vector<PlatformModel>& StageModel::getPlatforms() const {
     return platforms;
+}
+
+StageBackgroundElementModel& StageModel::addBackgroundElement(std::string&& animation_name){
+    const Animation& anim = tryAnimation(animation_name);
+    return backgroung_elements.emplace_back(anim);
+}
+
+const std::vector<StageBackgroundElementModel>& StageModel::getBackgroundElements() const {
+    return backgroung_elements;
 }
 
 StageModel::Values::Values() : 

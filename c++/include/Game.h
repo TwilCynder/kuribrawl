@@ -3,6 +3,8 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "PlayerFighter.h"
+#include "Drawer.h"
+#include "Camera.h"
 
 class Champion;
 class StageModel;
@@ -41,6 +43,8 @@ class Game {
     void updateAnimations();
     void hitDetection();
 
+    const Stage* getStage() const;
+
     //Debug
     void drawDebugInfo(TextureFont& font, SDL_Renderer* target);
     int getFrame();
@@ -56,13 +60,17 @@ class Game {
     const GameConfSPtr& getOriginalConfigurationSharedPtr() const;
 
     private:
+    void onFighterAdded(const Fighter&);
+
+    Drawer graphics;
+    Camera camera;
+
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
 
     std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
     std::unique_ptr<Stage> stage;
 
     int frame;
-    SDL_Rect camera;    ///< The area of the Stage that should be displayed.
     bool running;       ///Indicates if the game is actually running or not.
 
     GameConfSPtr original_config;     ///< Releases on call to stop().

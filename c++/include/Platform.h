@@ -1,15 +1,25 @@
 #pragma once
 
-#include "Util/util.h"
-#include "Animation.h"
+#include <memory>
+#include "Util/structures.h"
+#include "AnimationPlayer.h"
+#include "Drawable.h"
 
-struct PlatformModel {
-    int w;
-    Kuribrawl::Vector pos;
+class PlatformModel;
+class SDL_Renderer;
 
-    PlatformModel();
-    PlatformModel(int w, int x = 0, int y = 0);
-    PlatformModel(int w, int x, int y, const Animation*);
+class Platform : public Drawable {
+    const PlatformModel& model;
+    std::unique_ptr<AnimationPlayer> animation_player;
+    Kuribrawl::Vector position;
 
-    const Animation* animation;
+    public:
+    Platform(const PlatformModel&);
+
+    void advanceAnimation();
+    void draw(SDL_Renderer*, const Camera&) const;
+    bool hasAnimation() const;
+    const Kuribrawl::Vector& getPosition() const;
+    const int getWidth() const;
+    const int getHalfWidth() const;
 };
