@@ -1,10 +1,15 @@
-#JPGTest.jpg
 oracle.png
 I:font_oracle
-acid\air_hurt_to_idle.png
-A:acid/air_hurt_to_idle 7 0.4 c
+testStage\testStage.dat
+S:testStage
+testStage\bg.png
+A:Stage/testStage/bg 1 -1.0
+testStage\platform.png
+A:Stage/testStage/platform 1 -1.0
 acid\acid_rainbows.dat
 C:acid
+acid\air_hurt_to_idle.png
+A:acid/air_hurt_to_idle 7 0.4 c
 acid\air_idle.png
 A:acid/air_idle 1 -1.0 c
 acid\air_idle_after_hurt.png
@@ -35,9 +40,3 @@ acid\uair.png
 A:acid/uair acid\uair.dat
 acid\walk.png
 A:acid/walking 6 0.15 c
-testStage\testStage.dat #testComment
-S:testStage
-testStage\bg.png 
-A:Stage/testStage/bg 1 -1
-testStage\platform.png
-A:Stage/testStage/platform 1 -1

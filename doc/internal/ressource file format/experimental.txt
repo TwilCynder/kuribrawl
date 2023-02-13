@@ -1,0 +1,14 @@
+=========================================================
+FICHIER ANIMATION BACKGROUND : B   
+CAS SPECIAL : Implicite en cas d'animation de stage : voir section précédente 
+
+(animation sans intéraction avec les entités)
+Le fichier est l'image source (contenant toutes les frames). 
+
+Les fichiers d'animation background se lisent comme les fichiers d'animation d'entité, à l'exception que tout élément d'interaction (voir plus bas)
+génèrera une erreur.
+
+Éléments d'interaction :
+- hitboxes
+- hurtboxes
+- frame movements
