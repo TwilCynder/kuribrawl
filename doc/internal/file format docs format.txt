@@ -1,4 +1,5 @@
 [abc] = facultatif  
 {abc|bcd} = abc OU bcd
+[a|b] = a et/ou b, ordre non-important
 * après un {} indique répétition (0 à n fois)
 (commentaires)
