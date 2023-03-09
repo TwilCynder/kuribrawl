@@ -26,7 +26,7 @@ CURRENT_NB = 0
 all: start $(EXEC)
 
 relstart:
-	@printf "\n\033[1;Building in release mode\n\033[0m"
+	@printf "\n\033[1;33mBuilding in release mode\n\033[0m"
 	$(eval LDFLAGS := $(LDFLAGS_STATIC))
 
 deploy:
