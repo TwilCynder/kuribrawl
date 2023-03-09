@@ -5,7 +5,7 @@ S:testStage
 testStage\bg.png
 A:Stage/testStage/bg 1 -1.0
 testStage\platform.png
-A:Stage/testStage/platform 1 -1.0
+A:Stage/testStage/platform testStage\platform.dat
 acid\acid_rainbows.dat
 C:acid
 acid\air_hurt_to_idle.png

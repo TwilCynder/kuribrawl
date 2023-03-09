@@ -1,12 +1,14 @@
 .PHONY: game all editor start
 
+export NOCLEAR = ""
 
 all: game editor
 
 start: 
-	@mkdir release
+	@mkdir -p release
 
 game: start
+	$(eval NOCLEAR := "true")
 	$(MAKE) release -C ./c++
 
 editor: start
