@@ -24,6 +24,8 @@ void Fighter::applyAirAccel(int direction){
  */
 void Fighter::groundCollision(){
     
+    Debug::out << "Ground collision from fighter " << this->id << '\n' << std::flush;
+
     if (state == Fighter::State::ATTACK && current_move->landing_lag != -1){
         setAnimation(Champion::DefaultAnimation::LANDING, current_move->landing_lag);
     } else {
@@ -34,21 +36,33 @@ void Fighter::groundCollision(){
     land();
 }
 
+inline void Fighter::onGround(double height, Kuribrawl::VectorDouble& new_pos){
+    speed.y = 0.0;
+    new_pos.y = height;
+    if (!grounded)
+                groundCollision();
+}
+
 const Platform* Fighter::checkGroundCollision(const Stage* stage, Kuribrawl::VectorDouble& new_pos){
     if (speed.y < 0){
-        for (const Platform& plat : stage->getPlatforms()){
-            const int half_w = plat.getHalfWidth();
-            if (new_pos.x >= plat.getPosition().x - half_w && new_pos.x < plat.getPosition().x + half_w){
-                if (position.y >= plat.getPosition().y && new_pos.y < plat.getPosition().y){
-                    new_pos.y = plat.getPosition().y;
-                    speed.y = 0.0;
-                    if (!grounded)
-                        groundCollision();
-
-                    return &plat;
+        if (new_pos.y < 0){
+            onGround(0, new_pos);
+        } else {
+            for (const Platform& plat : stage->getPlatforms()){
+                const int half_w = plat.getHalfWidth();
+                if (new_pos.x >= plat.getPosition().x - half_w && new_pos.x < plat.getPosition().x + half_w){
+                    if (position.y >= plat.getPosition().y && new_pos.y < plat.getPosition().y){
+                        onGround(plat.getPosition().y, new_pos);
+                        return &plat;
+                    }
                 }
             }
+            //no collision with any platform or ground
+            if (grounded){
+                groundToAir();
+            }
         }
+
     }
     return nullptr;
 }
@@ -139,15 +153,13 @@ void Fighter::applyPhysics(Game& game){
     const Stage* stage = game.getStage();
     //Maybe test if stage isn't null ? Shouldn't happen tho (called only if !!game.running, et game.running => game.getStage() != nullptr)
 
-    checkGroundCollision(stage, new_pos);
-
-    if (new_pos.y <= 0){
-        new_pos.y = 0;
-        speed.y = 0;
-        if (!grounded) groundCollision();
-    } else if (grounded){
-        //groundToAir();
+    if (grounded && new_pos.y > position.y){
+        groundToAir();
+    } else {
+        checkGroundCollision(stage, new_pos);
     }
+
+
 
     position.x = new_pos.x;
     position.y = new_pos.y;

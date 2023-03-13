@@ -533,3 +533,7 @@ bool Fighter::attack(const Move& move){
     }
     return false;
 }
+
+void Fighter::setID(int id){
+    this->id = id;
+}

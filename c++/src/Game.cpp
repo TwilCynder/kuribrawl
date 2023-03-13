@@ -66,13 +66,22 @@ void Game::applyConfig(GameConfiguration& config){
         graphics.add(platform);
     }
 
+    #ifdef DEBUG
+    int i = 0;
+    #endif
     for (PlayerConfiguration& player : config.players){
+        Fighter* f;
         if (player.port != nullptr){
-            addFighter(&player.champion, x, 100, *player.port);
+            f = addFighter(&player.champion, x, 100, *player.port);
         } else {
-            addFighter(&player.champion, x, 100);
+            f = addFighter(&player.champion, x, 100);
         }
         x += step;
+
+        #ifdef DEBUG
+        f->setID(i);
+        i++;
+        #endif
     }
 }
 
