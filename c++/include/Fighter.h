@@ -53,6 +53,8 @@ class Fighter : public Drawable {
     void writeDebugInfo(AdvancedTextDisplayer& out);
     bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
 
+    void setID(int);
+
     //Hitboxes
     const HurtboxVector& getCurrentHurtboxes() const;
     const HitboxVector&  getCurrentHitboxes () const;
@@ -120,6 +122,7 @@ class Fighter : public Drawable {
     virtual jumpX decideJumpXType() const = 0;
 
     //Physics
+    inline void onGround(double height, Kuribrawl::VectorDouble& new_pos);
     void groundCollision();
     void groundToAir();
 	void land();
