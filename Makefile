@@ -10,7 +10,7 @@ clearterminal:
 	$(eval export NOCLEAR := "oui")
 
 start: clearterminal
-	@mkdir release
+	@mkdir -p release
 
 game: start 
 	@printf "\n\033[1;33mBuilding Kuribrawl\n\033[0m"
