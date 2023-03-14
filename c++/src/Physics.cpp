@@ -5,6 +5,8 @@
 #include "Util/util.h"
 #include "Game.h"
 #include "Stage.h"
+#include "Ground.h"
+#include "Platform.h"
 
 #define MAX_SPEED_PRECISION 0.01 //Speeds below this value will be nullified
 
@@ -36,15 +38,32 @@ void Fighter::groundCollision(){
     land();
 }
 
-inline void Fighter::onGround(double height, Kuribrawl::VectorDouble& new_pos){
+inline void Fighter::onGround_(double height, Kuribrawl::VectorDouble& new_pos, const Ground* ground){
+    if (ground_interaction == GroundInteraction::SOFT && (ground && ground->isTraversable())) return;
     speed.y = 0.0;
     new_pos.y = height;
     if (!grounded)
-                groundCollision();
+        groundCollision();
+    current_ground = ground;
+}
+
+inline void Fighter::onGround(double height, Kuribrawl::VectorDouble& new_pos){
+    onGround_(height, new_pos, nullptr);
+}
+
+inline void Fighter::onGround(double height, Kuribrawl::VectorDouble& new_pos, const Ground& ground){
+    onGround_(height, new_pos, &ground);
 }
 
 const Platform* Fighter::checkGroundCollision(const Stage* stage, Kuribrawl::VectorDouble& new_pos){
     if (speed.y < 0){
+        if (grounded && current_ground && current_ground->isTraversable() && ground_interaction == GroundInteraction::HARD){
+            groundToAir();
+            setState(State::IDLE);
+            updateAnimation();
+            return nullptr;
+        }
+
         if (new_pos.y < 0){
             onGround(0, new_pos);
         } else {
@@ -52,7 +71,7 @@ const Platform* Fighter::checkGroundCollision(const Stage* stage, Kuribrawl::Vec
                 const int half_w = plat.getHalfWidth();
                 if (new_pos.x >= plat.getPosition().x - half_w && new_pos.x < plat.getPosition().x + half_w){
                     if (position.y >= plat.getPosition().y && new_pos.y < plat.getPosition().y){
-                        onGround(plat.getPosition().y, new_pos);
+                        onGround(plat.getPosition().y, new_pos, plat);
                         return &plat;
                     }
                 }
@@ -73,6 +92,7 @@ const Platform* Fighter::checkGroundCollision(const Stage* stage, Kuribrawl::Vec
  */
 void Fighter::groundToAir(){
     grounded = false;
+    current_ground = nullptr;
     updateAnimation();
 }
 
@@ -159,7 +179,7 @@ void Fighter::applyPhysics(Game& game){
         checkGroundCollision(stage, new_pos);
     }
 
-
+    ground_interaction = GroundInteraction::NONE;
 
     position.x = new_pos.x;
     position.y = new_pos.y;

@@ -229,6 +229,10 @@ DirectionIG PlayerFighter::getControlDirection4IG() const {
 void PlayerFighter::checkStickState(){ //lots of error checks to do
     if (!valid_port) return;
 
+    if (!grounded && isDown(current_direction_control_state, current_controller_vals.analogStickSmashThreshold)){
+        ground_interaction = GroundInteraction::SOFT;
+    }
+
     switch (state){
         case State::IDLE:
             if (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold){
@@ -297,7 +301,6 @@ void PlayerFighter::updateInputsStates(){
     if (secondary_stick.current_state.y > current_controller_vals.analogStickThreshold && secondary_stick.previous_state.y < current_controller_vals.analogStickThreshold){
         handleStickFlick(Direction::DOWN);
     } else if (secondary_stick.current_state.y < -current_controller_vals.analogStickThreshold && secondary_stick.previous_state.y > -current_controller_vals.analogStickThreshold){
-        Debug::log("flick");
         handleStickFlick(Direction::UP);
     } 
 }

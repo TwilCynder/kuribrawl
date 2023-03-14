@@ -2,7 +2,7 @@
 #include <vector>
 
 /**
- * @brief std::vector expanded with some utilitary methods
+ * @brief std::vector expanded with some utility methods
  * 
  * @tparam T 
  */

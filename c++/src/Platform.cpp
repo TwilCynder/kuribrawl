@@ -39,3 +39,7 @@ void Platform::draw(SDL_Renderer* target, const Camera& cam) const {
     SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
     //SDL_RenderDrawLine(target, position.x - getWidth() / 2);
 }
+
+bool Platform::isTraversable() const {
+    return model.traversable_downwards;
+}

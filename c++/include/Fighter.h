@@ -17,6 +17,7 @@ class Game;
 struct Move;
 
 class AdvancedTextDisplayer;
+class Ground;
 class Platform;
 class Stage;
 
@@ -93,11 +94,17 @@ class Fighter : public Drawable {
     int state_timer;    ///< Number of frames this the current state was started.
     bool update_anim;   ///< Whether the animation should be updated according to the current state.
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the AnimationPlayer will be updated.\ Is decremented each frame.
-    int8_t facing;         ///< 1 if the Fighter is facing left, -1 if they're facing right.
+    enum class GroundInteraction{
+        NONE,   ///< Do nothing, normal collision
+        SOFT,   ///< Ignore collision with traversable platforms if airborn
+        HARD,   ///< Go through a traversable platform even if currently grounded on it.
+    } ground_interaction;   ///< Determines the interaction between this fighter and the ground below them.
+    int8_t facing;          ///< 1 if the Fighter is facing left, -1 if they're facing right.
     bool grounded;      ///< true if the Fighter is on the ground.
     Uint8 air_jumps;    ///< Number of times this fighter can air jump before touching the ground again
     Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
     Kuribrawl::VectorDouble speed;      ///< Current speed to the Fighter.
+    const Ground* current_ground;
 
     void applyAirAccel(int direction);
 
@@ -122,7 +129,9 @@ class Fighter : public Drawable {
     virtual jumpX decideJumpXType() const = 0;
 
     //Physics
+    inline void onGround_(double height, Kuribrawl::VectorDouble& new_pos, const Ground* ground);
     inline void onGround(double height, Kuribrawl::VectorDouble& new_pos);
+    inline void onGround(double height, Kuribrawl::VectorDouble& new_pos, const Ground& ground);
     void groundCollision();
     void groundToAir();
 	void land();

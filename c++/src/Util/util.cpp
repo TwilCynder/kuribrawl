@@ -53,3 +53,19 @@ DirectionIG Kuribrawl::getDirection4IG(const Vector& stick_state, int threshold,
         return (DirectionIG)( 2 + sign(stick_state.y));
     }
 }
+
+bool Kuribrawl::isRight(const Kuribrawl::Vector& stick, int threshold){
+    return stick.x > threshold;
+}
+
+bool Kuribrawl::isUp(const Kuribrawl::Vector& stick, int threshold){
+    return stick.y < -threshold;
+}
+
+bool Kuribrawl::isLeft(const Kuribrawl::Vector& stick, int threshold){
+    return stick.x < -threshold;
+}
+
+bool Kuribrawl::isDown(const Kuribrawl::Vector& stick, int threshold){
+    return stick.y > threshold;
+}

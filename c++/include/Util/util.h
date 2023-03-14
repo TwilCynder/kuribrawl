@@ -44,5 +44,10 @@ namespace Kuribrawl {
     DirectionIG DirectionToDirectionIG(Direction, int facing);
     Direction getDirection4(const Vector& stick_state, int threshold);
     DirectionIG getDirection4IG(const Vector& stick_state, int threshold, int facing);
+
+    bool isRight(const Kuribrawl::Vector& stick, int threshold);
+    bool isUp(const Kuribrawl::Vector& stick, int threshold);
+    bool isLeft(const Kuribrawl::Vector& stick, int threshold);
+    bool isDown(const Kuribrawl::Vector& stick, int threshold);
 }
 

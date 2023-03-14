@@ -1,4 +1,5 @@
 #include "PlayerFighter.h"
+#include "Ground.h"
 #include "KBDebug/Debug.h"
 
 int PlayerFighter::InputHandler_Jump(RegisteredInput& input){
@@ -80,9 +81,14 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
 }
 
 int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
-    if (!grounded && (speed.y < 0.0 || paused)){
+    if (grounded){
+        Debug::log(current_ground);
+        if (current_ground && current_ground->isTraversable())
+            ground_interaction = GroundInteraction::HARD;
+    } else if (speed.y < 0.0 || paused){
         speed.y = - (getChampion().values.fast_fall_speed);
     }
+
     return InputHandlerResult::HANDLED;
 }
 

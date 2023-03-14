@@ -4,11 +4,12 @@
 #include "Util/structures.h"
 #include "AnimationPlayer.h"
 #include "Drawable.h"
+#include "Ground.h"
 
 class PlatformModel;
 class SDL_Renderer;
 
-class Platform : public Drawable {
+class Platform : public Drawable, public Ground {
     const PlatformModel& model;
     std::unique_ptr<AnimationPlayer> animation_player;
     Kuribrawl::Vector position;
@@ -18,6 +19,7 @@ class Platform : public Drawable {
 
     void advanceAnimation();
     void draw(SDL_Renderer*, const Camera&) const;
+    virtual bool isTraversable() const;
     bool hasAnimation() const;
     const Kuribrawl::Vector& getPosition() const;
     const int getWidth() const;

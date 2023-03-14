@@ -12,4 +12,5 @@ struct PlatformModel {
     PlatformModel(int w, int x, int y, const Animation&);
 
     const Animation* animation;
+    bool traversable_downwards;
 };
