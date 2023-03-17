@@ -311,8 +311,8 @@ void Game::step(SDL_Renderer* render_target){
     resolveInputs();
     updateAnimations();
     //From this point on every animation change must be done manually   
-    hitDetection();
     applyPhysics();
+    hitDetection();
     draw(render_target);
     advanceAnimations();
     frame++;

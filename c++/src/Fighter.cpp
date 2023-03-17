@@ -256,6 +256,8 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
 	x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
 	y_type = (y_type == jumpY::UndecidedY) ? decideGroundedJumpYType() : y_type;
 
+    Champion::DefaultAnimation animation_id;
+
     switch (y_type){
         case jumpY::Full:
             speed.y += model->values.jump_speed;
@@ -272,18 +274,21 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
             if (speed.x * facing < model->values.ground_forward_jump_speed){
                 speed.x = model->values.ground_forward_jump_speed * facing;
             }
+            animation_id = Champion::DefaultAnimation::JUMP_FORWARD;
             break;
         case jumpX::Backwards:
             if (speed.x * -facing < model->values.ground_backward_jump_speed){
                 speed.x = model->values.ground_backward_jump_speed * -facing;
             }
+            animation_id = Champion::DefaultAnimation::JUMP_BACKWARD;
             break;
         default:
+            animation_id = Champion::DefaultAnimation::JUMP;
             break;
     }
 
     setState(State::IDLE, 0, 1, false);
-    setAnimation(Champion::DefaultAnimation::JUMP);
+    setAnimation(animation_id);
     grounded = false;
 }
 
@@ -294,25 +299,30 @@ int Fighter::air_jump(jumpX x_type){
 	if (air_jumps > 0) {    
 		x_type = (x_type == jumpX::UndecidedX) ? decideJumpXType() : x_type;
 	
+        Champion::DefaultAnimation animation_id;
+
 	    switch(x_type){
             case jumpX::Forward:
                 if (speed.x * facing < model->values.air_forward_jump_speed){
                     speed.x = model->values.air_forward_jump_speed * facing;
                 }
+                animation_id = Champion::DefaultAnimation::AIR_JUMP_FORWARD;
                 break;
             case jumpX::Backwards:
                 if (speed.x * -facing < model->values.air_backward_jump_speed){
                     speed.x = model->values.air_backward_jump_speed * -facing;
                 }
+                animation_id = Champion::DefaultAnimation::AIR_JUMP_BACKWARD;
                 break;
             default:
+                animation_id = Champion::DefaultAnimation::AIR_JUMP;
                 break;
         }
 		
         speed.y = model->values.air_jump_speed;
 		air_jumps--;
 		setState(Fighter::State::IDLE, 0, 0, false);
-        setAnimation(Champion::DefaultAnimation::AIR_JUMP);
+        setAnimation(animation_id);
         
         return 1;
 	} else {
