@@ -1,5 +1,6 @@
 #include "Champion.h"
 #include "KBDebug/Debug.h"
+#include "Util/containers_util.h"
 
 #define DEFAULT_GRAVITY 0.6
 
@@ -177,6 +178,35 @@ void Champion::finalizeMoves(){
     }
 }
 
+const EntityAnimation* Champion::resolveDefaultAnimation(Champion::DefaultAnimation id, std::unordered_set<Champion::DefaultAnimation>& already_seen){
+    const EntityAnimation* anim = getDefaultAnimation(id);
+    if (anim){
+        return anim;
+    } else {
+        auto it = default_animations_fallbacks.find(id);
+        if (it != default_animations_fallbacks.end()){
+            DefaultAnimation fallback_id = it->second;
+
+            already_seen.insert(id);
+
+            if (already_seen.contains(fallback_id)){
+                Debug::out << "WARNING : cyclic dependency found in optional default animations dependencies : animation " <<
+                    Kuribrawl::getMapValue(default_animation_name, id) << " depends on animation " <<
+                    Kuribrawl::getMapValue(default_animation_name, fallback_id) << '\n';
+                return nullptr;
+            }
+
+            const EntityAnimation* fallback_anim = resolveDefaultAnimation(fallback_id, already_seen);
+            Debug::out << "Using animation " << (int)fallback_id << " instead of " << (int)id << '\n';
+            default_animations[(int)id] = fallback_anim;
+            return fallback_anim;
+        } else {
+            return nullptr;
+        }
+
+    }
+}
+
 /**
  * @brief Initializes the data relative to the currently added Animations of this Champion.
  * Initializes the state-animation association (based on the \ref Fighter#state_default_animation_name "state-animation name" association),
@@ -186,13 +216,29 @@ void Champion::finalizeMoves(){
 void Champion::initDefaultAnimations(){
     EntityAnimation *anim, *anim2;
 
+    //Checking existing default animations
     for (auto const& [state, name] : default_animation_name){
         if ((anim = (EntityAnimation*)getAnimation(name))){
             default_animations[(int)state] = anim;
-            if (state == DefaultAnimation::JUMP) {
+        }
+    }
+
+    //Checking optional default animations
+
+    {
+        std::unordered_set<DefaultAnimation> seen;
+        for (auto const& [default_id, fallback_id] : default_animations_fallbacks){
+            const EntityAnimation* anim = getDefaultAnimation(default_id);
+            if (!anim){
+                Debug::out << "We have no animation for ID " << (int)default_id << ", fallback id is " << (int)fallback_id << '\n';
+                const EntityAnimation* fallback_anim = resolveDefaultAnimation(fallback_id, seen);
+                seen.clear();
+                Debug::out << "Using animation " << (int)fallback_id << " : " << (void*)fallback_anim << " instead of " << (int)default_id << '\n';
+                default_animations[int(default_id)] = fallback_anim;
             }
         }
     }
+
 
     if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::JUMP))){
         anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
@@ -211,6 +257,10 @@ void Champion::initDefaultAnimations(){
         anim2->setEndAction(anim);
     } else {
         setDefaultAnimation(DefaultAnimation::AIR_HITSTUN_TO_IDLE, anim);
+    }
+
+    for (int i = 0; i < (int)DefaultAnimation::TOTAL ; i++){
+        Debug::out << "ID " << i << " : " << (void*)getDefaultAnimation((DefaultAnimation)i) << '\n';
     }
 }
 
@@ -262,4 +312,10 @@ const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name 
     {Champion::DefaultMoves::USpecial, "uspecial"},
     {Champion::DefaultMoves::DSpecial, "dspecial"},
 
+};
+
+const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion::default_animations_fallbacks = {
+    {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, Champion::DefaultAnimation::JUMP_BACKWARD},
+    {Champion::DefaultAnimation::JUMP_FORWARD, Champion::DefaultAnimation::AIR_JUMP_BACKWARD},
+    {Champion::DefaultAnimation::JUMP_BACKWARD, Champion::DefaultAnimation::JUMP_FORWARD},
 };

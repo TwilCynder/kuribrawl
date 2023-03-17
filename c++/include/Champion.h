@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <unordered_set>
 #include "SDL2/SDL.h"
 #include "Util/util.h"
 #include "AnimationsPool.h"
@@ -24,7 +25,11 @@ class Champion : public AnimationsPool<EntityAnimation> {
         #include "states.enum"
         AIR_IDLE,
         JUMP,
+        JUMP_FORWARD,
+        JUMP_BACKWARD,
         AIR_JUMP,
+        AIR_JUMP_FORWARD,
+        AIR_JUMP_BACKWARD,
         AIR_HITSTUN_TO_IDLE,
         AIR_IDLE_AFTER_HIT,
         TOTAL
@@ -103,6 +108,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
     void setDefaultAnimation(const DefaultAnimation state, const EntityAnimation* anim);
     void initDefaultAnimations();
+    const EntityAnimation* resolveDefaultAnimation(DefaultAnimation id, std::unordered_set<DefaultAnimation>&);
     void initDefaultMoves();
     void finalizeMoves();
 
@@ -127,6 +133,8 @@ class Champion : public AnimationsPool<EntityAnimation> {
     static const std::map<DefaultAnimation, std::string> default_animation_name;
     /** @brief Same as ::default_animation_name for Moves*/
     static const std::map<DefaultMoves, std::string> default_move_name;
+
+    static const std::map<DefaultAnimation, DefaultAnimation> default_animations_fallbacks;
 
     const std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
