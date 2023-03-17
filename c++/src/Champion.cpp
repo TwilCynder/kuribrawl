@@ -315,7 +315,8 @@ const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name 
 };
 
 const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion::default_animations_fallbacks = {
-    {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, Champion::DefaultAnimation::JUMP_BACKWARD},
-    {Champion::DefaultAnimation::JUMP_FORWARD, Champion::DefaultAnimation::AIR_JUMP_BACKWARD},
-    {Champion::DefaultAnimation::JUMP_BACKWARD, Champion::DefaultAnimation::JUMP_FORWARD},
+    {Champion::DefaultAnimation::JUMP_FORWARD, Champion::DefaultAnimation::JUMP},
+    {Champion::DefaultAnimation::JUMP_BACKWARD, Champion::DefaultAnimation::JUMP},
+    {Champion::DefaultAnimation::AIR_JUMP_FORWARD, Champion::DefaultAnimation::AIR_JUMP},
+    {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, Champion::DefaultAnimation::AIR_JUMP},
 };

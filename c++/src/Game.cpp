@@ -253,6 +253,10 @@ void Game::hitDetection(){
 
     for (attacker = fighters.begin(); attacker != fighters.end(); ++attacker){
 
+        if (!attacker->is_initialized())
+            throw KBFatal("Uninitialized fighter (at hit detection stage), ID : %d", attacker->id);
+
+
         const Kuribrawl::VectorDouble& attackerPos = attacker->getPosition();
         const HitboxVector & hitbox_vector  = attacker->getCurrentHitboxes();
         for (defender = fighters.begin(); defender != fighters.end(); ++defender){

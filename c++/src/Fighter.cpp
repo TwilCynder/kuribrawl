@@ -49,6 +49,8 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     speed.x = 0.0;
     speed.y = 0.0;
 
+    //setAnimation(Champion::DefaultAnimation::IDLE);
+
     id = Random::get_int();
 }
 
@@ -82,7 +84,10 @@ const EntityAnimation* Fighter::getCurrentAnimation() const {
 
 void Fighter::setAnimation(const EntityAnimation* anim) {
     last_hit = -1;
-    current_animation.setAnimation(anim);
+    if (anim)
+        current_animation.setAnimation(anim);
+    else
+        Debug::warn("Attempting to set null animation");
 }
 
 void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
@@ -437,6 +442,7 @@ void Fighter::updateAnimation(){
             anim = (grounded) ? 
                 model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
                 (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
+            
             if (anim)
                 setAnimation(anim);
             break;
