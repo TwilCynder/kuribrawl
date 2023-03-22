@@ -5,6 +5,13 @@
 #define DEFAULT_GRAVITY 0.6
 
 /**
+ * POUR LES TRANSI ENTRE ANIMATIONS
+ * On va commencer par juste faire un système de transitions animation -> animation
+ * le truc de généraliser le concept du "si je veux jouer aur_idle après air_hurt en fait je joue air_idle_after_hurt" me paraît pas si utile
+ * donc on va laisser le air_idle_after_hurt comme "cas spécial" et mettre le air_hurt_to_idle dans le nouveau système de transition
+ */
+
+/**
  * @brief Construct a new Champion:: Champion object
  *
  * @param name_ The internal name.

@@ -133,8 +133,10 @@ class Champion : public AnimationsPool<EntityAnimation> {
     static const std::map<DefaultAnimation, std::string> default_animation_name;
     /** @brief Same as ::default_animation_name for Moves*/
     static const std::map<DefaultMoves, std::string> default_move_name;
-
+    /** @brief Map associating a DefaultAnimation with another DefaultAnimation that can be used instead. */
     static const std::map<DefaultAnimation, DefaultAnimation> default_animations_fallbacks;
+    /** @brief Matrix associating a couple of default animations with the name of the animation that should be used as a transition between them.*/
+    static const Kuribrawl::DynamicMatrix<DefaultAnimation, std::string> default_transition_animations_names;
 
     const std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
@@ -143,5 +145,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     std::unique_ptr<const Move*[]> default_moves;
     
     std::map<std::string, Move, std::less<>> moves;
+
+    std::map<std::pair<const EntityAnimation*, const EntityAnimation*>, const EntityAnimation&> transition_matrix;
 };
 
