@@ -128,6 +128,8 @@ class Champion : public AnimationsPool<EntityAnimation> {
     /** @brief Same as ::default_animation_name for Moves*/
     static const std::map<DefaultMoves, std::string> default_move_name;
 
+    static const std::map<std::pair<DefaultAnimation, DefaultAnimation>, DefaultAnimation> default_transition_animations_names;
+
     const std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.
     std::unique_ptr<const EntityAnimation*[]> default_animations; /**< Array associating each \ref Fighter#State "fighter state" to an animation.
@@ -135,5 +137,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     std::unique_ptr<const Move*[]> default_moves;
     
     std::map<std::string, Move, std::less<>> moves;
+
+    std::map<std::pair<const EntityAnimation*, const EntityAnimation*>, const EntityAnimation&> transition_matrix;
 };
 
