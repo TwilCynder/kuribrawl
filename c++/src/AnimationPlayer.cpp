@@ -172,7 +172,6 @@ void AnimationPlayer::advance(){
         } else  {
             finished = false;
             frame_changed = false;
-
         }
 
         timeleft--;

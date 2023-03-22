@@ -239,19 +239,6 @@ void Champion::initDefaultAnimations(){
         }
     }
 
-
-    if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::JUMP))){
-        anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
-    }
-    if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_JUMP))){
-        anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
-    }
-
-    anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_IDLE_AFTER_HIT);
-    if (!anim){
-        anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_IDLE);
-    }
-
     anim2 = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_HITSTUN_TO_IDLE); 
     if (anim2){ //there is a air_hurt_to_idle animation
         anim2->setEndAction(anim);
@@ -315,8 +302,11 @@ const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name 
 };
 
 const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion::default_animations_fallbacks = {
+    {Champion::DefaultAnimation::JUMP, Champion::DefaultAnimation::AIR_IDLE},
+    {Champion::DefaultAnimation::AIR_JUMP, Champion::DefaultAnimation::AIR_IDLE},
     {Champion::DefaultAnimation::JUMP_FORWARD, Champion::DefaultAnimation::JUMP},
     {Champion::DefaultAnimation::JUMP_BACKWARD, Champion::DefaultAnimation::JUMP},
     {Champion::DefaultAnimation::AIR_JUMP_FORWARD, Champion::DefaultAnimation::AIR_JUMP},
     {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, Champion::DefaultAnimation::AIR_JUMP},
+    {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, Champion::DefaultAnimation::AIR_IDLE},
 };
