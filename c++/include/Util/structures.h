@@ -2,6 +2,7 @@
 #include <type_traits>
 #include <utility>
 #include <ostream>
+#include <map>
 
 namespace Kuribrawl
 {
@@ -122,4 +123,7 @@ namespace Kuribrawl
     using Rectangle = Rect<int>;
 
     using VectorDouble = Vec2<double>;
+
+    template<typename K, typename V>
+    using DynamicMatrix = std::map<std::pair<K, K>, V>;
 } // namespace Kuribrawl
