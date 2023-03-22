@@ -2,11 +2,10 @@
 #include "Text/TextDisplayer.h"
 
 /**
- * @brief Construct a new Text Displayer object with a certain position and font.
- * 
- * @param x 
- * @param y 
- * @param font_ 
+ * @brief Construct a new Text Displayer.
+ * @param x initial cursos position, where text will be written (top left of first char)
+ * @param y initial cursos position, where text will be written (top left of first char)
+ * @param font bitmap font used
  */
 TextDisplayer::TextDisplayer(int x, int y, TextureFont& font_) :
     pos{x, y},
@@ -150,11 +149,10 @@ TextDisplayer& TextDisplayer::operator<<(TextDisplayer::SetPositionData&& new_po
 }
 
 /**
- * @brief Construct a new Anchored Text Displayer object.
- * 
- * @param x 
- * @param y 
- * @param font 
+ * @brief Construct a new Anchored Text Displayer, see TextDisplayer(). The initial position is remembered as the origin position.
+ * @param x initial cursos position and origin position, where text will be written (top left of first char)
+ * @param y initial cursos position and origin position, where text will be written (top left of first char)
+ * @param font bitmap font used
  */
 AnchoredTextDisplayer::AnchoredTextDisplayer(int x, int y, TextureFont& font) : 
     TextDisplayer(x, y, font),
@@ -219,7 +217,7 @@ AdvancedTextDisplayer::AdvancedTextDisplayer(int x, int y, TextureFont& font):
  * @return AdvancedTextDisplayer::AdvanceLength 
  */
 AdvancedTextDisplayer::AdvanceLength AdvancedTextDisplayer::force_advance(int l){
-    return l;
+    return (AdvanceLength)l;
 }
 
 /**
@@ -229,8 +227,8 @@ AdvancedTextDisplayer::AdvanceLength AdvancedTextDisplayer::force_advance(int l)
  * @return AdvancedTextDisplayer& 
  */
 AdvancedTextDisplayer& AdvancedTextDisplayer::operator<<(AdvancedTextDisplayer::AdvanceLength l){
-    if (last_advance < l){
-        advance(l - last_advance);
+    if (last_advance < l.v){
+        advance(l.v - last_advance);
     }
     return *this;
 }

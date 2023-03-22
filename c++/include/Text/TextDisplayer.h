@@ -21,8 +21,8 @@
 class TextureFont;
 
 /**
- * @brief Object writing a text on the screen, updating the writing position after each write.  
- * Currently only available with TextureFonts.
+ * @brief Object writing text on screen, with a persistent cursos position.  
+ * Currently only available with TextureFonts. 
  * 
  */
 class TextDisplayer {
@@ -33,6 +33,7 @@ class TextDisplayer {
     inline void displayString(const std::string&);
 
     public:
+
     TextDisplayer(int x, int y, TextureFont& font);
     
     TextDisplayer& operator<<(const std::string& s);
@@ -67,6 +68,7 @@ class AnchoredTextDisplayer : public TextDisplayer {
     Kuribrawl::Vector orig_pos; /**Origin point of this textdisplayer, the position can be reset to this point.*/
     public:
 
+    
     AnchoredTextDisplayer(int x, int y, TextureFont& font);
 
     void reset();
@@ -102,7 +104,8 @@ class AdvancedTextDisplayer : public AnchoredTextDisplayer {
         return *this;
     }
 
-    using AdvanceLength = int;
+    struct advanceLength_d {};
+    using AdvanceLength = type_wrapper<int, advanceLength_d>;
     static AdvanceLength force_advance(int x);
     AdvancedTextDisplayer& operator<<(AdvanceLength);
 
