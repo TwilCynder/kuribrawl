@@ -6,8 +6,8 @@
 #include "Util/Logger.h"
 
 /**
- * @brief Set of functions aimed at printing stuff to a debug output.
- * 
+ * @brief Set of functions aimed at printing stuff to a debug output.  
+ * Subsequent references to the debug output refer to Debug::out
  */
 namespace Debug {
     extern Logger out; ///< Logger using standard output
@@ -16,8 +16,7 @@ namespace Debug {
     extern SpacedLogger sout;
 
     /**
-     * @brief Logs a value to the debug output
-     * Currently uses stdout
+     * @brief Logs a value to @ref ::out "the debug output"
      * @tparam T : type of the value
      * @param value 
      */
@@ -31,6 +30,12 @@ namespace Debug {
     template<>
     void log (bool value);
 
+    /**
+     * @brief Logs a value as a warning to @ref ::out "the debug output"
+     * 
+     * @tparam T 
+     * @param value 
+     */
     template<typename T>
     void warn(T value){
         #ifdef DEBUG
@@ -39,7 +44,7 @@ namespace Debug {
     }
     
     /**
-     * @brief Logs a value in hex mode to the debug output
+     * @brief Logs a value in hex mode to @ref ::out "the debug output"
      * 
      * @tparam T : type of the value
      * @param value 
@@ -52,7 +57,7 @@ namespace Debug {
     }
 
     /**
-     * @brief Logs a value as a bit sequence to the debug output
+     * @brief Logs a value as a bit sequence to @ref ::out "the debug output"
      * Relies on std::bitset .
      * @tparam T : type of the value
      * @param value 
