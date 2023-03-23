@@ -78,6 +78,11 @@ void TextureFont::displayString(const std::string& s, int& x, int& y, SDL_Render
     }
 }
 
+/**
+ * @brief Returns wheter this texture font is ready to use.  
+ * Cases where this returns false are usually error cases.  
+ * @return bool
+ */
 bool TextureFont::isInitialized() const {
     return char_sheet != nullptr; 
 }
