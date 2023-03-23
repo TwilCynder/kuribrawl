@@ -27,5 +27,5 @@ class TextureFont {
 
     void displayString(const std::string& s, int& x, int& y, SDL_Renderer* target = NULL) const;
 
-    bool isInitialized();
+    bool isInitialized() const;
 };

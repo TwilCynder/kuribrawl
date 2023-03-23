@@ -77,3 +77,7 @@ void TextureFont::displayString(const std::string& s, int& x, int& y, SDL_Render
         x += char_size.w;
     }
 }
+
+bool TextureFont::isInitialized() const {
+    return char_sheet != nullptr; 
+}
