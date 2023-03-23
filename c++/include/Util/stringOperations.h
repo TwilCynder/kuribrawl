@@ -33,6 +33,14 @@ namespace Kuribrawl {
             str(sv.str), len(sv.len)
         {}
 
+        basic_string_view(std::basic_string_view<CharT, Traits>& sv):
+            str(sv.data()), len(sv.size())
+        {}
+
+        basic_string_view(std::basic_string_view<CharT, Traits>&& sv):
+            str(sv.data()), len(sv.size())
+        {}
+
         basic_string_view& operator=(const CharT* data){
             set(data);
             return *this;
