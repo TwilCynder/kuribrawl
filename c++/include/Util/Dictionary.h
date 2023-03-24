@@ -117,8 +117,22 @@ class Dictionnary {
         return get((std::string)name, args...);
     }
 
-    template <class... Args>
-    T& set(const std::string& name, T&& obj){
+    /**
+     * @brief Associates a value to the given key, even if the key was already present.  
+     * @tparam Args 
+     * @param name 
+     * @param obj 
+     * @return T& 
+     */
+    T& set(const std::string&& name, T&& obj){
+        auto [node, success] = elements.insert_or_assign(name, obj);
+        return node->second;
+    }
+    T& set(const char* name, T&& obj){
+        return set((std::string)name, obj);
+    }
+    T& set(const Kuribrawl::string_view name, T&& obj){
+        return set((std::string)name, obj);
     }
 
     template<typename A>
