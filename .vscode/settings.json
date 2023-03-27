@@ -61,7 +61,8 @@
         "bitset": "cpp",
         "*.h": "cpp",
         "numbers": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "unordered_set": "cpp"
     },
     "java.project.sourcePaths": [
         "tools\\editor\\javaEditor\\src"

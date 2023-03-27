@@ -2,14 +2,19 @@
 #include <type_traits>
 #include <utility>
 #include <ostream>
-#include <map>
+
+/**
+ * @file structures.h
+ * @brief Defines data structures for the Kuribrawl namespace.  
+ * Entirely new data structures go here, for extension of stl data structures sett containers_util.h.  
+ */
+
+/**
+ * @brief namespace used for general utility features.  
+ */
 
 namespace Kuribrawl
 {
-    using namespace std;
-    template<typename T>
-    using bipair = pair<T, T>;
-
     template <typename T, typename Enabler = void>
     struct Vec2 {
         union {
@@ -28,7 +33,7 @@ namespace Kuribrawl
     };
 
     template <typename T>
-    struct Vec2 <T, enable_if_t<is_class_v<T> && !is_aggregate_v<T>>> {
+    struct Vec2 <T, std::enable_if_t<std::is_class_v<T> && !std::is_aggregate_v<T>>> {
         T x;
         T y;
 
@@ -42,7 +47,7 @@ namespace Kuribrawl
         {}
         */
 
-        Vec2(T&& x_, T&& y_) : x(move(x_)), y(move(y_))
+        Vec2(T&& x_, T&& y_) : x(std::move(x_)), y(std::move(y_))
         {}
 
         Vec2(const T& x_, const T& y_) : x(x_), y(y_)
@@ -124,6 +129,9 @@ namespace Kuribrawl
 
     using VectorDouble = Vec2<double>;
 
-    template<typename K, typename V>
-    using DynamicMatrix = std::map<std::pair<K, K>, V>;
+    template <typename T1, typename T2>
+    class RefPair {
+        const T1& first;
+        const T2& second;
+    }
 } // namespace Kuribrawl

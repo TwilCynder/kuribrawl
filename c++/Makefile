@@ -17,8 +17,9 @@ _OBJS= $(SRC:.cpp=.o)
 vpath %.h include
 vpath %.cpp src
 
-OBJS = $(patsubst src/%,bin/%,$(_OBJS))
-OBJDIRS:=$(dir $(OBJECTS))
+OBJS = $(patsubst src/%,$(OBJ_DIR)/%,$(_OBJS))
+OBJ_DIR = bin
+
 
 NB_FILES = $(words $(SRC))
 CURRENT_NB = 0
@@ -59,15 +60,17 @@ start:
 		clear;\
 	fi
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
-	@mkdir -p bin
 	@printf "Compiling with command \033[0;36mg++ $(CFLAGS) -c \033[0;34mx.cpp\033[0;36m -o \033[0;34mx.o\033[0m\n"
 
-bin/%.o: %.cpp #$(SRC)
+$(OBJ_DIR)/%.o: %.cpp $(OBJ_DIR)
 	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
 	@printf "\033[1;33m[$(CURRENT_NB)/$(NB_FILES)]\033[0m "
 	@mkdir -p $(dir $@)
 	@echo "Compiling $< into $@"
 	@g++ $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR): 
+	@mkdir -p $(OBJ_DIR)
 
 clear:
 	touch bin/d

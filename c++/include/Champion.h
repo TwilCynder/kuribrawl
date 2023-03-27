@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <unordered_set>
+#include "Util/containers_util.h"
 #include "SDL2/SDL.h"
 #include "Util/util.h"
 #include "AnimationsPool.h"
@@ -146,6 +147,6 @@ class Champion : public AnimationsPool<EntityAnimation> {
     
     std::map<std::string, Move, std::less<>> moves;
 
-    std::map<std::pair<const EntityAnimation*, const EntityAnimation*>, const EntityAnimation&> transition_matrix;
+    std::map<std::pair<const EntityAnimation&, const EntityAnimation&>, const EntityAnimation&> transition_matrix;
 };
 

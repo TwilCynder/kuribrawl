@@ -246,6 +246,13 @@ void Champion::initDefaultAnimations(){
         }
     }
 
+    if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::JUMP))){
+        anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
+    }
+    if ((anim = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_JUMP))){
+        anim->setEndAction(getDefaultAnimation(DefaultAnimation::AIR_IDLE));
+    }
+
     anim2 = (EntityAnimation*)getDefaultAnimation(DefaultAnimation::AIR_HITSTUN_TO_IDLE); 
     if (anim2){ //there is a air_hurt_to_idle animation
         anim2->setEndAction(anim);
