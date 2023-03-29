@@ -128,10 +128,5 @@ namespace Kuribrawl
     using Rectangle = Rect<int>;
 
     using VectorDouble = Vec2<double>;
-
-    template <typename T1, typename T2>
-    class RefPair {
-        const T1& first;
-        const T2& second;
-    }
+    
 } // namespace Kuribrawl
