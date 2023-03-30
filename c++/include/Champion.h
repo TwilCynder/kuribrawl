@@ -8,6 +8,7 @@
 #include "AnimationsPool.h"
 #include "Move.h"
 #include "EntityAnimation.h"
+#include "Util/DoubleKeyMap.h"
 
 /**
  * @brief A character of the game.
@@ -137,7 +138,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     /** @brief Map associating a DefaultAnimation with another DefaultAnimation that can be used instead. */
     static const std::map<DefaultAnimation, DefaultAnimation> default_animations_fallbacks;
     /** @brief Matrix associating a couple of default animations with the name of the animation that should be used as a transition between them.*/
-    static const Kuribrawl::DynamicMatrix<DefaultAnimation, std::string> default_transition_animations_names;
+    static const Kuribrawl::DynamicMatrixST<DefaultAnimation, std::string> default_transition_animations_names;
 
     const std::string name;   ///< Internal identifier of this Champion.
     std::string display_name;   ///< Name that will be displayed for this Champion.

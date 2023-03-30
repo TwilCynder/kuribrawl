@@ -129,4 +129,47 @@ namespace Kuribrawl
 
     using VectorDouble = Vec2<double>;
     
+    template <class T1, class T2> 
+    struct refpair {
+        T1& first;
+        T2& second;
+
+        refpair(T1& x, T2& y) : 
+            first(x), second(y) {}
+
+        template <class U, class V>
+        refpair<T1,T2>& operator=(const std::pair<U,V> &p){
+            first=p.first;
+            second=p.second;
+            return *this;
+        }
+
+        std::weak_ordering operator<=>(const std::pair<T1, T2>& other) const {
+            auto res = first <=> other.first;
+            if (res == 0) 
+                return second <=> other.second;
+            return res; 
+        }
+
+        template <typename U1, typename U2>
+        std::weak_ordering operator<=>(const std::pair<U1, U2>& other) const {
+            auto res = first <=> other.first;
+            if (res == 0) 
+                return second <=> other.second;
+            return res; 
+        }
+
+        bool operator==(const std::pair<T1, T2>& other) const {
+            return (first == other.first) && (second == other.second); 
+        }
+
+        template <typename U1, typename U2>
+        bool operator==(const std::pair<U1, U2>& other) const {
+            return (first == other.first) && (second == other.second); 
+        }
+    };
+
+    template <typename T>
+    using refbipair = refpair<T, T>;
+
 } // namespace Kuribrawl
