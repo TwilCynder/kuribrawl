@@ -15,11 +15,10 @@ namespace Kuribrawl {
      * @tparam T2 type of second member
      */
     template <typename T1, typename T2>
-    using refpair = std::pair<T1&, T2&>;
-  
+    using refpair_std = std::pair<T1&, T2&>;
 
     template <typename T1, typename T2>
-    std::weak_ordering operator<=>(const std::pair<T1, T2>& p1, const refpair<T1, T2>& p2){
+    std::weak_ordering operator<=>(const std::pair<T1, T2>& p1, const refpair_std<T1, T2>& p2){
         auto res = p1.first <=> p2.second;
         if (res == 0) 
             return p1.second <=> p2.second;
@@ -27,7 +26,7 @@ namespace Kuribrawl {
     }
 
     template <typename T1, typename T2>
-    int operator==(const std::pair<T1, T2>& p1, const refpair<T1, T2>& p2){
+    int operator==(const std::pair<T1, T2>& p1, const refpair_std<T1, T2>& p2){
         return (p1.first == p2.first) && (p1.second == p2.second);
     }
 
@@ -39,7 +38,7 @@ namespace Kuribrawl {
     using bipair = std::pair<T, T>;
 
     template <typename T>
-    using refbipair = refpair<T, T>;
+    using refbipair_std = refpair_std<T, T>;
 
     /**
      * @brief Returns a pointer the value associated with a given key in a map, or a null pointer.  
@@ -59,19 +58,4 @@ namespace Kuribrawl {
             return &it->second;
         }
     }
-
-    template<typename K, typename V>
-    class DynamicMatrix : public std::map<bipair<K>, V, std::less<>>{
-        public:
-        using ref_key = refbipair<K>;
-
-        template<class... Args>
-        void try_emplace(const K& k1, const K& k2, Args&&... args){
-            try_emplace(std::pair<K, K>(k1, k2), args...);
-        }
-        template<class... Args>
-        void try_emplace(K&& k1, K&& k2, Args&&... args){
-            try_emplace(std::pair<K, K>(k1, k2), args...);
-        }
-    };
 }
