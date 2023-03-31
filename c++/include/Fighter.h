@@ -134,6 +134,7 @@ class Fighter : public Drawable {
     inline void onGround(double height, Kuribrawl::VectorDouble& new_pos, const Ground& ground);
     void groundCollision();
     void groundToAir();
+    void groundToAir(State);
 	void land();
     const Platform* checkGroundCollision(const Stage*, Kuribrawl::VectorDouble& new_pos);
 };

@@ -58,9 +58,7 @@ inline void Fighter::onGround(double height, Kuribrawl::VectorDouble& new_pos, c
 const Platform* Fighter::checkGroundCollision(const Stage* stage, Kuribrawl::VectorDouble& new_pos){
     if (speed.y < 0){
         if (grounded && current_ground && current_ground->isTraversable() && ground_interaction == GroundInteraction::HARD){
-            groundToAir();
-            setState(State::IDLE);
-            updateAnimation();
+            groundToAir(State::IDLE);
             return nullptr;
         }
 
@@ -78,7 +76,7 @@ const Platform* Fighter::checkGroundCollision(const Stage* stage, Kuribrawl::Vec
             }
             //no collision with any platform or ground
             if (grounded){
-                groundToAir();
+                groundToAir(State::IDLE);
             }
         }
 
@@ -94,6 +92,11 @@ void Fighter::groundToAir(){
     grounded = false;
     current_ground = nullptr;
     updateAnimation();
+}
+
+void Fighter::groundToAir(Fighter::State s){
+    setState(s);
+    groundToAir();
 }
 
 void Fighter::land(){
