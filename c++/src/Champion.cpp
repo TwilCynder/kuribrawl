@@ -215,6 +215,14 @@ const EntityAnimation* Champion::resolveDefaultAnimation(Champion::DefaultAnimat
 }
 
 /**
+ * @brief Initializes this Champions animation transition matrix, based on the default animation transitions.  
+ * 
+ */
+void Champion::initAnimationTransitionMatrix(){
+    
+}
+
+/**
  * @brief Initializes the data relative to the currently added Animations of this Champion.
  * Initializes the state-animation association (based on the \ref Fighter#state_default_animation_name "state-animation name" association),
  * and the callbacks of certains animations based on their key in the map (e.g. the `jump` animation)
