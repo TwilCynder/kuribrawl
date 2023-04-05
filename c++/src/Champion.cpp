@@ -219,7 +219,9 @@ const EntityAnimation* Champion::resolveDefaultAnimation(Champion::DefaultAnimat
  * 
  */
 void Champion::initAnimationTransitionMatrix(){
-    
+    for (auto [id1, id2, name] : default_transition_animations_names.trange()){
+        Debug::sout << (int)id1 << (int)id2 << name << '\n';
+    }
 }
 
 /**
@@ -268,9 +270,7 @@ void Champion::initDefaultAnimations(){
         setDefaultAnimation(DefaultAnimation::AIR_HITSTUN_TO_IDLE, anim);
     }
 
-    for (int i = 0; i < (int)DefaultAnimation::TOTAL ; i++){
-        Debug::out << "ID " << i << " : " << (void*)getDefaultAnimation((DefaultAnimation)i) << '\n';
-    }
+    initAnimationTransitionMatrix();
 }
 
 /**
@@ -332,3 +332,8 @@ const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion:
     {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, Champion::DefaultAnimation::AIR_JUMP},
     {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, Champion::DefaultAnimation::AIR_IDLE},
 };
+
+const Kuribrawl::DynamicMatrixST<Champion::DefaultAnimation, std::string> Champion::default_transition_animations_names = {{
+    {{Champion::DefaultAnimation::HITSTUN, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT}, "air_hurt_to_idle"},
+    {{Champion::DefaultAnimation::HITSTUN, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT}, "air_hurt_to_idle"}
+}};

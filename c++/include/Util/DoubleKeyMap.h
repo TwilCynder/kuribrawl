@@ -1,6 +1,7 @@
 #pragma once
 #include "containers_util.h"
 #include "structures.h"
+#include "KBDebug/Debug.h"
 
 namespace Kuribrawl {
     template <typename P, typename T1, typename T2>
@@ -26,11 +27,13 @@ namespace Kuribrawl {
         using ref_key = _Refpair<const K1, const K2>;
         //using const_ref_key = refbipair<const K>;
 
-        /*
-        const_ref_key make_key_ref(const K& k1, const K& k2){
-            std::cout << "\nmake_key_ref\n";
-            return const_ref_key(k1, k2);
-        }*/
+        using base_type::map;
+
+        template <class C>
+        __DoubleKeyMap(std::initializer_list<C> init){
+            Debug::log("Construcion");
+        }
+
         ref_key make_key_ref(const K1& k1, const K2& k2){
             return ref_key(k1, k2);
         }
@@ -70,17 +73,27 @@ namespace Kuribrawl {
             return V{};
         }
 
-        struct tuple_iterator : public base_type::iterator{
-            using base_it = base_type::iterator;
-            auto operator*(){
-                const _Key& k = (*this)->first;
-                const V& v = (*this)->second;
-                return std::tuple<const K1&, const K2&, const V&>(k.first, k.second, v);
-            }
+        private:
+        template <class Iterator>
+        struct __tuple_iterator : Iterator{
+                using base_it = Iterator;
+                auto operator*(){
+                    const _Key& k = (*this)->first;
+                    const V& v = (*this)->second;
+                    return std::tuple<const K1&, const K2&, const V&>(k.first, k.second, v);
+                }
         };
+
+        public:
+        using tuple_iterator = __tuple_iterator<typename base_type::iterator>;
+        using const_tuple_iterator = __tuple_iterator<typename base_type::const_iterator>;
 
         tuple_iterator tbegin(){
             return (tuple_iterator)base_type::begin();
+        }
+
+        const_tuple_iterator tbegin() const {
+            return (const_tuple_iterator)base_type::begin();
         }
 
         struct DoubleKeyRange;
@@ -88,11 +101,19 @@ namespace Kuribrawl {
         DoubleKeyRange& trange() {
             return (DoubleKeyRange&)(*this);
         }
+
+        const DoubleKeyRange& trange() const {
+            return (const DoubleKeyRange&)(*this);
+        }
     };
 
     template <typename K1, typename K2, typename V, typename _Key, template <typename T1, typename T2> typename _Refpair> 
     struct __DoubleKeyMap<K1, K2, V, _Key, _Refpair>::DoubleKeyRange : public __DoubleKeyMap<K1, K2, V, _Key, _Refpair>{
         auto begin(){
+            return tbegin();
+        }
+
+        const auto begin() const {
             return tbegin();
         }
     };
