@@ -62,7 +62,7 @@ start:
 	@printf "\n\033[1;33mStarted compilation\n\033[0m"
 	@printf "Compiling with command \033[0;36mg++ $(CFLAGS) -c \033[0;34mx.cpp\033[0;36m -o \033[0;34mx.o\033[0m\n"
 
-$(OBJ_DIR)/%.o: %.cpp $(OBJ_DIR)
+$(OBJ_DIR)/%.o: %.cpp
 	$(eval CURRENT_NB=$(shell echo $$(($(CURRENT_NB)+1))))
 	@printf "\033[1;33m[$(CURRENT_NB)/$(NB_FILES)]\033[0m "
 	@mkdir -p $(dir $@)
