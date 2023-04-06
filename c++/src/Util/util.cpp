@@ -1,6 +1,8 @@
 #include "Util/util.h"
+#include "Util/std_util.h"
 #include "KBDebug/Debug.h"
 #include <cmath>
+#include <compare>
 
 using namespace Kuribrawl;
 
@@ -68,4 +70,21 @@ bool Kuribrawl::isLeft(const Kuribrawl::Vector& stick, int threshold){
 
 bool Kuribrawl::isDown(const Kuribrawl::Vector& stick, int threshold){
     return stick.y > threshold;
+}
+
+inline std::weak_ordering partial_to_weak(std::partial_ordering& order){
+    return 
+        order == std::partial_ordering::less ? std::weak_ordering::less : 
+        order == std::partial_ordering::equivalent ? std::weak_ordering::equivalent : 
+        order == std::partial_ordering::greater ? std::weak_ordering::greater : 
+        throw;
+}
+
+std::weak_ordering Kuribrawl::cmp(double a, double b){
+    std::partial_ordering p_order = a <=> b;
+    return (p_order != std::partial_ordering::unordered) ? partial_to_weak(p_order) : 
+        std::isnan(a) ? 
+            std::isnan(b) ? std::weak_ordering::equivalent : std::weak_ordering::less :
+            std::isnan(b) ? std::weak_ordering::greater : throw;
+
 }
