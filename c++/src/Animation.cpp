@@ -1,4 +1,5 @@
 #include "KBDebug/Debug.h"
+#include "Util/std_util.h"
 #include "Animation.h"
 #include <stdio.h>
 
@@ -204,4 +205,22 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame, int facing)c
         SDL_RenderCopyEx(target, spritesheet, &source.display, &dest, 0, NULL, SDL_FLIP_HORIZONTAL);
     else
         SDL_RenderCopy(target, spritesheet, &source.display, &dest);
+}
+
+bool Animation::operator==(const Animation &other) const
+{
+    return 
+        spritesheet == other.spritesheet && 
+        nb_frames == other.nb_frames &&
+        base_speed == other.base_speed;
+}
+
+std::weak_ordering Animation::operator<=>(const Animation &other) const
+{
+    std::weak_ordering order = spritesheet <=> other.spritesheet;
+    return 
+        (order != 0) ? order : 
+        ((order = (nb_frames <=> other.nb_frames)) != 0) ? order : 
+        Kuribrawl::cmp(base_speed, other.base_speed);
+    
 }

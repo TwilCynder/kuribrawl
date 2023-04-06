@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <compare>
 #include "SDL2/SDL.h"
 #include "Frame.h"
 #include "Util/util.h"
@@ -36,6 +37,9 @@ class Animation {
     void draw(SDL_Renderer* target, int x, int y, int frame)const;
     void draw(SDL_Renderer* target, int x, int y, int frame, int facing)const;
 
+    bool operator==(const Animation&) const;
+    std::weak_ordering operator<=>(const Animation&) const;
+
     protected:
     int nb_frames;  ///< Number of frames in this animation.
     bool loop;
@@ -48,4 +52,5 @@ class Animation {
 
     double base_speed;  /**< Speed of this animation.
                         Can be < 1, in which case it will be used as a multiplier; or a >0 integer, in which case it will be the total duration of the Animation.*/
+    
 };

@@ -91,7 +91,7 @@ namespace Kuribrawl {
         tuple_iterator tbegin(){
             return (tuple_iterator)base_type::begin();
         }
-
+        
         const_tuple_iterator tbegin() const {
             return (const_tuple_iterator)base_type::begin();
         }

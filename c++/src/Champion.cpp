@@ -19,7 +19,8 @@
 Champion::Champion(const std::string& name_):
     name(name_),
     default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL)),
-    default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL))
+    default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL)),
+    transition_matrix()
 {
     initDefaultMoves();
 }
@@ -219,8 +220,20 @@ const EntityAnimation* Champion::resolveDefaultAnimation(Champion::DefaultAnimat
  * 
  */
 void Champion::initAnimationTransitionMatrix(){
-    for (auto [id1, id2, name] : default_transition_animations_names.trange()){
-        Debug::sout << (int)id1 << (int)id2 << name << '\n';
+    const EntityAnimation *source, *destination, *transition;
+    for (auto [source_id, dest_id, transition_name] : default_transition_animations_names.trange()){
+        Debug::sout << (int)source_id << (int)dest_id << name << '\n';
+        source = getDefaultAnimation(source_id);
+        destination = getDefaultAnimation(dest_id);
+        if (source && destination){
+            transition = getAnimation(transition_name);
+            if (transition)
+                transition_matrix.try_emplace(*source, *destination, *transition);
+        }   
+    }
+
+    for (auto [s, d, t] : transition_matrix.trange()){
+        Debug::sout << s.getSpritesheet() << d.getSpritesheet() << t.getSpritesheet();
     }
 }
 
@@ -335,5 +348,5 @@ const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion:
 
 const Kuribrawl::DynamicMatrixST<Champion::DefaultAnimation, std::string> Champion::default_transition_animations_names = {{
     {{Champion::DefaultAnimation::HITSTUN, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT}, "air_hurt_to_idle"},
-    {{Champion::DefaultAnimation::HITSTUN, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT}, "air_hurt_to_idle"}
+    {{Champion::DefaultAnimation::HITSTUN, Champion::DefaultAnimation::AIR_IDLE}, "air_hurt_to_idle"}
 }};
