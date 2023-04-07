@@ -4,6 +4,9 @@
 #include "KBDebug/Debug.h"
 
 namespace Kuribrawl {
+    template <typename T>
+    concept Object = ! (std::is_reference_v<T> || std::is_scalar_v<T>);
+
     template <typename P, typename T1, typename T2>
     concept PairOf = std::is_base_of<std::pair<T1, T2>, P>::value;
 
@@ -20,6 +23,7 @@ namespace Kuribrawl {
     template<typename K1, typename K2, typename V, typename _Key, template <typename Tr1, typename Tr2> typename _Refpair>
         requires ValidDoubleKeyMapTypeArguments<K1, K2, V, _Key, _Refpair>
     class __DoubleKeyMap : public std::map<_Key, V, std::less<>>{
+        protected:
         using base_type = std::map<_Key, V, std::less<>>;
 
         public:
@@ -122,11 +126,24 @@ namespace Kuribrawl {
     class DoubleKeyMap;
 
     template<typename K1, typename K2, typename V, typename _Key, template <typename Tr1, typename Tr2> typename _Refpair>
-        requires(!(std::is_reference_v<K1> && std::is_reference_v<K2>))
-    class DoubleKeyMap<K1, K2, V, _Key, _Refpair> : public __DoubleKeyMap<K1, K2, V, _Key, _Refpair> {
+        requires(std::is_scalar_v<K1> && std::is_scalar_v<K1>)
+    struct DoubleKeyMap<K1, K2, V, _Key, _Refpair> : public __DoubleKeyMap<K1, K2, V, _Key, _Refpair> {
+        using base_type = std::map<_Key, V, std::less<>>;
+        
+        template<class... Args>
+        void try_emplace(K1 k1, K2 k2, Args&&... args){
+            base_type::try_emplace(_Key(k1, k2), args...);
+        }
+    };
+
+    template<typename K1, typename K2, typename V, typename _Key, template <typename Tr1, typename Tr2> typename _Refpair>
+        requires(Object<K1> || Object<K2>)
+    struct DoubleKeyMap<K1, K2, V, _Key, _Refpair> : public __DoubleKeyMap<K1, K2, V, _Key, _Refpair> {
+        using base_type = std::map<_Key, V, std::less<>>;
+        
         template<class... Args>
         void try_emplace(K1&& k1, K2&& k2, Args&&... args){
-            try_emplace(_Key(k1, k2), args...);
+            base_type::try_emplace(_Key(k1, k2), args...);
         }
     };
 

@@ -149,6 +149,6 @@ class Champion : public AnimationsPool<EntityAnimation> {
     
     std::map<std::string, Move, std::less<>> moves;
 
-    Kuribrawl::DynamicMatrixST<const EntityAnimation&, const EntityAnimation&> transition_matrix;
+    Kuribrawl::DynamicMatrixST<const EntityAnimation*, const EntityAnimation&> transition_matrix;
 };
 

@@ -228,12 +228,12 @@ void Champion::initAnimationTransitionMatrix(){
         if (source && destination){
             transition = getAnimation(transition_name);
             if (transition)
-                transition_matrix.try_emplace(*source, *destination, *transition);
+                transition_matrix.try_emplace(source, destination, *transition);
         }   
     }
 
     for (auto [s, d, t] : transition_matrix.trange()){
-        Debug::sout << s.getSpritesheet() << d.getSpritesheet() << t.getSpritesheet();
+        Debug::sout << s->getSpritesheet() << d->getSpritesheet() << t.getSpritesheet();
     }
 }
 
