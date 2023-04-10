@@ -4,8 +4,11 @@
 
 #define model_ ((EntityAnimation*)model)
 
+using EndAction = AnimationEndAction<EntityAnimation>;
+
 EntityAnimationPlayer::EntityAnimationPlayer():
-    AnimationPlayer()
+    AnimationPlayerBase(),
+    override_end_action(false)
 {
 }
 
@@ -16,27 +19,37 @@ EntityAnimationPlayer::EntityAnimationPlayer():
  */
 
 EntityAnimationPlayer::EntityAnimationPlayer(EntityAnimation* animation):
-    AnimationPlayer((Animation*)animation)
+    AnimationPlayerBase((Animation*)animation)
 {
 }
 
+const EndAction& EntityAnimationPlayer::resolveEndAction() const {
+    return (override_end_action) ? end_action : model_->getEndAction();
+};
+
+
 int EntityAnimationPlayer::advance(){
-    AnimationPlayer::advance();
+    const EndAction& current_end_action = resolveEndAction();
+
+    AnimationPlayerBase::advance(current_end_action.mode == EndAction::Mode::REPEAT);
 
     if (finished){
-        const EntityAnimation* next;
-        switch (model_->getEndActionMode()){
-            case EntityAnimation::EndAction::REPEAT:
-                break;
-            case EntityAnimation::EndAction::RETURN_CODE:
-                return model_->getEndAction().code;
-            case EntityAnimation::EndAction::START_ANIMATION:
-                next = model_->getEndAction().next_anim;
-                if (next != nullptr){
-                    setAnimation(next);
-                }
-                break;
+        switch (current_end_action.mode){
+        case EndAction::Mode::REPEAT :
+        case EndAction::Mode::NONE   :
+            break;
+        case EndAction::Mode::RETURN_CODE:
+            return current_end_action.data.code;
+        case EndAction::Mode::START_ANIMATION:
+        {
+            const EntityAnimation* next;
+            next = current_end_action.data.next_anim;  
+            if (next != nullptr){
+                setAnimation(next);
+            }
         }
+        break;
+    }
     }
     return 0;
 }
@@ -62,5 +75,5 @@ void EntityAnimationPlayer::setAnimation(const EntityAnimation* anim){
 }
 
 void EntityAnimationPlayer::setAnimation(const EntityAnimation* anim, double speed){
-    setAnimation((Animation*)anim);
+    setAnimation((Animation*)anim, speed);
 }

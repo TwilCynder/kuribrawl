@@ -12,6 +12,7 @@ class App;
 class GameData;
 class EntityAnimation;
 class Animation;
+class AnimationBase;
 class Champion;
 class StageModel;
 class StageBackgroundElementModel;
@@ -90,7 +91,7 @@ class DataFile {
     DataType readDataType();
     char* readFileTag();
     void readAnimation(GameData&);
-    void readAnimationFile(Animation& anim);
+    void readAnimationFile(AnimationBase& anim);
     void readEntityAnimationFile(EntityAnimation& anim);
     void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
@@ -103,7 +104,7 @@ class DataFile {
         READ, NOTHING_DONE, LEAVE_lOOP, SET_FRAME
     };
 
-    DataReadingResult readAnimationData(Animation&, Uint8 marker, AnimationParsingData& );
+    DataReadingResult readAnimationData(AnimationBase&, Uint8 marker, AnimationParsingData& );
     bool readEntityAnimationData(EntityAnimation&, Uint8 marker, AnimationParsingData&, EntityAnimationParsingData& );
 
     template<typename T>

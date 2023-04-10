@@ -4,11 +4,11 @@
 #include <stdio.h>
 
 /**
- * @brief Construct a new Animation object, without any frames or spritesheet.
- * The frame array is not even created, which means that this object should not be used at all until frames are created with Animation::initFrames()
+ * @brief Construct a new AnimationBase object, without any frames or spritesheet.
+ * The frame array is not even created, which means that this object should not be used at all until frames are created with AnimationBase::initFrames()
  */
 
-Animation::Animation():
+AnimationBase::AnimationBase():
     nb_frames(0),
     loop(true),
     spritesheet(nullptr),
@@ -18,33 +18,33 @@ Animation::Animation():
 }
 
 /**
- * @brief Construct a new Animation object, without any frames.
- * The frame array is not even created, which means that this object should not be used at all until frames are created with Animation::initFrames().
- * Delegates to Animation::Animation().
+ * @brief Construct a new AnimationBase object, without any frames.
+ * The frame array is not even created, which means that this object should not be used at all until frames are created with AnimationBase::initFrames().
+ * Delegates to AnimationBase::AnimationBase().
  * @param spritesheet_ SDL Texture that will be used as the source image, containing all frames.
  */
 
-Animation::Animation(SDL_Texture* spritesheet_) : Animation(){
+AnimationBase::AnimationBase(SDL_Texture* spritesheet_) : AnimationBase(){
     setSpritesheet(spritesheet_);
 }
 
 /**
- * @brief Construct a new Animation object.
+ * @brief Construct a new AnimationBase object.
  *
  * @param spritesheet SDL Texture that will be used as the source image, containing all frames.
- * @param nFrames Number of frames this animation has.
+ * @param nFrames Number of frames this AnimationBase has.
  */
 
-Animation::Animation(SDL_Texture* spritesheet, int nFrames) : Animation(spritesheet){
+AnimationBase::AnimationBase(SDL_Texture* spritesheet, int nFrames) : AnimationBase(spritesheet){
     initFrames(nFrames);
 }
 
 /**
- * @brief Destroy the Animation object
+ * @brief Destroy the AnimationBase object
  *
  */
 
-Animation::~Animation(){
+AnimationBase::~AnimationBase(){
 }
 
 /**
@@ -53,7 +53,7 @@ Animation::~Animation(){
  * @param spritesheet the SDL texture that will be used as the spritesheet.
  */
 
-void Animation::setSpritesheet(SDL_Texture* spritesheet_){
+void AnimationBase::setSpritesheet(SDL_Texture* spritesheet_){
     if (!spritesheet_){
         throw KBFatal(Kuribrawl::formatString("SetSpritesheet : spritesheet texture pointer is null"));
     }
@@ -67,12 +67,12 @@ void Animation::setSpritesheet(SDL_Texture* spritesheet_){
  * @return SDL_Texture*
  */
 
-SDL_Texture* Animation::getSpritesheet() const {
+SDL_Texture* AnimationBase::getSpritesheet() const {
     return spritesheet;
 }
 
 /**
- * @brief Initializes this Animation's frames.
+ * @brief Initializes this AnimationBase's frames.
  * This function creates the frames array (until it's called, the array is a NULL pointer).
  * The frames positions are initialized considering that the image contains all the frame lined up horizontally,
  * filling the entire image.
@@ -80,9 +80,9 @@ SDL_Texture* Animation::getSpritesheet() const {
  * @param n
  */
 
-void Animation::initFrames(int n){
+void AnimationBase::initFrames(int n){
     if (n < 1){
-        throw KBFatal("Tried to init animation with 0 frames");
+        throw KBFatal("Tried to init AnimationBase with 0 frames");
     }
 
     frames = std::make_unique<Frame[]>(n);
@@ -104,63 +104,63 @@ void Animation::initFrames(int n){
 }
 
 /**
- * @brief Returns whether this Animation is ready for use
+ * @brief Returns whether this AnimationBase is ready for use
  *
- * @return true if this Animation has a valid spritesheet and frames array.
+ * @return true if this AnimationBase has a valid spritesheet and frames array.
  * @return false otherwise.
  */
 
-bool Animation::is_initialized() const {
+bool AnimationBase::is_initialized() const {
     return spritesheet && frames;
 }
 
 /**
- * @brief Returns the number of frames this Animation has.
+ * @brief Returns the number of frames this AnimationBase has.
  *
  * @return int
  */
 
-int Animation::getNbFrames(){
+int AnimationBase::getNbFrames(){
     return nb_frames;
 }
 
 /**
- * @brief Returns a frame of this Animation.
+ * @brief Returns a frame of this AnimationBase.
  *
  * @param n the id of the frame. Frame ids are just array indexes, thus start at 0.
- * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the Animation exists.
+ * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the AnimationBase exists.
  */
 
-Frame* Animation::getFrame(int n){
+Frame* AnimationBase::getFrame(int n){
     return &frames[n];
 }
 
 /**
  * @brief Sets the base speed of this animtion.
  * Can be < 1, in which case it will be used as a multiplier, or an integer, in which case it will
- * be the total duration of the Animation.
+ * be the total duration of the AnimationBase.
  * @param speed
  */
 
-void Animation::setBaseSpeed(double speed){
+void AnimationBase::setBaseSpeed(double speed){
     base_speed = speed;
 }
 
 /**
  * @brief Returns the base speed of this animtion.
  * Can be < 1, in which case it will be used as a multiplier, or an integer, in which case it will
- * be the total duration of the Animation.
+ * be the total duration of the AnimationBase.
  * Any value that isn't either of those (a non-integer > 1) is invalid and will cause **undefined behavior**
  * @return the speed
  */
 
-double Animation::getBaseSpeed(){
+double AnimationBase::getBaseSpeed(){
     return base_speed;
 }
 
 
 /**
- * @brief Draws a certain frame of this Animation.
+ * @brief Draws a certain frame of this AnimationBase.
  * Uses SDL_RenderCopy to copy the rectangle designated frame from.
  * @param target the renderer the frame will be drawn to.
  * @param x x position in the destination.
@@ -168,7 +168,7 @@ double Animation::getBaseSpeed(){
  * @param frame index of the frame.
  */
 
-void Animation::draw(SDL_Renderer* target, int x, int y, int frame)const{
+void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
@@ -186,7 +186,7 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame)const{
     SDL_RenderCopy(target, spritesheet, &source.display, &dest);
 }
 
-void Animation::draw(SDL_Renderer* target, int x, int y, int frame, int facing)const{
+void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame, int facing)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
@@ -207,7 +207,7 @@ void Animation::draw(SDL_Renderer* target, int x, int y, int frame, int facing)c
         SDL_RenderCopy(target, spritesheet, &source.display, &dest);
 }
 
-bool Animation::operator==(const Animation &other) const
+bool AnimationBase::operator==(const AnimationBase &other) const
 {
     return 
         spritesheet == other.spritesheet && 
@@ -215,7 +215,7 @@ bool Animation::operator==(const Animation &other) const
         base_speed == other.base_speed;
 }
 
-std::weak_ordering Animation::operator<=>(const Animation &other) const
+std::weak_ordering AnimationBase::operator<=>(const AnimationBase &other) const
 {
     std::weak_ordering order = spritesheet <=> other.spritesheet;
     return 

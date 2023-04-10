@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL2/SDL.h"
 #include "CBoxVectors.h"
+#include "AnimationEndAction.h"
 
 class Animation;
 class Fighter;
@@ -11,11 +12,11 @@ class Fighter;
  * and can switch to another Animation completely at any time.
  */
 
-class AnimationPlayer {
+class AnimationPlayerBase {
     public:
 
-    AnimationPlayer();
-    AnimationPlayer(const Animation* animation);
+    AnimationPlayerBase();
+    AnimationPlayerBase(const Animation* animation);
 
     void draw(SDL_Renderer* target, int x, int y) const; 
     void draw(SDL_Renderer* target, int x, int y, int facing) const;
@@ -27,7 +28,7 @@ class AnimationPlayer {
     void setAnimation(const Animation* anim);
     void setAnimation(const Animation* anim, double speed);
     void setSpeed(double speed);
-    void advance();
+    void advance(bool loop);
 
     protected:
     int current_frame; ///< Index of the current frame.
@@ -49,9 +50,22 @@ class AnimationPlayer {
     double base_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
     double current_carry; ///< If the total duration is not a multiple of the number of frames, certain frames will be displayed one frame-time longer than others. This calue is used to calculate which ones.
 
-    void nextFrame();
+    void nextFrame(bool loop);
     void reset();
     //void startFrame();
     void init();
     void start();
+};
+
+class AnimationPlayer : public AnimationPlayerBase, public AnimationEndActionOwner<Animation> {
+    //might need to make this work like for entityanimationplayer, with a member indicating which end_action to use
+    //and ::triggerEndAction etc
+    public:
+    template <typename... Args>
+    AnimationPlayer(Args...args):
+        AnimationPlayerBase(args...), AnimationEndActionOwner()
+    {}
+
+    void advance();
+    void advance(AnimationEndAction<Animation>&);
 };

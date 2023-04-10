@@ -499,7 +499,7 @@ SDL_Texture* DataFile::readTexture(){
  * @param context persistent data
  * @return DataFile::DataReadingResult 
  */
-DataFile::DataReadingResult DataFile::readAnimationData(Animation& anim, Uint8 marker, DataFile::AnimationParsingData& context){
+DataFile::DataReadingResult DataFile::readAnimationData(AnimationBase& anim, Uint8 marker, DataFile::AnimationParsingData& context){
     switch (marker){
         case FILEMARKER_ANIMSPEED: {
             double valueD = readValue<double>();
@@ -675,7 +675,7 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
  * @param anim the anim that was created or updated based on this Data Chunk
  */
 
-void DataFile::readAnimationFile(Animation& anim){
+void DataFile::readAnimationFile(AnimationBase& anim){
     bool leave_loop = false;
     AnimationParsingData anim_context;
     Debug::log("----Reading animation----");

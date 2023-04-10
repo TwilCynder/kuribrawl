@@ -11,7 +11,7 @@
  * Creates it without an Animation to run, so it is unusable until an Animation is set.
  */
 
-AnimationPlayer::AnimationPlayer():
+AnimationPlayerBase::AnimationPlayerBase():
     current_frame(0),
     model(nullptr),
     animation_set(),
@@ -27,8 +27,8 @@ AnimationPlayer::AnimationPlayer():
  * @param animation the Animation that will be ran at first.
  */
 
-AnimationPlayer::AnimationPlayer(const Animation* animation):
-    AnimationPlayer()
+AnimationPlayerBase::AnimationPlayerBase(const Animation* animation):
+    AnimationPlayerBase()
 {
     setAnimation(animation);
 }
@@ -40,11 +40,11 @@ AnimationPlayer::AnimationPlayer(const Animation* animation):
  * @return false otherwise
  */
 
-bool AnimationPlayer::is_initialized()const{
+bool AnimationPlayerBase::is_initialized()const{
     return model && model->is_initialized();
 }
 
-const Animation* AnimationPlayer::getAnimation() const {
+const Animation* AnimationPlayerBase::getAnimation() const {
     return model;
 }
 
@@ -53,11 +53,11 @@ const Animation* AnimationPlayer::getAnimation() const {
  *
  * @return finished or not.
  */
-bool AnimationPlayer::is_finished() const {
+bool AnimationPlayerBase::is_finished() const {
     return finished;
 }
 
-bool AnimationPlayer::frameChanged() const {
+bool AnimationPlayerBase::frameChanged() const {
     return frame_changed;
 }
 
@@ -67,7 +67,7 @@ bool AnimationPlayer::frameChanged() const {
  * @param anim
  */
 
-void AnimationPlayer::setAnimation(const Animation* anim){
+void AnimationPlayerBase::setAnimation(const Animation* anim){
     setAnimation(anim, anim->base_speed);
 }
 
@@ -78,7 +78,7 @@ void AnimationPlayer::setAnimation(const Animation* anim){
  * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
  */
 
-void AnimationPlayer::setAnimation(const Animation* anim, double speed_){
+void AnimationPlayerBase::setAnimation(const Animation* anim, double speed_){
     if (!anim) return;
     model = anim;
     init();
@@ -95,7 +95,7 @@ void AnimationPlayer::setAnimation(const Animation* anim, double speed_){
  * For speeds that do not make each frame displayed the same amount of time, using this method while the animation has already advanced at least one frame will result in imprecisions.
  */
 
-void AnimationPlayer::setSpeed(double speed_){
+void AnimationPlayerBase::setSpeed(double speed_){
     if (speed_){
         speed = speed_;
     } else {
@@ -128,7 +128,7 @@ void AnimationPlayer::setSpeed(double speed_){
  *
  */
 
-void AnimationPlayer::init(){
+void AnimationPlayerBase::init(){
     over = false;
     finished = false;
     reset();
@@ -138,7 +138,7 @@ void AnimationPlayer::init(){
  * @brief resets this Current Animation to the initial state of the current Animation.
  */
 
-void AnimationPlayer::reset(){
+void AnimationPlayerBase::reset(){
     current_frame = 0;
     frame_changed = true;
     current_carry = 0;
@@ -149,7 +149,7 @@ void AnimationPlayer::reset(){
  *
  */
 
-void AnimationPlayer::start(){
+void AnimationPlayerBase::start(){
     Frame* f = &(model->frames[current_frame]);
     if (f->duration){
         timeleft = f->duration;
@@ -163,7 +163,7 @@ void AnimationPlayer::start(){
  *
  */
 
-void AnimationPlayer::advance(){
+void AnimationPlayerBase::advance(bool loop){
     if (speed != -1 && is_initialized()){
         
         if (animation_set){
@@ -177,7 +177,7 @@ void AnimationPlayer::advance(){
         timeleft--;
         if (timeleft <= 0){
             current_carry += base_carry;
-            nextFrame();
+            nextFrame(loop);
         }
 
     }
@@ -188,7 +188,7 @@ void AnimationPlayer::advance(){
  * Updates the timeleft for the current frame, and the carry if needed.
  */
 
-void AnimationPlayer::nextFrame(){
+void AnimationPlayerBase::nextFrame(bool loop){
     if (!model->loop && over) return;
     
     if (current_frame < model->nb_frames - 1){
@@ -196,7 +196,7 @@ void AnimationPlayer::nextFrame(){
         frame_changed = true;
     } else {
         finished = true;
-        if (model->loop){
+        if (loop){
             reset();
             start();
         } else {
@@ -225,18 +225,26 @@ void AnimationPlayer::nextFrame(){
  * @param y y position on the destination.
  */
 
-void AnimationPlayer::draw(SDL_Renderer* target, int x, int y) const {
+void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y) const {
     if (!model){
-        throw KBFatal("Tried to draw non-initalized AnimationPlayer");
+        throw KBFatal("Tried to draw non-initalized AnimationPlayerBase");
     }
 
     model->draw(target, x, y, current_frame);
 }
 
-void AnimationPlayer::draw(SDL_Renderer* target, int x, int y, int facing) const {
+void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y, int facing) const {
     if (!model){
-        throw KBFatal("Tried to draw non-initalized AnimationPlayer");
+        throw KBFatal("Tried to draw non-initalized AnimationPlayerBase");
     }
 
     model->draw(target, x, y, current_frame, facing);
+}
+
+void AnimationPlayer::advance(AnimationEndAction<Animation>& end_action_){
+    AnimationPlayerBase::advance(end_action_.mode == EndAction::Mode::REPEAT);
+}
+
+void AnimationPlayer::advance(){
+    advance(end_action);
 }

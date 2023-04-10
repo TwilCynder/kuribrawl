@@ -411,6 +411,7 @@ bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
 
         //can you believe there is no function in sdl to render a fucking circle
         //damn i forgot about that and i still can't believe it
+        //forgot about all that again, there's no function to render a circle ???
         SDL_RenderDrawRect(target, &box);
 
         double analogThreshold = Port::normalizeStickValue(current_controller_vals.analogStickThreshold);
