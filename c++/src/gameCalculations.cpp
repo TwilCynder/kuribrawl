@@ -9,5 +9,5 @@ double GameCalc::getKnockback(int percentage, double bkb, double skb, double wei
 }
 
 int GameCalc::getHitLag(double damage){
-    return 15;
+    return 3;
 }
