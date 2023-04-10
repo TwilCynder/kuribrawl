@@ -77,6 +77,9 @@ clear:
 	-rm -r bin/*
 	-rm *.exe
 
+clear-exec:
+	-rm *.exe
+
 $(EXEC): $(OBJS)
 	@printf "\033[1;33m[Linking]\033[0m with command \033[0;36mg++ \033[0;34m<all of the .o above>\033[0;36m -o $@ $(LDFLAGS) \033[0m\n"
 	@g++ $^ -o $@ $(LDFLAGS) 
