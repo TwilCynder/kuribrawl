@@ -71,6 +71,7 @@ class Fighter : public Drawable {
     void setAnimation(Champion::DefaultAnimation, double speed);
     bool setAnimationMaybe(Champion::DefaultAnimation);
     bool setAnimationMaybe(Champion::DefaultAnimation, double speed);
+
     void advanceAnimation();
     void applyFrameMovement(double& speed, const EntityFrame::FrameMovementAxis& fma);
     Kuribrawl::VectorDouble& getPosition();
@@ -109,6 +110,8 @@ class Fighter : public Drawable {
     void applyAirAccel(int direction);
 
     void updateAnimation();
+    void changeAnimation(const EntityAnimation*);
+    void changeAnimation(const EntityAnimation*, double speed);
 
     private:
     const Champion* const model;    /**<Champion this Fighter is based on. Pointer validity : can be invalidated if a champion is deleted or moved (should not happen while a Fighter instance exists)*/

@@ -26,6 +26,7 @@ class EntityAnimationPlayer : public AnimationPlayerBase, public AnimationEndAct
     template <typename... Args> requires EntityAnimationEndActionValidArg<EntityAnimation, Args...>
     void setEndAction(Args... args){
         end_action.set(args...);
+        override_end_action = true;
     }
 
     template <typename... Args>

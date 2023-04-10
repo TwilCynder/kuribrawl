@@ -40,7 +40,7 @@ struct AnimationEndAction {
         data.code = code_;
     }
     void set(const A* anim_){
-        mode = Mode::NONE;
+        mode = Mode::START_ANIMATION;
         data.next_anim = anim_ ;
     }
 

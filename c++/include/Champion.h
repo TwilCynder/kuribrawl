@@ -109,11 +109,10 @@ class Champion : public AnimationsPool<EntityAnimation> {
     const std::string& getName();
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
     void setDefaultAnimation(const DefaultAnimation state, const EntityAnimation* anim);
+    const EntityAnimation* getAnimationTransition(const EntityAnimation&, const EntityAnimation&) const;
     void initDefaultAnimations();
     const EntityAnimation* resolveDefaultAnimation(DefaultAnimation id, std::unordered_set<DefaultAnimation>&);
     void initAnimationTransitionMatrix();
-    void initDefaultMoves();
-    void finalizeMoves();
 
     Move& addMove(const std::string& name);
     Move& addMove(std::string&& name);
@@ -122,6 +121,8 @@ class Champion : public AnimationsPool<EntityAnimation> {
     Move& tryMove(const char* name);
     Move& tryMove(std::string&& name);
     const Move* getDefaultMove(DefaultMoves) const;
+    void initDefaultMoves();
+    void finalizeMoves();
 
     void setDisplayName(const char* display_name);
     const std::string& getDisplayName() const;
@@ -149,6 +150,6 @@ class Champion : public AnimationsPool<EntityAnimation> {
     
     std::map<std::string, Move, std::less<>> moves;
 
-    Kuribrawl::DynamicMatrixST<const EntityAnimation*, const EntityAnimation&> transition_matrix;
+    Kuribrawl::DynamicMatrixST<const EntityAnimation*, const EntityAnimation*> transition_matrix;
 };
 

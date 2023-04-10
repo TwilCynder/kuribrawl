@@ -38,7 +38,7 @@ namespace Kuribrawl {
             Debug::log("Construcion");
         }
 
-        ref_key make_key_ref(const K1& k1, const K2& k2){
+        ref_key make_key_ref(const K1& k1, const K2& k2) const {
             return ref_key(k1, k2);
         }
 
@@ -122,7 +122,7 @@ namespace Kuribrawl {
         }
     };
 
-    template<typename K1, typename K2, typename V, typename _Key = std::pair<K1, K2>, template <typename Tr1, typename Tr2> typename _Refpair = refpair_std>
+    template<typename K1, typename K2, typename V, typename _Key = std::pair<K1, K2>, template <typename Tr1, typename Tr2> typename _Refpair = refpair>
     class DoubleKeyMap;
 
     template<typename K1, typename K2, typename V, typename _Key, template <typename Tr1, typename Tr2> typename _Refpair>

@@ -34,6 +34,7 @@ int EntityAnimationPlayer::advance(){
     AnimationPlayerBase::advance(current_end_action.mode == EndAction::Mode::REPEAT);
 
     if (finished){
+        override_end_action = false;
         switch (current_end_action.mode){
         case EndAction::Mode::REPEAT :
         case EndAction::Mode::NONE   :

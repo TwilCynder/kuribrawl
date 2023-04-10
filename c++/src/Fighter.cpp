@@ -82,17 +82,41 @@ const EntityAnimation* Fighter::getCurrentAnimation() const {
     return current_animation.getAnimation();
 }
 
+void Fighter::changeAnimation(const EntityAnimation* anim){
+    const EntityAnimation* transition = model->getAnimationTransition(*current_animation.getAnimation(), *anim);
+
+
+    if (transition){   
+        current_animation.setAnimation(transition, anim);
+    } else {
+        current_animation.setAnimation(anim);
+    }
+}
+
+void Fighter::changeAnimation(const EntityAnimation* anim, double speed){
+    const EntityAnimation* transition = model->getAnimationTransition(*current_animation.getAnimation(), *anim);
+    
+    if (transition){
+        current_animation.setAnimation(transition, speed, anim);
+    } else {
+        current_animation.setAnimation(anim, speed);
+    }
+}
+
 void Fighter::setAnimation(const EntityAnimation* anim) {
     last_hit = -1;
     if (anim)
-        current_animation.setAnimation(anim);
+        changeAnimation(anim);
     else
-        Debug::warn("Attempting to set null animation");
+        throw KBFatal("Attempting to set null animation");
 }
 
 void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
     last_hit = -1;
-    current_animation.setAnimation(anim, speed);
+    if (anim)
+        changeAnimation(anim, speed);
+    else
+        throw KBFatal("Attempting to set null animation");
 }
 
 
@@ -100,26 +124,26 @@ void Fighter::setAnimation(const EntityAnimation* anim, double speed) {
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim){
     const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
     checkNull(anim, KBFatalExplicit("Missing Animation"))
-    setAnimation(anim);
+    changeAnimation(anim);
 }
 
 void Fighter::setAnimation(Champion::DefaultAnimation default_anim, double speed){
     const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
     checkNull(anim, KBFatalExplicit("Missing Animation"))
-    setAnimation(anim, speed);
+    changeAnimation(anim, speed);
 }
 
 bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim){
     const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
     if (!anim) return false;
-    setAnimation(anim);
+    changeAnimation(anim);
     return true;
 }
 
 bool Fighter::setAnimationMaybe(Champion::DefaultAnimation default_anim, double speed){
     const EntityAnimation* anim = model->getDefaultAnimation(default_anim);
     if (!anim) return false;
-    setAnimation(anim, speed);
+    changeAnimation(anim, speed);
     return true;
 }
 
@@ -414,7 +438,7 @@ void Fighter::updateState(){
             break;
         case State::HITSTUN:    //State info is the hitstun duration
             if (state_timer >= state_info) {
-                setState(State::IDLE, 0, 2, Champion::DefaultAnimation::AIR_HITSTUN_TO_IDLE);
+                setState(State::IDLE, 0, 2, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT);
             }
             break;
         case State::ATTACK:

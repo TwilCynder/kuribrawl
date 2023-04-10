@@ -19,7 +19,7 @@ namespace Kuribrawl {
 
     template <typename T1, typename T2>
     std::weak_ordering operator<=>(const std::pair<T1, T2>& p1, const refpair_std<T1, T2>& p2){
-        auto res = p1.first <=> p2.second;
+        auto res = p1.first <=> p2.first;
         if (res == 0) 
             return p1.second <=> p2.second;
         return res;    
@@ -32,7 +32,7 @@ namespace Kuribrawl {
 
     template <typename T1, typename T2>
     std::weak_ordering operator<=>(refpair_std<T1, T2>& p1, refpair_std<T1, T2>& p2){
-        auto res = p1.first <=> p2.second;
+        auto res = p1.first <=> p2.first;
         if (res == 0) 
             return p1.second <=> p2.second;
         return res;    
@@ -41,6 +41,14 @@ namespace Kuribrawl {
     template <typename T1, typename T2>
     bool operator==(const std::pair<T1, T2>& p1, const refpair_std<T1, T2>& p2){
         return (p1.first == p2.first) && (p1.second == p2.second);
+    }
+
+    template <typename T1, typename T2>
+    std::weak_ordering operator<=>(const std::pair<const T1&, const T2&>& p1, const std::pair<T1, T2>& p2){
+        auto res = p1.first <=> p2.first;
+        if (res == 0) 
+            return p1.second <=> p2.second;
+        return res; 
     }
 
     /**
