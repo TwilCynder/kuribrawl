@@ -9,8 +9,8 @@
 #include "GameData.h"
 #include "Assets.h"
 #include "GameManager.h"
-#include "Text/TextureFont.h"
-#include "Text/TextDisplayer.h"
+#include "Util/Text/TextureFont.h"
+#include "Util/Text/TextDisplayer.h"
 #include "Util/StaticFullQueue.h"
 #include "KBException.h"
 

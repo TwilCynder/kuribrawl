@@ -16,7 +16,7 @@
 #include "System.h"
 #include "messageBox.h"
 #include "Random.h"
-#include "Text/TextDisplayer.h"
+#include "Util/Text/TextDisplayer.h"
 
 #define PORTS_NB 4
 

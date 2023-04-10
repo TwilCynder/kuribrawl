@@ -7,7 +7,7 @@
 #include "Move.h"
 #include "Random.h"
 #include "gameCalculations.h"
-#include "Text/TextDisplayer.h"
+#include "Util/Text/TextDisplayer.h"
 #include "Camera.h"
 
 #include "KBDebug/Debug.h"

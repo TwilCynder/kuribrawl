@@ -10,8 +10,8 @@
 #include "KBDebug/DebugTime.h"
 #include "GameConfiguration.h"
 #include "PlayerConfiguration.h"
-#include "Text/TextureFont.h"
-#include "Text/TextDisplayer.h"
+#include "Util/Text/TextureFont.h"
+#include "Util/Text/TextDisplayer.h"
 #include "defs.h"
 
 using namespace std;
