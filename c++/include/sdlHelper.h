@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Util/Logger.h"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include <iostream>
+
+class Logger;
 
 namespace SDLHelper {
     void prepareRender(SDL_Renderer* target);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Util/util.h"
-#include "Animation.h"
+#include "Animation/Animation.h"
 
 struct PlatformModel {
     int half_w;

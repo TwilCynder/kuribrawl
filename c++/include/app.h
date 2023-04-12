@@ -5,7 +5,7 @@
 #include <fstream>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_syswm.h"
-#include "Animation.h"
+#include "Animation/Animation.h"
 #include "GameData.h"
 #include "Assets.h"
 #include "GameManager.h"

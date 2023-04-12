@@ -4,7 +4,7 @@
 #include <memory>
 #include "SDL2/SDL.h"
 #include "Drawable.h"
-#include "EntityAnimationPlayer.h"
+#include "Animation/EntityAnimationPlayer.h"
 #include "Util/util.h"
 #include "InputManager.h"
 #include "gameActions.h"

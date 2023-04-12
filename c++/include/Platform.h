@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "Util/structures.h"
-#include "AnimationPlayer.h"
+#include "Animation/AnimationPlayer.h"
 #include "Drawable.h"
 #include "Ground.h"
 

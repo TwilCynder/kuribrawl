@@ -5,9 +5,9 @@
 #include "Util/containers_util.h"
 #include "SDL2/SDL.h"
 #include "Util/util.h"
-#include "AnimationsPool.h"
+#include "Animation/AnimationsPool.h"
 #include "Move.h"
-#include "EntityAnimation.h"
+#include "Animation/EntityAnimation.h"
 #include "Util/DoubleKeyMap.h"
 
 /**

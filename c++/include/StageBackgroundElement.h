@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AnimationPlayer.h"
+#include "Animation/AnimationPlayer.h"
 #include "Drawable.h"
 
 class StageBackgroundElementModel;

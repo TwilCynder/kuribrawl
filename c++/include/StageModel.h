@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "AnimationsPool.h"
-#include "Animation.h"
+#include "Animation/AnimationsPool.h"
+#include "Animation/Animation.h"
 #include "PlatformModel.h"
 #include "StageBackgroundElementModel.h"
 #include "Util/util.h"
