@@ -7,3 +7,10 @@ Gameplay-wise, Kuribrawl aims to be "fun while technical" : the game (and by tha
 
 ## Installing
 Of course, proper packaged releases with a ready-to-run executable will be published in time. For now, kuribrawl can be built from its source code by following the [installation guide](./doc/internal/install-build.md#Kuribrawl)
+
+## Project organization
+
+The Kuribrawl project is made of multiple modules : the Game, the Datafile Maker, and the Editor. 
+
+### Kuribrawl (the game)
+The game itself 
