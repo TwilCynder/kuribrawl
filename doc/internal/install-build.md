@@ -1,6 +1,6 @@
 # Introduction
 
-Kuribrawl is made of multiple modules, that are built separately.  
+All modules are built separately, and have their own build system(s).
 If you have `make`, they can all be built at once by running `make` in the root directory, if you meet the requirements for them (see below). `make release` packages all the executables in the `release` subdirectory, and `make [game|editor|dfm]` build only the specified module.  
 Each module has its own build system that can be used individually as described below ; some of them can be built without `make`. 
 
@@ -57,3 +57,8 @@ This is the system that is used if you simply run `make [install]` or `make edit
 ### Using nothing else than Java
 Simply run the `build.sh` script. It will build the application in the form of an executable Jar. By default, this jar needs the `lib` folder to work, but using the `-s` option builds it in standalone mode, allowing it to work anywhere by itself. The jar can then be run with the `java -jar kuribrawl-editor.jar` command, or by double-clicking it on windows (or using the `start` command) if Java is properly installed.    
 The `-r` option implies `-s` and copies the jar to the `release` directory. Only works if the `kuribrawl-tools` directory is located directly in the `kuribrawl` directory.
+
+## Datafile Maker
+The files of the game (animation source images, data files) are not read directly as-is by the game, but compiled into a single large file called the "datafile". The Datafile Maker's job is to turn the base files into this file. More information can be found in [the root readme](../../README.md) and the [DFM readme](../../tools/gamefile%20manager/readme.md). 
+
+It written in Purebasic 
