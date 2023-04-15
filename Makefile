@@ -4,7 +4,6 @@ export NOCLEAR = ""
 
 all: game editor dfm
 
-
 clearterminal:
 	clear
 	$(eval export NOCLEAR := "oui")
@@ -17,10 +16,9 @@ game: start
 	$(MAKE) release -C ./c++
 
 editor: start 
-	$(MAKE) -C ./tools/editor/javaEditor
+	$(MAKE) release -C ./tools/editor/javaEditor
 	@mkdir -p release/tools/editor
-	cp ./tools/editor/javaEditor/kuribrawl-editor.jar ./release/tools/editor
 
 dfm:
 	$(eval NOCLEAR := "true")
-	$(MAKE) -C "./tools/gamefile manager"
+	$(MAKE) release -C "./tools/gamefile manager"
