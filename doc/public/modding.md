@@ -1,66 +1,52 @@
 # Kuribrawl Modding Tutorial  
-This guide will show you how to add content to Kuribrawl.  
+This guide will explain the specification of the files used by the games, i.e. the *source files* used to make the Data File (which is in turn read by the game). This specification is available   
+
+Since additional Data Files can be used to extend the content of the game, built from the same source files,  this guide will also show you how to add content to Kuribrawl.  
 
 ## Intro
-All the data of the game (informations about a character, animations, etc) is contained within the `data.twl` file. This file is built by the DataFileMaker.exe (DFM) executable, using files listed in the `project_db.txt` file.  
+All the data of the game (informations about a character, animations, etc) is contained within the `data.twl` file. This file is built by the DFM.exe (DataFileMaker) executable, using files listed in the `project_db.txt` file.   
+These files include "media files" such as images and sounds, Lua scripts, and "Descriptor files", text files with a ".dat" extension that contain information following a [defined syntax](../internal/ressource%20file%20format/0.3.4.md).  
 To add characters or stages, you will have to list all the files related to them (animation spritesheets, info files, etc) in this file, and then simply run DFM.
 
-## project_db.txt
-`project_db.txt` must contain a list of all files that will be used, following this syntax : 
+## Content
+Just before we start, just a quick reminder on the *content* you are goind to add. There are 2 types of content you can add, i.e. :
+
+- **Champions** : A champion is defined by a *descriptor file* (see below) containing all its informations (physical properties, landing lags, etc).
+- **Stages** : A champion is defined by a *descriptor file* containing all its informations (size, camera zone, platform positions, etc)
+- **Animations** : An animation, bound to a champion or a stage, is defined by an image and potentially a *descriptor file* containing all its information (speed, origin point, hitboxes for champion animations, etc).
+- Lua **Scripts** that will be run at various stages of the game. (Not implemented yet)
+
+### About animations and how Champions/Stages use them
+To clarify : animations are usually bound to a *domain*, which is a champion or stage, but they are not defined *by* that domain, i.e. the descriptor or that champion or stage doesn't define a list of all its animation; rather, the animations are created as separate objects, that include their domain in their name.  
+
+Animations can then be used by their domain through their name : 
+- Some names have predefined uses : for example, for each player state there is a default animation name ; if there is an animation with this name it will be used for that state (this is oversimplified)
+- Some informations in a descriptor may require an animation name : stage descriptors include.
+- Lua scripts may refer to an animation by its name. 
+
+## Files organization
+All source files must be located in the same directory (and potentially subdirectories !)
+
+### project_db.txt
+A file named`project_db.txt`, at the root of the directory must contain a list of all files that will be used, following this syntax : 
 ```
 path_to_file
 Type:tag info
 ```
-- `Type` is a short code (1/2 letters) indicating the type of the file 
-- `Tag` is an identifier for the file. It may need to follow a specific sytax, depending on the file type.
-- `info` is a string that will provide additional info, depending on the file type.
-
-## Content
-Just before we start, just a quick reminder on the *content* you are goind to add. There are 2 types of content you can add, i.e. :
-- **Champions** : A champion is defined by a *descriptor file* containing all its informations (physical properties, landing lags, etc), and some *animation* files.
-- **Stages** : A champion is defined by a *descriptor file* containing all its informations (size, camera zone, platform positions, etc), and some *animation* files (for the background and platforms).
+(repeated)  
 
 ## Files
-Just a last thing before we start, about how to read this document. When describing text you are supposed to write, the syntax will be the following : 
-- Text between `<>`: replace entirely (including the brackets) with the value described in the brackets.
-- Text between `[]` : facultative.
-- Text between `{}` : can be repeated any number of times.
-- Text between `〔|〕` : Include *one* of the parts separated by a `|`.
+Keep in mind that everytime a **file descriptor** is presented, its syntax can be found [here](../internal/ressource%20file%20format/0.3.4.md)
+
 ### Champion descriptor
-A champion descriptor is a text file containing all the informations of a champions that isn't already part of the info of one of its animations.  
-Its description in the Project DB must follow this syntax : 
-```
-C:Tag
-```
-`Tag` is the name of the Champion. (note : the *name* is only the internal identifier, the name that will be displayed is the *display name*).
+A champion descriptor is a text file containing all the informations of a champions that isn't already part of the info of one of its animations. 
 
 - The first line of a Champion Descriptor must contain its *display name*. If you want it to be the same as it's internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).
-- The second line must contain all the *values* of this champions, separated by spaces. These values are (in this order): 
-    - Weight
-    - Walk Speed
-    - Dash Speed
-    - Initial Dash Speed
-    - Dash Turn Acceleration (backwards acceleration aaplied during a dash turn)
-    - Max Air Speed (maximum air drift horizontal speed)
-    - Air Acceleration (acceleration applied when air drifting)
-    - Traction (deceleration/backwards acceleration applied while on the ground)
-    - Jump Speed (full hop starting vertical speed)
-    - Jumpsquat Duration (duration of the jumpsquat, in frames. Leave at 0 to set it to the jumpsquat animation length)
-    - Dash Stop Duration (duration of the dash stop state. Leave at 0 to set it to the dashstop animation length)
-    - Dash Start Duration (duration of the initial dash state. Leave at 0 to set it to the dashstart animation length)
-    - Dash Turn Duration (duration of the dash turn state. Leave at 0 to set it to the dashturn animation length)
-    - Short Hop Speed (short hop starting vertical speed)
-    - Double Jump Speed (double jump starting vertical speed)
-    - Max Fall Speed (maximum vertical speed when falling)
-    - Fast Fall Speed
-    - Air Friction (deceleration/backwards acceleration applied when airborne)
-    - Landing duration (duration of the landing state. Leave to 0 to set it to the duration of the lading animation)  
-    - Shield Startup : number of frames between the frame you press Guard and the frame your shield appears.
-    - Shield Endlag : number of frames between the frame you release Guard (and your shield disappears) and the frame you can act again.  
+- The second line must contain all the *values* of this champions, separated by spaces. These values can be found in the [appendix of the descriptor specification](../internal/ressource%20file%20format/0.3.4.md#Annexe)
 
-It is important to note that for every value indicating a duration, two special values can be used :  
-- -1 : indicates that the duration of the animation should be used  
-- x  : indicates that the default duration should be used
+It is important to note that two special values may be used :  
+- `x` indicate the default value (this is the case for any value in a descriptor that has a default value, but all champion values have an implicit default value)
+- for all states durations, `-1` indicates "the length of the corresponding animation".
 
 After the first 2 lines, all lines indicate facultative info, and can be included in any order.
 

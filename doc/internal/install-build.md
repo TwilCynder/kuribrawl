@@ -59,6 +59,6 @@ Simply run the `build.sh` script. It will build the application in the form of a
 The `-r` option implies `-s` and copies the jar to the `release` directory. Only works if the `kuribrawl-tools` directory is located directly in the `kuribrawl` directory.
 
 ## Datafile Maker
-The files of the game (animation source images, data files) are not read directly as-is by the game, but compiled into a single large file called the "datafile". The Datafile Maker's job is to turn the base files into this file. More information can be found in [the root readme](../../README.md) and the [DFM readme](../../tools/gamefile%20manager/readme.md). 
+More information can be found in [the root readme](../../README.md) and the [DFM readme](../../tools/gamefile%20manager/readme.md). 
 
 It written in Purebasic 

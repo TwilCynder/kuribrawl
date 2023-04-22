@@ -3,9 +3,9 @@
 - Image : downwards Y
 
 
-Coordinates on the stage (entities, stage elements, etc): Physics   
-Coordinates on frame source image (origin point): Image  
-Coordinates relative to frame origin : Physics  
-Collision boxes rectangles : position if UP left angle
+- Coordinates on the stage (entities, stage elements, etc): Physics   
+- Coordinates on frame source image (origin point): Image  
+- Coordinates relative to frame origin : Physics  
+- Collision boxes rectangles : position of UP left angle
 
 
