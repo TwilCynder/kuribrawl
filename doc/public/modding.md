@@ -3,12 +3,12 @@ This guide will explain the specification of the files used by the games, i.e. t
 
 Since additional Data Files can be used to extend the content of the game, built from the same source files,  this guide will also show you how to add content to Kuribrawl.  
 
-## Intro
+# Intro
 All the data of the game (informations about a character, animations, etc) is contained within the `data.twl` file. This file is built by the DFM.exe (DataFileMaker) executable, using files listed in the `project_db.txt` file.   
 These files include "media files" such as images and sounds, Lua scripts, and "Descriptor files", text files with a ".dat" extension that contain information following a [defined syntax](../internal/ressource%20file%20format/0.3.4.md).  
 To add characters or stages, you will have to list all the files related to them (animation spritesheets, info files, etc) in this file, and then simply run DFM.
 
-## Content
+# Content
 Just before we start, just a quick reminder on the *content* you are goind to add. There are 2 types of content you can add, i.e. :
 
 - **Champions** : A champion is defined by a *descriptor file* (see below) containing all its informations (physical properties, landing lags, etc).
@@ -24,10 +24,10 @@ Animations can then be used by their domain through their name :
 - Some informations in a descriptor may require an animation name : stage descriptors include.
 - Lua scripts may refer to an animation by its name. 
 
-## Files organization
+# Files organization
 All source files must be located in the same directory (and potentially subdirectories !)
 
-### project_db.txt
+## project_db.txt
 A file named`project_db.txt`, at the root of the directory must contain a list of all files that will be used, following this syntax : 
 ```
 path_to_file
@@ -35,14 +35,14 @@ Type:tag info
 ```
 (repeated)  
 
-## Files
+# Files
 Keep in mind that everytime a **file descriptor** is presented, its syntax can be found [here](../internal/ressource%20file%20format/0.3.4.md)
 
-### Champion descriptor
+## Champion descriptor
 A champion descriptor is a text file containing all the informations of a champions that isn't already part of the info of one of its animations. 
 
 - The first line of a Champion Descriptor must contain its *display name*. If you want it to be the same as it's internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).
-- The second line must contain all the *values* of this champions, separated by spaces. These values can be found in the [appendix of the descriptor specification](../internal/ressource%20file%20format/0.3.4.md#Annexe)
+- The second line must contain all the *values* (numerical properties) of this champions, separated by spaces. These values can be found in the [appendix of the descriptor specification](../internal/ressource%20file%20format/0.3.4.md#Annexe)
 
 It is important to note that two special values may be used :  
 - `x` indicate the default value (this is the case for any value in a descriptor that has a default value, but all champion values have an implicit default value)
@@ -50,17 +50,22 @@ It is important to note that two special values may be used :
 
 After the first 2 lines, all lines indicate facultative info, and can be included in any order.
 
-- `〔m<id> | m:<move name>〕[l<land lag>]`
-    - `id` is the numerical identifier of a move, `move name` is the text identifier of a move.
-    - You can only specify the landing lag of an aerial move (aerials including ZAir, and specials if they are configured a certain way).
-- `〔u<id> | u:<move name>〕{<part end frame> <part start frame>}` : make the specified move a *multimove* (a move with different parts, allowing you to stop at the end of one of the parts; typically a smash/rivals jab).
-    - `id` is the numerical identifier of a move, `move name` is the text identifier of a move.
-    - `part end frame` is the frame where a part ends, `part start frame` is the frame where the next part starts. The first part always starts at frame 0, the last part always stops on the last frame.  
-    A multimove will always, by default, stop just before reaching the `part start frame` of a part unless you have pressed A during the last part. If you press A between the `part end frame` of the current part and the `part start frame` of the next frame, the game will instantly skip all frames until the said `part start frame`
+### Move
+
+A **move** is *formally* defined as "A Champion-specific state tied to an action", which means an action that will put your fighter in a state that, unlike basic states like DASH or GUARD is specific to your champion. It can be as simple as an action that starts a specific animation, and includes, most importantly, what is commonly reffered to as "attacks" (in fact, atm the only moves used by the game are attacks).  
+Moves have a name, and can be started from a lua script, however the game will by default start moves with certain names when a specific input is performed : for example, if a Champion has a move called `nair`, the game will start is automatically if you press the attack button, with the control stick in neutral position, while in the air (and your fighter is in a state that allows attacking).   
+Moves can be referred to in two ways : 
+- a numerical id (for built-in moves, i.e. the ones that are used natively by the engine)
+- a name 
+
+In the long term, moves will be able to completely redefine the behavior of a fighter while they are on (like any built-in state), but for now they just have a few properties : 
+- **land lag** : When a Fighter lands on the ground, they are put in a landing state (and animation) for a certain duration. If you land during a move, this duration is the land lag property of the move in question.
+
+### Note 
 
 Please note that the presence of a Champion Descriptor is not required to create the described champion : in fact, a champion is created as soon as anything related to it as added (animation or descriptor), the descriptor only configures it. In clear, it means that you do not need to include the Champion Descriptor before animations of this champion.
 
-### Stage Descriptor
+## Stage Descriptor
 A champion descriptor is a text file containing all the informations of a champions that isn't already part of the info of one of its animations.  
 Its description in the Project DB must follow this syntax : 
 ```
@@ -85,7 +90,7 @@ After the first 2 lines, all lines indicate facultative info, and can be include
     - `animationName`  must be the name of an animation of the stage.
 
 
-### Animation
+## Animation
 An animation file is, in fact, a combination of two files : 
 - An image file, called the spritesheet, containing all the frames of this animation (with the same dimensions), aligned horizontally
 - In most cases, a descriptor file, containing all info on this animation (speed, hitboxes, etc)
@@ -139,8 +144,8 @@ The usage of the animation depends of its name :
 An animations marked with a \*\* indicates that it will be played on loop (with no limit of duration). It means they can be still animations.  
 An animation marked with a \* indicates that it might be played for a set duration regardless of its length, generally the duration of the state it is associated with, in which case it is slowed down/accelerated to match this duration, but also that this duration can be set to depend on the animation (in which case the duration of the state is the length of the animatin). Typically, the initial dash animation will be played during a number of frames specified in the champions descriptor, but if the specified duration is 0, then the game will simply play the animation at its normal pace and the initial dash state's duration will be determined by the animation. These animation can be still if they are played in a context where they have a set duration, but you need to be careful as they but will cause problem if they are ever played without a set duration. (example : since the `jumpsquat` animation is only ever played during jumpsquat, it can be still with no problem if the champion has a set jumpsquat duration).
 
-#### Animation descriptor
-First, you must note that you *don't* really need to know any of the content of this part, as animation descriptors are integrally managed by the Frame Tool (a guide on how to use this software will come soon). 
+### Animation descriptor
+First, you must note that you *don't* really need to know any of the content of this part, as animation descriptors are integrally managed by the Editor (a guide on how to use this software will come soon). 
 
 - The first line must be the number of frames of the animation.
 
