@@ -1,0 +1,32 @@
+name: Update the latest resource file documentation
+on: 
+  push:
+    paths:
+      - doc\internal\ressource file format/**
+jobs:
+  Copy-Latest:
+    name: Copy lastest version of the standard
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Copy latest
+        run : ./doc/public/build/copy_latest.sh
+      - name: Commit changes
+        shell: bash
+        run: |
+          git add *
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Creating link" -a
+          fi
+
+      - name: push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }} #${{ steps.extract_branch.outputs.branch }}
