@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'doc/internal/ressource file format/**'
+  workflow_dispatch:
 jobs:
   Copy-Latest:
     name: Copy lastest version of the standard
