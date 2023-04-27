@@ -14,10 +14,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Copy latest
-        run : |
-          latest=$(doc/public/build/latest_version.exe doc/internal/ressource\ file\ format/*)
-          cp "$latest" doc/public/
-          mv "doc/public/$(basename "$latest")" doc/public/resource-format-latest.md
+        run : ./doc/public/build/copy_latest.sh
       - name: Commit changes
         shell: bash
         run: |
