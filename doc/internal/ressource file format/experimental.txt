@@ -12,3 +12,5 @@ génèrera une erreur.
 - hitboxes
 - hurtboxes
 - frame movements
+
+test
