@@ -2,7 +2,7 @@ name: Update the latest resource file documentation
 on: 
   push:
     paths:
-      - doc/internal/ressource file format/**
+      - 'doc/internal/ressource file format/**'
 jobs:
   Copy-Latest:
     name: Copy lastest version of the standard
