@@ -3,6 +3,7 @@
 c++/doc/*
 c++/kuribrawl.exe
 *.exe
+!latest_version.exe
 *.dll
 *.twl
 log.txt
