@@ -1,0 +1,7 @@
+## Stages
+
+Pour les trucs du genre plateforme principale, on pourrait avoir un concept d'"Objet Solide". Un objet solide serait un objet avec lequel il peut y avoir des collisions.  
+A priori plusieurs formes possibles, notament rectangle et polygone. Voir [Shapes](./shapes.md) pour le système de plusieurs-shapes-possibles 
+
+Les polygones seraient des ensembles de sommets internalement.  
+- voir comment détecter collision avec ça ("Point in polygon")
