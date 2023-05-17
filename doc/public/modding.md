@@ -136,9 +136,7 @@ The speed of an animation, which is a simple number, may hold different meanings
 - An integer >= 1 means the total duration of the animation, in cycles, of the animation.  
 Keep in mind that this behavior (which only allows evenly-distributed duration across all frames of the animation) can be overriden by the "duration" property of individual frames.
 
-<br> 
-<div style = "border-top: solid 1px; width: 50%"></div>
-<br>
+------
 
 After the animation speed, you may add any number of lines, each one describing the properties of a certain element of the animation, as [specified here](./resource-format-latest.md#animation)
 
@@ -196,9 +194,7 @@ Besides the rectangle coordinates, a hitbox must indicate a type, and then infor
 - Wind hitboxes (2) or windboxes don't "hit" targets, they simply "push" them (give them a certain amount of speed in a given direction, added to their current speed)
 - Special hitboxes (3) are currently unsupported
 
-<br> 
-<div style = "border-top: solid 1px; width: 50%"></div>
-<br>
+------
 
 # Appendix
 
