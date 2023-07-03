@@ -28,4 +28,4 @@ More information about its usage can be found in [its own readme](./tools/gamefi
 
 ### Kuribrawl Editor
 A visual interface allowing the user to edit game data (mainly, the information contained in [descriptors](./doc/public/modding.md/#)). Written in java, it is compiled as a Jar archive, which requires java to run.  
-A proper user manual will be provided soon. 
+A proper user manual will be provided """soon""". 
