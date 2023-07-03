@@ -7,4 +7,3 @@
 
 ## Outils pour plus tard 
 - setIconImage
-- JFileChooser

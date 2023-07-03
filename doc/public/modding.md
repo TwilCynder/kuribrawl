@@ -8,20 +8,19 @@ All the data of the game (informations about a character, animations, etc) is co
 These files include "media files" such as images and sounds, Lua scripts, and "Descriptor files", text files with a ".dat" extension that contain information following a [defined syntax](./resource-format-latest.md#annexe).  
 To add characters or stages, you will have to list all the files related to them (animation spritesheets, info files, etc) in this file, and then simply run DFM.
 
-# Content
 Just before we start, just a quick reminder on the *content* you are goind to add. There are 2 types of content you can add, i.e. :
 
-- **Champions** : A champion is defined by a *descriptor file* (see below) containing all its informations (physical properties, landing lags, etc).
-- **Stages** : A champion is defined by a *descriptor file* containing all its informations (size, camera zone, platform positions, etc)
-- **Animations** : An animation, bound to a champion or a stage, is defined by an image and potentially a *descriptor file* containing all its information (speed, origin point, hitboxes for champion animations, etc).
+- **Champions** : A [champion](#champion) is defined by a *descriptor file* (see below) containing all its informations (physical properties, landing lags, etc).
+- **Stages** : A [stage](#stage) is defined by a *descriptor file* containing all its informations (size, camera zone, platform positions, etc)
+- **Animations** : An [animation](#animation), bound to a champion or a stage, is defined by an image and potentially a *descriptor file* containing all its information (speed, origin point, hitboxes for champion animations, etc).
 - Lua **Scripts** that will be run at various stages of the game. (Not implemented yet)
 
 ### About animations and how Champions/Stages use them
-To clarify : animations are usually bound to a *domain*, which is a champion or stage, but they are not defined *by* that domain, i.e. the descriptor or that champion or stage doesn't define a list of all its animation; rather, the animations are created as separate objects, that include their domain in their name.  
+To clarify : animations are usually bound to a *domain* (an animation pool), which is a champion or stage, but they are not defined *by* that domain, i.e. the descriptor for that champion or stage doesn't define a list of all its animation; rather, the animations are created as separate objects, that include their domain in their name.  
 
 Animations can then be used by their domain through their name : 
-- Some names have predefined uses : for example, for each player state there is a default animation name ; if there is an animation with this name it will be used for that state (this is oversimplified)
-- Some informations in a descriptor may require an animation name : stage descriptors include.
+- Some names have [predefined uses](#default-animations) : for example, for each player state there is a default animation name ; if there is, in the animation pool of a champion, an animation with the name bound to a state, it will be used when the a fighter based on that champion enters this state (this is oversimplified)
+- Some informations in a descriptor may refer to an animation by its name.  
 - Lua scripts may refer to an animation by its name. 
 
 When the game is running, a currently displayed animation can be "owned" by an entity : this means that the animation is bound to this entity (will generally move with it etc), and may affect the behavior of the entty in some ways, or vice-versa
@@ -37,11 +36,14 @@ Type:tag info
 ```
 (repeated)  
 
-# Files
-Keep in mind that everytime a **file descriptor** is presented, its syntax can be found [here](../internal/ressource%20file%20format/0.3.4.md)
+# Content and Files
 
-## Champion descriptor
-A champion descriptor is a text file containing all the informations of a champions that isn't already part of the info of one of its animations. 
+## Champion
+A Champion is a "character" : it contains all the information that defines how a character is played. Keep in mind that the entity controlled by the player in-game, with an evolutive *state*, is called a Fighter ; a champion can be seen as all the character-dependant information a Fighter will be initialized with (physics values, animations, etc). In kuribrawl terminology, we say that the Fighter controlled by a player who selected a specific Champion is an instance of this Champion. 
+
+A champion is an [animation domain](#about-animations-and-how-championsstages-use-them) : animations can be bound to a champion, which basically mean that they are put in the animation pool of that champion.  
+
+A champion descriptor is a text file containing all the informations on a champions that isn't already part of the info of one of its animations.
 
 - The first line of a Champion Descriptor must contain its *display name*. If you want it to be the same as it's internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).
 - The second line must contain all the *values* (numerical properties) of this champions, separated by spaces. These values can be found in the [appendix of the descriptor specification](./resource-format-latest.md#annexe)
@@ -55,10 +57,7 @@ After the first 2 lines, all lines indicate facultative info, and can be include
 ### Move
 
 A **move** is *formally* defined as "A Champion-specific state tied to an action", which means an action that will put your fighter in a state that, unlike basic states like DASH or GUARD is specific to your champion. It can be as simple as an action that starts a specific animation, and includes, most importantly, what is commonly reffered to as "attacks" (in fact, atm the only moves used by the game are attacks).  
-Moves have a name, and can be started from a lua script, however the game will by default start moves with certain names when a specific input is performed : for example, if a Champion has a move called `nair`, the game will start is automatically if you press the attack button, with the control stick in neutral position, while in the air (and your fighter is in a state that allows attacking).   
-Moves can be referred to in two ways : 
-- a numerical id (for built-in moves, i.e. the ones that are used natively by the engine)
-- a name 
+Moves have a name, and can be started from a lua script, however the game will by default start moves with certain names when a specific input is performed : for example, if a Champion has a move called `nair`, the game will start it automatically if you perform a Neutral Air input (press the attack button, with the control stick in neutral position, while in the air) and your fighter is in a state that allows attacking. See [the appendix](#default-moves) for more information.  
 
 In the long term, moves will be able to completely redefine the behavior of a fighter while they are on (like any built-in state), but for now they just have a few properties : 
 - **land lag** : When a Fighter lands on the ground, they are put in a landing state (and animation) for a certain duration. If you land during a move, this duration is the land lag property of the move in question.
@@ -70,9 +69,12 @@ In the long term, moves will be able to completely redefine the behavior of a fi
 
 Please note that the presence of a Champion Descriptor is not required to create the described champion : in fact, a champion is created as soon as anything related to it is added (animation or descriptor), the descriptor only configures it. In clear, it means that you do not need to include the Champion Descriptor before animations of this champion.
 
-## Stage Descriptor
-A champion descriptor is a text file containing all the informations on a stage.
+## Stage
+Stages are the arenas where games take place. Note that there is a subtle difference between a "Stage", the environement in-game, with a state that can evolve (platforms can move, etc), and a "Stage Model", often referred to simply as "Stage" too depending on the context, which is the model for in-game stages, containing all the constant/static information about a playable stage. In the context of game files, it is of course what we are talking about.  
 
+A stage is an [animation domain](#about-animations-and-how-championsstages-use-them) : animations can be bound to a stage, which basically mean that they are put in the animation pool of that stage.  
+
+A stage descriptor is a text file containing all the informations on a stage.
 
 - The first line of a Stage Descriptor must contain its *display name*. If you want it to be the same as it's internal name, just leave the line empty (it is important that you still include the empty line, as the first line will be considered as the display name regardless of its content).
 - The second line must contain all the *values* of this stage, separated by spaces. These values are (in this order): 
@@ -111,6 +113,7 @@ An animation may be defined by two files :
 
 The tag of an animation holds special meaning. Indeed, an animation may (and in most cases will) be bound to a domain : see [this section](#about-animations-and-how-championsstages-use-them). See the [specification](./resource-format-latest.md#animation) for more info on how the domain of an animation is defined.
 
+Note that you *don't* really need to know any of the content of this part, as animation descriptors are integrally managed by the Editor (a guide on how to use this software will come soon). 
 
 The "info" part that follow the animation tag in the file list may be a file name, ending in `.dat`, in which case this file will be used as the descriptor ; or a few informations if they are the only ones needed
 - a frame number (the only mandatory info an animation will ever require)
@@ -120,7 +123,7 @@ Information about an animation include :
 
 ### Animation speed
 #### About time units and what "frame" means
-In videogames, especially fighting, there are 2 very different meaning associated with the word "frame"
+In videogames, especially fighting games, there are 2 very different meaning associated with the word "frame"
 - The common meaning is a frame *of an animation*, one of the images the animation is made of. In this document this will be referred to as "frame".
 - In fighting games, it can also be a frame *of the game*, one "display cycle", either the point of time where the game is redrawn or the time between two consecutive redraws. In this case, "frame" is a time unit. The difference can be confusing, because even at normal speed a single frame *of an animation* can be displayed during several frames *of the game*. Therefore, in this document the latter will be referred to as "cycles". 
 
@@ -133,9 +136,7 @@ The speed of an animation, which is a simple number, may hold different meanings
 - An integer >= 1 means the total duration of the animation, in cycles, of the animation.  
 Keep in mind that this behavior (which only allows evenly-distributed duration across all frames of the animation) can be overriden by the "duration" property of individual frames.
 
-<br> 
-<div style = "border-top: solid 1px; width: 50%"></div>
-<br>
+------
 
 After the animation speed, you may add any number of lines, each one describing the properties of a certain element of the animation, as [specified here](./resource-format-latest.md#animation)
 
@@ -193,77 +194,64 @@ Besides the rectangle coordinates, a hitbox must indicate a type, and then infor
 - Wind hitboxes (2) or windboxes don't "hit" targets, they simply "push" them (give them a certain amount of speed in a given direction, added to their current speed)
 - Special hitboxes (3) are currently unsupported
 
-<br> 
-<div style = "border-top: solid 1px; width: 50%"></div>
-<br>
+------
 
-### How the game uses animations
+# Appendix
 
-The usage of the animation depends of its name : 
-- For a stage, the animation named `background` will be the background of the stage.
-    - All other animations have no particular use but can be used by platforms as their animation.
-- For a champion, a lot of animation names are associated with a move or a state. Most of them are required (facultative animations are indicated in italics)
-    - `idle` : Idle grounded animation. **
-    - `airIdle` : Idle airborne animation **
-    - `walk` : walk animation **
-    - `dashstart` : initial dash animation *
-    - `dash` : dash animation **
-    - `dashstop` : dash stop animation *
-    - `dashturn` : dash turn *
-    - `jumpsquat` : jumpsqat animation (just before jumping) *
-    - `jump` : *used when the champion jumps, and transitions on the airIdle animation when it ends. If not specified, the champion will just enter the airIdle animation on the start of the jump*.
-    - `doublejump` : *double jump animation. If not specified, double jump will simply work like normal jumps*
-    - `land` : Landing animation. *
-    - `hurt` : Animation set when going in hitstun (note : when hitstun ends the animation stays until it is changed by an action). **
-    - `hurtground` : *Same as `hurt` but for hits that don't make you leave the ground. Defaults to `hurt`* **
-    - `hurtheavy` : *Same as `hurt` but for heavy hits (hits that send you in tubmle). Defaults to `hurt`* **
-    - `hurtup` : *Same as `hurt` but for heavy hits that also send you upwards. Defaults to `hurt`* **
-    - `hurtdown` : *Same as `hurt` but for heavy hits that also send you downwards. Defaults to `hurt`* **
-    - `hurtbounce` : *Animation set when you hit the ground in hitstun and bounce off it. Defaults to `hurt`* **
-    - `jab`
-    - `ftilt`
-    - `utilt`
-    - `dtilt`
-    - `nair`
-    - `fair`
-    - `bair`
-    - `uair`
-    - `dair`
-    - `zair`
-    - `nspecial`
-    - `fspecial`
-    - `dspecial`
-    - `uspecial`
-    - All animation with other names will have no use unless a script manually uses them.
+## Default moves
+When a player performs certain inputs, the game may start a move with a certain name, if it exists. Here is a complete list (`move name` : Input)
+- `dashattack` : A while in dash/run
+- `jab` : A on the ground with control stick in neutral position
+- `fstrong` : A on the ground after quickly flicking* the control stick left or right ** 
+- `dstrong` : A on the ground after quickly flicking* the control stick down ** 
+- `fstrong` : A on the ground after quickly flicking* the control stick up **
+- `ftilt` : A on the ground with the control stick tilted left or right **
+- `dtilt` : A on the ground with the control stick tilted down **
+- `utilt` : A on the ground with the control stick tilted up **
+- `nair` : A in the air with the control stick in neutral position
+- `fair` : A in the air with the constrol stick tilted forward (in the direction the fighter is looking at) **
+- `bair` : A in the air with the control sttick tilted backward (in the direction the fighter is not looking at) **
+- `uair` : A in the air with the constrol stick tilted up **
+- `dair` : A in the air with the constrol stick tilted down **
+- `nspecial` : B with the control stick in neutral position
+- `fspecial` : B with the control stick tilted left or right ***
+- `uspecial` : B with the control stick tilted up ***
+- `dspecial` : B with the control stick tilted down ***
 
-An animations marked with a \*\* indicates that it will be played on loop (with no limit of duration). It means they can be still animations.  
-An animation marked with a \* indicates that it might be played for a set duration regardless of its length, generally the duration of the state it is associated with, in which case it is slowed down/accelerated to match this duration, but also that this duration can be set to depend on the animation (in which case the duration of the state is the length of the animatin). Typically, the initial dash animation will be played during a number of frames specified in the champions descriptor, but if the specified duration is 0, then the game will simply play the animation at its normal pace and the initial dash state's duration will be determined by the animation. These animation can be still if they are played in a context where they have a set duration, but you need to be careful as they but will cause problem if they are ever played without a set duration. (example : since the `jumpsquat` animation is only ever played during jumpsquat, it can be still with no problem if the champion has a set jumpsquat duration).
+(*) "Quickly flicking" a stick means tilting it entirely from neutral position in a short time. This time can be configured in the player controller configuration  
+(**) If on the player's input mapping, "Attack" is mapped to the second stick, tilting this stick will trigger a `tilt` move depending on the direction, without the need for a A press. If "Strong attack" is mapped to this stick, tilting it will trigger a `strong` move depending on the direction, without the need for a A press or any quick flick. In both cases, tilting this stick while in the air will trigger a `air` move, depending on the direction.    
+(***) If on the player's input mapping, "Special" is mapped to the second stick, tilting this stick will trigger a `special` move.
 
-### Animation descriptor
-First, you must note that you *don't* really need to know any of the content of this part, as animation descriptors are integrally managed by the Editor (a guide on how to use this software will come soon). 
+## Default animations
+As explained in [this part](#about-animations-and-how-championsstages-use-them), champions and stages have a number of default animations that will be displayed automatically by the game in some situations. More precisely, for each type of animation domain, there are *names* that are bound to a special situation, and if there is an animation with this name in the animation pool ("domain") of this entity, it is used for this situation. Some of these are mandatory (no animation with this name results in an error), some of them are facultative and default to another animation. 
 
-- The first line must be the number of frames of the animation.
+In the following lists, if an animation is facultative, the animation displayed instead is indicated ; no such indication means that the animation is mandatory.
 
-All subsequent lines describe facultative info and can be omitted and included in any order.
-- `s<speed>` : the speed of the animation. To undertand properly how animation speed works, it is important to separate *animation frames* (the actual frames of the animation) and *real frames* (which is a unit of *time*, one cycle of the game) ; by default an animation frame is displayed every real frame, but if the speed is set an animation frame can be displayed during several real frames before changing. This value can be either : 
-    - An integer number, in which case this number will be the total number of frames  the animation will last, regardless of its number of actual frames (example : if a 3-frame animation has a speed of 13, its frames will be displayed during 4 or 5 frames so that the animation ends after 13 real frames). If this number is -1, the animation will be still.
-    - A decimal number, in which case this number will be a multiplier for the animation speed. For example, if the speed of an animation is 0.25, it will be played 4 times slower (with one animation frame lasting 4 real frames.). In the end, the animation will last `Int(1 / speed)` real frames.
+### For champions
+  - `idle` : Idle grounded animation. *
+  - `air_idle` : Idle airborne animation *
+  - `walk` : Walking animation *
+  - `dash_start` : initial dash animation
+  - `dash` : dash animation *
+  - `dash_stop` : dash stop animation 
+  - `dash_turn` : dash turn 
+  - `jumpsquat` : Jumpsquat animation (state a Fighter stays in for a short, character dependant duration before leaving the ground wehn jumping) 
+  - `jump` : used when the fighter jumps from the ground, and transitions on the `air_idle` animation when it ends (leaving the ground during a ground jump instantly puts a fighter in the idle/free state, so the the fighter is already in this state when this animation plays, the animaiton transition has no effect gameplay-wise and does not denote a change of state). If not specified, the champion will just enter the airIdle animation on the start of the jump (Defaults to `air_idle`)
+  - `jump_f` and `jump_b` : work like `jump`, used when jumping forward of backward. (Both default to `jump`)
+  - `air_jump` : Air jump, aka double jump, used when a fighter jumps while in the air. Transitions to `air_idle` (note that, just like for ground jumps, air jumps instantly puts the fighter in the idle state, so when this animation plays the fighter is already idle/free, the transition has no effect gameplay-wise) (Defaults to `jump`)
+  - `air_jump_f` and `air_jump_b` : Work like `air_jump`, used when air jumping forward or backward. (Both default to air_jump)
+  - `land` : Landing animation.
+  - `guard_start` : Guard startup animation
+  - `guard` : Guard *
+  - `guard_stop` : Exiting the guard state
+  - `hurt` : Animation set when going in non-tumble hitstun (when you get hit but not too hard). When the hitstun state ends, the fighter is put in the idle state but the animation is set to `air_idle_after_hurt`. *
+  - `air_idle_after_hurt` : Used when the fighter becomes actionable again after exiting the hitstun state. (Defaults to `hurt`) *
+  - **All moves** have a corresponding default animation, that will be started when that move is started. 
+  - All animation with other names will have no use unless a script specifically uses them.
 
-- `f<frame id> [d<duration>] [o<origin x> <origin y>] [m<speed mode> <vx> <vy>]` : properties of a specific frame
-    - `frame id` is the frame numer (the number of the first frame is 0)
-    - `duration` will be the durationof the frame, which means the time (in real frames) during which the frame will be displayed. Setting this value overrides the animation speed system (in fact, i advise never using frames with set durations in an animation with a set speed)
-    - `origin x` and `origin y` is the position of the frame's *origin*. The origin of a frame is the point that matches the fighter's position : when displaying the frame, it will be placed so that the origin point is placed exactly on the fighter position.
-    By default, the origin of a frame is placed at {width/2 ; height} (center bottom) for a champion, and {0;0} for a stage.
-    - `speed mode` is a number indicating how *frame movement* works with this frame. `vx` and `vy` are the speed that will be applied. Frame movement causes a frame to change the speed of a fighter when it is displayed. This number must be written in decimal in the descriptor, but is interpreted as a binary number, bit-by-bit : every bit indicates a specific property of this frame's movement :
-        - bit 1 (lsb) : indicates that frame movement is enabled. If it is 0, there will be no frame movement at all regardless of all other bits.
-        - bit 2 : 0 means that the speed is added to the fighter's current speed, 1 means the speed replaces the fighter's current speed.
-        - bit 3 : (for frames that last more than one real frame) 0 indicates that the speed is applied (added or set, depending on bit 2) only once, when the frame starts being displayed, 1 indicates that the speed is applied every frame until the animation goes on another frame.
-        - bit 4 : disables x speed. If this bit is 1, only vertical speed will be applied.
-        - bit 5 (msb) : disables y speed. If this bit is 1, only horizontal speed will be applied. (if both bits 4 and 5 are 1, frame movement has no effect)
+- ( * ) Animations marked with a * will be played on loop if they are not still. They are typically used in a situation for which we don't know *when* it will end (such as a state that ends only when the player does something).
+- Animations with the mention "transitions to" will transition to another animation once they end, in most cases without any change gameplay-wise
+- Other animation will be used in a situation that has a "predicatble ending", which means that when it starts we know when it's supposed to end (unless it is somehow canceled). These animations generally last for the entire duration of the state they are used for
+  - By default, the animation is what decides the length of the state (state ends when animation ends)
+  - However, if the "duration override" mention is present the state  will last for the specified amount of time, regardless of the speed of the animation (which will be slowed or accelerated to match the duration). When that duration is the name of a Champion value (the numerical properties of champions, [see here](#champion)), that champion value may be set (in the descriptor, so by you !) to -1, in which case there will be no fixed duration, and the animation decides the length of the state
 
-- `c<frame id> <x> <y> <w> <h>` : creates a hurtbox on the specified frame, at the specified coordinates (relative to the origin)
-
-- `h<frame id> <x> <y> <w> <h> <damages> <angle> [<hitID>] [<priority>]` : creates a hitbox on the secified frame, with the specified damage and angle.
-    - `hitID` is the numerical identifier of the hit this hitbox belongs to. If an hitbox connects with another fighter that has already been hit by an hitbox with the same hitID, it will do nothing. This means that only two hitboxes with different hitIDs can both connect. For most moves hitID will always be 0, but different hitIDs allow for the creation of multihits.
-    - `priority` if two hitboxes connect on the same frame, the hitbox with the highest priority is used.
-    

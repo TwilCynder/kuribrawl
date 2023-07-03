@@ -19,6 +19,5 @@ editor: start
 	$(MAKE) release -C ./tools/editor/javaEditor
 	@mkdir -p release/tools/editor
 
-dfm:
-	$(eval NOCLEAR := "true")
+dfm: start
 	$(MAKE) release -C "./tools/gamefile manager"

@@ -306,6 +306,9 @@ void Champion::initDefaultMoves(){
 
 const std::map<Champion::DefaultAnimation, std::string> Champion::default_animation_name = {
     {Champion::DefaultAnimation::IDLE, "idle"},
+    {Champion::DefaultAnimation::GUARD, "guard"},
+    {Champion::DefaultAnimation::GUARD_START, "guard_start"},
+    {Champion::DefaultAnimation::GUARD_STOP, "guard_stop"},
     {Champion::DefaultAnimation::WALK, "walking"},
     {Champion::DefaultAnimation::WALK_TURN, "walk_turn"},
     {Champion::DefaultAnimation::JUMPSQUAT, "jumpsquat"},
@@ -315,10 +318,16 @@ const std::map<Champion::DefaultAnimation, std::string> Champion::default_animat
     {Champion::DefaultAnimation::DASH_STOP, "dash_stop"},
     {Champion::DefaultAnimation::DASH_TURN, "dash_turn"},
     {Champion::DefaultAnimation::JUMP, "jump"},
+    {Champion::DefaultAnimation::JUMP_FORWARD, "jump_f"},
+    {Champion::DefaultAnimation::JUMP_BACKWARD, "jump_b"},
     {Champion::DefaultAnimation::AIR_IDLE, "air_idle"},
     {Champion::DefaultAnimation::AIR_JUMP, "air_jump"},
+    {Champion::DefaultAnimation::AIR_JUMP_FORWARD, "air_jump_f"},
+    {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, "air_jump_b"},
     {Champion::DefaultAnimation::HITSTUN, "hurt"},
     {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, "air_idle_after_hurt"}
+    //a voir pour les animations tumble
+    //pour le landing lag ce sera spécial aussi
 };
 
 const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name = {
@@ -343,7 +352,7 @@ const std::map<Champion::DefaultMoves, std::string> Champion::default_move_name 
 
 const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion::default_animations_fallbacks = {
     {Champion::DefaultAnimation::JUMP, Champion::DefaultAnimation::AIR_IDLE},
-    {Champion::DefaultAnimation::AIR_JUMP, Champion::DefaultAnimation::AIR_IDLE},
+    {Champion::DefaultAnimation::AIR_JUMP, Champion::DefaultAnimation::JUMP},
     {Champion::DefaultAnimation::JUMP_FORWARD, Champion::DefaultAnimation::JUMP},
     {Champion::DefaultAnimation::JUMP_BACKWARD, Champion::DefaultAnimation::JUMP},
     {Champion::DefaultAnimation::AIR_JUMP_FORWARD, Champion::DefaultAnimation::AIR_JUMP},
