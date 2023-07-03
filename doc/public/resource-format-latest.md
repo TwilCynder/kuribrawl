@@ -1,6 +1,8 @@
+
+
 # Format des fichiers resource
 
-Structure des fichiers ressource utilisés pour générer le datafile.
+Spécification de la structure et du contenu des fichiers ressource utilisés pour générer le datafile.
 Systèmes affectés par cette specification : 
 - datafile maker
 - editor
@@ -47,15 +49,25 @@ Contenu du descripteur d'animation
 - [s<speed>] (vitesse de l'animation)
 {
 - f<n° de frame> [d<durée>] [o<x origine> <y origine>] [m[<x mode*>:<x value>],[<y mode*>:<y value>]] (infos de frame) |
-- c{[[<n° de frame>] <x> <y> <w> <h> <invincible> (info de hurtbox) | whole] | all } |
+- c{[[<n° de frame>] <x> <y> <w> <h> <Mode>* (info de hurtbox) | whole] | all } |
 - h[<n° de frame>] <x> <y> <w> <h> <type> <infos spécifiques au type> (info de hitbox)
 }*
 ```
 
-(*) Infos de hitbox spécifiques au type : 
-- Damage hitbox : `<damage> <angle> <hitID> <priority>`
+Infos de hitbox spécifiques au type (numéro de type entre parenthèses) : 
+- Damage hitbox (0) : `<damage> <angle> <bkb> <skb> <hitID> <priority>`
+- Grab hitbox (1) : unsupported
+- Wind hitbox (2) : rien
+- Special hitbox (3) : unsupported
 
-(*) Frame movement : `[[s|w]]` ("s" indique set_speed, "w" indique whole_frame)
+(*) Hurtbox mode : 
+- 0 = Normal
+- 1 = Protected
+- 2 = Intangible
+
+
+
+(*) Frame movement mode : `[[s|w]]` ("s" indique set_speed, "w" indique whole_frame)
 
 ### Types de domaines : 
 - **Champion** : "Champion", "Champ" ou "C"
