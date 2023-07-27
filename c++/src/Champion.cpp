@@ -248,7 +248,7 @@ void Champion::initAnimationTransitionMatrix(){
  */
 
 void Champion::initDefaultAnimations(){
-    EntityAnimation *anim, *anim2;
+    EntityAnimation *anim;
 
     //Checking existing default animations
     for (auto const& [state, name] : default_animation_name){

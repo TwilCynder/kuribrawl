@@ -1,6 +1,7 @@
 #pragma once
 #include <forward_list>
 #include <memory>
+#include "Util/ManualCountForwardList.h"
 #include "SDL2/SDL.h"
 #include "PlayerFighter.h"
 #include "Drawer.h"
@@ -42,6 +43,7 @@ class Game {
     void updateStates();
     void updateAnimations();
     void hitDetection();
+    void updateCameraPosition();
 
     const Stage* getStage() const;
 
@@ -67,7 +69,7 @@ class Game {
 
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;
 
-    std::forward_list<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
+    ManualCountForwardList<PlayerFighter> fighters; ///< A list containing all Fighters present in this Game.
     std::unique_ptr<Stage> stage;
 
     int frame;

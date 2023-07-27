@@ -19,9 +19,9 @@ void App::startTestGame(){
 	Debug::out << "Stage : " << testStage->getDisplayName() << '\n';
 
 	GameConfiguration config;
+	config.addPlayer(nullptr, *acid);
+	config.addPlayer(nullptr, *acid);
 	config.addPlayer(&ports[0], *acid);
-	config.addPlayer(nullptr, *acid);
-	config.addPlayer(nullptr, *acid);
 	config.setStage(testStage);
 
 	Game& game = game_manager.start(config);
