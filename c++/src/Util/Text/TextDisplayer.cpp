@@ -211,8 +211,8 @@ AdvancedTextDisplayer::AdvancedTextDisplayer(int x, int y, TextureFont& font):
 }
 
 /**
- * @brief Returns a value to be passed to operator<<(AdvancedTextDisplayer::AdvanceLength).
- * 
+ * @brief Returns a value to be passed to operator<<(AdvancedTextDisplayer::AdvanceLength). 
+ * Increases the current horizontal write position to be at a certain distance from the position before the previous write.
  * @param l 
  * @return AdvancedTextDisplayer::AdvanceLength 
  */

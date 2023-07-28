@@ -2,7 +2,7 @@
 
 export NOCLEAR = ""
 
-all: game editor dfm
+all: game editor dfm end
 
 clearterminal:
 	clear
@@ -21,3 +21,6 @@ editor: start
 
 dfm: start
 	$(MAKE) release -C "./tools/gamefile manager"
+
+end: 
+	@printf "\033[0;32m\033[1mBuild successful !\n\033[0m"

@@ -13,6 +13,7 @@
 #include "Util/Text/TextureFont.h"
 #include "Util/Text/TextDisplayer.h"
 #include "defs.h"
+#include "GameConstants.h"
 
 using namespace std;
 
@@ -137,6 +138,7 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
 }
 
 void Game::onFighterAdded(const Fighter& fighter){
+    fighters++;
     graphics.add(fighter);
 }
 
@@ -159,6 +161,8 @@ void Game::draw(SDL_Renderer* target){
         it->draw(target);
     }*/
 
+    updateCameraPosition();
+    
     graphics.draw(target, camera);
 }
 
@@ -212,7 +216,6 @@ void Game::updateAnimations(){
  * May only be called if `running` is true
  */
 void Game::applyPhysics(){
-    const StageModel& stageModel = stage.get()->getModel();
 
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
@@ -277,6 +280,27 @@ void Game::hitDetection(){
             }
         }
     }
+}
+
+void Game::updateCameraPosition(){
+
+    //average position of the fighters, aka the target for the camera pos
+    ArithVec2<double> avgPos = {0, 0}; 
+    for (auto fighter : fighters){
+        avgPos += fighter.getPosition();
+    }
+    avgPos /= fighters.size();
+    
+    //we want the actual average pos on the center of the screen
+    avgPos.y -= SCREEN_HEIGHT / 2;
+
+    ArithVec2<double> distance = avgPos - camera.position;
+    double distSquared = distance.normSquare(); //manipulating squared distances to go faster
+
+    if (distSquared < camera_max_speed_squared){
+        camera.position = avgPos;
+    }
+
 }
 
 void Game::drawDebugInfo(TextureFont& font, SDL_Renderer* target){

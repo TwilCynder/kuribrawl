@@ -58,22 +58,146 @@ namespace Kuribrawl
 
     };
 
+    template <typename T, typename U>
+    concept SumExists = requires (T t, U u){
+        t + u;
+    };
+    template <typename T, typename U>
+    concept SubstExists = requires (T t, U u){
+        t - u;
+    };
+    template <typename T, typename U>
+    concept MultExists = requires (T t, U u){
+        t * u;
+    };
+    template <typename T, typename U>
+    concept DivExists = requires (T t, U u){
+        t / u;
+    };
+
     template<typename T>
     struct ArithVec2 : public Vec2<T> {
-        template<typename U>
-        ArithVec2<U> operator+(ArithVec2<U>&& other){
-            return ArithVec2(this->x + other.x, this->y + other.y);
-        }
-
-        template<typename U>
-        ArithVec2<U> operator+(U&& other){
-            return ArithVec2(this->x + other, this->y + other);
-        }
-
         ArithVec2<T>& operator=(const Vec2<T>& v){
             this->x = v.x;
             this->y = v.y;
         }
+
+        template<typename U>
+        ArithVec2<T>& operator=(const Vec2<U>& v){
+            this->x = v.x;
+            this->y = v.y;
+            return *this;
+        }
+
+        template<typename U>
+            requires SumExists<T, U>
+        auto operator+(const ArithVec2<U>& other){
+            return ArithVec2(this->x + other.x, this->y + other.y);
+        }
+
+        template<typename U>
+            requires SumExists<T, U>
+        auto operator+(const U& other){
+            return ArithVec2(this->x + other, this->y + other);
+        }
+
+        ArithVec2<T>& operator+=(const Vec2<T>& v){
+            this->x += v.x;
+            this->y += v.y;
+            return *this;
+        }
+
+        template<typename U>
+        ArithVec2<T>& operator+=(const U& v){
+            this->x += v;
+            this->y += v;
+            return *this;
+        }
+
+        template<typename U>
+            requires SubstExists<T, U>
+        auto operator-(const Vec2<U>& other){
+            return ArithVec2{this->x - other.x, this->y - other.y};
+        }
+
+        template<typename U>
+            requires SubstExists<T, U>
+        auto operator-(const U& other){
+            return ArithVec2(this->x - other, this->y - other);
+        }
+
+        ArithVec2<T>& operator-=(const Vec2<T>& v){
+            this->x -= v.x;
+            this->y -= v.y;
+            return *this;
+        }
+
+        template<typename U>
+        ArithVec2<T>& operator-=(const U& v){
+            this->x -= v;
+            this->y -= v;
+            return *this;
+        }
+
+        template<typename U>
+            requires MultExists<T, U>
+        auto operator*(const ArithVec2<U>& other){
+            return ArithVec2(this->x * other.x, this->y * other.y);
+        }
+
+        template<typename U>
+            requires MultExists<T, U>
+        auto operator*(const U& other){
+            return ArithVec2(this->x * other, this->y * other);
+        }
+
+        ArithVec2<T>& operator*=(const Vec2<T>& v){
+            this->x *= v.x;
+            this->y *= v.y;
+            return *this;
+        }
+
+        template<typename U>
+        ArithVec2<T>& operator*=(const U& v){
+            this->x *= v;
+            this->y *= v;
+            return *this;
+        }
+
+        template<typename U>
+            requires DivExists<T, U>
+        auto operator/(const ArithVec2<U>& other){
+            return ArithVec2(this->x / other.x, this->y / other.y);
+        }
+
+        template<typename U>
+            requires DivExists<T, U>
+        auto operator/(const U& other){
+            return ArithVec2(this->x / other, this->y / other);
+        }
+
+        ArithVec2<T>& operator/=(const Vec2<T>& v){
+            this->x /= v.x;
+            this->y /= v.y;
+            return *this;
+        }
+
+        template<typename U>
+        ArithVec2<T>& operator/=(const U& v){
+            this->x /= v;
+            this->y /= v;
+            return *this;
+        }
+
+        T normSquare(){
+            return this->x * this->x + this->y * this->y;
+        }
+
+        T norm(){
+            return sqrt(normSquare);
+        }
+
+
     };
 
     template <typename T>
@@ -127,6 +251,7 @@ namespace Kuribrawl
 
     using Rectangle = Rect<int>;
 
+    //TODO arihvec2
     using VectorDouble = Vec2<double>;
     
     template <class T1, class T2> 

@@ -267,8 +267,8 @@ void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
 
 void Fighter::writeDebugInfo(AdvancedTextDisplayer& out){
     out 
-        << "Speed X : " << speed.x << (int)250
-        << "   Speed Y : " << speed.y << AdvancedTextDisplayer::force_advance(80)
+        << "Speed X : " << speed.x << AdvancedTextDisplayer::force_advance(120)
+        << "   Speed Y : " << speed.y << AdvancedTextDisplayer::force_advance(120)
         << " " << Debug::state_to_string(state);
 }
 
