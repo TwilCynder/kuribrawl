@@ -49,5 +49,25 @@ namespace Kuribrawl {
     bool isUp(const Kuribrawl::Vector& stick, int threshold);
     bool isLeft(const Kuribrawl::Vector& stick, int threshold);
     bool isDown(const Kuribrawl::Vector& stick, int threshold);
-}
 
+    //FROM CHATGPT. FUCK. I HAD A GOOD 70% OF THE SOLUTION MYSELF BTW BTW.
+    template<typename Range, typename T>
+    concept RangeOf = requires(Range r) {
+        typename Range::value_type; // Check if the range has a nested 'value_type'
+        requires std::same_as<typename Range::value_type, T>; // Ensure the value_type is T
+        { std::begin(r) } -> std::same_as<typename Range::iterator>; // Check begin() returns the correct iterator type
+        { std::end(r) } -> std::same_as<typename Range::iterator>;   // Check end() returns the correct iterator type
+    };
+
+    template <typename T, typename Range, typename U = T>
+    requires RangeOf<Range, U>
+    T average(const Range& r, int size){
+        T res{};
+        for (U el : r){
+            res += el;
+        }
+        res /= size;
+        return res;
+    }
+
+}

@@ -69,7 +69,7 @@ bool Fighter::is_initialized(){
  *
  * @return Kuribrawl::VectorDouble&
  */
-Kuribrawl::VectorDouble& Fighter::getPosition() {
+const Kuribrawl::VectorDouble& Fighter::getPosition() const {
     return position;
 }
 

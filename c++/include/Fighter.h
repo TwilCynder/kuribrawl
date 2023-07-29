@@ -74,7 +74,7 @@ class Fighter : public Drawable {
 
     void advanceAnimation();
     void applyFrameMovement(double& speed, const EntityFrame::FrameMovementAxis& fma);
-    Kuribrawl::VectorDouble& getPosition();
+    const Kuribrawl::VectorDouble& getPosition() const;
     void setSpeed(double x, double y);
     bool getGrounded() const;
     int getFacing() const;

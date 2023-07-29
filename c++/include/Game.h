@@ -43,7 +43,7 @@ class Game {
     void updateStates();
     void updateAnimations();
     void hitDetection();
-    void updateCameraPosition();
+    void updateCameraPosition(SDL_Renderer* target);
 
     const Stage* getStage() const;
 

@@ -15,6 +15,27 @@
 
 namespace Kuribrawl
 {
+    template <typename T, typename U>
+    concept SumExists = requires (T t, U u){
+        t + u;
+    };
+    template <typename T, typename U>
+    concept SubstExists = requires (T t, U u){
+        t - u;
+    };
+    template <typename T, typename U>
+    concept MultExists = requires (T t, U u){
+        t * u;
+    };
+    template <typename T, typename U>
+    concept DivExists = requires (T t, U u){
+        t / u;
+    };
+
+    template <typename T>
+    concept NotAnAggregate = !std::is_aggregate_v<T>;
+
+
     template <typename T, typename Enabler = void>
     struct Vec2 {
         union {
@@ -56,23 +77,6 @@ namespace Kuribrawl
         Vec2()
         {}
 
-    };
-
-    template <typename T, typename U>
-    concept SumExists = requires (T t, U u){
-        t + u;
-    };
-    template <typename T, typename U>
-    concept SubstExists = requires (T t, U u){
-        t - u;
-    };
-    template <typename T, typename U>
-    concept MultExists = requires (T t, U u){
-        t * u;
-    };
-    template <typename T, typename U>
-    concept DivExists = requires (T t, U u){
-        t / u;
     };
 
     template<typename T>
@@ -197,7 +201,6 @@ namespace Kuribrawl
             return sqrt(normSquare);
         }
 
-
     };
 
     template <typename T>
@@ -214,38 +217,79 @@ namespace Kuribrawl
     };
     using Size = SizeT<int>;
 
-    template<typename T>
+    template <typename T>
     struct Rect {
-        T x;
-        T y;
-        T w;
-        T h;
+                union {
+            T x;
+            T left;
+        };
+        union {
+            T y;
+            T top;
+        };
+        union {
+            T w;
+            T right;
+        };
+        union {
+            T h;
+            T bottom;
+        };
+
+        inline const Vec2<T> asVec() const {
+            return *((Vec2<T>*)this);
+        }
+    };
+
+    template<typename T>
+    requires (std::is_class_v<T> && !std::is_aggregate_v<T>)
+    struct Rect <T> {
+        union {
+            T x;
+            T left;
+        };
+        union {
+            T y;
+            T top;
+        };
+        union {
+            T w;
+            T right;
+        };
+        union {
+            T h;
+            T bottom;
+        };
 
         inline const Vec2<T> asVec() const {
             return *((Vec2<T>*)this);
         }
 
-        Rect(T x_, T y_, T w_, T h_) : 
+        constexpr Rect(T x_, T y_, T w_, T h_) : 
             x(x_), y(y_), w(w_), h(h_)
         {
             //#pragma message "Coucou je suis la !"
         }
 
-        Rect(Vec2<T> position, SizeT<T> size) :
+        constexpr Rect(Vec2<T> position, SizeT<T> size) :
             x(position.x), y(position.y), w(size.w), h(size.h)
         {}
 
-        Rect(Vec2<T> position, T w_, T h_) :
+        constexpr Rect(Vec2<T> position, T w_, T h_) :
             x(position.x), y(position.y), w(w_), h(h_)
         {}
 
-        Rect<T> operator+ (const Vec2<T>& vec){
-            return Rect<T>(x + vec.x, y + vec.y, w, h);
+    };
+
+    template <typename T>
+    struct ArithRect : public Rect<T> {
+        ArithRect<T> operator+ (const Vec2<T>& vec){
+            return Rect<T>(this->x + vec.x, this->y + vec.y, this->w, this->h);
         }
 
         template<typename U>
-        Rect<T> operator*(const U& coef){
-            return Rect<T>(x, y, w * coef, h * coef);
+        ArithRect<T> operator*(const U& coef){
+            return Rect<T>(this->x, this->y, this->w * coef, this->h * coef);
         }
     };
 

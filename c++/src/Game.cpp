@@ -161,7 +161,7 @@ void Game::draw(SDL_Renderer* target){
         it->draw(target);
     }*/
 
-    updateCameraPosition();
+    updateCameraPosition(target);
     
     graphics.draw(target, camera);
 }
@@ -282,24 +282,101 @@ void Game::hitDetection(){
     }
 }
 
-void Game::updateCameraPosition(){
+void Game::updateCameraPosition(SDL_Renderer* target){
 
-    //average position of the fighters, aka the target for the camera pos
-    ArithVec2<double> avgPos = {0, 0}; 
-    for (auto fighter : fighters){
-        avgPos += fighter.getPosition();
+    if (fighters.empty()) return;
+
+    Kuribrawl::Rect<double> fighters_box;
+    {
+        auto fighter_it = fighters.begin();
+        const auto& pos = fighter_it->getPosition();
+        
+        fighters_box.left = pos.x;
+        fighters_box.top = pos.y;
+        fighters_box.right = pos.x;
+        fighters_box.bottom = pos.y;
+
+        Debug::log("===================");
+        Debug::sout << "Fighter 1 " << pos.x << pos.y << '\n';
+
+        for (++fighter_it; fighter_it != fighters.end(); ++fighter_it){
+            const auto& pos = fighter_it->getPosition();
+            if (pos.x < fighters_box.left) fighters_box.left = pos.x;
+            if (pos.y > fighters_box.top) fighters_box.top = pos.y;
+            if (pos.x > fighters_box.right) fighters_box.right = pos.x;
+            if (pos.y < fighters_box.bottom) fighters_box.bottom = pos.y;
+            Debug::sout << "Fighter x " << pos.x << pos.y << '\n';
+        }
     }
-    avgPos /= fighters.size();
-    
-    //we want the actual average pos on the center of the screen
-    avgPos.y -= SCREEN_HEIGHT / 2;
 
-    ArithVec2<double> distance = avgPos - camera.position;
-    double distSquared = distance.normSquare(); //manipulating squared distances to go faster
+    Debug::sout << "Fighters box" << fighters_box.left << fighters_box.top << fighters_box.right << fighters_box.bottom << '\n';
 
-    if (distSquared < camera_max_speed_squared){
-        camera.position = avgPos;
-    }
+    SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
+    SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), fighters_box.right - fighters_box.left, fighters_box.top - fighters_box.bottom};
+    Debug::sout << "Fighters box on screen" << fbrect.x << fbrect.y << fbrect.w << fbrect.h << '\n';
+    SDL_RenderDrawRect(target, &fbrect);
+
+    SDL_SetRenderDrawColor(target, 255, 0, 255, 255);
+
+
+    if (fighters_box.right - fighters_box.left >= game_constants_calc.camera_nomove_area_size.x){
+        //average position of the fighters, aka the target for the camera pos
+        ArithVec2<double> avgPos = {0, 0}; 
+        for (auto& fighter : fighters){
+            avgPos += fighter.getPosition();
+        }
+        avgPos /= fighters.size();
+        //we want the actual average pos on the center of the screen
+
+        SDL_RenderDrawLine(target, camera.getXOnScreen(avgPos.x - 10), camera.getYOnScreen(avgPos.y), camera.getXOnScreen(avgPos.x + 10), camera.getYOnScreen(avgPos.y));
+        SDL_RenderDrawLine(target, camera.getXOnScreen(avgPos.x), camera.getYOnScreen(avgPos.y) - 10, camera.getXOnScreen(avgPos.x), camera.getYOnScreen(avgPos.y) + 10);
+        SDL_SetRenderDrawColor(target, 255, 255, 255, 255);
+        SDL_RenderDrawLine(target, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 + 10, SCREEN_HEIGHT / 2);
+        SDL_RenderDrawLine(target, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 10, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 10);
+        
+        avgPos.y -= SCREEN_HEIGHT / 2;
+
+        /* //Pour si jamais on repart sur un truc qui traite pas x et y séparément
+        ArithVec2<double> distance = avgPos - camera.position;
+        double distSquared = distance.normSquare(); //manipulating squared distances to go faster
+
+        if (distSquared < camera_max_speed_squared){
+            camera.position = avgPos;
+        } else {
+
+        }*/
+
+        int camera_movement_x = avgPos.x - camera.position.x;
+        if (camera_movement_x){
+            if (abs(camera_movement_x) <= game_constants.camera_max_speed){
+                camera.position.x = avgPos.x;
+            } else {
+                camera.position.x += game_constants.camera_max_speed * Kuribrawl::sign(camera_movement_x);
+            }
+        }
+
+    } else {
+        Kuribrawl::Rectangle current_nomove_area = {
+            camera.position.x + game_constants_calc.camera_nomove_area.left,
+            camera.position.y + game_constants_calc.camera_nomove_area.top,
+            camera.position.x + game_constants_calc.camera_nomove_area.right,
+            camera.position.y + game_constants_calc.camera_nomove_area.bottom
+        };
+
+        SDL_Rect fbrect {camera.getXOnScreen(current_nomove_area.left), camera.getYOnScreen(current_nomove_area.top), current_nomove_area.right - current_nomove_area.left, current_nomove_area.top - current_nomove_area.bottom};
+        Debug::sout << "Camera nomove area on screen" << fbrect.x << fbrect.y << fbrect.w << fbrect.h << '\n';
+        SDL_RenderDrawRect(target, &fbrect);
+
+        int camera_movement_x = 0;
+        if      (fighters_box.left < current_nomove_area.left) camera_movement_x = fighters_box.left - current_nomove_area.left;
+        else if (fighters_box.right > current_nomove_area.right) camera_movement_x = fighters_box.right - current_nomove_area.right;
+
+        if (abs(camera_movement_x) > game_constants.camera_max_speed){
+            camera.position.x += game_constants.camera_max_speed * Kuribrawl::sign(camera_movement_x);
+        } else {
+            camera.position.x += camera_movement_x;
+        }
+    }   
 
 }
 
