@@ -3,9 +3,9 @@
 constexpr struct {
     double camera_max_speed = 10;
     Kuribrawl::Rect<double> camera_nomove_area_rel = {
-        .left =     0.5, 
+        .left =     0.6, 
         .top =      0.5, 
-        .right =    0.5,
+        .right =    0.6,
         .bottom =   0.5
     };
 } game_constants;
