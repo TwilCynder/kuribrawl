@@ -29,14 +29,14 @@ On définit les **Limites de vue** horizontales d'une caméra C comme les deux d
 Soient bgauche et bdroite les intersections entre P et C.l1 et C.l2 respectivement.  
 On définit une **Projection de caméra** C sur un plan P comme le segment entre bgauche et bdroite.  
 
-La longueur de la projection de C sur P0 est la larger de l'écran ; tout point de P0 situé sur cette projection sera affiché à l'écran.  
+La longueur de la projection de C sur P0 est la largeur de l'écran ; tout point de P0 situé sur cette projection sera affiché à l'écran.  
 
 Soit W la largeur de l'écran en pixels.  
 On définit la **Position relative** d'un point pp (aux coordonneés exprimées en pixels) sur l'écran comme pr de [0, 1] tq pr = pp / W.  
 
-Un point p situé sur la projection de C sur P est affiché sur l'écran à la position relative |(p.x - bgauche.x) / (bgauche.x - bdroite.x)|. 
+Un point p situé sur la projection de C sur un plan de décor P (comme P0) est affiché sur l'écran à la position relative |(p.x - bgauche.x) / (bgauche.x - bdroite.x)|. 
 
 On est dans une hypothèse de jeu sans zoom/dézoom, c'est à dire que les éléments de P0 seront toujours affichés à la même taille ; la zone couverte par l'écran est toujours de même taille. Cela veut dire que la taille de la projection de C sur P0 ne changera jamais. Cette taille dépend (pythagore TMTC) de l'angle C.ax et de la distance entre P0 et C, c'est à dire C.position.z. On décide donc que ces paramètres ne changeront jamais.  
 Afin de simplifier, on décide donc, puisque la distance entre bgauche et bdroite ne changera jamais, que l'unité de distance dans notre repère est telle que |bgauche.x - bdroite.x| == W. Ainsi, un point p de la projection est affiché à la position (en pixels) |p.x - bgauche.x|.  
 
-On sait maintenant comment sont affichés les objets et distances de P0 sur l'écran, au travers du modèle de la caméra (l'écran étant la projection de la caméra sur P0). L'idée du parallax est d'introduire d'autres plans de décor (rappel : tout plan de décor est perpendiculaire à C.dd, dont parallèle à P0) ; il nous faut définir à quelle position sur l'écran sont affichés les objets situés sur ces autres plans de décor.  
+On sait maintenant comment sont affichés les objets et distances de P0 sur l'écran, au travers du modèle de la caméra (l'écran étant la projection de la caméra sur P0). L'idée du parallax est d'introduire d'autres plans de décor (rappel : tout plan de décor est perpendiculaire à C.dd, donc parallèle à P0) ; il nous faut définir à quelle position sur l'écran sont affichés les objets situés sur ces autres plans de décor.  
