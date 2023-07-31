@@ -15,7 +15,8 @@ Soit C.dd la demi droite qui part d'une caméra C, et s'étend dans la direction
 On définit un **Plan de décor** vis à vis d'une caméra C un plan tq C.position ne se trouve pas sur le plan, et C.dd est perpendiculaire au plan (et le traverse). 
 Pour des raisons de simplicité (et parce que le contexte 2D finira par nous l'imposer), on impose que tous les plans de décor sont parallèle au plan XY (et donc entre eux). Par conséquent, C.direction ne changera jamais.
 
-La distance entre C et un plan de décor quelconque P est |C.position.z - pp.z|, avec pp un point quelconque de P.
+On définit la propriété z d'un plan P de décor comme pp.z avec pp un point quelconque de P, tous les points de P ayant la même composante z.  
+La distance entre C et un plan de décor quelconque P est |C.position.z| - |P.z|.
 
 Pour des raisons de simplicité de l'explication, on s'intéresse ici uniquement aux positions et distances sur les axes X et Z (c'est à dire qu'on ne considère que le plan XZ), toute distance ou déplacement sur l'axe Y fonctionnant comme sur l'axe X. On peut donc ne considérer que deux dimensions des vecteurs en général,  et un seul angle de la caméra ; les plans parallèles à l'axe Y (c'est à dire tous les plans considérés ici) deviennent des droites. L'écran devient également un segment au lieu d'un plan.
 
@@ -26,37 +27,48 @@ On définit les **Limites de vue** horizontales d'une caméra C comme les deux d
 - C.dd est la bissectrice de l'angle (par conséquent, l'angle entre li et C.direction est de cx / 2).
 D'un point de vue concret, il faut comprendre que tous les points situés entre l1 et l2 seront affichés à l'écran.
 
-Soient bgauche(P) et bdroite(P) les intersections entre P et C.l1 et C.l2 respectivement.  
+Soient bgauche(C, P) et bdroite(C, P) les intersections entre P et C.l1 et C.l2 respectivement.  
 On définit une **Projection de caméra** C sur un plan P Pr(C, P) comme le segment entre bgauche et bdroite. Par définition de C.l1 et C.l2 (et par extension, de la caméra), tout point de Pr(C, P) sera affiché à l'écran.
 
-Soit W la largeur de l'écran.  
-On définit **position relative à l'écran** d'un point pp, pr(pp), tq pour P' le plan de décor passant par pp, pr = (pp.x - bgauche(P').x) / (bgauche(P').x - bdroite(P').x). On note que pr app [0, 1] <=> pp est entre C.l1 et C.l2, donc un point n'est affiché que si sa position relative app [0, 1] ; pp est affiché sur l'écran à la position pr(pp) * W.
+Soit SW la largeur de l'écran, en pixels.  
+On définit **position relative à l'écran** d'un point pp, pr(pp), tq pour P' le plan de décor passant par pp, pr = (pp.x - bgauche(C, P').x) / (bgauche(C, P').x - bdroite(C, P').x). On note que pr app [0, 1] <=> pp est entre C.l1 et C.l2, donc un point n'est affiché que si sa position relative app [0, 1] ; pp est affiché sur l'écran à la position pr(pp) * SW.
 
-D'après les définitions de bgauche/bdroite, on peut déterminer que  
-pr(pp) = C.position.x + 
+D'après les définitions de pr, bgauche et bdroite, et avec w(C, P) la longueur de la projection Pr(C, P), c'est à dire |bgauche(C, P')| - |bgauche(C, P')| on peut déterminer que  
+pr(pp) = (pp.x - C.position.x + W(C, P')/2) / W(C, P')   
 
-tan(opp/adj)
+> On peut également noter que W(C, P') = 2 * dz * tan(C.ax / 2), avec dz(C, P) = |C.position.z| - |P'.z| Mais en vrai osef.  
 
--------
+#### Parallax
 
-Dans une hypothèse de pure 2D (= sans parallax), tous les éléments se trouvent sur le même plan P0, parallèle aux axes X et Y.    
+Dans une hypothèse de pure 2D (= sans parallax), tous les éléments se trouvent sur le même plan de décor P0.
 
 - La caméra qu'on utilsera ici sera toujours telle que P0 est un plan de décor. C.direction ne changera donc jamais. 
 - P0 étant perpendiculaire aux axes X et Y, C.position.z est la distance entre C et P0.
 
 
+On est dans une hypothèse de jeu sans zoom/dézoom, c'est à dire que les éléments de P0 seront toujours affichés à la même taille ; la zone couverte par l'écran est toujours de même taille. Cela veut dire que la taille de la projection de C sur P0, W(C, P0) ne changera jamais. D'après la formule de W(C, P) en fin de section précédente, cette taille dépend de dz et de C.ax. Ces deux paramètres sont donc également fixes. (techniquement on peut changer C.ax et dz et quand même arriver au même W(C, P0), voir plus bas).
 
-La longueur de la projection de C sur P0 est la largeur de l'écran ; tout point de P0 situé sur cette projection sera affiché à l'écran.  
+On ajoute maintenant d'autres plans de décor sur lesquels on veut pouvoir afficher des éléments (qui seront pour l'instant représentés par des points).  
+Premièrement, on veut que l'hypothèse de non-zoom soit maintenue pour tous les plans
+- C'est pour cela qu'on a fixé C.ax
+- Il faut également que dz(C, P) soit constant pour tout P, donc que C.position.z soit constant.  
 
-Soit W la largeur de l'écran en pixels.  
-On définit la **Position relative** d'un point pp (aux coordonneés exprimées en pixels) sur l'écran comme pr de [0, 1] tq pr = pp / W.  
 
-Un point p situé sur la projection de C sur un plan de décor P (comme P0) est affiché sur l'écran à la position relative |(p.x - bgauche.x) / (bgauche.x - bdroite.x)|. 
+La position d'un élément de P0 sur l'écran est triviale, mais le but ici est de déterminer la position à l'écran d'un point situé sur un autre plan de décor, c'est à dire pour un point pour lequel z != z0.  
 
-On est dans une hypothèse de jeu sans zoom/dézoom, c'est à dire que les éléments de P0 seront toujours affichés à la même taille ; la zone couverte par l'écran est toujours de même taille. Cela veut dire que la taille de la projection de C sur P0 ne changera jamais. Cette taille dépend (pythagore TMTC) de l'angle C.ax et de la distance entre P0 et C, c'est à dire C.position.z. On décide donc que ces paramètres ne changeront jamais.  
-Afin de simplifier, on décide donc, puisque la distance entre bgauche et bdroite ne changera jamais, que l'unité de distance dans notre repère est telle que |bgauche.x - bdroite.x| == W. Ainsi, un point p de la projection est affiché à la position (en pixels) |p.x - bgauche.x|.  
+On va pour cela redéfinir W(C, P), relativement à P0.  
+W(C, P) = SW * (dz(C, P) / dz0)
 
-On sait maintenant comment sont affichés les objets et distances de P0 sur l'écran, au travers du modèle de la caméra (l'écran étant la projection de la caméra sur P0). L'idée du parallax est d'introduire d'autres plans de décor (rappel : tout plan de décor est perpendiculaire à C.dd, donc parallèle à P0) ; il nous faut définir à quelle position sur l'écran sont affichés les objets situés sur ces autres plans de décor.  
+Par conséquent, pour tout pp,  
+pr(pp) = (pp.x - C.position.x + (SW * pp.z / (2 * dz0))) / (SW * pp.z / dz0).  
+
+Afin de simplifier cette formule, on fixe dz0 à 1 (ce qui par extension fixe C.Ax à 45° mais osef)  
+
+pr(pp) = (pp.x - C.position.x + (SW * pp.z) / 2) / (SW * pp.z) 
+
+Par définition de pr, la position à l'écran est  
+x = ((pp.x - C.position.x + (SW * pp.z) / 2) / (SW * pp.z) ) * SW = (pp.x - C.position.x + (SW * pp.z) / 2) / pp.z
+
 
 ## Old
 
