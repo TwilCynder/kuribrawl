@@ -1,7 +1,7 @@
 #include "Util/structures.h"
 
 constexpr struct {
-    double camera_max_speed = 10;
+    double camera_max_speed = 5;
     Kuribrawl::Rect<double> camera_nomove_area_rel = {
         .left =     0.6, 
         .top =      0.5, 

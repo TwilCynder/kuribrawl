@@ -30,9 +30,7 @@ void InputManager::registerInput(Input input, Port* port, int element, ElementTy
 /**
  * @brief Updates all registered Inputs, attempting to apply their effect.
  * Handles the result of the input handler if there is one for this type of input.  
- * These results can be :   
- * - 0 : nothing was done by the handler, the input durability is decreased
- * - 1 : the input was handled
+ * These results can be : see PlayerFighter::InputHandlerResult.
  */
 void InputManager::updateInputs(){
     using Result = PlayerFighter::InputHandlerResult;

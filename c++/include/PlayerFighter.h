@@ -70,7 +70,7 @@ class PlayerFighter : public Fighter {
     Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
     ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
-    bool valid_port;
+    bool valid_port; ///< Indicates that this playerfighter has a valid port. If this is false, NO port-related feature and more importantly pointer should be used.
     friend class InputManager;
     InputManager input_manager;    ///< InputManager used to process the input made by the Port.
     Vec2<StickBuffer> control_stick_buffer;
@@ -86,9 +86,13 @@ class PlayerFighter : public Fighter {
     int InputHandler_SmashStickUp(RegisteredInput& input);
     int InputHandler_Attack(RegisteredInput& input);
 
+    /**
+     * @brief Describes the result of the handling of an input.  
+     * This result determines what happens to the input in the input queue
+     */
     enum InputHandlerResult {
-        HANDLED,
-        DISMISSED,
-        POSTPONE
+        HANDLED, ///< The input has been handled, and will now be forgotten (erased from the queue)
+        DISMISSED, ///< The input could not take any effect, and will remain in the queue but lose durability, and will be erased once it is dismissed with no durability left
+        POSTPONE ///< The input is postponed : it was not used, but will not lose any durability. 
     };
 };
