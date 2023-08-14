@@ -29,9 +29,9 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
         {
             setState(Fighter::State::DASH_TURN, side);
         }
+        return InputHandlerResult::HANDLED;
     }
-
-    return InputHandlerResult::HANDLED;
+    return InputHandlerResult::DISMISSED;
 }
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
