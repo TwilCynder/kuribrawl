@@ -1,15 +1,17 @@
 **But** : Intégrer un concept de profondeur pour les éléments de background des stages, et déterminer comment les positionner en fonction de la caméra afin de simuler la profondeur de manière réaliste.  
 
-## Modèle conceptuel
-### Espace 3D
+# Modèle conceptuel
+
+## Espace 3D
 On représente l'espace en trois dimensions.  
 
 On introduit une **Caméra**, représentée par un point, une direction (vecteur) et deux angles : Cam(pos, dir, ax, ay) 
 > angles : angle de vue / FOV horizontal et vertical. Généralement proportionels.
 
-### Modèle 2D/3D
+## Modèle 2D/3D
 
-#### Modèle général
+### Modèle 3D général
+
 Soit C.dd la demi droite qui part d'une caméra C, et s'étend dans la direction de C.direction (C'est à dire, dd parallèle à C.direction, et pour tout point p de dd différent de C.position, (C.position->p) dot (C.direction) == 1)
 
 On définit un **Plan de décor** vis à vis d'une caméra C un plan tq C.position ne se trouve pas sur le plan, et C.dd est perpendiculaire au plan (et le traverse). 
@@ -31,43 +33,71 @@ Soient bgauche(C, P) et bdroite(C, P) les intersections entre P et C.l1 et C.l2 
 On définit une **Projection de caméra** C sur un plan P Pr(C, P) comme le segment entre bgauche et bdroite. Par définition de C.l1 et C.l2 (et par extension, de la caméra), tout point de Pr(C, P) sera affiché à l'écran.
 
 Soit SW la largeur de l'écran, en pixels.  
-On définit **position relative à l'écran** d'un point pp, pr(pp), tq pour P' le plan de décor passant par pp, pr = (pp.x - bgauche(C, P').x) / (bgauche(C, P').x - bdroite(C, P').x). On note que pr app [0, 1] <=> pp est entre C.l1 et C.l2, donc un point n'est affiché que si sa position relative app [0, 1] ; pp est affiché sur l'écran à la position pr(pp) * SW.
+On définit **position relative à l'écran** d'un point pp, pr(C, pp), tq pour P' le plan de décor passant par pp, pr = (pp.x - bgauche(C, P').x) / (bgauche(C, P').x - bdroite(C, P').x). On note que pr app [0, 1] <=> pp est entre C.l1 et C.l2, donc un point n'est affiché que si sa position relative app [0, 1] ; pp est affiché sur l'écran à la position px(pp) = pr(C, pp) * SW.
 
 D'après les définitions de pr, bgauche et bdroite, et avec w(C, P) la longueur de la projection Pr(C, P), c'est à dire |bgauche(C, P')| - |bgauche(C, P')| on peut déterminer que  
-pr(pp) = (pp.x - C.position.x + W(C, P')/2) / W(C, P')   
+pr(C, pp) = (pp.x - C.position.x + W(C, P')/2) / W(C, P')   
 
-> On peut également noter que W(C, P') = 2 * dz * tan(C.ax / 2), avec dz(C, P) = |C.position.z| - |P'.z| Mais en vrai osef.  
+On peut également noter que W(C, P') = 2 * dz(C, P) * tan(C.ax / 2), avec dz(C, P) = |C.position.z - P'.z|.
 
-#### Parallax
+### Parallax
 
-Dans une hypothèse de pure 2D (= sans parallax), tous les éléments se trouvent sur le même plan de décor P0.
+Dans une hypothèse de pure 2D (= sans parallax) tous les éléments se trouvent sur le même plan de décor P0.
 
-- La caméra qu'on utilsera ici sera toujours telle que P0 est un plan de décor. C.direction ne changera donc jamais. 
-- P0 étant perpendiculaire aux axes X et Y, C.position.z est la distance entre C et P0.
+- La caméra qu'on utilsera ici sera toujours telle que P0 est un plan de décor. C'est la raison pour laquelle on a imposé plus tôt que tous les plans de décor soient parallèles au plan XY : au final ils doivent être parallèles à P0 de toute façon. 
+- On note z0 la valeur de P0.z, et w0 la valeur de W(C, P0)
 
+On est également dans une hypothèse de jeu sans zoom/dézoom, c'est à dire que les éléments de P0 seront toujours affichés à la même taille ; la zone couverte par l'écran est toujours de même taille. Cela veut dire que la taille de la projection de C sur P0, W(C, P0) ne changera jamais.  
 
-On est dans une hypothèse de jeu sans zoom/dézoom, c'est à dire que les éléments de P0 seront toujours affichés à la même taille ; la zone couverte par l'écran est toujours de même taille. Cela veut dire que la taille de la projection de C sur P0, W(C, P0) ne changera jamais. D'après la formule de W(C, P) en fin de section précédente, cette taille dépend de dz et de C.ax. Ces deux paramètres sont donc également fixes. (techniquement on peut changer C.ax et dz et quand même arriver au même W(C, P0), voir plus bas).
+> On note que cela signifie que d'un point de vue technique, tant que l'environement de jeu est entièrement 2D, la position des éléments à l'écran est en réalité triviale : 
+> - comme on n'a pas de profondeur, on peut ne pas considérer la caméra mais seulement sa projection, c'est à dire le rectangle dont tout contenu sera affiché sur l'écran
+> - comme on n'a ni zoom ni dézoom, on peut partir du principe que la taille de cette projection ne change jamais, donc ne retenir que la position de la caméra.
+> Il nous suffit alors de décider que la représentation de la caméra dans l'environement de jeu, est égale à SW, pour arriver à la formule suivante pour la position à l'écran d'un point pp : px = (pp.x - C.position.x + SW / 2).
 
 On ajoute maintenant d'autres plans de décor sur lesquels on veut pouvoir afficher des éléments (qui seront pour l'instant représentés par des points).  
-Premièrement, on veut que l'hypothèse de non-zoom soit maintenue pour tous les plans
-- C'est pour cela qu'on a fixé C.ax
-- Il faut également que dz(C, P) soit constant pour tout P, donc que C.position.z soit constant.  
+Premièrement, on veut que l'hypothèse de non-zoom soit maintenue pour tous les plans.  
+Cela veut dire que W(C, P) doit rester identique *pour tout plan*. D'après la formule de W(C, P) en fin de section précédente, cette taille dépend de dz(C, P) et de C.ax. Ces deux paramètres doivent donc rester fixes pour chaque plan. Par souci de simplicté on fixe C.position.z à 0 précisément. La formule de W(C, P) devient donc W(C, P) = 2 * P.z * tan(C.ax / 2). 
 
+Maintenant, on voudrait deux choses : 
+- Simplifier la formule de la position à l'écran d'un point pp (qui a l'heure actuelle implique un nombre important de produits/divisions et une tangente)
+- Maintenir, pour P0, la formule triviale utilisée dans l'hypothèse de non-profondeur et non-zoom originale, x = (pp.x - C.position.x + SW / 2).
 
-La position d'un élément de P0 sur l'écran est triviale, mais le but ici est de déterminer la position à l'écran d'un point situé sur un autre plan de décor, c'est à dire pour un point pour lequel z != z0.  
+Afin de parvenir au second point, la condition était que la représentation de la caméra dans l'environement 2D, c'est à dire la projection de C sur P0, soit de la même taille que l'écran. Pour arriver à cette équation, il faut donc que
+```
+w0 = SW <=> 
+2 * z0 * tan(C.ax / 2) = SW <=>
+```    
+Les inconnues ici sont C.ax et z0, et leur valeur ne nous intéresse en fait pas. On garde simplement en tête que leur valeur (qui reste fixe comme stipulé plus haut) est telle que w0 = SW.  
 
-On va pour cela redéfinir W(C, P), relativement à P0.  
-W(C, P) = SW * (dz(C, P) / dz0)
+On veut maintenant savoir quelle est la valeur de px(C, pp) pour un pp quelconque hors P0. Et il s'avère que pour cela nous n'avons même pas beosin de la valeur de C.ax. En effet, on peut maintenant définir W(C, P) à partir de w0.  
+
+```
+| W(C, P) = 2 * P.z * tan(C.ax / 2)
+| w0 = 2 * z0 * tan(C.ax / 2)
+<=>
+| tan(C.ax / 2) = W(C, P) / (2P.z)
+| tan(C.ax / 2) = w0 / 2z0
+<=>
+W(C, P) / (2P.z) = w0 / 2z0
+<=>
+W(C, P) / P.z = w0 / z0
+<=>
+W(C, P) = w0 * P.z / z0
+```
+
+Plus besoin de calculer W(C, P) à partir de l'angle C.ax, on peut utiliser une relation de proportionalité avec w0 et z0 !
 
 Par conséquent, pour tout pp,  
-pr(pp) = (pp.x - C.position.x + (SW * pp.z / (2 * dz0))) / (SW * pp.z / dz0).  
+pr(C, pp) = (pp.x - C.position.x + (SW * pp.z / (2 * dz0))) / (SW * pp.z / dz0).  
 
 Afin de simplifier cette formule, on fixe dz0 à 1 (ce qui par extension fixe C.Ax à 45° mais osef)  
 
 pr(pp) = (pp.x - C.position.x + (SW * pp.z) / 2) / (SW * pp.z) 
 
 Par définition de pr, la position à l'écran est  
-x = ((pp.x - C.position.x + (SW * pp.z) / 2) / (SW * pp.z) ) * SW = (pp.x - C.position.x + (SW * pp.z) / 2) / pp.z
+x = ((pp.x - C.position.x + (SW * pp.z) / 2) / (SW * pp.z) ) * SW = (pp.x - C.position.x + (SW * pp.z) / 2) / pp.z    
+= (pp.x - C.position.x) / pp.z + ((SW * pp.z / 2) / pp.z)  
+**= (pp.x - C.position.x) / pp.z + SW / 2**
 
 
 ## Old
