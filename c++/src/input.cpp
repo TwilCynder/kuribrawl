@@ -1,6 +1,5 @@
 #include "input.h"
-
-constexpr int INPUT_DURABILITY = 10;
+#include "GameConstantsBase.h"
 
 /**
  * @brief Construct a new Registered Input object
@@ -17,6 +16,6 @@ RegisteredInput::RegisteredInput(Input input_, Port* port_, int element_ = -1, E
     element(element_),
     element_type(element_type_),
     data(data_),
-    durability(INPUT_DURABILITY)
+    durability(game_constants.input_durability)
 {
 }
