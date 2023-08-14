@@ -2,8 +2,16 @@
 
 #include "KBDebug/Debug.h"
 
+void Drawer::add(const Drawable& d, const int depth, const Layer layer, const int level){
+    drawables.emplace(Element(d, depth, layer, level));
+}
+
+void Drawer::add(const Drawable& d, const int depth, const Layer layer){
+    add(d, depth, layer, 0);
+}
+
 void Drawer::add(const Drawable& d, const int depth){
-    drawables.emplace(Element(d, depth));
+    add(d, 0, MIDDLE);
 }
 
 void Drawer::add(const Drawable& d){
