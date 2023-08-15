@@ -10,4 +10,5 @@ constexpr struct {
         .bottom=(int)(SCREEN_HEIGHT * (0.5 - game_constants.camera_nomove_area_rel.bottom / 2)),
     };
     Kuribrawl::Vector camera_nomove_area_size = {camera_nomove_area.right - camera_nomove_area.left, camera_nomove_area.top - camera_nomove_area.bottom};
+    int camera_offset_yreal = SCREEN_HEIGHT * (game_constants.camera_offset_y);
 } game_constants_calc;

@@ -14,14 +14,12 @@
 #include "Util/Text/TextDisplayer.h"
 #include "defs.h"
 #include "GameConstants.h"
+#include "Util/Drawing.h"
+
+constexpr bool camera_debug_markers = true;
 
 using namespace std;
 
-/**
- * @brief 
- * 
- *
- */
 Game::Game():
     frame(0),
     original_config(nullptr)
@@ -283,8 +281,6 @@ void Game::hitDetection(){
 }
 
 void Game::updateCameraPosition(SDL_Renderer* target){
-
-
     if (fighters.empty()) return;
 
     /*
@@ -318,41 +314,60 @@ void Game::updateCameraPosition(SDL_Renderer* target){
         }
     }
 
+    #ifdef DEBUG
+    if (camera_debug_markers){
+        SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
+        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), fighters_box.right - fighters_box.left, fighters_box.top - fighters_box.bottom};
+        SDL_RenderDrawRect(target, &fbrect);
+
+    }
+    #endif
+
+    fighters_box.top += game_constants_calc.camera_offset_yreal;
+    fighters_box.bottom += game_constants_calc.camera_offset_yreal;
+
     Kuribrawl::Vector mid_pos = {
         (fighters_box.right - fighters_box.left) / 2 + fighters_box.left,
-        (fighters_box.top - fighters_box.bottom) / 2 + fighters_box.bottom
+        (fighters_box.top - fighters_box.bottom) / 2 + fighters_box.bottom - (SCREEN_HEIGHT / 2)
     };
 
 
-    SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
-    SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), fighters_box.right - fighters_box.left, fighters_box.top - fighters_box.bottom};
-    SDL_RenderDrawRect(target, &fbrect);
+    #ifdef DEBUG
+    if (camera_debug_markers){
+        SDL_SetRenderDrawColor(target, 0, 255, 0, 127);
+        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), fighters_box.right - fighters_box.left, fighters_box.top - fighters_box.bottom};
+        SDL_RenderDrawRect(target, &fbrect);
 
-    SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
+        SDL_SetRenderDrawColor(target, 0, 255, 0, 127);
+        SDL_Drawing::drawCross(target, camera.getXOnScreen(mid_pos.x),  camera.getYOnScreen(mid_pos.y + (SCREEN_HEIGHT / 2)), 10);
+        SDL_SetRenderDrawColor(target, 255, 255, 255, 255);
+        SDL_Drawing::drawCross(target, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10);
 
-    SDL_RenderDrawLine(target, camera.getXOnScreen(mid_pos.x - 10), camera.getYOnScreen(mid_pos.y), camera.getXOnScreen(mid_pos.x + 10), camera.getYOnScreen(mid_pos.y));
-    SDL_RenderDrawLine(target, camera.getXOnScreen(mid_pos.x), camera.getYOnScreen(mid_pos.y) - 10, camera.getXOnScreen(mid_pos.x), camera.getYOnScreen(mid_pos.y) + 10);
-
-    SDL_SetRenderDrawColor(target, 255, 255, 255, 255);
-    SDL_RenderDrawLine(target, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2 + 10, SCREEN_HEIGHT / 2);
-    SDL_RenderDrawLine(target, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 10, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 10);
+    }
+    #endif
 
     /*
     Ideas : 
     - Si on reste longtemps dans la no-move zone mais toujours du même côté (donc longtemps nettement d'un côté de l'écran), on ignore la nomove zone et on bouge la caméra
     - Hors no-move zone (fighter box trop grande), ne bouger la cam que si les fighters se rapprochent ?
     */
-    if (fighters_box.right - fighters_box.left < game_constants_calc.camera_nomove_area_size.x){
-        Kuribrawl::Rectangle current_nomove_area = {
-            camera.position.x + game_constants_calc.camera_nomove_area.left,
-            camera.position.y + game_constants_calc.camera_nomove_area.top,
-            camera.position.x + game_constants_calc.camera_nomove_area.right,
-            camera.position.y + game_constants_calc.camera_nomove_area.bottom
-        };
 
+    Kuribrawl::Rectangle current_nomove_area = {
+        camera.position.x + game_constants_calc.camera_nomove_area.left,
+        camera.position.y + game_constants_calc.camera_nomove_area.top,
+        camera.position.x + game_constants_calc.camera_nomove_area.right,
+        camera.position.y + game_constants_calc.camera_nomove_area.bottom
+    };
+
+    #ifdef DEBUG
+    if (camera_debug_markers){
         SDL_SetRenderDrawColor(target, 255, 0, 255, 255);
-        SDL_Rect fbrect {camera.getXOnScreen(current_nomove_area.left), camera.getYOnScreen(current_nomove_area.top), current_nomove_area.right - current_nomove_area.left, current_nomove_area.top - current_nomove_area.bottom};
-        SDL_RenderDrawRect(target, &fbrect);
+        SDL_Rect cnma {camera.getXOnScreen(current_nomove_area.left), camera.getYOnScreen(current_nomove_area.top), current_nomove_area.right - current_nomove_area.left, current_nomove_area.top - current_nomove_area.bottom};
+        SDL_RenderDrawRect(target, &cnma);
+    }
+    #endif
+
+    if (fighters_box.right - fighters_box.left < game_constants_calc.camera_nomove_area_size.x){
 
         int camera_movement_x = 0;
         if      (fighters_box.left < current_nomove_area.left) camera_movement_x = fighters_box.left - current_nomove_area.left;
@@ -385,6 +400,32 @@ void Game::updateCameraPosition(SDL_Renderer* target){
                 camera.position.x = mid_pos.x;
             } else {
                 camera.position.x += game_constants.camera_max_speed * Kuribrawl::sign(camera_movement_x);
+            }
+        }
+    }   
+
+    if (fighters_box.top - fighters_box.bottom < game_constants_calc.camera_nomove_area_size.y){
+
+
+        int camera_movement_y = 0;
+        if      (fighters_box.top > current_nomove_area.top) camera_movement_y = fighters_box.top - current_nomove_area.top;
+        else if (fighters_box.bottom < current_nomove_area.bottom) camera_movement_y = fighters_box.bottom - current_nomove_area.bottom;
+
+        if (abs(camera_movement_y) > game_constants.camera_max_speed){
+            camera.position.y += game_constants.camera_max_speed * Kuribrawl::sign(camera_movement_y);
+        } else {
+            camera.position.y += camera_movement_y;
+        }
+
+    } else {
+
+
+        int camera_movement_y = mid_pos.y - camera.position.y;
+        if (camera_movement_y){
+            if (abs(camera_movement_y) <= game_constants.camera_max_speed){
+                camera.position.y = mid_pos.y;
+            } else {
+                camera.position.y += game_constants.camera_max_speed * Kuribrawl::sign(camera_movement_y);
             }
         }
     }   

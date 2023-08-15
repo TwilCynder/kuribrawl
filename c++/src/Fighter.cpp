@@ -2,6 +2,7 @@
 #include "Fighter.h"
 #include "defs.h"
 #include "Util/util.h"
+#include "Util/Drawing.h"
 #include "Champion.h"
 #include "CollisionBoxes.h"
 #include "Move.h"
@@ -261,8 +262,7 @@ void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
 
     //Drawing position
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
-    SDL_RenderDrawLine(target, cam.getXOnScreen(position.x - 10), SCREEN_HEIGHT - position.y, cam.getXOnScreen(position.x + 10), SCREEN_HEIGHT - position.y);
-    SDL_RenderDrawLine(target, cam.getXOnScreen(position.x), cam.getYOnScreen(position.y - 10), cam.getXOnScreen(position.x), cam.getYOnScreen(position.y + 10));
+    SDL_Drawing::drawCross(target, cam.getXOnScreen(position.x), cam.getYOnScreen(position.y), 10);
 }
 
 void Fighter::writeDebugInfo(AdvancedTextDisplayer& out){
