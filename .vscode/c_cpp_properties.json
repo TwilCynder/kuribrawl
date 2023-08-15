@@ -4,7 +4,10 @@
             "name": "Win32 C++20",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/c++/include"
+                "${workspaceFolder}/c++/include",
+                "C:/msys64/mingw64/include/**",
+                "C:/msys64/mingw64/include",
+                "C:/msys64/mingw64/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -16,7 +19,7 @@
             "cStandard": "c11",
             "cppStandard": "gnu++20",
             "intelliSenseMode": "windows-gcc-x64",
-            "configurationProvider": "ms-vscode.makefile-tools"
+            "configurationProvider": "ms-vscode.cpptools"
         },
         {
             "name": "Ubuntu C++20",
