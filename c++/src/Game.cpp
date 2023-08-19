@@ -16,7 +16,7 @@
 #include "GameConstants.h"
 #include "Util/Drawing.h"
 
-constexpr bool camera_debug_markers = true;
+constexpr bool camera_debug_markers = false;
 
 using namespace std;
 
