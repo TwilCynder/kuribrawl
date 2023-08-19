@@ -15,6 +15,7 @@
 #include "defs.h"
 #include "GameConstants.h"
 #include "Util/Drawing.h"
+#include "Collisions.h"
 
 constexpr bool camera_debug_markers = false;
 
@@ -232,14 +233,6 @@ void Game::advanceAnimations(){
     }
 }
 
-inline bool testRectCollision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2){
-    return (x1 < x2 + w2 &&
-            x1 + w1 > x2 &&
-            y1 > y2 - h2 &&
-            y1 - h1 < y2
-    );
-}
-
 void hit(Fighter& attacker, Fighter& defender, const Hitbox& hitbox, const Hurtbox& hurtbox){
     if (attacker.hitFighter(defender, hitbox, hurtbox)){
         defender.getHit(attacker, hitbox, hurtbox);
@@ -269,7 +262,7 @@ void Game::hitDetection(){
 
                 for (hurtbox = hurtbox_vector.begin(); hurtbox != hurtbox_vector.end(); ++hurtbox){
                     
-                    if (testRectCollision(attackerPos.x + hitbox->getRealXPos(attacker->getFacing()), attackerPos.y + hitbox->y, hitbox->w, hitbox->h,
+                    if (Collision::rectangle(attackerPos.x + hitbox->getRealXPos(attacker->getFacing()), attackerPos.y + hitbox->y, hitbox->w, hitbox->h,
                         defenderPos.x + hurtbox->getRealXPos(attacker->getFacing()), defenderPos.y + hurtbox->y, hurtbox->w, hurtbox->h))
                     {
                         hit(*attacker, *defender, *hitbox, *hurtbox);
