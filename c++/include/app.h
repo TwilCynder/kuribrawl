@@ -9,13 +9,11 @@
 #include "GameData.h"
 #include "Assets.h"
 #include "GameManager.h"
+#include "PortsManager.h"
 #include "Util/Text/TextureFont.h"
 #include "Util/Text/TextDisplayer.h"
 #include "Util/StaticFullQueue.h"
 #include "KBException.h"
-
-#define NB_PORTS 4
-#define NB_CONTROLLERS 16
 
 class Port;
 class Game;
@@ -57,12 +55,7 @@ class App
     //SDL functions
     SDL_Texture* LoadTexture(const char *file);
 
-    Port* controllers[NB_CONTROLLERS];    ///<An array associating each joystick numerical id with a Port. 
-                            /**<Pointer validity : can be invalidated if a Port is deleted or moved */
-    Port* keyboard; ///<Port associated with the keyboard
-    const Uint8* keyboard_state;
-
-    Port* getFirstInactivePort();
+    PortsManager portsManager;
 
     private:
     void initSDL();
@@ -70,9 +63,9 @@ class App
     void initGameData();
     void loadRessources();
     bool loadGameFile(const char* name);
+
     void handleEvents();
     void handleButtonEvent(const SDL_JoyButtonEvent& evt);
-    void readPorts();
     void render();
 
     void startTestGame();
@@ -102,8 +95,6 @@ class App
 
     GameManager game_manager;
     //Game* current_game; 
-
-    std::vector<Port> ports; ///< Currently active Ports.
 
     //Performance test
     StaticFullQueue<Duration, 30> last_frames_wait;

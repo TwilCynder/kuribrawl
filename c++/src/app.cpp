@@ -39,16 +39,6 @@ App::App(int framerate):
 	controllers_data(std::make_unique<ControllersData>()),
 	last_frames_wait(std::numeric_limits<Duration>::max())
 {
-	ports.reserve(PORTS_NB);
-	for (int i = 0; i< PORTS_NB; i++){
-		ports.emplace_back(this, i);
-	} 
-
-	for (int i = 0; i < NB_CONTROLLERS; i++){
-		controllers[i] = nullptr;
-	}
-	keyboard = nullptr;
-
 	setFrameRate(framerate);
 }
 
@@ -76,20 +66,6 @@ ControllersData& App::controllersData(){
 
 Assets& App::assets() {
 	return assets_;
-}
-
-/**
- * @brief Returns the first \ref Port#isActive "inactive" port or nullptr if there is none.
- * 
- * @return Port* 
- */
-Port* App::getFirstInactivePort(){
-	for (unsigned int i = 0; i < ports.size(); i++){
-		if (!ports[i].isActive()){
-			return &ports[i];
-		}
-	}
-	return nullptr;
 }
 
 /**
@@ -127,7 +103,6 @@ void App::initSDL(){
 
 	SDL_JoystickEventState(SDL_ENABLE);
 	SDL_GameControllerEventState(SDL_ENABLE);
-	keyboard_state = SDL_GetKeyboardState(nullptr);
 }
 
 /**
@@ -237,24 +212,7 @@ void App::render(){
  */
 
 void App::handleButtonEvent(const SDL_JoyButtonEvent& evt){
-	Port* port = controllers[evt.which];
-	Debug::log(evt.button);
-	if (port != nullptr && port->isActive()){
-		port->handleJoystickButtonPress(evt.button);
-	}
-}
-
-/**
- * @brief Handle input reading for all Ports
- * Calls the input reading method of all active Ports.
- */
-
-void App::readPorts(){
-	for (unsigned int i = 0; i < ports.size(); i++){
-		if (ports[i].isActive()){
-			ports[i].readController();
-		}
-	}
+	portsManager.handleButtonEvent(evt);
 }
 
 void App::print_report(Logger& out){
@@ -331,9 +289,7 @@ void App::handleEvents(){
 						setFrameRate(framerate + 5);
 						break;
 					default:
-						if (keyboard && !event.key.repeat)
-							keyboard->handleButtonPress(event.key.keysym.scancode);
-						break;
+						portsManager.handleKeyEvent(event.key);
 				}
 				break;
 			default:
@@ -417,7 +373,7 @@ void App::loop() try {
 
 		if ((!paused || advance)){
 			advance = false;
-			readPorts();
+			portsManager.readPorts();
 			SDLHelper::prepareRender(renderer);
 			if (game_manager.get() && game_manager->is_running()){
 				game_manager->step(renderer);

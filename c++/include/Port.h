@@ -15,6 +15,7 @@
 class App;
 class Binding;
 class ControllersData;
+class PortsManager;
 
 class Port {
     public:
@@ -38,7 +39,7 @@ class Port {
         INVALID
     };
 
-    Port(App* app_, int id);
+    Port(PortsManager& pm_, int id);
 
     bool isActive() const;
     void plugController(int id, ControllersData& cd);
@@ -77,7 +78,8 @@ class Port {
     bool initButtonMapping();
     void unregisterController();
 
-    App* app;   ///< The app that opened this Port
+    //App* app;   ///< The app that opened this Port
+    PortsManager& ports_manager;
 
     int id; /** Index in the \ref app#ports "port vector" */
 

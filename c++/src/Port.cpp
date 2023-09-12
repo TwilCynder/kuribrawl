@@ -6,13 +6,14 @@
 #include "Binding.h"
 #include "ControllersData.h"
 #include "controllerElements.h"
+#include "PortsManager.h"
 #include "defs.h"
 
 #define MAPPING_NORMAL_SIZE 32
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
 
-Port::Port(App* app_, int id_) :
-    app(app_),
+Port::Port(PortsManager& pm_, int id_) :
+    ports_manager(pm_),
     id(id_),
     active(false),
     controller(nullptr),
@@ -202,8 +203,8 @@ void Port::readController(){
 ///SDL GAMECONTROLLER
 signed char Port::getDpadStateX() const{
     if (isKeyboard){
-        return app->keyboard_state[current_controller_layout->direction_buttons.left] ? -1 : 
-        (app->keyboard_state[current_controller_layout->direction_buttons.right] ? 1 : 0); 
+        return ports_manager.keyboard_state[current_controller_layout->direction_buttons.left] ? -1 : 
+        (ports_manager.keyboard_state[current_controller_layout->direction_buttons.right] ? 1 : 0); 
     }
     return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) ? -1 : 
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) ? 1 : 0);
