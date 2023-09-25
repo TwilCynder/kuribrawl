@@ -310,7 +310,7 @@ void Game::updateCameraPosition(SDL_Renderer* target){
     #ifdef DEBUG
     if (camera_debug_markers){
         SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
-        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), fighters_box.right - fighters_box.left, fighters_box.top - fighters_box.bottom};
+        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), (int)fighters_box.right - fighters_box.left, (int)fighters_box.top - fighters_box.bottom};
         SDL_RenderDrawRect(target, &fbrect);
 
     }
