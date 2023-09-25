@@ -218,8 +218,8 @@ signed char Port::getDpadStateX() const{
 ///SDL GAMECONTROLLER
 signed char Port::getDpadStateY() const{
     if (isKeyboard){
-        return app->keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
-        (app->keyboard_state[current_controller_layout->direction_buttons.down] ? 1 : 0); 
+        return ports_manager.keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
+        (ports_manager.keyboard_state[current_controller_layout->direction_buttons.down] ? 1 : 0); 
     }
     return SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) ? 1 : 
         (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
@@ -288,7 +288,7 @@ bool Port::plugController_(int controller_id){
     if (controller_id == JOSTICKID_KEYBOARD){
         //REGISTERING CONTROLLER (see below)
         joystick_id = JOSTICKID_KEYBOARD;
-        app->keyboard = this;
+        ports_manager.keyboard = this;
     } else {
         if (controller) SDL_GameControllerClose(controller);
 
@@ -315,7 +315,7 @@ bool Port::plugController_(int controller_id){
          * @todo remplacer le système de app->controllers[] par celui de player-index de SDL 
          */
         joystick_id = instance_id;
-        app->controllers[instance_id] = this;
+        ports_manager.controllers[instance_id] = this;
         
         //STORING THE BUTTON MAPPING
         if (!initButtonMapping()){
@@ -359,9 +359,9 @@ void Port::setFighter(PlayerFighter* fighter_){
 
 void Port::unregisterController(){
     if (active){
-        if (joystick_id == JOSTICKID_KEYBOARD) app->keyboard = nullptr;
+        if (joystick_id == JOSTICKID_KEYBOARD) ports_manager.keyboard = nullptr;
         else
-            app->controllers[joystick_id] = nullptr;
+            ports_manager.controllers[joystick_id] = nullptr;
     }
 }
 
