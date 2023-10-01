@@ -5,7 +5,7 @@
 PortsManager::PortsManager(){
     ports.reserve(PORTS_NB);
     for (int i = 0; i< PORTS_NB; i++){
-        ports.emplace_back(this, i);
+        ports.emplace_back(*this, i);
     } 
 
     for (int i = 0; i < NB_CONTROLLERS; i++){
@@ -44,4 +44,19 @@ void PortsManager::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 void PortsManager::handleKeyEvent(const SDL_KeyboardEvent &evt){
     if (keyboard && !evt.repeat)
         keyboard->handleButtonPress(evt.keysym.scancode);
+}
+
+void PortsManager::plugController(uint8_t portID, uint8_t controller, ControllersData& cdata){
+	if (portID >= PORTS_NB){
+		throw KBFatal("Attemp to plug controller in port %d, which is above the maximum (%d)", portID, PORTS_NB);
+	}
+
+	ports[portID].plugController(controller, cdata);
+}
+
+const Port* PortsManager::getPort(uint8_t id) const {
+	if (id >= PORTS_NB){
+		throw KBFatal("Attemp to access port %d, which is above the maximum (%d)", id, PORTS_NB);
+	}
+	return &ports[id];
 }

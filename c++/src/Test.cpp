@@ -10,8 +10,8 @@
 
 void App::startTestGame(){
 	Debug::log("=====Starting game=====");
-	
-	ports[0].plugController(0, this->controllersData());
+
+	portsManager.plugController(0, 0, this->controllersData());
 	
 	Champion* acid = game_data->getChampion("acid");
 	const StageModel* testStage = game_data->getStage("testStage");
@@ -21,7 +21,7 @@ void App::startTestGame(){
 	GameConfiguration config;
 	config.addPlayer(nullptr, *acid);
 	config.addPlayer(nullptr, *acid);
-	config.addPlayer(&ports[0], *acid);
+	config.addPlayer(portsManager.getPort(0), *acid);
 	config.setStage(testStage);
 
 	Game& game = game_manager.start(config);

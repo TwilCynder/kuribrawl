@@ -10,7 +10,7 @@
  * @param element_type_ 
  * @param data_ 
  */
-RegisteredInput::RegisteredInput(Input input_, Port* port_, int element_ = -1, ElementType element_type_ = ElementType::UNKNOWN, int data_ = 0) : 
+RegisteredInput::RegisteredInput(Input input_, const Port* port_, int element_ = -1, ElementType element_type_ = ElementType::UNKNOWN, int data_ = 0) : 
     input(input_),
     port(port_),
     element(element_),

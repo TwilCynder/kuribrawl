@@ -40,7 +40,7 @@ class PlayerFighter : public Fighter {
     using StickBuffer = StaticFullQueue<int, CONTROL_STICK_FRAME_BUFFER>;
 
     //Port
-    Port* getPort() const;
+    const Port* getPort() const;
     void setPort(Port* port);
     void unsetPort();
     Binding* getInputBinding() const;
@@ -67,7 +67,7 @@ class PlayerFighter : public Fighter {
 	jumpY decideGroundedJumpYType() const override;
     jumpX decideJumpXType() const override;
 
-    Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
+    const Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
     ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port; ///< Indicates that this playerfighter has a valid port. If this is false, NO port-related feature and more importantly pointer should be used.

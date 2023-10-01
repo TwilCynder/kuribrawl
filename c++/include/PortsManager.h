@@ -12,7 +12,9 @@ class PortsManager {
 
     void initSDL();
 
+    void plugController(uint8_t portID, uint8_t controller, ControllersData&);
     void readPorts();
+
 
     void handleButtonEvent(const SDL_JoyButtonEvent& evt);
     void handleKeyEvent(const SDL_KeyboardEvent & evt);
@@ -23,5 +25,6 @@ class PortsManager {
     
     const Uint8* keyboard_state;
 
-    Port* getFirstInactivePort();
+    const Port* getPort(uint8_t id) const;
+    const Port* getFirstInactivePort();
 };

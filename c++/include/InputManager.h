@@ -14,7 +14,7 @@ class InputManager {
     public:
     InputManager(PlayerFighter*);
 
-    void registerInput(Input input, Port* port, int element, ElementType element_type, int data = 0);
+    void registerInput(Input input, const Port* port, int element, ElementType element_type, int data = 0);
     void updateInputs();
 
     //Debug

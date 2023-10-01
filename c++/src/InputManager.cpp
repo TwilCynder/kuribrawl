@@ -23,7 +23,7 @@ InputManager::InputManager(PlayerFighter* f) :
  * @param element_type
  * @param data
  */
-void InputManager::registerInput(Input input, Port* port, int element, ElementType element_type, int data){
+void InputManager::registerInput(Input input, const Port* port, int element, ElementType element_type, int data){
     inputQ.push_back(RegisteredInput(input, port, element, element_type, data));
 }
 

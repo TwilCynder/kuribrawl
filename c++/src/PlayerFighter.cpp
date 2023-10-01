@@ -62,7 +62,7 @@ void PlayerFighter::initPortOptimizationData(PortOptimizationData& pod) const {
  *
  * @return Port*
  */
-Port* PlayerFighter::getPort() const {
+const Port* PlayerFighter::getPort() const {
     return port;
 }
 

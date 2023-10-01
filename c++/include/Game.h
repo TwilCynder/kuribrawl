@@ -28,7 +28,7 @@ class Game {
     void applyConfig(GameConfiguration&);
     PlayerFighter* addFighter(Champion* model);
     PlayerFighter* addFighter(Champion* model, int x, int y);
-    PlayerFighter* addFighter(Champion* model, int x, int y, Port& port);
+    PlayerFighter* addFighter(Champion* model, int x, int y, const Port& port);
     bool is_running();
 
     //main loop
