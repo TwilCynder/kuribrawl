@@ -17,7 +17,7 @@ The game itself (and its source code) is located in the `c++` directory. It is w
 
 ### Tools
 
-Kuribrawl also comes with two tools, used to manage game files and data. They are **not** located in the same repository, but in a separate repository called [`kuribrawl-tools`](https://github.com/TwilCynder/kuribrawl-tools), which is a Git submodule (a repository *integrated* to another repo as a component) of this repo. To obtain it (and integrate it correctly into this repo) : 
+Kuribrawl also comes with two tools, used to manage game files and data. These are **not** located in the same repository, but in a separate repository called [`kuribrawl-tools`](https://github.com/TwilCynder/kuribrawl-tools), which is a Git submodule (a repository *integrated* to another repo as a component) of this repo. To obtain it (and integrate it correctly into this repo) : 
 - If you are using Git and haven't cloned this repo, specifying `--recurse-submodule` when you do (`git clone https://github.com/TwilCynder/kuribrawl --recurse-submodules`)
 - If you already cloned, run `git submodule update --init`, `git pull` and then `git submodule update --recursive`.  
 - If you are not using Git an downloaded the code as an archive, simply download [`kuribrawl-tools`](https://github.com/TwilCynder/kuribrawl-tools) as well and place it in the root directory of this repo, under the name `tools`. 

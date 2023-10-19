@@ -20,12 +20,16 @@ In any case, you will first have to navigate to the `c++` subdirectory.
 You will need a C++ compiler that supports C++20, and a way to manage the external dependencies. We recommend using the MinGW/MSYS environment.
 
 ### Using MinGW/MSYS
-Install the 64 or 32 bits version from the [MSYS website](https://www.msys2.org/) depending on your system.  
+Install the 64 or 32 bits version from the [MSYS website](https://www.msys2.org/) depending on your system.
 
-Run the MSYS terminal and update your system :  
+If you know about MSYS environments, pick the one you prefer, the supported environments are Mingw64 and UCRT64 (Clang might be in the future, MSYS doesn't have the required libraries)
+If you don't, use the MINGW64 Terminal (located in the msys installation directory).  
+
+Run the terminal (according to the environment you chose) and update your system :  
 `pacman -Syu`  
 then navigate to the c++ directory in the kuribrawl repository, and install the required dependencies by running : 
-`pacman -S --needed - < pkglist.txt`
+- `./dependencies.sh | pacman -S --needed -` if you are using MINGW64
+- `./dependencies.sh UCRT | pacman -S --needed -` if you are using UCRT64  
 
 Once the packages are installed, running `make` in this directory will compile and build the executable (`kuribrawl.exe`). It must be launched from the MinGW terminal !  
 

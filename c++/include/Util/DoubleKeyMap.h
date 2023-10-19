@@ -112,6 +112,7 @@ namespace Kuribrawl {
     };
 
     template <typename K1, typename K2, typename V, typename _Key, template <typename T1, typename T2> typename _Refpair> 
+        requires ValidDoubleKeyMapTypeArguments<K1, K2, V, _Key, _Refpair>
     struct __DoubleKeyMap<K1, K2, V, _Key, _Refpair>::DoubleKeyRange : public __DoubleKeyMap<K1, K2, V, _Key, _Refpair>{
         auto begin(){
             return tbegin();
