@@ -22,7 +22,7 @@ You will need a C++ compiler that supports C++20, and a way to manage the extern
 ### Using MinGW/MSYS
 Install the 64 or 32 bits version from the [MSYS website](https://www.msys2.org/) depending on your system.
 
-If you know about MSYS environments, pick the one you prefer, the supported environments are Mingw64 and UCRT64 (Clang might be in the future, MSYS doesn't have the required libraries)
+If you know about MSYS environments, pick the one you prefer, the supported environments are Mingw64 and UCRT64 (Clang might be in the future, MSYS doesn't have the required libraries)  
 If you don't, use the MINGW64 Terminal (located in the msys installation directory).  
 
 Run the terminal (according to the environment you chose) and update your system :  
@@ -33,7 +33,10 @@ then navigate to the c++ directory in the kuribrawl repository, and install the 
 
 Once the packages are installed, running `make` in this directory will compile and build the executable (`kuribrawl.exe`). It must be launched from the MinGW terminal !  
 
-- `make release` will copy all the files needed to run the game (from the terminal) in the `release` directory.  
+- `make release` will copy all the files needed to run the game (from the terminal) in the `release` directory.   
+
+#### Side note : VSCode C++ Intellisense
+Note that the Visual Studio Code C/C++ configuration file included in the repo relies on an environment variable named "msys_dir" to find the compiler and includePath's. You'll need to set this environment variable for C++ Intellisense to work in the Windows configuration.  
 
 # Tools
 The Kuribrawl project includes the game itself as well as several smaller programs (more information on that coming soon). These programs are located in a submodule repository, under the name `tools`. If you did not use git to obtain the source, or did not clone the submodules, you need to either install the submodule with `git submodule update --init`, or download it at `https://gitlab.com/TwilCynder/kuribrawl-tools`
@@ -63,6 +66,8 @@ Simply run the `build.sh` script. It will build the application in the form of a
 The `-r` option implies `-s` and copies the jar to the `release` directory. Only works if the `kuribrawl-tools` directory is located directly in the `kuribrawl` directory.
 
 ## Datafile Maker
-More information can be found in [the root readme](../../README.md) and the [DFM readme](../../tools/gamefile%20manager/readme.md). 
 
-It written in Purebasic 
+The Datafile Maker is compiled using [PureBasic](https://www.purebasic.com/). The only thing you actually need to compile is `pbcompiler`, but the simplest way to obtain it is to install PureBasic as a whole.  
+To compile, you can use `make`, or enter the command manually : `pbcompiler src/dataFileMaker.pb -e $(OUT) //CONSOLE`.  
+
+`make copy` can be used to copy the executable in the `res` dir for ease of use, meaning you can just open a terminal there and run `./DFM`.  
