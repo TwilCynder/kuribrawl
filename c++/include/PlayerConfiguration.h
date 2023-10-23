@@ -7,9 +7,9 @@ using PortRef = Port*; //to switch easily between * and &
 using ConstPortRef = const Port*;
 struct PlayerConfiguration{
 
-    ConstPortRef port;
+    PortRef port;
     Champion& champion;
 
     public:
-    PlayerConfiguration(ConstPortRef, Champion&);
+    PlayerConfiguration(PortRef, Champion&);
 };

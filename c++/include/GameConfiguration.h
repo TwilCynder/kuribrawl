@@ -13,6 +13,6 @@ struct GameConfiguration{
     GameConfiguration();
     GameConfiguration(GameConfiguration&) = default;
     
-    void addPlayer(ConstPortRef, Champion&);
+    void addPlayer(PortRef, Champion&);
     void setStage(const StageModel*);
 };

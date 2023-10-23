@@ -101,6 +101,8 @@ void App::initSDL(){
 		throw KBFatal(Kuribrawl::formatString("Failed to create renderer: %s\n", SDL_GetError()));
 	}
 
+	portsManager.initSDL();
+
 	SDL_JoystickEventState(SDL_ENABLE);
 	SDL_GameControllerEventState(SDL_ENABLE);
 }

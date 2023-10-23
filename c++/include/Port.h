@@ -42,7 +42,7 @@ class Port {
     Port(PortsManager& pm_, int id);
 
     bool isActive() const;
-    void plugController(int id, ControllersData& cd);
+    void plugController(int8_t id, ControllersData& cd);
     void setFighter(PlayerFighter*);
     void initOptimizationData();
     void deactivate();
@@ -74,7 +74,7 @@ class Port {
     using ButtonsMapping = std::vector<SDL_GameControllerButton>;
 
     private:
-    bool plugController_(int id);
+    bool plugController_(int8_t id);
     bool initButtonMapping();
     void unregisterController();
 

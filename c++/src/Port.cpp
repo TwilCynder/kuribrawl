@@ -8,6 +8,7 @@
 #include "controllerElements.h"
 #include "PortsManager.h"
 #include "defs.h"
+#include "KBDebug/Debug.h"
 
 #define MAPPING_NORMAL_SIZE 32
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
@@ -22,6 +23,7 @@ Port::Port(PortsManager& pm_, int id_) :
     control_stick{0, 0},
     current_dpad_state{0, 0}
 {
+    Debug::out << "Constructed Port " << id << '\n';
 }
 
 bool Port::isActive() const{
@@ -218,6 +220,7 @@ signed char Port::getDpadStateX() const{
 ///SDL GAMECONTROLLER
 signed char Port::getDpadStateY() const{
     if (isKeyboard){
+        Debug::out << (int)current_controller_layout->direction_buttons.up << '\t' << (int)ports_manager.keyboard_state[current_controller_layout->direction_buttons.up] << "\t" << (int)SDL_SCANCODE_W << '\n';
         return ports_manager.keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
         (ports_manager.keyboard_state[current_controller_layout->direction_buttons.down] ? 1 : 0); 
     }
@@ -282,8 +285,11 @@ bool Port::initButtonMapping(){
  * @param id numerical ID given by the OS to the controller, or -1 for the keyboard
  * @returns false if a problem occured (in which case the port remains inactive), true otherwise
  */
-bool Port::plugController_(int controller_id){
+bool Port::plugController_(int8_t controller_id){
     unregisterController();
+
+    Debug::log("Plug Conroller");
+    Debug::log(controller_id);
 
     if (controller_id == JOSTICKID_KEYBOARD){
         //REGISTERING CONTROLLER (see below)
@@ -325,6 +331,8 @@ bool Port::plugController_(int controller_id){
 
         Debug::out << "Controller plugged ( " << controller_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
     }
+
+    Debug::log(this);
     active = true;
     return true;
 }
@@ -335,7 +343,7 @@ bool Port::plugController_(int controller_id){
  * @param id the index of the controller
  * @param cd the ControllersData object that will be used to obtain a ControllerType
  */
-void Port::plugController(int id, ControllersData& cd){
+void Port::plugController(int8_t id, ControllersData& cd){
     plugController_(id);
 
     if (isKeyboard){

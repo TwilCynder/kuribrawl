@@ -46,7 +46,7 @@ void PortsManager::handleKeyEvent(const SDL_KeyboardEvent &evt){
         keyboard->handleButtonPress(evt.keysym.scancode);
 }
 
-void PortsManager::plugController(uint8_t portID, uint8_t controller, ControllersData& cdata){
+void PortsManager::plugController(uint8_t portID, int8_t controller, ControllersData& cdata){
 	if (portID >= PORTS_NB){
 		throw KBFatal("Attemp to plug controller in port %d, which is above the maximum (%d)", portID, PORTS_NB);
 	}
@@ -54,9 +54,9 @@ void PortsManager::plugController(uint8_t portID, uint8_t controller, Controller
 	ports[portID].plugController(controller, cdata);
 }
 
-const Port* PortsManager::getPort(uint8_t id) const {
+Port* PortsManager::getPort(uint8_t id) {
 	if (id >= PORTS_NB){
 		throw KBFatal("Attemp to access port %d, which is above the maximum (%d)", id, PORTS_NB);
-	}
+	}	
 	return &ports[id];
 }

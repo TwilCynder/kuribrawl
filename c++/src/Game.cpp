@@ -127,7 +127,7 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y){
  * @param port the port being used to control this PlayerFighter.
  * @return Fighter* the Fighter created (and added).
  */
-PlayerFighter* Game::addFighter(Champion* model, int x, int y, const Port& port){
+PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y, port);
 

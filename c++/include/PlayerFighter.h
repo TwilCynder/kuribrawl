@@ -24,7 +24,7 @@ class PlayerFighter : public Fighter {
 
     PlayerFighter(Game&, Champion* model_);
     PlayerFighter(Game&, Champion* model_, int x, int y);
-    PlayerFighter(Game&, Champion* model_, int x, int y, const Port& port);
+    PlayerFighter(Game&, Champion* model_, int x, int y, Port& port);
     ~PlayerFighter();
 
     //Input handling

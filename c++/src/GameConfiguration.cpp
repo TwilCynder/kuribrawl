@@ -4,7 +4,7 @@ GameConfiguration::GameConfiguration()
 {
 }
 
-void GameConfiguration::addPlayer(ConstPortRef port, Champion& champion){
+void GameConfiguration::addPlayer(PortRef port, Champion& champion){
     players.emplace_back(port, champion);
 }
 

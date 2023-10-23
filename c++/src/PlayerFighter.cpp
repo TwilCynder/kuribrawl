@@ -33,7 +33,7 @@ PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
     init_control_stick_buffer();
 }
 
-PlayerFighter::PlayerFighter(Game& game, Champion* model_, int x, int y, const Port& port):
+PlayerFighter::PlayerFighter(Game& game, Champion* model_, int x, int y, Port& port):
     PlayerFighter(game, model_, x, y)
 {
     port.setFighter(this);

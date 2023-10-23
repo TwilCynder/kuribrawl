@@ -1,7 +1,9 @@
 EXEC = kuribrawl
 
 ifdef RELEASE
-	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=gnu++2a -O3
+	CFLAGS = `sdl2-config --cflags` -Wall -Iinclude -std=gnu++2a -O3 -DSPEEDUP=1
+else ifdef BENCHMARK
+	CFLAGS = `sdl2-config --cflags` -Wall -O3 -Iinclude -std=gnu++2a -DDEBUG=1 -DSPEEDUP=1
 else
 	CFLAGS = `sdl2-config --cflags` -Wall -g -Iinclude -std=gnu++2a -DDEBUG=1
 endif 
