@@ -1,6 +1,8 @@
 ## New
-En gros on a toujorus un problème de reconnaissance des manettes. On utilise actuallement le système de mapping de SDL qui est pas très pratique a utiliser mais très pratique une fois utilisé. L'idéal serait de pouvoir mixer les deux. Pour ça on pourrait avoir une classe controllerManager, qui encapsule toute la partie events et requete d'état de manette, et aurait 2 fonctionnements, soit SDL_GameController soit SDL_Joystick avec un mapping custom. 
+En gros on a toujorus un problème de reconnaissance des manettes. On utilise actuellement le système de mapping de SDL qui est pas très pratique a utiliser mais très pratique une fois utilisé. L'idéal serait de pouvoir mixer les deux. Pour ça on pourrait avoir une classe controllerManager, qui encapsule toute la partie events et requete d'état de manette, et aurait 2 fonctionnements, soit SDL_GameController soit SDL_Joystick avec un mapping custom. 
 
+Voir si c'est même possible de connecter certaines manettes en mode JS et d'autres en mode Controller.  
+Voir aussi le vieux bug des events bouton joysticks  
 
 ## Old
 REMPLACER LES FIGHTER* DES INPUT HANDLERS PAR DES PLAYERFIGHTER* (fait)
