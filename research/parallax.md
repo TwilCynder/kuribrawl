@@ -134,3 +134,10 @@ On est dans une hypothèse de jeu sans zoom/dézoom, c'est à dire que les élé
 Afin de simplifier, on décide donc, puisque la distance entre bgauche et bdroite ne changera jamais, que l'unité de distance dans notre repère est telle que |bgauche.x - bdroite.x| == W. Ainsi, un point p de la projection est affiché à la position (en pixels) |p.x - bgauche.x|.  
 
 On sait maintenant comment sont affichés les objets et distances de P0 sur l'écran, au travers du modèle de la caméra (l'écran étant la projection de la caméra sur P0). L'idée du parallax est d'introduire d'autres plans de décor (rappel : tout plan de décor est perpendiculaire à C.dd, donc parallèle à P0) ; il nous faut définir à quelle position sur l'écran sont affichés les objets situés sur ces autres plans de décor.  
+
+# Implémentation
+Drawer déjà fait, voir pour la gestion de composants statiques/dynamiques dans la profondeur.  
+
+Idéalement : 
+- Chaque drawable a une profondeur (statique), un layer et un order (dynamiques)
+- Le drawable est une map de listes, qui sont retriées à chaque frame
