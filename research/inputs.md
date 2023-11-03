@@ -4,6 +4,8 @@ En gros on a toujorus un problème de reconnaissance des manettes. On utilise ac
 Voir si c'est même possible de connecter certaines manettes en mode JS et d'autres en mode Controller.  
 Voir aussi le vieux bug des events bouton joysticks  
 
+niveau mapping d'inputs, mettre une commande pour marcher ? (un bouton qui ferait marcher au lieu de dash quand appuyé)
+
 ## Old
 REMPLACER LES FIGHTER* DES INPUT HANDLERS PAR DES PLAYERFIGHTER* (fait)
 
