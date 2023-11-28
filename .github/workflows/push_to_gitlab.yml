@@ -3,6 +3,8 @@ name: Push to Gitlab
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:
+
 
 jobs:
   push:
@@ -21,5 +23,5 @@ jobs:
         echo Starting to push repo to gitlab
         git config user.name "TwilCynder"
         git config user.email "twilcynder@gmail.com"
-        git remote set-url origin "https://oauth2:${token}@gitlab.com/TwilCynder/kuribrawl.git"
+        git remote set-url origin "https://oauth2:${token}@gitlab.com/TwilCynder/kuribrawl-tools.git"
         git push origin master
