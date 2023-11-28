@@ -24,4 +24,5 @@ jobs:
         git config user.name "TwilCynder"
         git config user.email "twilcynder@gmail.com"
         git remote set-url origin "https://oauth2:${token}@gitlab.com/TwilCynder/kuribrawl-tools.git"
+        git pull origin master
         git push origin master
