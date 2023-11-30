@@ -14,7 +14,8 @@ class InputManager {
     public:
     InputManager(PlayerFighter*);
 
-    void registerInput(Input input, const Port* port, int element, ElementType element_type, int data = 0);
+    void registerInput(Input input, int element, ElementType element_type, int data);
+    void registerInput(Input input, int element, ElementType element_type = ElementType::UNKNOWN, Kuribrawl::Direction direction = Kuribrawl::Direction::NONE, int data = 0);
     void updateInputs();
 
     //Debug

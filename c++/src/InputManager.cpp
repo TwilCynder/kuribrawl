@@ -23,8 +23,13 @@ InputManager::InputManager(PlayerFighter* f) :
  * @param element_type
  * @param data
  */
-void InputManager::registerInput(Input input, const Port* port, int element, ElementType element_type, int data){
-    inputQ.push_back(RegisteredInput(input, port, element, element_type, data));
+void InputManager::registerInput(Input input, int element, ElementType element_type, int data){
+    inputQ.push_back(RegisteredInput(input, element, element_type, Kuribrawl::Direction::NONE, data));
+}
+
+void InputManager::registerInput(Input input, int element, ElementType element_type, Kuribrawl::Direction direction, int data)
+{
+    inputQ.push_back(RegisteredInput(input, element, element_type, direction, data));
 }
 
 /**

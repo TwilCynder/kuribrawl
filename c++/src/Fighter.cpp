@@ -534,7 +534,7 @@ Fighter::State Fighter::getState() const {
  */
 
 void Fighter::setState(const Fighter::State s, int facing_, int info, bool update_anim_){
-    Debug::log(s, *this);
+    //Debug::log(s, *this);
     state = s;
     state_info = info;
     update_anim = update_anim_;

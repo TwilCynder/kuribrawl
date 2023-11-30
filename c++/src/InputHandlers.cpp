@@ -35,7 +35,6 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 }
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
-
     using MoveID = Champion::DefaultMoves;
     DirectionIG direction;
     MoveID moveID;
@@ -43,9 +42,13 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
         return InputHandlerResult::DISMISSED;
     }
 
-    if (!grounded){
+    Debug::log("ATTACK INPUT");
+    Debug::log((int)input.direction);
+    Debug::log((int)Kuribrawl::DirectionToDirectionIG(input.direction, facing));
 
-        direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
+    if (!grounded){
+        direction = Kuribrawl::DirectionToDirectionIG(input.direction, facing);
+        //direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
 
         switch (direction){
             case DirectionIG::NONE:

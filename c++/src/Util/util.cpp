@@ -27,7 +27,7 @@ void Kuribrawl::substractValue(double* v1, double v2){
 }
 
 Kuribrawl::DirectionIG Kuribrawl::DirectionToDirectionIG(Kuribrawl::Direction direction, int facing){
-    return (facing == -1 && (int)direction % 2 == 0) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
+    return (facing == -1 && (direction == Direction::LEFT || direction == Direction::RIGHT)) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
 }
 
 Direction Kuribrawl::getDirection4(const Vector& stick_state, int threshold){

@@ -220,7 +220,6 @@ signed char Port::getDpadStateX() const{
 ///SDL GAMECONTROLLER
 signed char Port::getDpadStateY() const{
     if (isKeyboard){
-        Debug::out << (int)current_controller_layout->direction_buttons.up << '\t' << (int)ports_manager.keyboard_state[current_controller_layout->direction_buttons.up] << "\t" << (int)SDL_SCANCODE_W << '\n';
         return ports_manager.keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
         (ports_manager.keyboard_state[current_controller_layout->direction_buttons.down] ? 1 : 0); 
     }

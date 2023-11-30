@@ -9,6 +9,7 @@
 #define checkNull(value, exception) if (!value) {throw exception;}
 
 namespace Kuribrawl {
+    //ajouter NEUTRAL (actuellement NONE est utilisé, mais mtn NONE devrait vouloir dire non-spécifié)
     enum class Direction {
         RIGHT,
         UP,
