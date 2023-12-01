@@ -266,10 +266,11 @@ void App::handleEvents(){
 				stop();
 				break;
 			case SDL_JOYBUTTONDOWN:
+				
 				handleButtonEvent(event.jbutton);
 				break;
 			case SDL_CONTROLLERAXISMOTION:
-				Debug::log("lol");
+				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.scancode){
 					case SDL_SCANCODE_ESCAPE:

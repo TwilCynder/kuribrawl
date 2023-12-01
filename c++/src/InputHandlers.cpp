@@ -31,7 +31,7 @@ int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
         }
         return InputHandlerResult::HANDLED;
     }
-    return InputHandlerResult::DISMISSED;
+    return InputHandlerResult::HANDLED;
 }
 
 int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
