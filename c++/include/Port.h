@@ -33,12 +33,6 @@ class Port {
         void updatePrevious();
     };
 
-    enum class SDLMode {
-        JOYSTICK,
-        GAMECONTROLLER,
-        INVALID
-    };
-
     Port(PortsManager& pm_, int id);
 
     bool isActive() const;

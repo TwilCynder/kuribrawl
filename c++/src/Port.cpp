@@ -55,7 +55,7 @@ inline void Port::handleButtonPress(Uint8 cbutton){
     fighter->handleButtonPress(cbutton);
 }
 
-///SDL GAMECONTROLLER
+//SDL GAMECONTROLLER
 bool Port::isJoystickButtonPressed(int button) const{
     if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
 	return SDL_JoystickGetButton(joystick, button);
@@ -66,7 +66,7 @@ bool Port::isButtonPressed(int button) const {
 	return SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)button);
 }
 
-///SDL GAMECONTROLLER
+//SDL GAMECONTROLLER
 
 /**
  * @brief DEPRECATED Checks if a trigger is pressed
@@ -163,7 +163,7 @@ Sint16 getJoystickAxis(SDL_Joystick* joy, int axis){
     return (axis < 0) ? 0 : SDL_JoystickGetAxis(joy, axis);
 }
 
-///SDL GAMECONTROLLER
+//SDL GAMECONTROLLER
 void Port::readController(){
 
     control_stick.updatePrevious();
@@ -180,7 +180,7 @@ void Port::readController(){
 
             left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
             right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
-        } else {
+        } else {    
             control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
             control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
             secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
@@ -202,7 +202,7 @@ void Port::readController(){
  * -1 for left, 0 for neutral, 1 for right
  * @return Uint8 
  */
-///SDL GAMECONTROLLER
+//SDL GAMECONTROLLER
 signed char Port::getDpadStateX() const{
     if (isKeyboard){
         return ports_manager.keyboard_state[current_controller_layout->direction_buttons.left] ? -1 : 
@@ -217,7 +217,7 @@ signed char Port::getDpadStateX() const{
  * -1 for up, 0 for neutral, 1 for down
  * @return Uint8 
  */
-///SDL GAMECONTROLLER
+//SDL GAMECONTROLLER
 signed char Port::getDpadStateY() const{
     if (isKeyboard){
         return ports_manager.keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
