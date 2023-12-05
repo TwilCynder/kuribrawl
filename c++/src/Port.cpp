@@ -18,8 +18,9 @@ Port::Port(PortsManager& pm_, int id_) :
     id(id_),
     active(false),
     controller(nullptr),
-    joystick_id(-1),    
-    fighter(nullptr),    
+    joystick_id(-1),
+    fighter(nullptr),
+    control_stick{0, 0},
     current_dpad_state{0, 0}
 {
     Debug::out << "Constructed Port " << id << '\n';
@@ -137,20 +138,20 @@ bool Port::isElementPressed(ElementType type, int element, const ControllerVals&
 }
 
 const Port::StickState& Port::getControlStickState() const{
-    return elements_state.current.control_stick;
+    return control_stick;
 }
 
 
 const Port::StickState& Port::getSecondaryStickState() const{
-    return elements_state.current.secondary_stick;
+    return secondary_stick;
 }
 
 const Port::TriggerState& Port::getLeftTriggerState()  const {
-    return elements_state.current.left_trigger;
+    return left_trigger;
 }
 
 const Port::TriggerState& Port::getRightTriggerState() const {
-    return elements_state.current.right_trigger;
+    return right_trigger;
 }
 
 void Port::updateDpadState(){
@@ -429,9 +430,17 @@ void setController_GameController(int id, ControllerType* controller){
 
 */
 
-Port::ElementsState::ElementsState() :
-    control_stick{0, 0}
-    secondary_stick{0, 0},
-    left_trigger(0),
-    right_trigger(0)
-{}
+inline void Port::StickState::updatePrevious(){
+    previous_state.x = current_state.x;
+    previous_state.y = current_state.y;
+}
+
+inline void Port::TriggerState::updatePrevious(){
+    previous_state = current_state;
+}
+
+/**
+ * Note on the usual sequence of events when a PF is associated to a port
+ * - Port::setFighter is called. It can be called "manually", or by the (Game*, int, int, Port&) constructor of PF
+ * - PlayerFighter::setPort is called by Port::setFighter
+ */

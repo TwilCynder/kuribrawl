@@ -19,6 +19,19 @@ class PortsManager;
 
 class Port {
     public:
+    struct StickState {
+        Kuribrawl::Vector current_state;
+        Kuribrawl::Vector previous_state;
+
+        void updatePrevious();
+    };
+
+    struct TriggerState {
+        int previous_state;
+        int current_state;
+
+        void updatePrevious();
+    };
 
     Port(PortsManager& pm_, int id);
 
@@ -39,27 +52,6 @@ class Port {
     bool isElementPressed(ElementType type, int element) const;
     bool isElementPressed(ElementType type, int element, const ControllerVals& vals) const;
     void readController();
-
-    using DpadState = Kuribrawl::Vec2<int8_t>;
-    using StickState = Kuribrawl::Vector;
-    using TriggerState = int;
-
-    struct ElementsState {
-        StickState control_stick;
-        StickState secondary_stick; //TODO supporter plusieurs sticks secondaires ?
-        TriggerState left_trigger;
-        TriggerState right_trigger; /** TODO Supporter un nombre dynamique de triggers ? */
-        ElementsState();
-        void reset();
-    };
-
-    struct ElementsStatesTracker {
-        ElementsState current;
-        ElementsState previous;
-        void reset();
-    };
-
-
     const StickState& getControlStickState() const;
     const StickState& getSecondaryStickState() const;
     const TriggerState& getLeftTriggerState() const;
@@ -67,6 +59,7 @@ class Port {
     void updateDpadState(); //NOT USED YET
     inline signed char getDpadStateX() const;
     inline signed char getDpadStateY() const;
+    using DpadState = Kuribrawl::Vec2<int8_t>;
     const DpadState& getDpadState() const;
 
     static double normalizeStickValue(int);
@@ -97,7 +90,9 @@ class Port {
     PortOptimizationData pod;
 
     //State;
+    StickState control_stick;
+    StickState secondary_stick; //TODO supporter plusieurs sticks secondaires ?
+    TriggerState left_trigger;
+    TriggerState right_trigger; /** TODO Supporter un nombre dynamique de triggers ? */
     DpadState current_dpad_state; //NOT USED YET
-    ElementsStatesTracker elements_state;
-
 };
