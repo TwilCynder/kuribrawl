@@ -195,7 +195,7 @@ void PlayerFighter::updateDirectionControlState(){
         current_direction_control_state.x = dpad_state.x * value;
         current_direction_control_state.y = dpad_state.y * value;
     } else {
-        current_direction_control_state = port->getControlStickState().current_state;
+        current_direction_control_state = port->getControlStickState();
         if (
             input_binding->direction_control_mode == Binding::DirectionControlMode::BOTH &&
             (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < current_controller_vals.analogStickThreshold)
