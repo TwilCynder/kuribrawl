@@ -124,7 +124,7 @@ void PlayerFighter::handleTriggerPress(int trigger){
 
 void PlayerFighter::handleStickFlick(Direction direction){
     if (input_binding->second_stick != Input::NONE){
-        input_manager.registerInput(input_binding->second_stick, 0, ElementType::STICK, 1 addBitValue((int)direction, 1));
+        input_manager.registerInput(input_binding->second_stick, 0, ElementType::STICK, direction);
     }
 }
 
@@ -244,7 +244,11 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
             }
             break;
         case State::ATTACK:
-            if (!grounded) applyAirAccel(sign(current_direction_control_state.x));
+            if (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold){
+                if (!grounded){
+					applyAirAccel(sign(current_direction_control_state.x));
+				}
+            }
             break;
         case State::WALK:
             if (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold){
