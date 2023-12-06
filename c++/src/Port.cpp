@@ -20,7 +20,6 @@ Port::Port(PortsManager& pm_, int id_) :
     controller(nullptr),
     joystick_id(-1),
     fighter(nullptr),
-    control_stick{0, 0},
     current_dpad_state{0, 0}
 {
     Debug::out << "Constructed Port " << id << '\n';
@@ -138,20 +137,20 @@ bool Port::isElementPressed(ElementType type, int element, const ControllerVals&
 }
 
 const Port::StickState& Port::getControlStickState() const{
-    return control_stick;
+    return elements_state.control_stick;
 }
 
 
 const Port::StickState& Port::getSecondaryStickState() const{
-    return secondary_stick;
+    return elements_state.secondary_stick;
 }
 
 const Port::TriggerState& Port::getLeftTriggerState()  const {
-    return left_trigger;
+    return elements_state.left_trigger;
 }
 
 const Port::TriggerState& Port::getRightTriggerState() const {
-    return right_trigger;
+    return elements_state.right_trigger;
 }
 
 void Port::updateDpadState(){
@@ -166,28 +165,25 @@ Sint16 getJoystickAxis(SDL_Joystick* joy, int axis){
 //SDL GAMECONTROLLER
 void Port::readController(){
 
-    control_stick.updatePrevious();
-    secondary_stick.updatePrevious();
-    left_trigger.updatePrevious();
-    right_trigger.updatePrevious();
+    elements_state.updatePrevious();
 
     if (!isKeyboard){
         if (current_controller_layout){
-            control_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->control_stick.x);
-            control_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->control_stick.y);
-            secondary_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->secondary_stick.x);
-            secondary_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->secondary_stick.y);
+            elements_state.control_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->control_stick.x);
+            elements_state.control_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->control_stick.y);
+            elements_state.secondary_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->secondary_stick.x);
+            elements_state.secondary_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->secondary_stick.y);
 
-            left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
-            right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
+            elements_state.left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
+            elements_state.right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
         } else {    
-            control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-            control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-            secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
-            secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
+            elements_state.control_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+            elements_state.control_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+            elements_state.secondary_stick.current_state.x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
+            elements_state.secondary_stick.current_state.y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
             
-            left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
-            right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+            elements_state.left_trigger.current_state  = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
+            elements_state.right_trigger.current_state = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
         }
 
     }
@@ -430,17 +426,32 @@ void setController_GameController(int id, ControllerType* controller){
 
 */
 
-inline void Port::StickState::updatePrevious(){
+Port::StickState::StickState() : current_state{0, 0}, previous_state{0, 0} {}
+
+inline void Port::StickState::updatePrevious()
+{
     previous_state.x = current_state.x;
     previous_state.y = current_state.y;
 }
 
+Port::TriggerState::TriggerState() : current_state{0}, previous_state{0} {}
+
 inline void Port::TriggerState::updatePrevious(){
     previous_state = current_state;
 }
+
+void Port::ElementsState::updatePrevious()
+{
+    control_stick.updatePrevious();
+    secondary_stick.updatePrevious();
+    left_trigger.updatePrevious();
+    right_trigger.updatePrevious();
+}
+
 
 /**
  * Note on the usual sequence of events when a PF is associated to a port
  * - Port::setFighter is called. It can be called "manually", or by the (Game*, int, int, Port&) constructor of PF
  * - PlayerFighter::setPort is called by Port::setFighter
  */
+

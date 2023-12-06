@@ -2,7 +2,7 @@
 #include "SDL2/SDL.h"
 #include "ControllerType.h"
 
-
+#define JOSTICKID_KEYBOARD -1
 #define NB_CONTROLLERS 16
 
 class Port;
@@ -29,7 +29,7 @@ class Controller {
 
     Port* port; //port this controller is plugged in. Null if unpluged controlled.  
 
-    virtual bool isButtonPressed(int id) const;
+    bool isButtonPressed(int id) const;
 
     
 

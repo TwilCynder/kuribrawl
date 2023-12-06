@@ -51,6 +51,7 @@ namespace Kuribrawl
             x = x_;
             y = y_;
         }
+
     };
 
     template <typename T>
@@ -90,6 +91,18 @@ namespace Kuribrawl
         ArithVec2<T>& operator=(const Vec2<U>& v){
             this->x = v.x;
             this->y = v.y;
+            return *this;
+        }
+
+        ArithVec2<T>& operator=(const T& v){
+            this->x = v;
+            this->y = v;
+        }
+
+        template<typename U>
+        ArithVec2<T>& operator=(const U& v){
+            this->x = v;
+            this->y = v;
             return *this;
         }
 
