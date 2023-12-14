@@ -4,6 +4,8 @@
 
 #define NB_CONTROLLERS 16
 
+class Controller;
+
 class PortsManager {
     std::vector<Port> ports; ///< Currently active Ports.
 
@@ -26,4 +28,9 @@ class PortsManager {
 
     Port* getPort(uint8_t id);
     Port* getFirstInactivePort();
+
+    std::unique_ptr<Controller> keyboard_controller;
+    std::unique_ptr<Controller> controllers[NB_CONTROLLERS];
+
+    void removeController(int id);
 };

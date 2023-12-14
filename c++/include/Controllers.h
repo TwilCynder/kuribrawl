@@ -34,10 +34,3 @@ class Controller {
     
 
 };
-
-class ControllersManager {
-    std::unique_ptr<Controller> keyboard_controller;
-    std::unique_ptr<Controller> controllers[NB_CONTROLLERS];
-
-    void removeController(int id);
-};
