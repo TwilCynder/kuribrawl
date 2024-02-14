@@ -29,8 +29,11 @@ class PortsManager {
     Port* getPort(uint8_t id);
     Port* getFirstInactivePort();
 
-    std::unique_ptr<Controller> keyboard_controller;
-    std::unique_ptr<Controller> controllers[NB_CONTROLLERS];
+    void openController(int controller_id, ControllersData& cd);
+
+    using ControllerPtr = std::unique_ptr<Controller>;
+    ControllerPtr keyboard_controller;
+    ControllerPtr controllers[NB_CONTROLLERS];
 
     void removeController(int id);
 };

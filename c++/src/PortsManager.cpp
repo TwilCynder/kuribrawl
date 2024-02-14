@@ -1,4 +1,5 @@
 #include "PortsManager.h"
+#include "Controllers.h"
 
 #define PORTS_NB 4
 
@@ -12,6 +13,17 @@ PortsManager::PortsManager(){
 		controllers[i] = nullptr;
 	}
 	keyboard = nullptr;
+}
+
+void PortsManager::openController(int controller_id, ControllersData& cd){
+
+	auto controller_ptr = Controller::opencontroller(controller_id, cd);
+	int id = controller_ptr->getJoystickID();
+
+	ControllerPtr& current_controller = controllers[id];
+	//TODO remove that controller
+
+	controllers[id] = std::move(controller_ptr);
 }
 
 void PortsManager::initSDL()
