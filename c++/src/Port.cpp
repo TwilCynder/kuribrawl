@@ -9,6 +9,7 @@
 #include "PortsManager.h"
 #include "defs.h"
 #include "KBDebug/Debug.h"
+#include "Controllers.h"
 
 #define MAPPING_NORMAL_SIZE 32
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
@@ -16,9 +17,7 @@
 Port::Port(PortsManager& pm_, int id_) :
     ports_manager(pm_),
     id(id_),
-    active(false),
     controller(nullptr),
-    joystick_id(-1),
     fighter(nullptr),
     current_dpad_state{0, 0}
 {
@@ -26,26 +25,7 @@ Port::Port(PortsManager& pm_, int id_) :
 }
 
 bool Port::isActive() const{
-    return active;
-}
-
-const ControllerType* Port::getControllerType() const {
-    return controller_type;
-}
-
-void Port::setControllerType(const ControllerType* c){
-    controller_type = c;
-    current_controller_layout = c->getElementLayout();
-}
-
-void Port::handleJoystickButtonPress(Uint8 jbutton){
-    if (jbutton >= controller_buttons_mapping.size()){
-        return;
-    }
-    SDL_GameControllerButton cbutton = controller_buttons_mapping[jbutton];
-    if (cbutton != SDL_CONTROLLER_BUTTON_INVALID){
-        handleButtonPress(cbutton);
-    }
+    return !!controller;
 }
 
 inline void Port::handleButtonPress(Uint8 cbutton){
@@ -56,13 +36,11 @@ inline void Port::handleButtonPress(Uint8 cbutton){
 
 //SDL GAMECONTROLLER
 bool Port::isJoystickButtonPressed(int button) const{
-    if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
-	return SDL_JoystickGetButton(joystick, button);
+    //controller->IJBT
 }
 
 bool Port::isButtonPressed(int button) const {
-    if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
-	return SDL_GameControllerGetButton(controller, (SDL_GameControllerButton)button);
+    return controller->isButtonPressed(button);
 }
 
 //SDL GAMECONTROLLER
@@ -235,123 +213,20 @@ Kuribrawl::Vec2<double> Port::normalizeStickVector(Kuribrawl::Vector& value){
     return {normalizeStickValue(value.x), normalizeStickValue(value.y)};
 }
 
-/**
- * @brief Initializes controller_buttons_mapping with the current SDL Mapping for the current controller.  
- * Assumes the controller attribute is valid.
- * 
- * @return true 
- * @return false 
- */
-bool Port::initButtonMapping(){
-    size_t needed_size = MAPPING_NORMAL_SIZE;
-    
-    for (unsigned int i = 0; i < controller_buttons_mapping.size(); i++){
-        controller_buttons_mapping[i] = SDL_CONTROLLER_BUTTON_INVALID;
-    }
-
-
-    Debug::log(SDL_GameControllerMapping(controller));
-    for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++){
-        SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForButton(controller, static_cast<SDL_GameControllerButton>(i));
-        Debug::out << bind.bindType << " " << bind.value.button << " " << i << '\n';
-        if (bind.bindType == SDL_CONTROLLER_BINDTYPE_NONE) continue;
-        if (bind.bindType != SDL_CONTROLLER_BINDTYPE_BUTTON){
-            return false;
-        }
-        unsigned int jbutton = bind.value.button;
-        if (jbutton >= controller_buttons_mapping.size()){
-            controller_buttons_mapping.resize(jbutton + 1, SDL_CONTROLLER_BUTTON_INVALID);
-        }
-        if (jbutton + 1 > needed_size) needed_size = jbutton + 1;
-
-        controller_buttons_mapping[jbutton] = static_cast<SDL_GameControllerButton>(i);
-    }
-
-    if (controller_buttons_mapping.size() > needed_size){
-        controller_buttons_mapping.resize(needed_size);
-    }
-    Debug::log(controller_buttons_mapping[3]);
-    return true;
-}
 
 /**
  * @brief Binds this port to a controller (keyboard included)
- * Handles the creation of a SDL_GameController, and registers itself as the port for that joystick
  * @param id numerical ID given by the OS to the controller, or -1 for the keyboard
  * @returns false if a problem occured (in which case the port remains inactive), true otherwise
  */
-bool Port::plugController_(int8_t controller_id){
-    unregisterController();
-
-    Debug::log("Plug Conroller");
-    Debug::log(controller_id);
-
-    if (controller_id == JOSTICKID_KEYBOARD){
-        //REGISTERING CONTROLLER (see below)
-        joystick_id = JOSTICKID_KEYBOARD;
-        ports_manager.keyboard = this;
-    } else {
-        if (controller) SDL_GameControllerClose(controller);
-
-        controller = SDL_GameControllerOpen(controller_id);
-        joystick = SDL_GameControllerGetJoystick(controller);
-        SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
-
-        Debug::log("open controller");
-        Debug::log(controller);
-        Debug::log(joystick);
-
-        if (instance_id < 0) {
-            Debug::out << "Error while trying to plug controller " << controller_id << " into port " << id << " : ";
-            Debug::log(SDL_GetError());
-            controller = nullptr;
-            joystick = nullptr;
-            return false;
-        }
-
-        unregisterController();
-
-        //REGISTERING CONTROLLER (pas mis dans une fonction à part car impossible de factoriser avec la procédure pour le clavier, flemme de faire 2 fonctions)
-        /**
-         * @todo remplacer le système de app->controllers[] par celui de player-index de SDL 
-         */
-        joystick_id = instance_id;
-        ports_manager.controllers[instance_id] = this;
-        
-        //STORING THE BUTTON MAPPING
-        if (!initButtonMapping()){
-            Debug::out << "Error while trying to plug controller " << controller_id << " into port : the SDL mapping is ill-formed.\n";
-            return false;
-        }
-
-        Debug::out << "Controller plugged ( " << controller_id << ") to port " << (id + 1) << " : " << SDL_GameControllerName(controller) << '\n' << std::flush;
-    }
-
-    Debug::log(this);
-    active = true;
-    return true;
+void Port::plugController(Controller& cont, ControllersData& cd){
+    controller = &cont;
+    cont.
 }
 
-/**
- * @brief Calls Port::plugController_, and determines the ControllerType object that will be used for this Port.
- * 
- * @param id the index of the controller
- * @param cd the ControllersData object that will be used to obtain a ControllerType
- */
-void Port::plugController(int8_t id, ControllersData& cd){
-    plugController_(id);
+void Port::unplugController()
+{
 
-    if (isKeyboard){
-        setControllerType(cd.getKeyboardController());
-    } else {
-        ControllerType* ct = cd.getControllerFromMapping(SDL_GameControllerMapping(controller));
-
-        if (!ct){
-            ct = cd.getDefaultController();
-        }
-
-        setControllerType(ct);
-    }
 }
 
 void Port::setFighter(PlayerFighter* fighter_){
@@ -360,17 +235,8 @@ void Port::setFighter(PlayerFighter* fighter_){
     fighter->initPortOptimizationData(pod);
 }
 
-void Port::unregisterController(){
-    if (active){
-        if (joystick_id == JOSTICKID_KEYBOARD) ports_manager.keyboard = nullptr;
-        else
-            ports_manager.controllers[joystick_id] = nullptr;
-    }
-}
-
 void Port::deactivate(){
-    unregisterController();
-    active = false;
+    unplugController();
 }
 
 

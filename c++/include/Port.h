@@ -16,6 +16,7 @@ class App;
 class Binding;
 class ControllersData;
 class PortsManager;
+class Controller;
 
 class Port {
     public:
@@ -23,15 +24,15 @@ class Port {
     Port(PortsManager& pm_, int id);
 
     bool isActive() const;
-    void plugController(int8_t id, ControllersData& cd);
+    void plugController(Controller& cont, ControllersData& cd);
+    void unplugController();
     void setFighter(PlayerFighter*);
     void initOptimizationData();
     void deactivate();
-    void setControllerType(const ControllerType* c);
-    const ControllerType* getControllerType() const;
+
+    const Controller& getController() const;
 
     void handleButtonPress(Uint8);
-    void handleJoystickButtonPress(Uint8);
     bool isButtonPressed(int button) const;
     bool isJoystickButtonPressed(int button) const;
     bool isTriggerPressed(int trigger) const;
@@ -76,23 +77,12 @@ class Port {
     using ButtonsMapping = std::vector<SDL_GameControllerButton>;
 
     private:
-    bool plugController_(int8_t id);
-    bool initButtonMapping();
-    void unregisterController();
 
     //App* app;   ///< The app that opened this Port
     PortsManager& ports_manager;
 
     int id; /** Index in the \ref app#ports "port vector" */
-
-    //These attributes determine the behavior of the controller or keyboard. They must be set (or unset, as long as everything is valid) everytime the controller changes
-    bool active; ///< True if the controller is active ; if false, the other attributes must not be used.
-    const ControllerType* controller_type;
-    SDL_GameController* controller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
-	SDL_Joystick* joystick;
-    int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.
-    const ControllerLayout* current_controller_layout;    ///< The controller layout of the current controller, if any.
-    ButtonsMapping controller_buttons_mapping;
+    const Controller* controller;
 
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of its normal functioning.
     PortOptimizationData pod;

@@ -65,6 +65,15 @@ unique_ptr<Controller> Controller::openKeyboardController(ControllersData& cd){
     }
 }
 
+void Controller::plugToPort(Port & p)
+{
+    port = &p;
+}
+
+void Controller::unplug(){
+    port = nullptr;
+}
+
 bool Controller::isButtonPressed(int id) const
 {
     if (isKeyboard) return SDL_GetKeyboardState(nullptr)[id];
@@ -81,6 +90,30 @@ int Controller::getJoystickID() const {
     return joystick_id;
 }
 
+void Controller::handleButtonPress(Uint8 b)
+{
+    if (port){
+        port->handleButtonPress(b);
+    }
+}
+
+void Controller::handleJoystickButtonPress(Uint8 jb)
+{
+    if (jb >= controller_buttons_mapping.size()){
+        return;
+    }
+    SDL_GameControllerButton cbutton = controller_buttons_mapping[jb];
+    if (cbutton != SDL_CONTROLLER_BUTTON_INVALID){
+        handleButtonPress(cbutton);
+    }
+}
+
+/**
+ * @brief Initializes controller_buttons_mapping with the current SDL Mapping for the controller.  
+ * 
+ * @return true 
+ * @return false 
+ */
 bool Controller::initButtonMapping()
 {
         size_t needed_size = MAPPING_NORMAL_SIZE;

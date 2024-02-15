@@ -22,6 +22,9 @@ class Controller {
     static std::unique_ptr<Controller> opencontroller(int controller_id, ControllersData& cd);
     static std::unique_ptr<Controller> openKeyboardController(ControllersData& cd);
 
+    void plugToPort(Port&); //must be called ONLY by Port::plugController
+    void unplug(); //must be called ONLY by Port::unplugController
+
     void setControllerType(const ControllerType* c);
 
     int getJoystickID() const;
@@ -35,7 +38,7 @@ class Controller {
     //These attributes determine the behavior of the controller or keyboard. They must be set (or unset, as long as everything is valid) everytime the controller changes
     //bool active; ///< True if the controller is active ; if false, the other attributes must not be used.
     const ControllerType* controller_type;
-    SDL_GameController* gamecontroller; ///< MUST BE NULL IF NOT OPEN CURRENTLY
+    SDL_GameController* gamecontroller;
 	SDL_Joystick* joystick;
     int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.
     const ControllerLayout* current_controller_layout;    ///< The controller layout of the current controller, if any.
