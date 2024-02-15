@@ -1,7 +1,12 @@
+#pragma once
+
 #include <vector>
 #include <memory>
 #include "SDL2/SDL.h"
 #include "ControllerType.h"
+#include "ControllerVals.h"
+#include "controllerElements.h"
+#include "inputs.h"
 
 #define JOSTICKID_KEYBOARD -1
 #define NB_CONTROLLERS 16
@@ -29,6 +34,13 @@ class Controller {
 
     int getJoystickID() const;
 
+    bool isButtonPressed(int id) const;
+    bool isJoystickButtonPressed(int button) const;
+    bool isTriggerPressed(int trigger) const;
+    bool isTriggerPressed(int trigger, const ControllerVals& vals) const;
+    bool isElementPressed(ElementType type, int element) const;
+    bool isElementPressed(ElementType type, int element, const ControllerVals& vals) const;
+
     void handleButtonPress(Uint8);
     void handleJoystickButtonPress(Uint8);
 
@@ -45,8 +57,6 @@ class Controller {
     ButtonsMapping controller_buttons_mapping;
 
     Port* port; //port this controller is plugged in. Null if unpluged controlled.  
-
-    bool isButtonPressed(int id) const;
 
     bool init(int controller_id, ControllersData& cd);
     bool initAsKeyboard(ControllersData& cd);

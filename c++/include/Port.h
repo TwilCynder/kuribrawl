@@ -82,7 +82,7 @@ class Port {
     PortsManager& ports_manager;
 
     int id; /** Index in the \ref app#ports "port vector" */
-    const Controller* controller;
+    Controller* controller;
 
     PlayerFighter* fighter; //Pointer validity : is invalidated when the fighter is destroyed, which will happen a lot. The invalidation of this pointer is part of its normal functioning.
     PortOptimizationData pod;

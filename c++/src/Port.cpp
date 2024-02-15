@@ -220,13 +220,14 @@ Kuribrawl::Vec2<double> Port::normalizeStickVector(Kuribrawl::Vector& value){
  * @returns false if a problem occured (in which case the port remains inactive), true otherwise
  */
 void Port::plugController(Controller& cont, ControllersData& cd){
+        cont.plugToPort(*this);
     controller = &cont;
-    cont.
 }
 
 void Port::unplugController()
 {
-
+    controller->unplug();
+    controller = nullptr;
 }
 
 void Port::setFighter(PlayerFighter* fighter_){
