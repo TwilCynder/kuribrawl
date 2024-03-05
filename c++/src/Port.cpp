@@ -36,7 +36,7 @@ inline void Port::handleButtonPress(Uint8 cbutton){
 
 //SDL GAMECONTROLLER
 bool Port::isJoystickButtonPressed(int button) const{
-    //controller->IJBT
+    return controller->isJoystickButtonPressed(button);
 }
 
 bool Port::isButtonPressed(int button) const {
@@ -52,7 +52,7 @@ bool Port::isButtonPressed(int button) const {
  */
 
 bool Port::isTriggerPressed(int trigger) const {
-    return isTriggerPressed(trigger, controller_type->getControllerVals());
+    return controller->isTriggerPressed(trigger);
 }
 
 /**
@@ -64,17 +64,7 @@ bool Port::isTriggerPressed(int trigger) const {
  */
 
 bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) const{
-    if (isKeyboard) return false;
-    int threshold = controller_vals.analogTriggerThreshold;
-
-    switch(trigger){
-        case TRIGGER_LEFT:
-            return SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > threshold;
-        case TRIGGER_RIGHT:
-            return SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > threshold;
-        default:
-            return false;
-    }
+    return controller->isTriggerPressed(trigger, controller_vals);
 }
 
 /**
@@ -85,14 +75,7 @@ bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) 
  * @return whether the element is pressed
  */
 bool Port::isElementPressed(ElementType type, int element) const{
-    switch(type){
-        case ElementType::BUTTON:
-            return isButtonPressed(element);
-        case ElementType::TRIGGER:
-            return isTriggerPressed(element);
-        default:
-            return false;
-    }
+    return controller->isElementPressed(type, element);
 }
 
 /**
@@ -104,14 +87,7 @@ bool Port::isElementPressed(ElementType type, int element) const{
  * @return whether the element is pressed
  */
 bool Port::isElementPressed(ElementType type, int element, const ControllerVals& controller_vals) const{
-    switch(type){
-        case ElementType::BUTTON:
-            return isButtonPressed(element);
-        case ElementType::TRIGGER:
-            return isTriggerPressed(element, controller_vals);
-        default:
-            return false;
-    }
+    return controller->isElementPressed(type, element, controller_vals);
 }
 
 const Port::StickState& Port::getControlStickState() const{

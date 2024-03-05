@@ -12,6 +12,7 @@
 #define NB_CONTROLLERS 16
 
 class Port;
+class ControllersData;
 
 class Controller {
     public:

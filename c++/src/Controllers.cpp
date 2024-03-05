@@ -80,6 +80,83 @@ bool Controller::isButtonPressed(int id) const
     return SDL_GameControllerGetButton(gamecontroller, (SDL_GameControllerButton)id);
 }
 
+bool Controller::isJoystickButtonPressed(int button) const
+{
+    if (isKeyboard) return SDL_GetKeyboardState(nullptr)[button];
+	return SDL_JoystickGetButton(joystick, button);
+}
+
+/**
+ * @brief DEPRECATED Checks if a trigger is pressed
+ * @deprecated user the overload that takes a ControllerVals& now
+ * @param trigger 
+ */
+bool Controller::isTriggerPressed(int trigger) const
+{
+    return isTriggerPressed(trigger, controller_type->getControllerVals());
+}
+
+/**
+ * @brief Checks if a trigger is pressed given a certain threshold
+ * 
+ * @param trigger 
+ * @param controller_vals 
+ * @return whether the trigger is pressed (beyond the given threshold)
+ */
+bool Controller::isTriggerPressed(int trigger, const ControllerVals &controller_vals) const
+{
+    if (isKeyboard) return false;
+    int threshold = controller_vals.analogTriggerThreshold;
+
+    switch(trigger){
+        case TRIGGER_LEFT:
+            return SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > threshold;
+        case TRIGGER_RIGHT:
+            return SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > threshold;
+        default:
+            return false;
+    }
+}
+
+/**
+ * @brief DEPRECATED checks if an element (button or trigger) is pressed
+ * @deprecated user the overload that takes a ControllerVals& now
+ * @param type 
+ * @param element 
+ * @return whether the element is pressed
+ */
+bool Controller::isElementPressed(ElementType type, int element) const
+{
+    switch(type){
+        case ElementType::BUTTON:
+            return isButtonPressed(element);
+        case ElementType::TRIGGER:
+            return isTriggerPressed(element);
+        default:
+            return false;
+    }
+}
+
+/**
+ * @brief Checks if an element (button or trigger) is pressed, given certain ControllerVals
+ * 
+ * @param type type of element to check
+ * @param element id of element to check
+ * @param controller_vals controllerVals to base the answer on (most importantly, threshold for triggers)
+ * @return whether the element is pressed
+ */
+bool Controller::isElementPressed(ElementType type, int element, const ControllerVals &controller_vals) const
+{
+    switch(type){
+        case ElementType::BUTTON:
+            return isButtonPressed(element);
+        case ElementType::TRIGGER:
+            return isTriggerPressed(element, controller_vals);
+        default:
+            return false;
+    }
+}
+
 void Controller::setControllerType(const ControllerType *c)
 {
     controller_type = c;
