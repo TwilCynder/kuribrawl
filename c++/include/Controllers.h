@@ -12,10 +12,13 @@
 #define NB_CONTROLLERS 16
 
 class Port;
+class Port::ElementsState;
 class ControllersData;
 
 class Controller {
     public:
+    Controller();
+
     enum class SDLMode {
         JOYSTICK,
         GAMECONTROLLER,
@@ -42,8 +45,14 @@ class Controller {
     bool isElementPressed(ElementType type, int element) const;
     bool isElementPressed(ElementType type, int element, const ControllerVals& vals) const;
 
+    void readController(Port::ElementsState& state) const;
+
     void handleButtonPress(Uint8);
     void handleJoystickButtonPress(Uint8);
+
+    inline signed char getDpadStateX() const;
+    inline signed char getDpadStateY() const;
+
 
     private:
     Controller(int joystick_id);
@@ -62,5 +71,6 @@ class Controller {
     bool init(int controller_id, ControllersData& cd);
     bool initAsKeyboard(ControllersData& cd);
     bool initButtonMapping();
+
 
 };

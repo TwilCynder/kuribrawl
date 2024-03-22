@@ -67,8 +67,6 @@ class Port {
     const TriggerState& getLeftTriggerState() const;
     const TriggerState& getRightTriggerState() const;
     void updateDpadState(); //NOT USED YET
-    inline signed char getDpadStateX() const;
-    inline signed char getDpadStateY() const;
     const DpadState& getDpadState() const;
 
     static double normalizeStickValue(int);
@@ -89,6 +87,6 @@ class Port {
 
     //State;
     ElementsState elements_state;
-    DpadState current_dpad_state; //NOT USED YET
+    DpadState current_dpad_state;
 
 };

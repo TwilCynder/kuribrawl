@@ -5,6 +5,7 @@
 #define MAPPING_NORMAL_SIZE 32
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
 
+
 bool Controller::init(int controller_id, ControllersData &cd)
 {
     gamecontroller = SDL_GameControllerOpen(controller_id);
@@ -36,7 +37,7 @@ bool Controller::init(int controller_id, ControllersData &cd)
     setControllerType(ct);
 }
 
-unique_ptr<Controller> Controller::opencontroller(int controller_id, ControllersData& cd)
+unique_ptr<Controller> Controller::opencontroller(int controller_id, ControllersData &cd)
 {
     unique_ptr<Controller> controller;
     Debug::out << "Constructing controller from ID " << controller_id << '\n';
@@ -73,6 +74,8 @@ void Controller::plugToPort(Port & p)
 void Controller::unplug(){
     port = nullptr;
 }
+
+
 
 bool Controller::isButtonPressed(int id) const
 {
@@ -157,6 +160,35 @@ bool Controller::isElementPressed(ElementType type, int element, const Controlle
     }
 }
 
+Sint16 getJoystickAxis(SDL_Joystick* joy, int axis){
+    return (axis < 0) ? 0 : SDL_JoystickGetAxis(joy, axis);
+}
+
+void Controller::readController(Port::ElementsState& elements_state) const {
+    elements_state.updatePrevious();
+
+        if (!isKeyboard){
+        if (current_controller_layout){
+            elements_state.control_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->control_stick.x);
+            elements_state.control_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->control_stick.y);
+            elements_state.secondary_stick.current_state.x = getJoystickAxis(joystick, current_controller_layout->secondary_stick.x);
+            elements_state.secondary_stick.current_state.y = getJoystickAxis(joystick, current_controller_layout->secondary_stick.y);
+
+            elements_state.left_trigger.current_state  = getJoystickAxis(joystick, current_controller_layout->triggers.left);
+            elements_state.right_trigger.current_state = getJoystickAxis(joystick, current_controller_layout->triggers.right);
+        } else {    
+            elements_state.control_stick.current_state.x = SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_LEFTX);
+            elements_state.control_stick.current_state.y = SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_LEFTY);
+            elements_state.secondary_stick.current_state.x = SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_RIGHTX);
+            elements_state.secondary_stick.current_state.y = SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_RIGHTY);
+            
+            elements_state.left_trigger.current_state  = SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_TRIGGERLEFT );
+            elements_state.right_trigger.current_state = SDL_GameControllerGetAxis(gamecontroller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        }
+
+    }
+}
+
 void Controller::setControllerType(const ControllerType *c)
 {
     controller_type = c;
@@ -183,6 +215,42 @@ void Controller::handleJoystickButtonPress(Uint8 jb)
     if (cbutton != SDL_CONTROLLER_BUTTON_INVALID){
         handleButtonPress(cbutton);
     }
+}
+
+/**
+ * @brief Returns the the horizontal state of the dpad
+ * -1 for left, 0 for neutral, 1 for right
+ * @return Uint8 
+ */
+//SDL GAMECONTROLLER
+inline signed char Controller::getDpadStateX() const
+{
+    if (isKeyboard){
+        const Uint8* keyboard_state = SDL_GetKeyboardState(nullptr);
+
+        return keyboard_state[current_controller_layout->direction_buttons.left] ? -1 : 
+        (keyboard_state[current_controller_layout->direction_buttons.right] ? 1 : 0); 
+    }
+    return SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) ? -1 : 
+        (SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) ? 1 : 0);
+}
+
+/**
+ * @brief Returns the the vertical state of the dpad
+ * -1 for up, 0 for neutral, 1 for down
+ * @return Uint8 
+ */
+//SDL GAMECONTROLLER
+inline signed char Controller::getDpadStateY() const
+{
+    if (isKeyboard){
+        const Uint8* keyboard_state = SDL_GetKeyboardState(nullptr);
+
+        return keyboard_state[current_controller_layout->direction_buttons.up] ? -1 : 
+        (keyboard_state[current_controller_layout->direction_buttons.down] ? 1 : 0); 
+    }
+    return SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) ? 1 : 
+        (SDL_GameControllerGetButton(gamecontroller, SDL_CONTROLLER_BUTTON_DPAD_UP) ? -1 : 0);
 }
 
 /**
