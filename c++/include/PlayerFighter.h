@@ -51,6 +51,7 @@ class PlayerFighter : public Fighter {
 
     private:
     const InputManager* getInputManager() const;
+    const ControllerVals& getCurrentControllerVals() const;
     //Inputs
     void checkStickState();
     void init_control_stick_buffer();
@@ -68,7 +69,7 @@ class PlayerFighter : public Fighter {
     jumpX decideJumpXType() const override;
 
     const Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
-    ControllerVals current_controller_vals ; //Set when the port is set
+    //ControllerVals current_controller_vals ; //Set when the port is set
     Binding* input_binding; ///< Pointer validity is a validist concept
     bool valid_port; ///< Indicates that this playerfighter has a valid port. If this is false, NO port-related feature and more importantly pointer should be used.
     friend class InputManager;

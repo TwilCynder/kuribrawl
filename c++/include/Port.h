@@ -30,7 +30,8 @@ class Port {
     void initOptimizationData();
     void deactivate();
 
-    const Controller& getController() const;
+    const Controller* getController() const;
+    const ControllerType* getControllerType() const;
 
     void handleButtonPress(Uint8);
     bool isButtonPressed(int button) const;

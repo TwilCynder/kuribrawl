@@ -165,6 +165,15 @@ void Port::deactivate(){
     unplugController();
 }
 
+const Controller *Port::getController() const
+{
+    return controller;
+}
+
+const ControllerType *Port::getControllerType() const
+{
+    return controller ? controller->getControllerType() : nullptr;
+}
 
 /*
 void closeSDLInstance(){

@@ -189,6 +189,11 @@ void Controller::readController(Port::ElementsState& elements_state) const {
     }
 }
 
+const ControllerType *Controller::getControllerType() const
+{
+    return controller_type;
+}
+
 void Controller::setControllerType(const ControllerType *c)
 {
     controller_type = c;

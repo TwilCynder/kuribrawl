@@ -34,6 +34,7 @@ class Controller {
     void plugToPort(Port&); //must be called ONLY by Port::plugController
     void unplug(); //must be called ONLY by Port::unplugController
 
+    const ControllerType* getControllerType() const;
     void setControllerType(const ControllerType* c);
 
     int getJoystickID() const;
