@@ -38,7 +38,11 @@ void PortsManager::plugController(uint8_t portID, Controller& controller){
 		throw KBFatal("Attemp to plug controller in port %d, which is above the maximum (%d)", portID, PORTS_NB);
 	}
 
-	ports[portID].plugController(controller);
+	Port& port = ports[portID];
+	if (port.isActive()){
+		port.unplugController();
+	}
+	port.plugController(controller);
 }
 
 void PortsManager::plugKeyboard(uint8_t portID)
@@ -64,6 +68,16 @@ Port* PortsManager::getPort(uint8_t id) {
 		throw KBFatal("Attemp to access port %d, which is above the maximum (%d)", id, PORTS_NB);
 	}	
 	return &ports[id];
+}
+
+Port *PortsManager::getFirstInactivePort()
+{
+    for (int i = 0; i < PORTS_NB; i++){
+		if (!ports[i].isActive()){
+			return &ports[i];
+		}
+	}
+	return nullptr;
 }
 
 void PortsManager::removeController(int id)

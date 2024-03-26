@@ -14,6 +14,9 @@ void App::startTestGame(){
 	portsManager.openKeyboardController(this->controllersData());
 	portsManager.plugKeyboard(0);
 
+	portsManager.openController(0, this->controllersData());
+	portsManager.plugController(0, 0);
+
 	Champion* acid = game_data->getChampion("acid");
 	const StageModel* testStage = game_data->getStage("testStage");
 
@@ -25,5 +28,6 @@ void App::startTestGame(){
 	config.addPlayer(portsManager.getPort(0), *acid);
 	config.setStage(testStage);
 
+	SDLHelper::printJoysticks(Debug::out);
 	Game& game = game_manager.start(config);
 }
