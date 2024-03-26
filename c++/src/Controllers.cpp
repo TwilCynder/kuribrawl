@@ -5,6 +5,9 @@
 #define MAPPING_NORMAL_SIZE 32
 #define isKeyboard (joystick_id == JOSTICKID_KEYBOARD)
 
+Controller::Controller(){
+    
+}
 
 bool Controller::init(int controller_id, ControllersData &cd)
 {
@@ -35,11 +38,13 @@ bool Controller::init(int controller_id, ControllersData &cd)
     ControllerType* ct = cd.getControllerFromMapping(SDL_GameControllerMapping(gamecontroller));
     if (!ct) ct = cd.getDefaultController();
     setControllerType(ct);
+
+    return true;
 }
 
 unique_ptr<Controller> Controller::opencontroller(int controller_id, ControllersData &cd)
 {
-    unique_ptr<Controller> controller;
+    unique_ptr<Controller> controller = make_unique<Controller>();
     Debug::out << "Constructing controller from ID " << controller_id << '\n';
     if (controller->init(controller_id, cd)) {
         return controller;
@@ -54,10 +59,12 @@ bool Controller::initAsKeyboard(ControllersData& cd){
 
     gamecontroller = nullptr;
     joystick = nullptr;
+
+    return true;
 }
 
 unique_ptr<Controller> Controller::openKeyboardController(ControllersData& cd){
-    unique_ptr<Controller> controller;
+    unique_ptr<Controller> controller = make_unique<Controller>();
     Debug::out << "Constructing controller for keyboard\n";
     if (controller->initAsKeyboard(cd)) {
         return controller;
@@ -235,7 +242,7 @@ void Controller::handleJoystickButtonPress(Uint8 jb)
  * @return Uint8 
  */
 //SDL GAMECONTROLLER
-inline signed char Controller::getDpadStateX() const
+signed char Controller::getDpadStateX() const
 {
     if (isKeyboard){
         const Uint8* keyboard_state = SDL_GetKeyboardState(nullptr);
@@ -253,7 +260,7 @@ inline signed char Controller::getDpadStateX() const
  * @return Uint8 
  */
 //SDL GAMECONTROLLER
-inline signed char Controller::getDpadStateY() const
+signed char Controller::getDpadStateY() const
 {
     if (isKeyboard){
         const Uint8* keyboard_state = SDL_GetKeyboardState(nullptr);

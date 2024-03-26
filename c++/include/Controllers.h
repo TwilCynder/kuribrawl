@@ -51,8 +51,8 @@ class Controller {
     void handleButtonPress(Uint8);
     void handleJoystickButtonPress(Uint8);
 
-    inline signed char getDpadStateX() const;
-    inline signed char getDpadStateY() const;
+    signed char getDpadStateX() const;
+    signed char getDpadStateY() const;
 
 
     private:

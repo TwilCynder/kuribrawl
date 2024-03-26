@@ -28,7 +28,7 @@ bool Port::isActive() const{
     return !!controller;
 }
 
-inline void Port::handleButtonPress(Uint8 cbutton){
+void Port::handleButtonPress(Uint8 cbutton){
     if (!fighter) return;
 
     fighter->handleButtonPress(cbutton);
@@ -144,7 +144,7 @@ Kuribrawl::Vec2<double> Port::normalizeStickVector(Kuribrawl::Vector& value){
  * @param id numerical ID given by the OS to the controller, or -1 for the keyboard
  * @returns false if a problem occured (in which case the port remains inactive), true otherwise
  */
-void Port::plugController(Controller& cont, ControllersData& cd){
+void Port::plugController(Controller& cont){
     cont.plugToPort(*this);
     controller = &cont;
 }

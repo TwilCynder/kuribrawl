@@ -24,7 +24,7 @@ class Port {
     Port(PortsManager& pm_, int id);
 
     bool isActive() const;
-    void plugController(Controller& cont, ControllersData& cd);
+    void plugController(Controller& cont);
     void unplugController();
     void setFighter(PlayerFighter*);
     void initOptimizationData();
@@ -49,8 +49,8 @@ class Port {
         void updatePrevious();
     };
     struct TriggerState {
-        int previous_state;
         int current_state;
+        int previous_state;
         TriggerState();
         void updatePrevious();
     };

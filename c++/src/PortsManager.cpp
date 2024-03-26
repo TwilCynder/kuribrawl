@@ -15,6 +15,8 @@ PortsManager::PortsManager(){
 	keyboard_controller = nullptr;
 }
 
+PortsManager::~PortsManager() = default;
+
 void PortsManager::openController(int controller_id, ControllersData& cd){
 
 	auto controller_ptr = Controller::opencontroller(controller_id, cd);
@@ -26,12 +28,35 @@ void PortsManager::openController(int controller_id, ControllersData& cd){
 	controllers[id] = std::move(controller_ptr);
 }
 
-void PortsManager::plugController(uint8_t portID, Controller& controller, ControllersData& cdata){
+void PortsManager::openKeyboardController(ControllersData &cd)
+{
+	keyboard_controller = std::move(Controller::openKeyboardController(cd));
+}
+
+void PortsManager::plugController(uint8_t portID, Controller& controller){
 	if (portID >= PORTS_NB){
 		throw KBFatal("Attemp to plug controller in port %d, which is above the maximum (%d)", portID, PORTS_NB);
 	}
 
-	ports[portID].plugController(controller, cdata);
+	ports[portID].plugController(controller);
+}
+
+void PortsManager::plugKeyboard(uint8_t portID)
+{
+	if (keyboard_controller){
+		plugController(portID, *keyboard_controller);
+	}
+}
+
+void PortsManager::plugController(uint8_t portID, uint8_t controllerID)
+{
+    if (controllerID > NB_CONTROLLERS){
+		throw KBFatal("Attemp to access controller %d, which is above the maximum (%d)", controllerID, NB_CONTROLLERS);
+	}
+
+	if (controllers[controllerID]){
+		plugController(portID, *controllers[controllerID]);
+	}
 }
 
 Port* PortsManager::getPort(uint8_t id) {
@@ -43,6 +68,10 @@ Port* PortsManager::getPort(uint8_t id) {
 
 void PortsManager::removeController(int id)
 {
+	if (id > NB_CONTROLLERS){
+		throw KBFatal("Attemp to access controller %d, which is above the maximum (%d)", id, NB_CONTROLLERS);
+	}
+
 	Controller* cont = controllers[id].get();
 
 	if (cont){

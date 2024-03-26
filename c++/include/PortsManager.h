@@ -11,11 +11,17 @@ class PortsManager {
 
     public:
     PortsManager();
+    ~PortsManager();
 
     void initSDL();
 
     void openController(int controller_id, ControllersData& cd);
-    void plugController(uint8_t portID, Controller& controller, ControllersData&);
+    void openKeyboardController(ControllersData& cd);
+    void plugController(uint8_t portID, Controller& controller);
+    //these ones are mostly for debug
+    void plugKeyboard(uint8_t portID);
+    void plugController(uint8_t portID, uint8_t controller_id);
+
     void readPorts();
 
     void handleButtonEvent(const SDL_JoyButtonEvent& evt);
