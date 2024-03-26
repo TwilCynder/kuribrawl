@@ -7,12 +7,11 @@
 #include "ControllerVals.h"
 #include "controllerElements.h"
 #include "inputs.h"
+#include "Port.h"
 
 #define JOSTICKID_KEYBOARD -1
 #define NB_CONTROLLERS 16
 
-class Port;
-class Port::ElementsState;
 class ControllersData;
 
 class Controller {
@@ -32,7 +31,8 @@ class Controller {
     static std::unique_ptr<Controller> openKeyboardController(ControllersData& cd);
 
     void plugToPort(Port&); //must be called ONLY by Port::plugController
-    void unplug(); //must be called ONLY by Port::unplugController
+    void unplugFromPort();
+    void clearPort(); //must be called ONLY by Port::unplugController
 
     const ControllerType* getControllerType() const;
     void setControllerType(const ControllerType* c);

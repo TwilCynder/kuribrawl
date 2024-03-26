@@ -71,7 +71,14 @@ void Controller::plugToPort(Port & p)
     port = &p;
 }
 
-void Controller::unplug(){
+void Controller::unplugFromPort()
+{
+    if (port){
+        port->unplugController();
+    }
+}
+
+void Controller::clearPort(){
     port = nullptr;
 }
 

@@ -151,7 +151,7 @@ void Port::plugController(Controller& cont, ControllersData& cd){
 
 void Port::unplugController()
 {
-    controller->unplug();
+    controller->clearPort();
     controller = nullptr;
 }
 
