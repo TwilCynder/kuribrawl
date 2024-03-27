@@ -15,9 +15,8 @@ bool Controller::init(int controller_id, ControllersData &cd)
     joystick = SDL_GameControllerGetJoystick(gamecontroller);
     SDL_JoystickID instance_id = SDL_JoystickInstanceID(joystick);
 
-    Debug::log("open controller");
-    Debug::log(gamecontroller);
-    Debug::log(joystick);
+    Debug::out << "Openning controller " << controller_id << " : " << SDL_GameControllerName(gamecontroller) << '\n';
+    
 
     if (instance_id < 0){
         Debug::out << "Error while trying to open controller " << controller_id << '\n';
@@ -89,7 +88,10 @@ void Controller::clearPort(){
     port = nullptr;
 }
 
-
+void Controller::closeController()
+{
+    SDL_GameControllerClose(gamecontroller);
+}
 
 bool Controller::isButtonPressed(int id) const
 {

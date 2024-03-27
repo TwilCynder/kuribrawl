@@ -28,11 +28,12 @@ class Controller {
     using ButtonsMapping = std::vector<SDL_GameControllerButton>;
 
     static std::unique_ptr<Controller> opencontroller(int controller_id, ControllersData& cd);
-    static std::unique_ptr<Controller> openKeyboardController(ControllersData& cd);
+    static std::unique_ptr<Controller> openKeyboardController(ControllersData& cd); 
 
     void plugToPort(Port&); //must be called ONLY by Port::plugController
     void unplugFromPort();
     void clearPort(); //must be called ONLY by Port::unplugController
+    void closeController();
 
     const ControllerType* getControllerType() const;
     void setControllerType(const ControllerType* c);

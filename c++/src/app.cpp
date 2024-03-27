@@ -269,6 +269,9 @@ void App::handleEvents(){
 				
 				handleButtonEvent(event.jbutton);
 				break;
+			case SDL_CONTROLLERBUTTONDOWN:
+				Debug::log("GAME CONTROLLER BUTTON DOWN EVENT");
+				break;
 			case SDL_CONTROLLERAXISMOTION:
 				break;
 			case SDL_KEYDOWN:

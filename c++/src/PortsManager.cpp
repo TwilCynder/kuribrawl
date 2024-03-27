@@ -17,7 +17,7 @@ PortsManager::PortsManager(){
 
 PortsManager::~PortsManager() = default;
 
-void PortsManager::openController(int controller_id, ControllersData& cd){
+Controller& PortsManager::openController(int controller_id, ControllersData& cd){
 
 	auto controller_ptr = Controller::opencontroller(controller_id, cd);
 	int id = controller_ptr->getJoystickID();
@@ -26,11 +26,22 @@ void PortsManager::openController(int controller_id, ControllersData& cd){
 	//TODO remove that controller
 
 	controllers[id] = std::move(controller_ptr);
+
+	return *controllers[id];
 }
 
-void PortsManager::openKeyboardController(ControllersData &cd)
+Controller& PortsManager::openKeyboardController(ControllersData &cd)
 {
 	keyboard_controller = std::move(Controller::openKeyboardController(cd));
+	return *keyboard_controller;
+}
+
+void PortsManager::openAllControllers(ControllersData &cd)
+{
+	for (int i = 0; i < SDL_NumJoysticks(); i++){
+		openController(i, cd);
+	}
+	openKeyboardController(cd);
 }
 
 void PortsManager::plugController(uint8_t portID, Controller& controller){
@@ -117,7 +128,13 @@ void PortsManager::readPorts(){
 
 void PortsManager::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 	Controller* controller = controllers[evt.which].get();
+
+	if (controller == nullptr){
+		Debug::log("Received event for a controller that is not open. Opening it");
+	}
+
 	Debug::log(evt.button);
+	
 	if (controller != nullptr){
 		controller->handleJoystickButtonPress(evt.button);
 	}

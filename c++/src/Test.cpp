@@ -11,10 +11,12 @@
 void App::startTestGame(){
 	Debug::log("=====Starting game=====");
 
+	portsManager.openAllControllers(this->controllersData());
+
 	portsManager.openKeyboardController(this->controllersData());
 	portsManager.plugKeyboard(0);
 
-	portsManager.openController(0, this->controllersData());
+	//portsManager.openController(0, this->controllersData());
 	portsManager.plugController(0, 0);
 
 	Champion* acid = game_data->getChampion("acid");

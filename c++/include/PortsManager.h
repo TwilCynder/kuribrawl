@@ -15,8 +15,9 @@ class PortsManager {
 
     void initSDL();
 
-    void openController(int controller_id, ControllersData& cd);
-    void openKeyboardController(ControllersData& cd);
+    Controller& openController(int controller_id, ControllersData& cd);
+    Controller& openKeyboardController(ControllersData& cd);
+    void openAllControllers(ControllersData& cd);
     void plugController(uint8_t portID, Controller& controller);
     //these ones are mostly for debug
     void plugKeyboard(uint8_t portID);
