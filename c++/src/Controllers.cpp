@@ -27,6 +27,7 @@ bool Controller::init(int controller_id, ControllersData &cd)
     }
 
     joystick_id = instance_id;
+    device_id = controller_id;
 
     //STORING THE BUTTON MAPPING
     if (!initButtonMapping()){
@@ -53,7 +54,8 @@ unique_ptr<Controller> Controller::opencontroller(int controller_id, Controllers
 }
 
 bool Controller::initAsKeyboard(ControllersData& cd){
-    joystick_id = JOSTICKID_KEYBOARD;
+    joystick_id = JOYSTICKID_KEYBOARD;
+    device_id = JOYSTICKID_KEYBOARD;
     setControllerType(cd.getKeyboardController());
 
     gamecontroller = nullptr;

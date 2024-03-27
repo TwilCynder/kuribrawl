@@ -66,6 +66,7 @@ class App
 
     void handleEvents();
     void handleButtonEvent(const SDL_JoyButtonEvent& evt);
+    void handleDevideEvent(const SDL_ControllerDeviceEvent& evt);
     void render();
 
     void startTestGame();

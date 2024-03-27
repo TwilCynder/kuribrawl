@@ -9,7 +9,7 @@
 #include "inputs.h"
 #include "Port.h"
 
-#define JOSTICKID_KEYBOARD -1
+#define JOYSTICKID_KEYBOARD -1
 #define NB_CONTROLLERS 16
 
 class ControllersData;
@@ -65,6 +65,7 @@ class Controller {
     SDL_GameController* gamecontroller;
 	SDL_Joystick* joystick;
     int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.
+    int device_id; ///< Numerical ID of the device (given by the OS)
     const ControllerLayout* current_controller_layout;    ///< The controller layout of the current controller, if any.
     ButtonsMapping controller_buttons_mapping;
 

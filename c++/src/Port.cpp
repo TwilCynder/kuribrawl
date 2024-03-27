@@ -36,11 +36,11 @@ void Port::handleButtonPress(Uint8 cbutton){
 
 //SDL GAMECONTROLLER
 bool Port::isJoystickButtonPressed(int button) const{
-    return controller->isJoystickButtonPressed(button);
+    return isActive() && controller->isJoystickButtonPressed(button);
 }
 
 bool Port::isButtonPressed(int button) const {
-    return controller->isButtonPressed(button);
+    return isActive() && controller->isButtonPressed(button);
 }
 
 //SDL GAMECONTROLLER
@@ -52,7 +52,7 @@ bool Port::isButtonPressed(int button) const {
  */
 
 bool Port::isTriggerPressed(int trigger) const {
-    return controller->isTriggerPressed(trigger);
+    return isActive() && controller->isTriggerPressed(trigger);
 }
 
 /**
@@ -64,7 +64,7 @@ bool Port::isTriggerPressed(int trigger) const {
  */
 
 bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) const{
-    return controller->isTriggerPressed(trigger, controller_vals);
+    return isActive() && controller->isTriggerPressed(trigger, controller_vals);
 }
 
 /**
@@ -75,7 +75,7 @@ bool Port::isTriggerPressed(int trigger, const ControllerVals& controller_vals) 
  * @return whether the element is pressed
  */
 bool Port::isElementPressed(ElementType type, int element) const{
-    return controller->isElementPressed(type, element);
+    return isActive() && controller->isElementPressed(type, element);
 }
 
 /**
@@ -87,7 +87,7 @@ bool Port::isElementPressed(ElementType type, int element) const{
  * @return whether the element is pressed
  */
 bool Port::isElementPressed(ElementType type, int element, const ControllerVals& controller_vals) const{
-    return controller->isElementPressed(type, element, controller_vals);
+    return isActive() && controller->isElementPressed(type, element, controller_vals);
 }
 
 const Port::StickState& Port::getControlStickState() const{
@@ -108,7 +108,7 @@ const Port::TriggerState& Port::getRightTriggerState() const {
 }
 
 void Port::updateDpadState(){
-    if (controller){
+    if (isActive()){
         current_dpad_state.x = controller->getDpadStateX();
         current_dpad_state.y = controller->getDpadStateY();
     }
@@ -117,7 +117,7 @@ void Port::updateDpadState(){
 //SDL GAMECONTROLLER
 void Port::readController(){
 
-    if (controller){
+    if (isActive()){
         controller->readController(elements_state);
     }
 
@@ -153,6 +153,7 @@ void Port::unplugController()
 {
     controller->clearPort();
     controller = nullptr;
+    Debug::log("Port::unplugPort");
 }
 
 void Port::setFighter(PlayerFighter* fighter_){
@@ -172,7 +173,7 @@ const Controller *Port::getController() const
 
 const ControllerType *Port::getControllerType() const
 {
-    return controller ? controller->getControllerType() : nullptr;
+    return isActive() ? controller->getControllerType() : nullptr;
 }
 
 /*

@@ -28,6 +28,7 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->triggers[TRIGGER_LEFT] = Input::GUARD;
     input_binding->triggers[TRIGGER_RIGHT] = Input::JUMP;
     input_binding->second_stick = Input::ATTACK;
+    input_binding->analog_modifier_button = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
     input_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
     input_binding->tap_jump = true;
 

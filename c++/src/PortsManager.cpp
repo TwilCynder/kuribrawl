@@ -93,18 +93,28 @@ Port *PortsManager::getFirstInactivePort()
 
 void PortsManager::removeController(int id)
 {
+	Debug::out << "Removing controller " << id << '\n';
+
 	if (id > NB_CONTROLLERS){
 		throw KBFatal("Attemp to access controller %d, which is above the maximum (%d)", id, NB_CONTROLLERS);
 	}
 
 	Controller* cont = controllers[id].get();
 
+	Debug::out << "Controller : " << ((void*)cont) << '\n';
+
 	if (cont){
+
+		Debug::log("There was a controller. Unplugging it.");
+
 		cont->unplugFromPort();
+		cont->closeController();
 		controllers[id].reset();
 	} else {
 		Debug::warn(formatString("Tried to remove controller %d, which was not open"));
 	}
+
+	Debug::out << std::flush;
 }
 
 void PortsManager::initSDL()

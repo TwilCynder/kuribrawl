@@ -217,6 +217,11 @@ void App::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 	portsManager.handleButtonEvent(evt);
 }
 
+void App::handleDevideEvent(const SDL_ControllerDeviceEvent &evt)
+{
+	portsManager.removeController(evt.which);
+}
+
 void App::print_report(Logger& out){
 	Uint32 app_duration = System::now() - start_time;
 	out << "Time elapsed : " << app_duration << "ms. Frames displayed : " << frame << ". Mean frame duration : " << (double)app_duration / frame << ". Mean frame wait " << ((double)total_frame_wait / frame) << '\n';
@@ -265,8 +270,11 @@ void App::handleEvents(){
 			case SDL_QUIT:
 				stop();
 				break;
+			case SDL_JOYDEVICEREMOVED:
+				Debug::log("DEVICE FCKING REMOVED ===========================");
+				handleDevideEvent(event.cdevice);
+				break;
 			case SDL_JOYBUTTONDOWN:
-				
 				handleButtonEvent(event.jbutton);
 				break;
 			case SDL_CONTROLLERBUTTONDOWN:

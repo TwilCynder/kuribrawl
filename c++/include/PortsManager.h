@@ -23,6 +23,8 @@ class PortsManager {
     void plugKeyboard(uint8_t portID);
     void plugController(uint8_t portID, uint8_t controller_id);
 
+    void removeController(int id);
+
     void readPorts();
 
     void handleButtonEvent(const SDL_JoyButtonEvent& evt);
@@ -40,6 +42,4 @@ class PortsManager {
     using ControllerPtr = std::unique_ptr<Controller>;
     ControllerPtr keyboard_controller;
     ControllerPtr controllers[NB_CONTROLLERS];
-
-    void removeController(int id);
 };
