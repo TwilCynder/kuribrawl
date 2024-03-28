@@ -15,7 +15,9 @@ A:acid/air_idle 1 -1.0 c
 acid\air_idle_after_hurt.png
 A:acid/air_idle_after_hurt 1 -1.0 c
 acid\air_jump.png
-A:acid/air_jump 8 0.25 c
+A:acid/air_jump acid\air_jump.dat
+acid\bair.png
+A:acid/bair acid\bair.dat
 acid\dash.png
 A:acid/dash 4 0.18 c
 acid\dash_start.png
