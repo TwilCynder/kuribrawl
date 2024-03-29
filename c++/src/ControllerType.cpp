@@ -47,7 +47,7 @@ ControllerLayout& ControllerType::addElementLayout(){
     return *element_mapping.get();
 }
 
-const Binding* ControllerType::getDefaultBinding(){
+Binding* ControllerType::getDefaultBinding(){
     return default_binding.get();
 }
 

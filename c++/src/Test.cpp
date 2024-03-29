@@ -16,7 +16,7 @@ void App::startTestGame(){
 	//portsManager.openKeyboardController(this->controllersData());
 	//portsManager.plugKeyboard(0);
 	//portsManager.openController(0, this->controllersData());
-	//portsManager.plugController(0, 0);
+	portsManager.plugController(0, 0);
 
 	Champion* acid = game_data->getChampion("acid");
 	const StageModel* testStage = game_data->getStage("testStage");

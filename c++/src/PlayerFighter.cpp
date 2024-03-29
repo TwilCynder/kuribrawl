@@ -8,29 +8,19 @@
 #include "controllerElements.h"
 #include "ControllerVals.h"
 
-constexpr ControllerVals default_controller_vals = {10000, 18000, 20000};
+//constexpr ControllerVals default_controller_vals = {10000, 18000, 20000};
 
 using namespace Kuribrawl;
 
 PlayerFighter::PlayerFighter(Game& game, Champion* model):
-    Fighter(game, model),
-    port(nullptr),
-    valid_port(false),
-    input_manager(this),
-    control_stick_buffer(StickBuffer(7), StickBuffer(7)),
-    current_direction_control_state{0, 0} 
+    Fighter(game, model)
 {
     init_control_stick_buffer();
 }
 
 
 PlayerFighter::PlayerFighter(Game& game, Champion* model, int x, int y):
-    Fighter(game, model, x, y),
-    port(nullptr),
-    valid_port(false),
-    input_manager(this),
-    control_stick_buffer(StickBuffer(7), StickBuffer(7)),   
-    current_direction_control_state{0, 0}
+    Fighter(game, model, x, y)
 {
     init_control_stick_buffer();
 }
@@ -68,6 +58,11 @@ const Port* PlayerFighter::getPort() const {
     return port;
 }
 
+bool PlayerFighter::valid_port()
+{
+    return !!port;
+}
+
 /**
  * @brief Sets the Port controlling this Fighter.
  * Makes the port active.
@@ -77,7 +72,6 @@ void PlayerFighter::setPort(Port* port_){
     if (!port_) throw KBFatal("null pointer passed to PlayerFighter::setPort");
     //if (!port_->isActive()) throw KBFatal("Tried to assign inactive port to PlayerFighter");
 
-    valid_port = true;
     port = port_;
     
     //see below
@@ -96,7 +90,6 @@ void PlayerFighter::setPort(Port* port_){
  * Not sure if this will be ever used but it kinda made sense to make it idk 
  */
 void PlayerFighter::unsetPort(){
-    valid_port = false;
     port = nullptr;
 }
 
@@ -105,6 +98,7 @@ void PlayerFighter::onControllerChanged()
     if (port){
         const Controller* controller = port->getController();
         if (controller){
+                Debug::log("======== ON CONTROLLER CHANGED ========");
                 const ControllerType* controller_type = port->getControllerType();
                 if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
 
@@ -116,10 +110,10 @@ void PlayerFighter::onControllerChanged()
 
                 return;
         } else {
-            Debug::warn("Canend PlayerFighter::onControllerChanged() while port has no controller");
+            Debug::warn("Called PlayerFighter::onControllerChanged() while port has no controller");
         }
     } else {
-        Debug::warn("Canend PlayerFighter::onControllerChanged() while no port is set for this PlayerFighter");
+        Debug::warn("Called PlayerFighter::onControllerChanged() while no port is set for this PlayerFighter");
     }
 
     
@@ -254,7 +248,7 @@ DirectionIG PlayerFighter::getControlDirection4IG() const {
  * @brief Check is the sticks of the controller used by this Fighter's Port are in a position that should lead to an action (according to the current state) and takes it.
  */
 void PlayerFighter::checkStickState(){ //lots of error checks to do
-    if (!valid_port) return;
+    if (!valid_port()) return;
 
 
     if (!grounded && isDown(current_direction_control_state, current_controller_vals.analogStickSmashThreshold)){
@@ -306,7 +300,7 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
  *
  */
 void PlayerFighter::updateInputsStates(){
-    if (!valid_port) return;
+    if (!valid_port()) return;
     
     {
     const Kuribrawl::Vector previous_direction_control_state = current_direction_control_state;
@@ -463,7 +457,7 @@ bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
     const int radius = Kuribrawl::min(displayArea.w, displayArea.h) * 0.4;
     Vector center = {displayArea.x + displayArea.w / 2, displayArea.y + displayArea.h / 2 };
 
-    if (valid_port){
+    if (valid_port()){
         SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
 
         SDL_Rect box = {

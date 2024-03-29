@@ -8,6 +8,8 @@
 
 #include "controllerElements.h"
 
+ControllerType* HardCoded::default_controller_type = nullptr;
+
 /**
  * @brief Initializes all hard-coded informations related to Controllers, updating and populating a given ControllersData in consequence.
  *
@@ -31,6 +33,8 @@ void HardCoded::initControllersData(ControllersData& data){
     input_binding->analog_modifier_button = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
     input_binding->direction_control_mode = Binding::DirectionControlMode::BOTH;
     input_binding->tap_jump = true;
+
+    HardCoded::default_controller_type = c;
 
     mapping_string = "030000004c050000cc09000000000000,Sony DualShock 4 V2,a:b1,b:b2,back:b13,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Mac OS X,";
     SDL_GameControllerAddMapping(mapping_string);

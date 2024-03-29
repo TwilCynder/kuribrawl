@@ -96,6 +96,9 @@ int PlayerFighter::InputHandler_SmashStickDown(RegisteredInput& input){
 }
 
 int PlayerFighter::InputHandler_SmashStickUp(RegisteredInput& input){
+    Debug::log("INPUT HANDLER");
+    Debug::log((void*)input_binding);
+
     if (input_binding->tap_jump){
         jump_manager(input, jumpY::Full);
     }

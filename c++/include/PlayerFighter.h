@@ -16,6 +16,13 @@ class RegisteredInput;
 using namespace Kuribrawl;
 
 /**
+ * @brief todo remove when requirement for initialization with default controllertype is removed
+ */
+namespace HardCoded {
+    extern ControllerType* default_controller_type;
+}
+
+/**
  * @brief A Fighter controlled by a player (i.e.\ by a Port).
  * Contains all information needed by a Fighter to manage inputs from a Port.
  */
@@ -50,7 +57,11 @@ class PlayerFighter : public Fighter {
     //Debug
     bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
 
+
+
     private:
+    PlayerFighter();
+
     const InputManager* getInputManager() const;
     const ControllerVals& getCurrentControllerVals() const;
     void updateCurrentControllerVals(const ControllerType&);
@@ -71,14 +82,16 @@ class PlayerFighter : public Fighter {
 	jumpY decideGroundedJumpYType() const override;
     jumpX decideJumpXType() const override;
 
-    const Port* port;         ///<Port controlling this Fighter. Pointer validity : dla merde
-    ControllerVals current_controller_vals ; //Set when the port is set
-    const Binding* input_binding; ///< Pointer validity is a validist concept
-    bool valid_port; ///< Indicates that this playerfighter has a valid port. If this is false, NO port-related feature and more importantly pointer should be used.
+    const Port* port = nullptr;         ///<Port controlling this Fighter. Pointer validity : dla merde
+    ControllerVals current_controller_vals //Set when the port is set
+        = HardCoded::default_controller_type->default_vals; 
+    const Binding* input_binding  ///< Pointer validity is a validist concept
+        = HardCoded::default_controller_type->getDefaultBinding();
+    bool valid_port(); ///< Indicates that this playerfighter has a valid port. If this is false, NO port-related feature and more importantly pointer should be used.
     friend class InputManager;
-    InputManager input_manager;    ///< InputManager used to process the input made by the Port.
-    Vec2<StickBuffer> control_stick_buffer;
-    Vector current_direction_control_state;
+    InputManager input_manager = InputManager(this);    ///< InputManager used to process the input made by the Port.
+    Vec2<StickBuffer> control_stick_buffer = {StickBuffer(7), StickBuffer(7)};
+    Vector current_direction_control_state = {0, 0};
 
     static InputHandler input_handlers[Input::TOTAL];   ///< Array associating every Input to an InputHandler function that will apply the effect of this Input to a Fighter.
 
