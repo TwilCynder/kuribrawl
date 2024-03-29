@@ -90,6 +90,10 @@ void Controller::clearPort(){
     port = nullptr;
 }
 
+bool Controller::isPlugged() const {
+    return !!port;
+}
+
 void Controller::closeController()
 {
     SDL_GameControllerClose(gamecontroller);

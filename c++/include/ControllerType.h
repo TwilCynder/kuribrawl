@@ -27,8 +27,8 @@ class ControllerType {
     ControllerLayout* getElementLayout() const;
     ControllerLayout& addElementLayout();
 
-    Binding& getDefaultBinding() const;
-    Binding* getDefaultBinding();
+    const Binding& getDefaultBinding() const;
+    const Binding* getDefaultBinding();
 
     private:
     std::unique_ptr<ControllerLayout> element_mapping; //Will not be present for all controllers; only when there is a need to override the SDL one

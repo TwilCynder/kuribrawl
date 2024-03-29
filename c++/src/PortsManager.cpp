@@ -140,14 +140,20 @@ void PortsManager::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 	Controller* controller = controllers[evt.which].get();
 
 	if (controller == nullptr){
-		Debug::log("Received event for a controller that is not open. Opening it");
+		Debug::log("Received event for a controller that is not open.");
+		return;
 	}
 
 	Debug::log(evt.button);
 	
-	if (controller != nullptr){
-		controller->handleJoystickButtonPress(evt.button);
+
+	if (!controller->isPlugged()){
+		Port* first_inactive_port = getFirstInactivePort();
+		if (first_inactive_port){
+			first_inactive_port->plugController(*controller);
+		}
 	}
+	controller->handleJoystickButtonPress(evt.button);
 
 }
 

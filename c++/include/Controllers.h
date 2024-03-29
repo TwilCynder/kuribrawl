@@ -34,10 +34,11 @@ class Controller {
     void unplugFromPort();
     void clearPort(); //must be called ONLY by Port::unplugController
     void closeController();
+    bool isPlugged() const;
 
     const ControllerType* getControllerType() const;
     void setControllerType(const ControllerType* c);
-
+    
     int getJoystickID() const;
 
     bool isButtonPressed(int id) const;

@@ -47,10 +47,10 @@ ControllerLayout& ControllerType::addElementLayout(){
     return *element_mapping.get();
 }
 
-Binding* ControllerType::getDefaultBinding(){
+const Binding* ControllerType::getDefaultBinding(){
     return default_binding.get();
 }
 
-Binding& ControllerType::getDefaultBinding() const{
+const Binding& ControllerType::getDefaultBinding() const{
     return *default_binding.get();
 }

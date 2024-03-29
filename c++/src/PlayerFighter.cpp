@@ -75,18 +75,14 @@ const Port* PlayerFighter::getPort() const {
  */
 void PlayerFighter::setPort(Port* port_){
     if (!port_) throw KBFatal("null pointer passed to PlayerFighter::setPort");
-    if (!port_->isActive()) throw KBFatal("Tried to assign inactive port to PlayerFighter");
+    //if (!port_->isActive()) throw KBFatal("Tried to assign inactive port to PlayerFighter");
 
     valid_port = true;
     port = port_;
     
     //see below
-    const ControllerType* controller_type = port->getControllerType();
-    if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
-
-    input_binding = &controller_type->getDefaultBinding();
-    if (!input_binding) throw KBFatalDetailed("Unrecognized Controller", "PlayerFighter assigned to port, ended up with no input binding");
-
+    
+    onControllerChanged();
 
     ///\todo At some point we'lle have to make a decision regarding whether ports need to have a valid controller type (currently, yes)
     //current_controller_vals = ((!input_binding->override_controller_vals)/* && port->getControllerType()*/) ? //check is currently unnecessary since port->getControllerType() must be non-null anyways
@@ -102,6 +98,31 @@ void PlayerFighter::setPort(Port* port_){
 void PlayerFighter::unsetPort(){
     valid_port = false;
     port = nullptr;
+}
+
+void PlayerFighter::onControllerChanged()
+{
+    if (port){
+        const Controller* controller = port->getController();
+        if (controller){
+                const ControllerType* controller_type = port->getControllerType();
+                if (!controller_type) throw KBFatal("PlayerFighter::setPort : port has no controllerType");
+
+                const Binding& binding = controller_type->getDefaultBinding();
+                //if (!binding) throw KBFatalDetailed("Unrecognized Controller", "PlayerFighter assigned to port, ended up with no input binding");
+                setBinding(binding);
+
+                updateCurrentControllerVals(*controller_type);
+
+                return;
+        } else {
+            Debug::warn("Canend PlayerFighter::onControllerChanged() while port has no controller");
+        }
+    } else {
+        Debug::warn("Canend PlayerFighter::onControllerChanged() while no port is set for this PlayerFighter");
+    }
+
+    
 }
 
 void PlayerFighter::swap_control_stick_buffer(){
@@ -133,7 +154,6 @@ void PlayerFighter::handleStickFlick(Direction direction){
 }
 
 void PlayerFighter::update_control_stick_buffer(const Vector& current_state, const Vector& previous_state){
-    const ControllerVals current_controller_vals = getCurrentControllerVals();
 
     //At this point we assume the buffer is actually containing the position of the stick 2 frames ago
     if (current_state.x > current_controller_vals.analogStickSmashThreshold
@@ -203,7 +223,6 @@ void PlayerFighter::updateDirectionControlState(){
     } else {
         current_direction_control_state = port->getControlStickState().current_state;
 
-        const ControllerVals current_controller_vals = getCurrentControllerVals();
         if (
             input_binding->direction_control_mode == Binding::DirectionControlMode::BOTH &&
             (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold &&abs(current_direction_control_state.y) < current_controller_vals.analogStickThreshold)
@@ -216,11 +235,11 @@ void PlayerFighter::updateDirectionControlState(){
 }
 
 Direction PlayerFighter::getDirection4(const Kuribrawl::Vector& stick_state) const{
-    return Kuribrawl::getDirection4(stick_state, getCurrentControllerVals().analogStickThreshold);
+    return Kuribrawl::getDirection4(stick_state, current_controller_vals.analogStickThreshold);
 }
 
 DirectionIG PlayerFighter::getDirection4IG(const Kuribrawl::Vector& stick_state) const{
-    return Kuribrawl::getDirection4IG(stick_state, getCurrentControllerVals().analogStickThreshold, facing);
+    return Kuribrawl::getDirection4IG(stick_state, current_controller_vals.analogStickThreshold, facing);
 }
 
 Direction PlayerFighter::getControlDirection4() const {
@@ -237,7 +256,6 @@ DirectionIG PlayerFighter::getControlDirection4IG() const {
 void PlayerFighter::checkStickState(){ //lots of error checks to do
     if (!valid_port) return;
 
-    const ControllerVals current_controller_vals = getCurrentControllerVals();
 
     if (!grounded && isDown(current_direction_control_state, current_controller_vals.analogStickSmashThreshold)){
         ground_interaction = GroundInteraction::SOFT;
@@ -296,7 +314,6 @@ void PlayerFighter::updateInputsStates(){
     update_control_stick_buffer(current_direction_control_state, previous_direction_control_state);
     }
 
-    const ControllerVals current_controller_vals = getCurrentControllerVals();
 
     const Port::TriggerState& left_trigger = port->getLeftTriggerState();
     if (left_trigger.current_state >= current_controller_vals.analogTriggerThreshold && left_trigger.previous_state < current_controller_vals.analogTriggerThreshold){
@@ -340,6 +357,7 @@ const InputManager* PlayerFighter::getInputManager() const{
 
 const ControllerVals &PlayerFighter::getCurrentControllerVals() const
 {
+    /*
     const ControllerType* controller_type = port->getControllerType();
 
     return 
@@ -348,17 +366,31 @@ const ControllerVals &PlayerFighter::getCurrentControllerVals() const
         default_controller_vals
         )
     ;
+    */
+   return current_controller_vals;
 
-    ///\todo At some point we'lle have to make a decision regarding whether ports need to have a valid controller type (currently, yes)
+    ///\todo At some point we'lle have to make a decision regarding whether ports need to have a valid controller type (currently, no)
 
 }
+
+void PlayerFighter::updateCurrentControllerVals(const ControllerType& controller_type)
+{
+    current_controller_vals = input_binding->override_controller_vals ? input_binding->controller_vals :
+        controller_type.getControllerVals();
+}
+
+void PlayerFighter::setBinding(const Binding& b)
+{
+    input_binding = &b;
+}
+
 
 /**
  * @brief returns the input binding this PlayerFighter is currently using
  * 
  */
 
-Binding* PlayerFighter::getInputBinding()const{
+const Binding* PlayerFighter::getInputBinding()const{
     return input_binding;
 }
 
@@ -369,7 +401,6 @@ Binding* PlayerFighter::getInputBinding()const{
  */
 jumpY PlayerFighter::decideGroundedJumpYType() const {
 
-    const ControllerVals current_controller_vals = getCurrentControllerVals();
 
     if (((state_info >> 2) & 1) == 1) return jumpY::Short;
 
@@ -388,7 +419,7 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
  */
 jumpX PlayerFighter::decideJumpXType() const {
     int8_t orientation = sign(current_direction_control_state.x);
-    return (abs(current_direction_control_state.x) > getCurrentControllerVals().analogStickThreshold) ?
+    return (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold) ?
         (orientation == facing) ? jumpX::Forward : jumpX::Backwards :
         jumpX::Normal;
 }
@@ -446,8 +477,6 @@ bool PlayerFighter::drawDebugInfo(SDL_Renderer* target, SDL_Rect& displayArea){
         //damn i forgot about that and i still can't believe it
         //forgot about all that again, there's no function to render a circle ???
         SDL_RenderDrawRect(target, &box);
-
-        const ControllerVals current_controller_vals = getCurrentControllerVals();
 
         double analogThreshold = Port::normalizeStickValue(current_controller_vals.analogStickThreshold);
         double analogSmashThreshold = Port::normalizeStickValue(current_controller_vals.analogStickSmashThreshold);
