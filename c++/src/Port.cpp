@@ -148,6 +148,9 @@ void Port::plugController(Controller& cont){
     Debug::log("=========== Plugged controller ============");
 
     cont.plugToPort(*this);
+    if (fighter){
+        fighter->onControllerChanged();
+    }
     controller = &cont;
 }
 
@@ -155,7 +158,7 @@ void Port::unplugController()
 {
     controller->clearPort();
     controller = nullptr;
-    Debug::log("Port::unplugPort");
+    Debug::log("Port::unplugController");
 }
 
 void Port::setFighter(PlayerFighter* fighter_){
