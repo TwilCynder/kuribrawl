@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <functional>
+#include <bitset>
 #include "type_wrapper.h"
 
 class Logger {
@@ -53,6 +54,13 @@ class Logger {
             l << std::hex;
             l << val;
             l << std::dec;
+        };
+    }
+
+    template <typename T>
+    static lambda bin(const T& val){
+        return [val](Logger& l){
+            l << std::bitset<sizeof(T) * 8>(val);
         };
     }
 
