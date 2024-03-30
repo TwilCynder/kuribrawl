@@ -148,10 +148,11 @@ void Port::plugController(Controller& cont){
     Debug::log("=========== Plugged controller ============");
 
     cont.plugToPort(*this);
+    controller = &cont;
+
     if (fighter){
         fighter->onControllerChanged();
     }
-    controller = &cont;
 }
 
 void Port::unplugController()

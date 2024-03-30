@@ -144,8 +144,7 @@ void PortsManager::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 		return;
 	}
 
-	Debug::log(evt.button);
-	
+	//Debug::log(evt.button);
 
 	if (!controller->isPlugged()){
 		Port* first_inactive_port = getFirstInactivePort();
