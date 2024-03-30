@@ -232,6 +232,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
 void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
     current_animation.draw(target, cam.getXOnScreen(position.x) , cam.getYOnScreen(position.y), facing);
 
+    #ifdef DEBUG
     SDL_Rect box;
 
     //Drawing hurtboxes
@@ -263,6 +264,8 @@ void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
     //Drawing position
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
     SDL_Drawing::drawCross(target, cam.getXOnScreen(position.x), cam.getYOnScreen(position.y), 10);
+
+    #endif
 }
 
 void Fighter::writeDebugInfo(AdvancedTextDisplayer& out){

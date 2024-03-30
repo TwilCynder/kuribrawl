@@ -196,7 +196,7 @@ void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame, int faci
     Frame& source = frames[frame];
 
     SDL_Rect dest;
-    dest.x = x - source.origin.x;
+    dest.x = x + (facing > 0 ? -source.origin.x : source.origin.x - source.display.w);
     dest.y = y - source.origin.y;
     dest.w = source.display.w;
     dest.h = source.display.h;
