@@ -11,7 +11,7 @@
 void App::startTestGame(){
 	Debug::log("=====Starting game=====");
 
-	portsManager.openAllControllers(this->controllersData());
+	//portsManager.openAllControllers(this->controllersData()); //plus besoin car on a des events deviceadded au lancement
 
 	//portsManager.openKeyboardController(this->controllersData());
 	//portsManager.plugKeyboard(0);

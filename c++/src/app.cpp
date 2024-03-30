@@ -217,7 +217,11 @@ void App::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 	portsManager.handleButtonEvent(evt);
 }
 
-void App::handleDevideEvent(const SDL_ControllerDeviceEvent &evt)
+void App::handleDeviceAdded(const SDL_JoyDeviceEvent &evt){
+	portsManager.openController(evt.which, this->controllersData());
+}
+
+void App::handleDeviceRemoved(const SDL_JoyDeviceEvent &evt)
 {
 	portsManager.removeController(evt.which);
 }
@@ -270,13 +274,18 @@ void App::handleEvents(){
 			case SDL_QUIT:
 				stop();
 				break;
+			case SDL_JOYDEVICEADDED:
+				Debug::log("DEVICE FCKING ADDED ===========================");
+				handleDeviceAdded(event.jdevice);
+				break;
 			case SDL_JOYDEVICEREMOVED:
 				Debug::log("DEVICE FCKING REMOVED ===========================");
-				handleDevideEvent(event.cdevice);
+				handleDeviceRemoved(event.jdevice);
 				break;
 			case SDL_JOYBUTTONDOWN:
 				handleButtonEvent(event.jbutton);
 				break;
+
 			case SDL_CONTROLLERBUTTONDOWN:
 				Debug::log("GAME CONTROLLER BUTTON DOWN EVENT");
 				break;

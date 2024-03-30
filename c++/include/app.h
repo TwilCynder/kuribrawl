@@ -66,7 +66,8 @@ class App
 
     void handleEvents();
     void handleButtonEvent(const SDL_JoyButtonEvent& evt);
-    void handleDevideEvent(const SDL_ControllerDeviceEvent& evt);
+    void handleDeviceAdded(const SDL_JoyDeviceEvent& evt);
+    void handleDeviceRemoved(const SDL_JoyDeviceEvent& evt);
     void render();
 
     void startTestGame();
