@@ -26,6 +26,8 @@ acid\dash_stop.png
 A:acid/dash_stop 2 5.0 c
 acid\dash_turn.png
 A:acid/dash_turn 3 14.0 c
+acid\fair.png
+A:acid/fair acid\fair.dat
 acid\hurt.png
 A:acid/hurt 1 -1.0 c
 acid\idle.png

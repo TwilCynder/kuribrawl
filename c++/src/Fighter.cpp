@@ -416,7 +416,7 @@ void Fighter::updateState(){
     switch (state){
         case State::JUMPSQUAT:
             if (isStateFinished(model->values.jump_squat_duration)){
-                ground_jump();
+                ground_jump(static_cast<jumpX>(state_info & 0b11), (state_info & 0b100) ? jumpY::Short : jumpY::UndecidedY);
             }
             break;
         case State::DASH_START:
