@@ -13,7 +13,7 @@ void App::startTestGame(){
 
 	//portsManager.openAllControllers(this->controllersData()); //plus besoin car on a des events deviceadded au lancement
 
-	//portsManager.openKeyboardController(this->controllersData());
+	portsManager.openKeyboardController(this->controllersData());
 	//portsManager.plugKeyboard(0);
 	//portsManager.openController(0, this->controllersData());
 	//portsManager.plugController(0, 0);
@@ -24,8 +24,8 @@ void App::startTestGame(){
 	Debug::out << "Stage : " << testStage->getDisplayName() << '\n';
 
 	GameConfiguration config;
-	config.addPlayer(nullptr, *acid);
-	config.addPlayer(nullptr, *acid);
+	config.addPlayer(portsManager.getPort(2), *acid);
+	config.addPlayer(portsManager.getPort(1), *acid);
 	config.addPlayer(portsManager.getPort(0), *acid);
 	config.setStage(testStage);
 

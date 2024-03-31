@@ -147,8 +147,10 @@ void PortsManager::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 	//Debug::log(evt.button);
 
 	if (!controller->isPlugged()){
+		Debug::log("Received button event for unplugged controller. Attempting to plug.");
 		Port* first_inactive_port = getFirstInactivePort();
 		if (first_inactive_port){
+			Debug::log("A free prot was found, plugging.");
 			first_inactive_port->plugController(*controller);
 		}
 	}
@@ -158,6 +160,17 @@ void PortsManager::handleButtonEvent(const SDL_JoyButtonEvent& evt){
 
 void PortsManager::handleKeyEvent(const SDL_KeyboardEvent &evt){
 	Controller* controller = keyboard_controller.get();
-    if (controller != nullptr && !evt.repeat)
-        controller->handleButtonPress(evt.keysym.scancode);
+    if (controller != nullptr && !evt.repeat){
+		if (!controller->isPlugged()){
+			Debug::log("Received button event for unplugged controller (keyboard). Attempting to plug.");
+			Port* first_inactive_port = getFirstInactivePort();
+			if (first_inactive_port){
+				Debug::log("A free port was found, plugging.");
+				first_inactive_port->plugController(*controller);
+			}
+		}
+
+		controller->handleButtonPress(evt.keysym.scancode);
+	}
+        
 }
