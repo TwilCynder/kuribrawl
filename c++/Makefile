@@ -9,7 +9,7 @@ else
 endif 
 
 LDFLAGS = `sdl2-config --libs` -lSDL2_image -lm
-LDFLAGS_STATIC = `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
+LDFLAGS_STATIC = -Wl,-Bstatic `sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm -ljpeg -lpng -ltiff -lz -llzma -lzstd -lwebp
 
 #`sdl2-config --static-libs` -static-libgcc -static-libstdc++ -lSDL2_image -lm
 
