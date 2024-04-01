@@ -9,6 +9,16 @@
 #define checkNull(value, exception) if (!value) {throw exception;}
 
 namespace Kuribrawl {
+    template<typename T>
+    T min (T v1, T v2){
+        return (v1 > v2) ? v2 : v1;
+    }
+
+    template<typename T>
+    T max (T v1, T v2){
+        return (v1 < v2) ? v2 : v1;
+    }
+
     //ajouter NEUTRAL (actuellement NONE est utilisé, mais mtn NONE devrait vouloir dire non-spécifié)
     enum class Direction {
         RIGHT,
@@ -26,25 +36,37 @@ namespace Kuribrawl {
         NONE
     };
 
+    enum class Side {
+        LEFT = -1,
+        NEUTRAL = 0,
+        RIGHT = 1
+    };
 
     signed char sign(int);
     signed char sign(double);
     signed char signReduced(int value, int minimum);
     void substractValue(double* v1, double v2);
 
-    template<typename T>
-    T min (T v1, T v2){
-        return (v1 > v2) ? v2 : v1;
+    template <typename T>
+    inline Kuribrawl::Side signToSide(T v){
+        return (Kuribrawl::Side)sign(v);
     }
 
-    template<typename T>
-    T max (T v1, T v2){
-        return (v1 < v2) ? v2 : v1;
+    template <typename T>
+    inline T flipValue(T v, Kuribrawl::Side side){
+        return v * (int8_t)side;
     }
 
-    DirectionIG DirectionToDirectionIG(Direction, int facing);
+    Side oppSide(Side side){
+        return (Side)(-(int8_t)side);
+    }
+
+    inline Kuribrawl::Side operator-(Kuribrawl::Side);
+    inline bool operator!(Kuribrawl::Side);
+
+    DirectionIG DirectionToDirectionIG(Direction, Side facing);
     Direction getDirection4(const Vector& stick_state, int threshold);
-    DirectionIG getDirection4IG(const Vector& stick_state, int threshold, int facing);
+    DirectionIG getDirection4IG(const Vector& stick_state, int threshold, Side facing);
 
     bool isRight(const Kuribrawl::Vector& stick, int threshold);
     bool isUp(const Kuribrawl::Vector& stick, int threshold);

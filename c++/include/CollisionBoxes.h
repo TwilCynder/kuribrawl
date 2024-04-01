@@ -1,5 +1,7 @@
 #pragma once 
 
+#include "Util/util.h"
+
 /**
  * @brief Basically a rectangle, that will be used as a collision area for hit detection
  * Coordinates works like follows :
@@ -12,7 +14,7 @@ struct CollisionBox {
     int w;
     int h;
 
-    int getRealXPos(int facing) const;
+    int getRealXPos(Kuribrawl::Side facing) const;
 };
 
 struct Hurtbox : CollisionBox {

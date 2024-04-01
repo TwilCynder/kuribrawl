@@ -1,5 +1,5 @@
 #include "CollisionBoxes.h"
 
-int CollisionBox::getRealXPos(int facing) const{
-    return (facing == 1) ? x : -x - w;
+int CollisionBox::getRealXPos(Kuribrawl::Side facing) const{
+    return (facing == Kuribrawl::Side::RIGHT) ? x : -x - w;
 }

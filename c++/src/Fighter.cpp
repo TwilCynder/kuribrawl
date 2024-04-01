@@ -8,6 +8,7 @@
 #include "Move.h"
 #include "Random.h"
 #include "gameCalculations.h"
+
 #include "Util/Text/TextDisplayer.h"
 #include "Camera.h"
 
@@ -36,7 +37,7 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     update_anim(true),
     paused(false),
     ground_interaction(GroundInteraction::NONE),
-    facing(1),
+    facing(Kuribrawl::Side::NEUTRAL),
     grounded(false),
 	air_jumps(model_->values.air_jumps),
     current_ground(nullptr),
@@ -182,7 +183,7 @@ bool Fighter::getGrounded() const{
     return grounded;
 }
 
-int Fighter::getFacing() const{
+Kuribrawl::Side Fighter::getFacing() const{
     return facing;
 }
 
@@ -205,7 +206,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
 
     double knockback = GameCalc::getKnockback(0, 0, 0, 0) * 2;
     double angle = PI * 3 / 8;
-    if (attacker.facing < 0){
+    if (attacker.facing == Kuribrawl::Side::LEFT){
         angle = (PI - angle);
     }
 
@@ -213,7 +214,7 @@ void Fighter::getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hur
     speed.y = knockback * sin(angle);
 
     int hitstun = 10;
-    setState(Fighter::State::HITSTUN, -sign(speed.x), hitstun, false);
+    setState(Fighter::State::HITSTUN, Kuribrawl::signToSide(-speed.x), hitstun, false);
 
     /*Choix de l'animation de hitstun*/
     setAnimation(Champion::DefaultAnimation::HITSTUN);
@@ -298,14 +299,14 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
     
     switch(x_type){
         case jumpX::Forward:
-            if (speed.x * facing < model->values.ground_forward_jump_speed){
-                speed.x = model->values.ground_forward_jump_speed * facing;
+            if (Kuribrawl::flipValue(speed.x, facing) < model->values.ground_forward_jump_speed){
+                speed.x = Kuribrawl::flipValue(model->values.ground_forward_jump_speed, facing);
             }
             animation_id = Champion::DefaultAnimation::JUMP_FORWARD;
             break;
         case jumpX::Backwards:
-            if (speed.x * -facing < model->values.ground_backward_jump_speed){
-                speed.x = model->values.ground_backward_jump_speed * -facing;
+            if (Kuribrawl::flipValue(-speed.x, facing) < model->values.ground_backward_jump_speed){
+                speed.x = Kuribrawl::flipValue(-model->values.ground_backward_jump_speed, facing);
             }
             animation_id = Champion::DefaultAnimation::JUMP_BACKWARD;
             break;
@@ -314,7 +315,7 @@ void Fighter::ground_jump(jumpX x_type, jumpY y_type){
             break;
     }
 
-    setState(State::IDLE, 0, 1, false);
+    setState(State::IDLE, Kuribrawl::Side::NEUTRAL, 1, false);
     setAnimation(animation_id);
     grounded = false;
 }
@@ -330,14 +331,14 @@ int Fighter::air_jump(jumpX x_type){
 
 	    switch(x_type){
             case jumpX::Forward:
-                if (speed.x * facing < model->values.air_forward_jump_speed){
-                    speed.x = model->values.air_forward_jump_speed * facing;
+                if (Kuribrawl::flipValue(speed.x, facing) < model->values.air_forward_jump_speed){
+                    speed.x = Kuribrawl::flipValue(model->values.air_forward_jump_speed, facing);
                 }
                 animation_id = Champion::DefaultAnimation::AIR_JUMP_FORWARD;
                 break;
             case jumpX::Backwards:
-                if (speed.x * -facing < model->values.air_backward_jump_speed){
-                    speed.x = model->values.air_backward_jump_speed * -facing;
+                if (Kuribrawl::flipValue(speed.x, Kuribrawl::oppSide(facing)) < model->values.air_backward_jump_speed){
+                    speed.x = Kuribrawl::flipValue(model->values.air_backward_jump_speed, Kuribrawl::oppSide(facing));
                 }
                 animation_id = Champion::DefaultAnimation::AIR_JUMP_BACKWARD;
                 break;
@@ -348,7 +349,7 @@ int Fighter::air_jump(jumpX x_type){
 		
         speed.y = model->values.air_jump_speed;
 		air_jumps--;
-		setState(Fighter::State::IDLE, 0, 0, false);
+		setState(Fighter::State::IDLE, Kuribrawl::Side::NEUTRAL, 0, false);
         setAnimation(animation_id);
         
         return 1;
@@ -441,7 +442,7 @@ void Fighter::updateState(){
             break;
         case State::HITSTUN:    //State info is the hitstun duration
             if (state_timer >= state_info) {
-                setState(State::IDLE, 0, 2, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT);
+                setState(State::IDLE, Kuribrawl::Side::NEUTRAL, 2, Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT);
             }
             break;
         case State::ATTACK:
@@ -536,19 +537,19 @@ Fighter::State Fighter::getState() const {
  * @param update_anim_ Whether the current Animation should be changed according to the new state as soon as possible (defaults to true);
  */
 
-void Fighter::setState(const Fighter::State s, int facing_, int info, bool update_anim_){
+void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing_, int info, bool update_anim_){
     //Debug::log(s, *this);
     state = s;
     state_info = info;
     update_anim = update_anim_;
-    if (facing_) facing = facing_;
+    if (facing_ != Kuribrawl::Side::NEUTRAL) facing = facing_;
 
     state_timer = 0;
     paused = 0;
     checkStateDuration();
 }
 
-void Fighter::setState(const Fighter::State s, int facing, int info, Champion::DefaultAnimation anim){
+void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim){
     setAnimation(anim);
     setState(s, facing, info, false);
 }

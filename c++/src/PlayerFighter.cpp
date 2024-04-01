@@ -259,7 +259,7 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
         case State::IDLE:
             if (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold){
                 if (grounded){
-                    setState(State::WALK, sign(current_direction_control_state.x));
+                    setState(State::WALK, Kuribrawl::signToSide(current_direction_control_state.x));
                 } else {
 					applyAirAccel(sign(current_direction_control_state.x));
 				}
@@ -275,13 +275,13 @@ void PlayerFighter::checkStickState(){ //lots of error checks to do
         case State::WALK:
             if (abs(current_direction_control_state.x) < current_controller_vals.analogStickThreshold){
                 setState(State::IDLE);
-            } else if (sign(current_direction_control_state.x) != facing){
+            } else if (Kuribrawl::signToSide(current_direction_control_state.x) != facing){
 
                 setState(State::WALK, -facing, 0, false);
             }
             break;
         case State::DASH:
-            if (current_direction_control_state.x * facing < current_controller_vals.analogStickThreshold){
+            if (Kuribrawl::flipValue(current_direction_control_state.x, facing) < current_controller_vals.analogStickThreshold){
                 setState(State::DASH_STOP);
             }
             break;
@@ -412,7 +412,7 @@ jumpY PlayerFighter::decideGroundedJumpYType() const {
  * @return jumpX
  */
 jumpX PlayerFighter::decideJumpXType() const {
-    int8_t orientation = sign(current_direction_control_state.x);
+    Kuribrawl::Side orientation = Kuribrawl::signToSide(current_direction_control_state.x);
     return (abs(current_direction_control_state.x) > current_controller_vals.analogStickThreshold) ?
         (orientation == facing) ? jumpX::Forward : jumpX::Backwards :
         jumpX::Normal;
@@ -435,7 +435,7 @@ int PlayerFighter::jump_manager(RegisteredInput& input, jumpY type){
         if (state == Fighter::State::JUMPSQUAT && input.element_type != ElementType::STICK){ //if we pressed a second jump button/trigger basically
             state_info |= 0b100;  //set the jump Y type to short hop
         } else {
-            setState(Fighter::State::JUMPSQUAT, 0, 0 addBitValue(((Uint8)(type == jumpY::Short) ? 1 : 0), 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
+            setState(Fighter::State::JUMPSQUAT, Kuribrawl::Side::NEUTRAL, 0 addBitValue(((Uint8)(type == jumpY::Short) ? 1 : 0), 2) addBitValue(input.element_type, 3) addBitValue(input.element, 5));
         }
     } else {
         return air_jump();

@@ -19,7 +19,7 @@ class AnimationPlayerBase {
     AnimationPlayerBase(const Animation* animation);
 
     void draw(SDL_Renderer* target, int x, int y) const; 
-    void draw(SDL_Renderer* target, int x, int y, int facing) const;
+    void draw(SDL_Renderer* target, int x, int y, Kuribrawl::Side facing) const;
 
     bool is_initialized() const;
     bool is_finished() const;

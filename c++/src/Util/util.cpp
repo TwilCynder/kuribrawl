@@ -26,8 +26,18 @@ void Kuribrawl::substractValue(double* v1, double v2){
     *v1 *= s;
 }
 
-Kuribrawl::DirectionIG Kuribrawl::DirectionToDirectionIG(Kuribrawl::Direction direction, int facing){
-    return (facing == -1 && (direction == Direction::LEFT || direction == Direction::RIGHT)) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
+Kuribrawl::Side Kuribrawl::operator-(Kuribrawl::Side s)
+{
+    return Kuribrawl::oppSide(s);
+}
+
+bool Kuribrawl::operator!(Kuribrawl::Side s)
+{
+    return !(int8_t)s;
+}
+
+Kuribrawl::DirectionIG Kuribrawl::DirectionToDirectionIG(Kuribrawl::Direction direction, Kuribrawl::Side facing){
+    return (facing == Kuribrawl::Side::LEFT && (direction == Direction::LEFT || direction == Direction::RIGHT)) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
 }
 
 Direction Kuribrawl::getDirection4(const Vector& stick_state, int threshold){
@@ -43,14 +53,14 @@ Direction Kuribrawl::getDirection4(const Vector& stick_state, int threshold){
     }
 }
 
-DirectionIG Kuribrawl::getDirection4IG(const Vector& stick_state, int threshold, int facing) {
+DirectionIG Kuribrawl::getDirection4IG(const Vector& stick_state, int threshold, Kuribrawl::Side facing) {
     int absX = abs(stick_state.x);
     int absY = abs(stick_state.y);
 
     if (absX < threshold && absY < threshold){
         return DirectionIG::NONE;
     } else if (absX > absY){
-        return (DirectionIG)( 1 - (sign(stick_state.x) * facing));
+        return (DirectionIG)( 1 - (sign(stick_state.x) * (int8_t)facing));
     } else {
         return (DirectionIG)( 2 + sign(stick_state.y));
     }

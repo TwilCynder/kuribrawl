@@ -15,7 +15,7 @@ int PlayerFighter::InputHandler_ShortHop(RegisteredInput& input){
 
 int PlayerFighter::InputHandler_SmashStickSide(RegisteredInput& input){
 
-    int side = (input.input == Input::LEFT) ? -1 : 1;
+    Kuribrawl::Side side = (input.input == Input::LEFT) ? Kuribrawl::Side::LEFT : Kuribrawl::Side::RIGHT;
 
     if (grounded){
         if (state == Fighter::State::WALK ||

@@ -33,7 +33,7 @@ void Fighter::groundCollision(){
     } else {
         setAnimation(Champion::DefaultAnimation::LANDING);
     }
-    setState(Fighter::State::LANDING, 0, 0, false);
+    setState(Fighter::State::LANDING, Kuribrawl::Side::NEUTRAL, 0, false);
 
     land();
 }
@@ -113,7 +113,7 @@ void Fighter::applyPhysics(Game& game){
 
     Kuribrawl::VectorDouble new_pos;
 
-    if (!facing) facing = 1;
+    if (!facing) facing = Kuribrawl::Side::RIGHT;
 
     if (abs(speed.x) < MAX_SPEED_PRECISION) speed.x = 0;
     if (abs(speed.y) < MAX_SPEED_PRECISION) speed.y = 0;
@@ -150,16 +150,16 @@ void Fighter::applyPhysics(Game& game){
 
     switch (state) {
         case State::WALK:
-            speed.x = model->values.walk_speed * facing;
+            speed.x = Kuribrawl::flipValue(model->values.walk_speed, facing);
             break;
         case State::DASH:
-            speed.x = model->values.dash_speed * facing;
+            speed.x = Kuribrawl::flipValue(model->values.dash_speed, facing);
             break;
         case State::DASH_START:
-            speed.x = model->values.dash_start_speed * facing;
+            speed.x = Kuribrawl::flipValue(model->values.dash_start_speed, facing);
             break;
         case State::DASH_TURN:
-            speed.x += model->values.dash_turn_accel * facing;
+            speed.x += Kuribrawl::flipValue(model->values.dash_turn_accel, facing);
         default:
             break;
     }

@@ -169,24 +169,19 @@ double AnimationBase::getBaseSpeed(){
  */
 
 void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame)const{
-    if (!this->spritesheet) return;
-
-    if (frame > nb_frames) {
-        throw KBFatal("Frame index %d out of bounds", frame);
-    }
-
-    Frame& source = frames[frame];
-
-    SDL_Rect dest;
-    dest.x = x - source.origin.x;
-    dest.y = y - source.origin.y;
-    dest.w = source.display.w;
-    dest.h = source.display.h;
-
-    SDL_RenderCopy(target, spritesheet, &source.display, &dest);
+    return draw(target, x, y, frame, Kuribrawl::Side::RIGHT);
 }
 
-void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame, int facing)const{
+/**
+ * @brief Draws a specific frame of this AnimationBase. 
+ * Uses SDL_RenderCopy to copy the rectangle designated frame from.
+ * @param target the renderer the frame will be drawn to.
+ * @param x x position in the destination.
+ * @param y y position in the destination.
+ * @param frame index of the frame.
+ * @param facing orientation of the frame
+ */
+void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame, Kuribrawl::Side facing)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {
@@ -196,12 +191,12 @@ void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame, int faci
     Frame& source = frames[frame];
 
     SDL_Rect dest;
-    dest.x = x + (facing > 0 ? -source.origin.x : source.origin.x - source.display.w);
+    dest.x = x + (facing == Kuribrawl::Side::RIGHT ? -source.origin.x : source.origin.x - source.display.w);
     dest.y = y - source.origin.y;
     dest.w = source.display.w;
     dest.h = source.display.h;
 
-    if (facing == -1)
+    if (facing == Kuribrawl::Side::LEFT)
         SDL_RenderCopyEx(target, spritesheet, &source.display, &dest, 0, NULL, SDL_FLIP_HORIZONTAL);
     else
         SDL_RenderCopy(target, spritesheet, &source.display, &dest);

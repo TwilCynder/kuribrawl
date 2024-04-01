@@ -233,7 +233,7 @@ void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y) const {
     model->draw(target, x, y, current_frame);
 }
 
-void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y, int facing) const {
+void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y, Kuribrawl::Side facing) const {
     if (!model){
         throw KBFatal("Tried to draw non-initalized AnimationPlayerBase");
     }

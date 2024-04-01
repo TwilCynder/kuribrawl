@@ -35,7 +35,7 @@ class AnimationBase {
     double getBaseSpeed();
 
     void draw(SDL_Renderer* target, int x, int y, int frame)const;
-    void draw(SDL_Renderer* target, int x, int y, int frame, int facing)const;
+    void draw(SDL_Renderer* target, int x, int y, int frame, Kuribrawl::Side facing)const;
 
     bool operator==(const AnimationBase&) const;
     std::weak_ordering operator<=>(const AnimationBase&) const;

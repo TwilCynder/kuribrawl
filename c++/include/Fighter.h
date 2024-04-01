@@ -63,8 +63,8 @@ class Fighter : public Drawable {
     Game& getGame();
     const Champion& getChampion();
     State getState() const;
-    void setState(const State s, int facing = 0, int info = 0, bool update_anim_ = true);
-    void setState(const State s, int facing, int info, Champion::DefaultAnimation anim);
+    void setState(const State s, Kuribrawl::Side facing = Kuribrawl::Side::NEUTRAL, int info = 0, bool update_anim_ = true);
+    void setState(const State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim);
     bool attack(const Move&);
     const EntityAnimation* getCurrentAnimation() const;
     void setAnimation(Champion::DefaultAnimation);
@@ -77,7 +77,7 @@ class Fighter : public Drawable {
     const Kuribrawl::VectorDouble& getPosition() const;
     void setSpeed(double x, double y);
     bool getGrounded() const;
-    int getFacing() const;
+    Kuribrawl::Side getFacing() const;
     bool hitFighter(Fighter& target, const Hitbox& hitbox, const Hurtbox& hurtbox);
     void getHit(Fighter& attacker, const Hitbox& hitbox, const Hurtbox& hurtbox);
 
@@ -100,7 +100,7 @@ class Fighter : public Drawable {
         SOFT,   ///< Ignore collision with traversable platforms if airborn
         HARD,   ///< Go through a traversable platform even if currently grounded on it.
     } ground_interaction;   ///< Determines the interaction between this fighter and the ground below them.
-    int8_t facing;          ///< 1 if the Fighter is facing left, -1 if they're facing right.
+    Kuribrawl::Side facing;          ///< 1 if the Fighter is facing left, -1 if they're facing right.
     bool grounded;      ///< true if the Fighter is on the ground.
     Uint8 air_jumps;    ///< Number of times this fighter can air jump before touching the ground again
     Kuribrawl::VectorDouble position;   ///< Current position of the Fighter in the Stage the game is playing in.
