@@ -1,10 +1,10 @@
 ///\todo Animation* -> Animation&
 
 #include <math.h>
-#include "Animation/AnimationPlayer.h"
-#include "Animation/Animation.h"
+#include "Display/AnimationPlayer.h"
+#include "Display/Animation.h"
 #include "KBDebug/Debug.h"
-#include "Animation/Frame.h"
+#include "Display/Frame.h"
 
 /**
  * @brief Construct a new Current Animation object.

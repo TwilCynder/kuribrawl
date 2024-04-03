@@ -3,8 +3,8 @@
 #include <string>
 #include <memory>
 #include "SDL2/SDL.h"
-#include "Drawable.h"
-#include "Animation/EntityAnimationPlayer.h"
+#include "Display/Drawable.h"
+#include "Display/EntityAnimationPlayer.h"
 #include "Util/util.h"
 #include "InputManager.h"
 #include "gameActions.h"

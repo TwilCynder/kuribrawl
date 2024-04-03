@@ -36,6 +36,10 @@ bool Kuribrawl::operator!(Kuribrawl::Side s)
     return !(int8_t)s;
 }
 
+Kuribrawl::Side Kuribrawl::oppSide(Kuribrawl::Side side){
+    return (Side)(-(int8_t)side);
+}
+
 Kuribrawl::DirectionIG Kuribrawl::DirectionToDirectionIG(Kuribrawl::Direction direction, Kuribrawl::Side facing){
     return (facing == Kuribrawl::Side::LEFT && (direction == Direction::LEFT || direction == Direction::RIGHT)) ? (DirectionIG)(2 - (int)direction) : (DirectionIG)direction;
 }

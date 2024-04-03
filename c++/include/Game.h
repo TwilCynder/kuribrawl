@@ -4,7 +4,7 @@
 #include "Util/ManualCountForwardList.h"
 #include "SDL2/SDL.h"
 #include "PlayerFighter.h"
-#include "Drawer.h"
+#include "Display/Drawer.h"
 #include "Camera.h"
 
 class Champion;

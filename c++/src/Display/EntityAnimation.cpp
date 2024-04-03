@@ -1,4 +1,4 @@
-#include "Animation/EntityAnimation.h"
+#include "Display/EntityAnimation.h"
 #include "KBDebug/Debug.h"
 
 using EndAction = AnimationEndAction<EntityAnimation>;

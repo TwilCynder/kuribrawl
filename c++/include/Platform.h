@@ -2,8 +2,8 @@
 
 #include <memory>
 #include "Util/structures.h"
-#include "Animation/AnimationPlayer.h"
-#include "Drawable.h"
+#include "Display/AnimationPlayer.h"
+#include "Display/Drawable.h"
 #include "Ground.h"
 
 class PlatformModel;

@@ -1,4 +1,4 @@
-#include "Animation/Frame.h"
+#include "Display/Frame.h"
 
 /**
  * @brief Construct a new Frame object

@@ -1,7 +1,7 @@
-#include "Animation/AnimationsPool.h"
+#include "Display/AnimationsPool.h"
 #include "KBDebug/Debug.h"
-#include "Animation/Animation.h"
-#include "Animation/EntityAnimation.h"
+#include "Display/Animation.h"
+#include "Display/EntityAnimation.h"
 
 /**
  * @brief Adds an Animation.

@@ -2,7 +2,7 @@
 
 #include <set>
 #include "Util/structures.h"
-#include "Drawable.h"
+#include "Display/Drawable.h"
 
 class SDL_Renderer;
 

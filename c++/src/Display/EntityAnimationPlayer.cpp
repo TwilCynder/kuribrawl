@@ -1,6 +1,6 @@
 #include "KBDebug/Debug.h"
-#include "Animation/EntityAnimationPlayer.h"
-#include "Animation/EntityAnimation.h"
+#include "Display/EntityAnimationPlayer.h"
+#include "Display/EntityAnimation.h"
 
 #define model_ ((EntityAnimation*)model)
 

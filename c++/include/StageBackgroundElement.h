@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Animation/AnimationPlayer.h"
-#include "Drawable.h"
+#include "Display/AnimationPlayer.h"
+#include "Display/Drawable.h"
 
 class StageBackgroundElementModel;
 class SDL_Renderer;

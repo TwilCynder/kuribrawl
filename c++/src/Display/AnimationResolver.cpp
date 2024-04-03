@@ -1,4 +1,4 @@
-#include "Animation/AnimationResolver.h"
+#include "Display/AnimationResolver.h"
 
 template <class A>
 AnimationResolver::Binding<A>::Binding(const AnimationsPool<A>& pool_, const std::string&& animation_name_, A& target_) :

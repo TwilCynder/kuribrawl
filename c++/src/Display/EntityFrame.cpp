@@ -1,4 +1,4 @@
-#include "Animation/EntityFrame.h"
+#include "Display/EntityFrame.h"
 #include "KBDebug/Debug.h"
 
 /**

@@ -57,12 +57,10 @@ namespace Kuribrawl {
         return v * (int8_t)side;
     }
 
-    Side oppSide(Side side){
-        return (Side)(-(int8_t)side);
-    }
+    Side oppSide(Side side);
 
-    inline Kuribrawl::Side operator-(Kuribrawl::Side);
-    inline bool operator!(Kuribrawl::Side);
+    Kuribrawl::Side operator-(Kuribrawl::Side);
+    bool operator!(Kuribrawl::Side);
 
     DirectionIG DirectionToDirectionIG(Direction, Side facing);
     Direction getDirection4(const Vector& stick_state, int threshold);

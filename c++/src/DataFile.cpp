@@ -1,8 +1,8 @@
 #include <string.h>
 #include "SDL2/SDL_error.h"
 #include "DataFile.h"
-#include "Animation/AnimationsPool.h"
-#include "Animation/EntityAnimation.h"
+#include "Display/AnimationsPool.h"
+#include "Display/EntityAnimation.h"
 #include "Champion.h"
 #include "StageModel.h"
 #include "app.h"

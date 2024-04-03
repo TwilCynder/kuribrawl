@@ -140,4 +140,4 @@ Drawer déjà fait, voir pour la gestion de composants statiques/dynamiques dans
 
 Idéalement : 
 - Chaque drawable a une profondeur (statique), un layer et un order (dynamiques)
-- Le drawable est une map de listes, qui sont retriées à chaque frame
+- Le drawer est une map de listes, qui sont retriées à chaque frame
