@@ -310,7 +310,7 @@ void Game::updateCameraPosition(SDL_Renderer* target){
     #ifdef DEBUG
     if (camera_debug_markers){
         SDL_SetRenderDrawColor(target, 255, 255, 0, 255);
-        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), (int)fighters_box.right - fighters_box.left, (int)fighters_box.top - fighters_box.bottom};
+        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), (int)(fighters_box.right - fighters_box.left), (int)(fighters_box.top - fighters_box.bottom)};
         SDL_RenderDrawRect(target, &fbrect);
 
     }
@@ -320,15 +320,15 @@ void Game::updateCameraPosition(SDL_Renderer* target){
     fighters_box.bottom += game_constants_calc.camera_offset_yreal;
 
     Kuribrawl::Vector mid_pos = {
-        (fighters_box.right - fighters_box.left) / 2 + fighters_box.left,
-        (fighters_box.top - fighters_box.bottom) / 2 + fighters_box.bottom - (SCREEN_HEIGHT / 2)
+        static_cast<int>((fighters_box.right - fighters_box.left) / 2 + fighters_box.left),
+        static_cast<int>((fighters_box.top - fighters_box.bottom) / 2 + fighters_box.bottom - (SCREEN_HEIGHT / 2))
     };
 
 
     #ifdef DEBUG
     if (camera_debug_markers){
         SDL_SetRenderDrawColor(target, 0, 255, 0, 127);
-        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), fighters_box.right - fighters_box.left, fighters_box.top - fighters_box.bottom};
+        SDL_Rect fbrect {camera.getXOnScreen(fighters_box.left), camera.getYOnScreen(fighters_box.top), (int)(fighters_box.right - fighters_box.left), (int)(fighters_box.top - fighters_box.bottom)};
         SDL_RenderDrawRect(target, &fbrect);
 
         SDL_SetRenderDrawColor(target, 0, 255, 0, 127);

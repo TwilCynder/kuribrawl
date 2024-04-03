@@ -565,6 +565,8 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
         case DataReadingResult::SET_FRAME:
             context.current_entity_frame = anim.getEntityFrame(anim_context.frame_id);
             return false;
+        default:
+            break;
     }
 
     switch (marker){
