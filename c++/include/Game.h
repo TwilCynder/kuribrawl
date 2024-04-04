@@ -4,7 +4,7 @@
 #include "Util/ManualCountForwardList.h"
 #include "SDL2/SDL.h"
 #include "PlayerFighter.h"
-#include "Display/Drawer.h"
+#include "Display/Graphics.h"
 #include "Camera.h"
 
 class Champion;
@@ -62,9 +62,9 @@ class Game {
     const GameConfSPtr& getOriginalConfigurationSharedPtr() const;
 
     private:
-    void onFighterAdded(const Fighter&);
+    void onFighterAdded(Fighter&);
 
-    Drawer graphics;
+    Graphics graphics;
     Camera camera;
 
     using Fighteriterator = std::forward_list<PlayerFighter>::iterator;

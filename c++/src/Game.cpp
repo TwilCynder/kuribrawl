@@ -136,9 +136,9 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
     return &(*it);
 }
 
-void Game::onFighterAdded(const Fighter& fighter){
+void Game::onFighterAdded(Fighter& fighter){
     fighters++;
-    graphics.add(fighter);
+    graphics.addToMainPlane(fighter);
 }
 
 /**

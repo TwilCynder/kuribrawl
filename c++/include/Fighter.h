@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 #include "SDL2/SDL.h"
-#include "Display/Drawable.h"
+#include "Display/DynamicPlaneDrawable.h"
 #include "Display/EntityAnimationPlayer.h"
 #include "Util/util.h"
 #include "InputManager.h"
@@ -25,7 +25,7 @@ class Stage;
  * @brief An in-game character ("instance" of a Champion).
  * A Fighter is an in-game entity that can be player-controlled, and bases its animation, properties, and overall gameplay on a Champion.
  */
-class Fighter : public Drawable {
+class Fighter : public DynamicPlaneDrawable {
     public:
 
     /**
