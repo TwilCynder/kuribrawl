@@ -411,7 +411,7 @@ StageBackgroundElementModel& DataFile::readBackgroundElementData(StageModel& sta
         element.depth = -1;
     } else {
         element.position.set(x, readValue<int16_t>());
-        element.depth = readValue<int16_t>();
+        element.depth = readValue<double>();
     }
 
     Debug::sout << "Background element :" << element.position.x << element.position.y << element.depth << '\n';

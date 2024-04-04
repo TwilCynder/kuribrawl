@@ -6,7 +6,7 @@ class Animation;
 struct StageBackgroundElementModel {
     const Animation& animation;
     Kuribrawl::Vector position;
-    int depth;
+    double depth;
 
     StageBackgroundElementModel(const Animation& anim);
 };
