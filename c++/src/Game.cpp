@@ -59,6 +59,10 @@ void Game::applyConfig(GameConfiguration& config){
     stage = std::make_unique<Stage>(*stageModel);
 
     for (const StageBackgroundElement& background_element : stage->getBackgroundElements()){
+        double depth = background_element.getModel().depth;
+        if (depth == 1.0){
+            //graphics.addToMainPlane(background_element)
+        }
         graphics.add(background_element, background_element.getModel().depth);
     }
 
