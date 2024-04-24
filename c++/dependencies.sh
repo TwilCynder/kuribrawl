@@ -3,8 +3,21 @@
 cat ./dependencies/pkglist_base.txt
 printf "\n"
 
-if [ "$1" = "UCRT" ]; then
-    cat ./dependencies/pkglist_ucrt64.txt
-else
-    cat ./dependencies/pkglist_mingw64.txt
+mode="mingw"
+devpkgs=false
+
+for var in "$@"
+do
+    case "$var" in
+        '-d' | '--dev' | '--opt') 
+            devpkgs=true  
+            ;;
+        *) mode=$var    
+    esac
+done
+
+cat ./dependencies/pkglist_${mode}64.txt
+if $devpkgs; then
+    printf "\n"
+    cat ./dependencies/pkglist_${mode}64_opt.txt
 fi

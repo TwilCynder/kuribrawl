@@ -29,11 +29,16 @@ Run the terminal (according to the environment you chose) and update your system
 `pacman -Syu`  
 then navigate to the c++ directory in the kuribrawl repository, and install the required dependencies by running : 
 - `./dependencies.sh | pacman -S --needed -` if you are using MINGW64
-- `./dependencies.sh UCRT | pacman -S --needed -` if you are using UCRT64  
+- `./dependencies.sh ucrt | pacman -S --needed -` if you are using UCRT64  
+
+You can add the `-d` option to the `./dependencies.sh` call to install [additional dev tools](#additional-tools) as well.  
 
 Once the packages are installed, running `make` in this directory will compile and build the executable (`kuribrawl.exe`). It must be launched from the MinGW terminal !  
 
 - `make release` will copy all the files needed to run the game (from the terminal) in the `release` directory.   
+
+#### Additional tools
+I also recommend installing GDB. You can do so by running `./dependencies.sh [ucrt] -d | pacman -S --needed -` (with or without "ucrt" depending on your environment). 
 
 #### Side note : VSCode C++ Intellisense
 Note that the Visual Studio Code C/C++ configuration file included in the repo relies on an environment variable named "msys_dir" to find the compiler and includePath's. You'll need to set this environment variable for C++ Intellisense to work in the Windows configuration.  
