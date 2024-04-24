@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include "structures.h"
 
 #define PI 3.1416
