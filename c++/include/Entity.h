@@ -1,13 +1,15 @@
 #pragma once
 
+#include <cstdint>
+
 class Entity {
-    long euid;
+    uint32_t euid;
 
     protected:
     Entity();
 
-    long makeEUID();
+    static uint32_t makeEUID();
 
     public:
-    long getEUID();
+    uint32_t getEUID() const;
 };
