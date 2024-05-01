@@ -2,3 +2,5 @@
 	path = tools
 	url = https://github.com/TwilCynder/kuribrawl-tools
 	branch = master
+[submodule "tools/"]
+	branch = master
