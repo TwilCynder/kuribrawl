@@ -19,7 +19,7 @@ bool Controller::init(int controller_id, ControllersData &cd)
     
 
     if (instance_id < 0){
-        Debug::out << "Error while trying to open controller " << controller_id << '\n';
+        Debug::err << "Error while trying to open controller " << controller_id << '\n' << std::flush;
         Debug::log(SDL_GetError());
         gamecontroller = nullptr;
         joystick = nullptr;
@@ -31,7 +31,7 @@ bool Controller::init(int controller_id, ControllersData &cd)
 
     //STORING THE BUTTON MAPPING
     if (!initButtonMapping()){
-        Debug::out << "Error while trying to open controller : the SDL mapping is ill-formed.\n";
+        Debug::err << "Error while trying to open controller : the SDL mapping is ill-formed.\n" << std::flush;
         return false;
     }
 
@@ -49,6 +49,7 @@ unique_ptr<Controller> Controller::opencontroller(int controller_id, Controllers
     if (controller->init(controller_id, cd)) {
         return controller;
     } else {
+        Debug::err << "Keyboard controller init failed for controller " << controller_id << '\n' << std::flush;
         return nullptr;
     }
 }
@@ -70,6 +71,7 @@ unique_ptr<Controller> Controller::openKeyboardController(ControllersData& cd){
     if (controller->initAsKeyboard(cd)) {
         return controller;
     } else {
+        Debug::err << "Keyboard controller init failed\n" << std::flush;
         return nullptr;
     }
 }
@@ -288,18 +290,17 @@ signed char Controller::getDpadStateY() const
  */
 bool Controller::initButtonMapping()
 {
-        size_t needed_size = MAPPING_NORMAL_SIZE;
+    size_t needed_size = MAPPING_NORMAL_SIZE;
     
     for (unsigned int i = 0; i < controller_buttons_mapping.size(); i++){
         controller_buttons_mapping[i] = SDL_CONTROLLER_BUTTON_INVALID;
     }
 
-
     Debug::log(SDL_GameControllerMapping(gamecontroller));
     for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++){
         SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForButton(gamecontroller, static_cast<SDL_GameControllerButton>(i));
         Debug::out << bind.bindType << " " << bind.value.button << " " << i << '\n';
-        if (bind.bindType == SDL_CONTROLLER_BINDTYPE_NONE) continue;
+        if (bind.bindType == SDL_CONTROLLER_BINDTYPE_NONE || bind.bindType == SDL_CONTROLLER_BINDTYPE_HAT) continue;
         if (bind.bindType != SDL_CONTROLLER_BINDTYPE_BUTTON){
             return false;
         }
