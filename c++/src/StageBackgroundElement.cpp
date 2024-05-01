@@ -5,7 +5,10 @@
 
 #include "KBDebug/Debug.h"
 
+///TODO add the ability to be either a ParallaxDepth entity or a LayerDepth entity
+
 StageBackgroundElement::StageBackgroundElement(const StageBackgroundElementModel& model_):
+    DepthfulEntity(model_.depth, model_.subdepth),
     model(model_), animation_player(&model_.animation)
 {}
 

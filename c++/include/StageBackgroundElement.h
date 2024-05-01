@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Display/AnimationPlayer.h"
-#include "Display/Drawable.h"
+#include "DepthfulEntity.h"
 
 class StageBackgroundElementModel;
 class SDL_Renderer;
 
-class StageBackgroundElement : public Drawable {
+class StageBackgroundElement : public DepthfulEntity {
     const StageBackgroundElementModel& model;
     AnimationPlayer animation_player;
 

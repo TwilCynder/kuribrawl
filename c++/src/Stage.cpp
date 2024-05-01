@@ -33,3 +33,9 @@ const std::vector<StageBackgroundElement>& Stage::getBackgroundElements() const 
 const std::vector<Platform>& Stage::getPlatforms() const {
     return platforms;
 }
+
+void Stage::addToGraphics(GameGraphics & g)
+{
+    g.add(platforms);
+    g.add(background_elements);
+}

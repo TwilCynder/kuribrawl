@@ -11,7 +11,7 @@ DepthfulEntity::DepthUnion::DepthUnion(Layer layer, level_t level):
 DepthfulEntity::DepthfulEntity():
     Entity(),
     depth_type(DepthType::LAYER),
-    depth{MIDDLE, 0}
+    depth{Types::MIDDLE, 0}
 {
 }
 
@@ -27,6 +27,11 @@ DepthfulEntity::DepthfulEntity(Layer layer_, level_t level_):
     depth_type(DepthType::PARALLAX),
     depth{layer_, level_}
 {
+}
+
+inline DepthfulEntity::DepthType DepthfulEntity::getDepthType() const
+{
+    return depth_type;
 }
 
 inline DepthfulEntity::Layer DepthfulEntity::getLayer() const

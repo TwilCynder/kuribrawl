@@ -58,8 +58,10 @@ void Game::applyConfig(GameConfiguration& config){
     if (!stageModel) throw KBFatal("Starting game will null stage");
     stage = std::make_unique<Stage>(*stageModel);
 
+    /*
     for (const StageBackgroundElement& background_element : stage->getBackgroundElements()){
         double depth = background_element.getModel().depth;
+        
         if (depth == 1.0){
             //graphics.addToMainPlane(background_element)
         }
@@ -68,7 +70,7 @@ void Game::applyConfig(GameConfiguration& config){
 
     for (const Platform& platform : stage->getPlatforms()){
         graphics.add(platform);
-    }
+    }*/
 
     #ifdef DEBUG
     int i = 0;
@@ -142,7 +144,7 @@ PlayerFighter* Game::addFighter(Champion* model, int x, int y, Port& port){
 
 void Game::onFighterAdded(Fighter& fighter){
     fighters++;
-    graphics.addToMainPlane(fighter);
+    //graphics.addToMainPlane(fighter);
 }
 
 /**
@@ -156,17 +158,19 @@ bool Game::is_running(){
 /**
  * @brief Displays the Game.
  * Displays the Stage and every entity present in it.
+ * Assumes the GameGraphics instance is clear.
  * @param target the renderer the Game will be displayed on.
  */
 void Game::draw(SDL_Renderer* target){
-    /*Fighteriterator it;
-    for (it = fighters.begin(); it != fighters.end(); ++it){
-        it->draw(target);
-    }*/
-
     updateCameraPosition(target);
+
+    for (auto& f : fighters){
+        graphics.add(f);
+    }
+    stage->addToGraphics(graphics);
     
     graphics.draw(target, camera);
+    graphics.clear();
 }
 
 /**

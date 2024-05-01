@@ -1,8 +1,12 @@
 #include "PlatformModel.h"
 #include "Platform.h"
 #include "Camera.h"
+#include "Types/GameTypes.h"
+
+#include "KBDebug/Debug.h"
 
 Platform::Platform(const PlatformModel& model_) : 
+    DepthfulEntity(Types::Layer::MIDDLE),
     model(model_), position(model_.pos)
 {
     const Animation* model_animation = model.animation;

@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Types {
     using depth_t = double;
     using subDepth_t = long;

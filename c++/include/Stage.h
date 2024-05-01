@@ -7,6 +7,7 @@
 class StageModel;
 class StageBackgroundElementModel;
 class Game;
+class GameGraphics;
 
 class Stage {
     public:
@@ -22,4 +23,6 @@ class Stage {
 
     const std::vector<StageBackgroundElement>& getBackgroundElements() const;
     const std::vector<Platform>& getPlatforms() const;
+
+    void addToGraphics(GameGraphics&);
 };
