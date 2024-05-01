@@ -1,20 +1,17 @@
 #pragma once
 
-#include "Display/Drawer.h"
-#include "Display/Drawable.h"
-#include "Display/DynamicDrawablePlane.h"
-#include "Display/DynamicPlaneDrawable.h"
+#include <vector>
+#include <algorithm>
+
+class Drawable;
 
 class Graphics {
-    Drawer drawer;
-    DynamicDrawablePlane main_plane;
+    std::vector<Drawable&> drawables;
 
     public:
-    Graphics();
+    void clear();
 
-    void add(DynamicPlaneDrawable& d, const DynamicPlaneDrawable::Layer layer = DynamicPlaneDrawable::Layer::MIDDLE, const int level = 0);
-    void addToMainPlane(DynamicPlaneDrawable& d, const DynamicPlaneDrawable::Layer layer = DynamicPlaneDrawable::Layer::MIDDLE, const int level = 0);
-    void add(const Drawable& d, const double depth = 1.0, const int subdepth = 0);
+    void add(const Drawable&);
 
-    void draw(SDL_Renderer*, const Camera&) ;
+    void draw();
 };
