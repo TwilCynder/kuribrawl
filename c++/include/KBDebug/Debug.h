@@ -39,7 +39,7 @@ namespace Debug {
     template<typename T>
     void warn(T value){
         #ifdef DEBUG
-        out << "\033[0;36m WARNING : " << value << "\033[0m\n";
+        err << "\033[0;36m WARNING : " << value << "\033[0m\n";
         #endif
     }
     
