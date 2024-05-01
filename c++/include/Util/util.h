@@ -72,6 +72,7 @@ namespace Kuribrawl {
     bool isLeft(const Kuribrawl::Vector& stick, int threshold);
     bool isDown(const Kuribrawl::Vector& stick, int threshold);
 
+    
     //FROM CHATGPT. FUCK. I HAD A GOOD 70% OF THE SOLUTION MYSELF BTW BTW.
     template<typename Range, typename T>
     concept RangeOf = requires(Range r) {
@@ -80,6 +81,11 @@ namespace Kuribrawl {
         { std::begin(r) } -> std::same_as<typename Range::iterator>; // Check begin() returns the correct iterator type
         { std::end(r) } -> std::same_as<typename Range::iterator>;   // Check end() returns the correct iterator type
     };
+    
+
+    template <typename R, typename V>
+    concept RefRangeOf = std::ranges::range<R> && std::convertible_to<std::ranges::range_reference_t<R>, V>;
+
 
     template <typename T, typename Range, typename U = T>
     requires RangeOf<Range, U>
