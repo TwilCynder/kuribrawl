@@ -1,20 +1,17 @@
 #pragma once
 
+#include "Types/GameTypes.h"
 #include "Entity.h"
+#include "Display/Drawable.h"
 
-class DepthfulEntity : public Entity {
+class DepthfulEntity : public Entity, public Drawable {
     public:
-    enum Layer {
-        BACKGROUND, //Always drawn in the back
-        MIDDLE, //where most dynamic elements will be
-        FORGROUND_DECORATION, //where small decorations that appear 
-        ABOVE_FOREGROUND_DECORATION, //sometimes dynamic elements need to go above the small decorations
-        FOREGROUND //always drawn above all else
-    };
 
-    using depth_t = double;
-    using subDepth_t = long;
-    using level_t = long;
+    using Layer = Types::Layer;
+
+    using depth_t = Types::depth_t;
+    using subDepth_t = Types::subDepth_t;
+    using level_t = Types::subDepth_t;
 
     enum class DepthType {
         PARALLAX,
