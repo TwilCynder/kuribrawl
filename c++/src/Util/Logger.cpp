@@ -2,23 +2,23 @@
 #include "Util/streamUtil.h"
 
 Logger::Logger(std::ostream& stream_):
-    stream(stream_)
+    stream(&stream_)
 {}
 
 void Logger::newline(){
-    stream << '\n';
+    (*stream) << '\n';
 }
 
 inline void Logger::changeColor(const std::string_view& color){
-    stream << escapeBegin << changeColorSequence << color << espaceEnd;
+    (*stream) << escapeBegin << changeColorSequence << color << espaceEnd;
 }
 
 inline void Logger::changeColor(int color){
-    stream << escapeBegin << changeColorSequence << color << espaceEnd;
+    (*stream) << escapeBegin << changeColorSequence << color << espaceEnd;
 }
 
 inline void Logger::resetColor(){
-    stream << resetColorSequence;
+    (*stream) << resetColorSequence;
 }
 
 Logger::changeColorData Logger::color(int c){
@@ -41,20 +41,20 @@ Logger& Logger::operator<<(Logger::resetColorData&&){
 
 Logger& Logger::operator<<(int i){
     changeColor(intColor);
-    stream << i;
+    *stream << i;
     resetColor();
     return *this;
 }
 
 Logger& Logger::operator<<(long i){
     changeColor(intColor);
-    stream << i;
+    *stream << i;
     resetColor();
     return *this;
 }
 
 Logger& Logger::operator<<(Logger::ostreamFunction f){
-    stream << f;
+    stream = &(*stream << f);
     return *this;
 }
 
@@ -70,19 +70,19 @@ Logger &Logger::operator<<(lambda&& l)
 }
 
 void Logger::printFixed(const char* str, size_t len){
-    Kuribrawl::printFixed(stream, str, len);
+    Kuribrawl::printFixed(*stream, str, len);
 }
 
 void Logger::printBytes(const char* str, size_t len){
-    Kuribrawl::printBytes(stream, str, len);
+    Kuribrawl::printBytes(*stream, str, len);
 }
 
 void Logger::printReadable(const char c){
-    Kuribrawl::printReadable(stream, c);
+    Kuribrawl::printReadable(*stream, c);
 }
 
 void Logger::printReadable(const char* str, size_t len){
-    Kuribrawl::printReadable(stream, str, len);
+    Kuribrawl::printReadable(*stream, str, len);
 }
 
 SpacedLogger& SpacedLogger::operator<<(char c)

@@ -7,9 +7,10 @@
 #include <functional>
 #include <bitset>
 #include "type_wrapper.h"
+#include "LMFWrapper.h"
 
 class Logger {
-    std::ostream& stream;
+    std::ostream* stream;
 
     struct changeColorData_d {};
     using changeColorData = type_wrapper<int, changeColorData_d>;
@@ -48,6 +49,13 @@ class Logger {
     using lambda = std::function<void(Logger&)>;
     Logger& operator<<(lambda&&);
 
+    
+    template <class T, std::ostream&(T::*F)(std::ostream&)>
+    Logger& operator<<(const LogWrapper<T, F> lw){
+        stream = &lw(*stream);
+        return *this;
+    }
+
     template<typename T>
     static lambda hex(const T& val){
         return [val](Logger& l){
@@ -66,13 +74,13 @@ class Logger {
 
     template<typename T>
     Logger& operator<<(T&& v){
-        stream << v;
+        (*stream) << v;
         return *this;
     }
 
     template<typename T>
     Logger& operator<<(const T& v){
-        stream << v;
+        (*stream) << v;
         return *this;
     }
 
