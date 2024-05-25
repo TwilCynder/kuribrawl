@@ -53,9 +53,44 @@ inline DepthfulEntity::subDepth_t DepthfulEntity::getSubDepth() const
 {
     return depth.parallax.subDepth;
 }
+ 
+std::ostream& DepthfulEntity::displayInfo(std::ostream & os)
+{
+    os << "DepthfulEntity - ";
+    if (depth_type == DepthType::LAYER) {
+        displayLayerDepthInfo(os);
+    } else {
+        displayParallaxDepthInfo(os);
+    }
+
+    return os;
+}
+
+void DepthfulEntity::displayLayerDepthInfo(std::ostream & os)
+{
+    os 
+        << "depth type : Layers | layer : "
+        << depth.layer.layer
+        << " | level : "
+        << depth.layer.level
+        << '\n'
+    ;    
+}
+
+void DepthfulEntity::displayParallaxDepthInfo(std::ostream & os)
+{
+    os 
+        << "depth type : Parallax | depth : "
+        << depth.parallax.depth
+        << " | subdepth : "
+        << depth.parallax.subDepth
+        << '\n'
+    ;    
+}
 
 bool DepthfulEntityComparator::operator()(const DepthfulEntity & a, const DepthfulEntity & b) const
 {
+
     return 
         (a.depth_type == DepthfulEntity::DepthType::LAYER ? 
             (b.depth_type == DepthfulEntity::DepthType::LAYER ?

@@ -3,6 +3,8 @@
 #include "Types/GameTypes.h"
 #include "Entity.h"
 #include "Display/Drawable.h"
+#include <ostream>
+
 
 class DepthfulEntity : public Entity, public Drawable {
     public:
@@ -48,6 +50,11 @@ class DepthfulEntity : public Entity, public Drawable {
     inline level_t getLevel() const;
     inline depth_t getDepth() const;
     inline subDepth_t getSubDepth() const;
+
+    
+    std::ostream& displayInfo(std::ostream&);
+    void displayLayerDepthInfo(std::ostream&);
+    void displayParallaxDepthInfo(std::ostream&);
 };
 
 class DepthfulEntityComparator {
