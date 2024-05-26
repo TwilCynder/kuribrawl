@@ -51,10 +51,11 @@ class DepthfulEntity : public Entity, public Drawable {
     inline depth_t getDepth() const;
     inline subDepth_t getSubDepth() const;
 
-    
-    std::ostream& displayInfo(std::ostream&);
-    void displayLayerDepthInfo(std::ostream&);
-    void displayParallaxDepthInfo(std::ostream&);
+    std::ostream& displayInfo(std::ostream&) const;
+
+    protected:
+    void displayLayerDepthInfo(std::ostream&) const;
+    void displayParallaxDepthInfo(std::ostream&) const;
 };
 
 class DepthfulEntityComparator {

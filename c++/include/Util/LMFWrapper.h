@@ -44,5 +44,5 @@ auto lmf_wrap(T* obj, std::ostream&(T::*F)(std::ostream&) const){
 */
 
 
-#define LMFWRAP(cl, method, obj) LogWrapper<cl, method>(obj)
-#define CLMFWRAP(cl, method, obj) ConstLogWrapper<cl, method>(obj)
+#define LMFWRAP(cl, methodName, obj) LogWrapper<cl, cl::methodName>(obj)
+#define CLMFWRAP(cl, methodName, obj) ConstLogWrapper<cl, methodName>(obj)

@@ -56,6 +56,12 @@ class Logger {
         return *this;
     }
 
+        template <class T, std::ostream&(T::*F)(std::ostream&) const>
+    Logger& operator<<(const ConstLogWrapper<T, F> lw){
+        stream = &lw(*stream);
+        return *this;
+    }
+
     template<typename T>
     static lambda hex(const T& val){
         return [val](Logger& l){

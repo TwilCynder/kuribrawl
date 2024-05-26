@@ -24,7 +24,7 @@ DepthfulEntity::DepthfulEntity(depth_t depth_, subDepth_t subDepth_):
 
 DepthfulEntity::DepthfulEntity(Layer layer_, level_t level_):
     Entity(),
-    depth_type(DepthType::PARALLAX),
+    depth_type(DepthType::LAYER),
     depth{layer_, level_}
 {
 }
@@ -54,7 +54,7 @@ inline DepthfulEntity::subDepth_t DepthfulEntity::getSubDepth() const
     return depth.parallax.subDepth;
 }
  
-std::ostream& DepthfulEntity::displayInfo(std::ostream & os)
+std::ostream& DepthfulEntity::displayInfo(std::ostream & os) const
 {
     os << "DepthfulEntity - ";
     if (depth_type == DepthType::LAYER) {
@@ -66,25 +66,23 @@ std::ostream& DepthfulEntity::displayInfo(std::ostream & os)
     return os;
 }
 
-void DepthfulEntity::displayLayerDepthInfo(std::ostream & os)
+void DepthfulEntity::displayLayerDepthInfo(std::ostream & os) const
 {
     os 
         << "depth type : Layers | layer : "
         << depth.layer.layer
         << " | level : "
         << depth.layer.level
-        << '\n'
     ;    
 }
 
-void DepthfulEntity::displayParallaxDepthInfo(std::ostream & os)
+void DepthfulEntity::displayParallaxDepthInfo(std::ostream & os) const
 {
     os 
         << "depth type : Parallax | depth : "
         << depth.parallax.depth
         << " | subdepth : "
         << depth.parallax.subDepth
-        << '\n'
     ;    
 }
 
@@ -114,5 +112,5 @@ bool DepthfulEntityComparator::compareParallax(const DepthfulEntity::DepthUnion:
 
 bool DepthfulEntityComparator::compareLayers(const DepthfulEntity::DepthUnion::LayerDepth & a, const DepthfulEntity::DepthUnion::LayerDepth & b) const
 {
-    return a.layer == b.layer ? a.level < b.level : a.layer < b.layer;
+    return a.layer == b.layer ? a.level < b.level : a.layer > b.layer;
 }

@@ -6,7 +6,7 @@
 #include "KBDebug/Debug.h"
 
 Platform::Platform(const PlatformModel& model_) : 
-    DepthfulEntity(Types::Layer::MIDDLE),
+    DepthfulEntity(Types::Layer::FOREGROUND),
     model(model_), position(model_.pos)
 {
     const Animation* model_animation = model.animation;
