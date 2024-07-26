@@ -56,6 +56,13 @@ class DepthfulEntity : public Entity, public Drawable {
     protected:
     void displayLayerDepthInfo(std::ostream&) const;
     void displayParallaxDepthInfo(std::ostream&) const;
+
+    int getParallaxXOnScreen(const Camera&, int x) const;
+    int getParallaxYOnScreen(const Camera&, int y) const;
+    int getMainplaneXOnScreen(const Camera&, int x) const;
+    int getMainplaneYOnScreen(const Camera&, int y) const;
+    int getXOnScreen(const Camera&, int x) const;
+    int getYOnScreen(const Camera&, int y) const;
 };
 
 class DepthfulEntityComparator {

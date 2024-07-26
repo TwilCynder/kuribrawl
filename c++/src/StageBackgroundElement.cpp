@@ -17,7 +17,7 @@ void StageBackgroundElement::advanceAnimation(){
 }
 
 void StageBackgroundElement::draw(SDL_Renderer* target, const Camera& cam) const {
-    animation_player.draw(target, cam.getXOnScreen(model.position.x), cam.getYOnScreen(model.position.y));
+    animation_player.draw(target, getParallaxXOnScreen(cam, model.position.x), getYOnScreen(cam, model.position.y));
 }
 
 const StageBackgroundElementModel& StageBackgroundElement::getModel() const {

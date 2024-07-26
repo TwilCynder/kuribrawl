@@ -1,4 +1,5 @@
 #include "DepthfulEntity.h"
+#include "Camera.h"
 
 DepthfulEntity::DepthUnion::DepthUnion(depth_t depth, subDepth_t subDepth):
     parallax{depth, subDepth}
@@ -113,4 +114,34 @@ bool DepthfulEntityComparator::compareParallax(const DepthfulEntity::DepthUnion:
 bool DepthfulEntityComparator::compareLayers(const DepthfulEntity::DepthUnion::LayerDepth & a, const DepthfulEntity::DepthUnion::LayerDepth & b) const
 {
     return a.layer == b.layer ? a.level < b.level : a.layer > b.layer;
+}
+
+inline int DepthfulEntity::getParallaxXOnScreen(const Camera & camera, int x) const
+{
+	return camera.getXOnScreen(x, depth.parallax.depth);
+}
+
+int DepthfulEntity::getParallaxYOnScreen(const Camera & camera, int y) const
+{
+	return camera.getYOnScreen(y, depth.parallax.depth);
+}
+
+int DepthfulEntity::getMainplaneXOnScreen(const Camera & camera, int x) const
+{
+	return camera.getXOnScreen(x);
+}
+
+int DepthfulEntity::getMainplaneYOnScreen(const Camera & camera, int y) const
+{
+	return camera.getXOnScreen(y);
+}
+
+int DepthfulEntity::getXOnScreen(const Camera & camera, int x) const
+{
+	return depth_type == DepthType::PARALLAX ? getParallaxXOnScreen(camera, x) : getMainplaneXOnScreen(camera, x);
+}
+
+int DepthfulEntity::getYOnScreen(const Camera & camera, int y) const
+{
+	return depth_type == DepthType::PARALLAX ? getParallaxYOnScreen(camera, y) : getMainplaneYOnScreen(camera, y);
 }
