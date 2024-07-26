@@ -18,9 +18,9 @@ int Camera::getYOnScreen(int y) const {
 }
 
 int Camera::getXOnScreen(int x, double depth) const {
-    return (depth < 0.0 ? x : (x - position.x) / depth) + half_screen_w;
+    return (depth <= 0.0 ? x : (x - position.x) / depth) + half_screen_w;
 }
 
 int Camera::getYOnScreen(int y, double depth) const {
-    return SCREEN_HEIGHT - (depth < 0.0 ? y : (y - position.y) / depth);
+    return SCREEN_HEIGHT - (depth <= 0.0 ? y : (y - position.y) / depth);
 }

@@ -103,7 +103,7 @@ bool DepthfulEntityComparator::operator()(const DepthfulEntity & a, const Depthf
 
 bool DepthfulEntityComparator::isBelowMainPlane(const DepthfulEntity::DepthUnion::ParallaxDepth & depth) const
 {
-    return depth.depth > 1.0 || (depth.depth == 1.0 && depth.subDepth < 1) || (depth.depth < 0.0);
+    return depth.depth > 1.0 || (depth.depth == 1.0 && depth.subDepth < 1) || (depth.depth <= 0.0);
 }
 
 bool DepthfulEntityComparator::compareParallax(const DepthfulEntity::DepthUnion::ParallaxDepth & a, const DepthfulEntity::DepthUnion::ParallaxDepth & b) const
