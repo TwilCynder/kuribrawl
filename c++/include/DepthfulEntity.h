@@ -15,6 +15,8 @@
  * The depth value of the Main Plane is 1.0.
  *
  * /!\ It is very important to note that the parallax effect only effects the position of elements on screen : no zooming or dezooming is done. This means that if a sprite is 100 pixels wide, it will be 100 pixels wide on the screen no matter how far it is from the camera, which can cause unexpected results. This is intended, as (de)zooming pixel art sprites often yields ugly results : the user is instead supposed to keep the final depth of an object in mind when designing and drawing it : if you make an object that, in terms of real in-world size, would appear 100px wide on the Main Plane, and you're gonna place it at a depth of 2.0 (twice as far as the Main Plane), you need to make it 50px wide.
+ * 
+ * Parallax depths below or equal to zero represent an infinite depth, which means the element never moves from it's position on screen no matter where the camera moves.  
  */
 class DepthfulEntity : public Entity, public Drawable {
     public:
@@ -87,6 +89,12 @@ class DepthfulEntity : public Entity, public Drawable {
     int getYOnScreen(const Camera&, int y) const;
 };
 
+/**
+ * @brief Comparator for two DepthfulEntities.  
+ * 
+ * Order is : 
+ * - Parallax entities with depth > 1
+ */
 class DepthfulEntityComparator {
     public:
 

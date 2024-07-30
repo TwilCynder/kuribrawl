@@ -1,14 +1,23 @@
 #include "DepthfulEntity.h"
 #include "Camera.h"
 
+/**
+ * @brief Construct a new instance of the DepthUnion union, populating the Parallax Depth member.
+ */
 DepthfulEntity::DepthUnion::DepthUnion(depth_t depth, subDepth_t subDepth):
     parallax{depth, subDepth}
 {}
 
+/**
+ * @brief Construct a new instance of the DepthUnion union, populating the Layer Depth member.
+ */
 DepthfulEntity::DepthUnion::DepthUnion(Layer layer, level_t level):
     layer{layer, level}
 {}
 
+/**
+ * @brief Construct a new, default DepthfulEntity, with Layer-based depth. 
+ */
 DepthfulEntity::DepthfulEntity():
     Entity(),
     depth_type(DepthType::LAYER),
@@ -16,6 +25,9 @@ DepthfulEntity::DepthfulEntity():
 {
 }
 
+/**
+ * @brief Construct a new DepthfulEntity, configuring a Parallax-based depth.  
+ */
 DepthfulEntity::DepthfulEntity(depth_t depth_, subDepth_t subDepth_):
     Entity(),
     depth_type(DepthType::PARALLAX),
@@ -23,6 +35,9 @@ DepthfulEntity::DepthfulEntity(depth_t depth_, subDepth_t subDepth_):
 {
 }
 
+/**
+ * @brief Construct a new DepthfulEntity, configuring a Layer-based depth.  
+ */
 DepthfulEntity::DepthfulEntity(Layer layer_, level_t level_):
     Entity(),
     depth_type(DepthType::LAYER),
@@ -35,26 +50,47 @@ inline DepthfulEntity::DepthType DepthfulEntity::getDepthType() const
     return depth_type;
 }
 
+/**
+ * @brief Returns the layer this entity is on, assuming is uses Layer-based depth
+ * @return DepthfulEntity::Layer 
+ */
 inline DepthfulEntity::Layer DepthfulEntity::getLayer() const
 {
     return depth.layer.layer;
 }
 
+/**
+ * @brief Returns the level this entity is on, assuming is uses Layer-based depth
+ * @return DepthfulEntity::level_t 
+ */
 inline DepthfulEntity::level_t DepthfulEntity::getLevel() const
 {
     return depth.layer.level;
 }
 
+/**
+ * @brief Returns the parallax depth, assuming is uses parallax-based depth
+ * @return DepthfulEntity::depth_t 
+ */
 inline DepthfulEntity::depth_t DepthfulEntity::getDepth() const
 {
     return depth.parallax.depth;
 }
 
+/**
+ * @brief Returns the parallax subdepth, assuming is uses parallax-based depth
+ * @return DepthfulEntity::subDepth_t 
+ */
 inline DepthfulEntity::subDepth_t DepthfulEntity::getSubDepth() const
 {
     return depth.parallax.subDepth;
 }
 
+/**
+ * @brief Writes information about this DepthfulEntity, namely it's depth type, and either layer/level or depth/subdepth, to an ostream.
+ * @param os a writable stream
+ * @return std::ostream& the input ostream
+ */
 std::ostream& DepthfulEntity::displayInfo(std::ostream & os) const
 {
     os << "DepthfulEntity - ";
@@ -67,6 +103,10 @@ std::ostream& DepthfulEntity::displayInfo(std::ostream & os) const
     return os;
 }
 
+/**
+ * @brief Writes the Layer-based depth properties to an ostream, assuming it's the type of depth this entity uses.
+ * @param os a writable stream
+ */
 void DepthfulEntity::displayLayerDepthInfo(std::ostream & os) const
 {
     os
@@ -77,6 +117,10 @@ void DepthfulEntity::displayLayerDepthInfo(std::ostream & os) const
     ;
 }
 
+/**
+ * @brief Writes the Layer-based depth properties to an ostream, assuming it's the type of depth this entity uses.
+ * @param os a writable stream
+ */
 void DepthfulEntity::displayParallaxDepthInfo(std::ostream & os) const
 {
     os
@@ -86,6 +130,7 @@ void DepthfulEntity::displayParallaxDepthInfo(std::ostream & os) const
         << depth.parallax.subDepth
     ;
 }
+
 
 bool DepthfulEntityComparator::operator()(const DepthfulEntity & a, const DepthfulEntity & b) const
 {
