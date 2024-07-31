@@ -1,11 +1,12 @@
 #include "DepthfulEntity.h"
 #include "Camera.h"
+#include <cmath>
 
 /**
  * @brief Construct a new instance of the DepthUnion union, populating the Parallax Depth member.
  */
 DepthfulEntity::DepthUnion::DepthUnion(depth_t depth, subDepth_t subDepth):
-    parallax{depth, subDepth}
+    parallax{validateDepth(depth), subDepth}
 {}
 
 /**
@@ -31,7 +32,7 @@ DepthfulEntity::DepthfulEntity():
 DepthfulEntity::DepthfulEntity(depth_t depth_, subDepth_t subDepth_):
     Entity(),
     depth_type(DepthType::PARALLAX),
-    depth{depth_, subDepth_}
+    depth{validateDepth(depth_), subDepth_}
 {
 }
 
@@ -146,17 +147,17 @@ bool DepthfulEntityComparator::operator()(const DepthfulEntity & a, const Depthf
         );
 }
 
-bool DepthfulEntityComparator::isBelowMainPlane(const DepthfulEntity::DepthUnion::ParallaxDepth & depth) const
+bool DepthfulEntityComparator::isBelowMainPlane(const DepthfulEntity::DepthUnion::ParallaxDepth & depth)
 {
-    return depth.depth > 1.0 || (depth.depth == 1.0 && depth.subDepth < 1) || (depth.depth <= 0.0);
+    return depth.depth > 1.0 || (depth.depth == 1.0 && depth.subDepth < 1);
 }
 
-bool DepthfulEntityComparator::compareParallax(const DepthfulEntity::DepthUnion::ParallaxDepth & a, const DepthfulEntity::DepthUnion::ParallaxDepth & b) const
+bool DepthfulEntityComparator::compareParallax(const DepthfulEntity::DepthUnion::ParallaxDepth & a, const DepthfulEntity::DepthUnion::ParallaxDepth & b)
 {
-    return a.depth == b.depth ? a.subDepth < b.subDepth : a.depth < b.depth;
+    return a.depth == b.depth ? a.subDepth < b.subDepth : (a.depth < b.depth);
 }
 
-bool DepthfulEntityComparator::compareLayers(const DepthfulEntity::DepthUnion::LayerDepth & a, const DepthfulEntity::DepthUnion::LayerDepth & b) const
+bool DepthfulEntityComparator::compareLayers(const DepthfulEntity::DepthUnion::LayerDepth & a, const DepthfulEntity::DepthUnion::LayerDepth & b)
 {
     return a.layer == b.layer ? a.level < b.level : a.layer > b.layer;
 }
@@ -189,4 +190,9 @@ int DepthfulEntity::getXOnScreen(const Camera & camera, int x) const
 int DepthfulEntity::getYOnScreen(const Camera & camera, int y) const
 {
 	return depth_type == DepthType::PARALLAX ? getParallaxYOnScreen(camera, y) : getMainplaneYOnScreen(camera, y);
+}
+
+DepthfulEntity::depth_t DepthfulEntity::validateDepth(DepthfulEntity::depth_t depth)
+{
+    return (depth <= 0) ? infinite_depth : depth;
 }

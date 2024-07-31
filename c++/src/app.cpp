@@ -287,9 +287,13 @@ void App::handleEvents(){
 				break;
 
 			case SDL_CONTROLLERBUTTONDOWN:
-				Debug::log("GAME CONTROLLER BUTTON DOWN EVENT");
+				//Debug::log("GAME CONTROLLER BUTTON DOWN EVENT");
 				break;
 			case SDL_CONTROLLERAXISMOTION:
+				//Debug::log("CONTROLLER AXIS MOTION");
+				break;
+			case SDL_JOYAXISMOTION:
+				//Debug::log("JOYSTICK AXIS MOTION");
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.scancode){

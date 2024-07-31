@@ -16,7 +16,7 @@
  *
  * /!\ It is very important to note that the parallax effect only effects the position of elements on screen : no zooming or dezooming is done. This means that if a sprite is 100 pixels wide, it will be 100 pixels wide on the screen no matter how far it is from the camera, which can cause unexpected results. This is intended, as (de)zooming pixel art sprites often yields ugly results : the user is instead supposed to keep the final depth of an object in mind when designing and drawing it : if you make an object that, in terms of real in-world size, would appear 100px wide on the Main Plane, and you're gonna place it at a depth of 2.0 (twice as far as the Main Plane), you need to make it 50px wide.
  * 
- * Parallax depths below or equal to zero represent an infinite depth, which means the element never moves from it's position on screen no matter where the camera moves.  
+ * Initializing an object with a Parallax-based depth that is less or equal to zero will convert it to infinity, which means the element never moves from it's position on screen no matter where the camera moves. 
  */
 class DepthfulEntity : public Entity, public Drawable {
     public:
@@ -26,6 +26,8 @@ class DepthfulEntity : public Entity, public Drawable {
     using depth_t = Types::depth_t;
     using subDepth_t = Types::subDepth_t;
     using level_t = Types::subDepth_t;
+    
+    static constexpr depth_t infinite_depth = Types::infinite_depth;
 
     /// @brief Whether an entity is on the Main Plane, or outside of it (with a parallax effect)
     enum class DepthType {
@@ -87,19 +89,23 @@ class DepthfulEntity : public Entity, public Drawable {
     int getMainplaneYOnScreen(const Camera&, int y) const;
     int getXOnScreen(const Camera&, int x) const;
     int getYOnScreen(const Camera&, int y) const;
+
+    static depth_t validateDepth(depth_t);
 };
 
 /**
  * @brief Comparator for two DepthfulEntities.  
  * 
  * Order is : 
- * - Parallax entities with depth > 1
+ * - Parallax entities with depth > 1 or equal to 1 with subDepth > 0, sorted by higher depth then higher subdepth
+ * - Layer entities, sorted by layer then higher level
+ * - Other parallax entities, sorted by higher depth then higher subdepth
  */
 class DepthfulEntityComparator {
     public:
 
     bool operator()(const DepthfulEntity&, const DepthfulEntity&) const;
-    bool isBelowMainPlane(const DepthfulEntity::DepthUnion::ParallaxDepth&) const;
-    bool compareParallax(const DepthfulEntity::DepthUnion::ParallaxDepth&, const DepthfulEntity::DepthUnion::ParallaxDepth&) const;
-    bool compareLayers(const DepthfulEntity::DepthUnion::LayerDepth&, const DepthfulEntity::DepthUnion::LayerDepth&) const;
+    static bool isBelowMainPlane(const DepthfulEntity::DepthUnion::ParallaxDepth&);
+    static bool compareParallax(const DepthfulEntity::DepthUnion::ParallaxDepth&, const DepthfulEntity::DepthUnion::ParallaxDepth&);
+    static bool compareLayers(const DepthfulEntity::DepthUnion::LayerDepth&, const DepthfulEntity::DepthUnion::LayerDepth&);
 };
