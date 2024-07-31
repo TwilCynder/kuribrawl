@@ -62,15 +62,15 @@ class Controller {
 
     //These attributes determine the behavior of the controller or keyboard. They must be set (or unset, as long as everything is valid) everytime the controller changes
     //bool active; ///< True if the controller is active ; if false, the other attributes must not be used.
-    const ControllerType* controller_type;
-    SDL_GameController* gamecontroller;
-	SDL_Joystick* joystick;
+    const ControllerType* controller_type = nullptr;
+    SDL_GameController* gamecontroller = nullptr;
+	SDL_Joystick* joystick = nullptr;
     int joystick_id; ///< Numerical ID of the controller given by SDL, or -1 if using the keyboard.
     int device_id; ///< Numerical ID of the device (given by the OS)
-    const ControllerLayout* current_controller_layout;    ///< The controller layout of the current controller, if any.
+    const ControllerLayout* current_controller_layout = nullptr;    ///< The controller layout of the current controller, if any.
     ButtonsMapping controller_buttons_mapping;
 
-    Port* port; //port this controller is plugged in. Null if unpluged controlled.  
+    Port* port = nullptr; //port this controller is plugged in. Null if unpluged controlled.  
 
     bool init(int controller_id, ControllersData& cd);
     bool initAsKeyboard(ControllersData& cd);
