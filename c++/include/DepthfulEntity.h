@@ -100,6 +100,8 @@ class DepthfulEntity : public Entity, public Drawable {
  * - Parallax entities with depth > 1 or equal to 1 with subDepth > 0, sorted by higher depth then higher subdepth
  * - Layer entities, sorted by layer then higher level
  * - Other parallax entities, sorted by higher depth then higher subdepth
+ * 
+ * o make this intuitive, you can consider that all Layer entities are on a single plane that has a depth of 1.0 and a subdepth of 0.5
  */
 class DepthfulEntityComparator {
     public:

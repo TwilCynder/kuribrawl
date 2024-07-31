@@ -132,7 +132,10 @@ void DepthfulEntity::displayParallaxDepthInfo(std::ostream & os) const
     ;
 }
 
-
+/**
+ * @brief Compares two DethfulEntities, according to the order specified in the documentation of this class
+ * @return true if a is below b according to this order
+ */
 bool DepthfulEntityComparator::operator()(const DepthfulEntity & a, const DepthfulEntity & b) const
 {
 
@@ -147,40 +150,76 @@ bool DepthfulEntityComparator::operator()(const DepthfulEntity & a, const Depthf
         );
 }
 
+/**
+ * @brief Returns whether a certain depth is below the "main plane", which is where all the Layer entities are
+ */
 bool DepthfulEntityComparator::isBelowMainPlane(const DepthfulEntity::DepthUnion::ParallaxDepth & depth)
 {
     return depth.depth > 1.0 || (depth.depth == 1.0 && depth.subDepth < 1);
 }
 
+/**
+ * @brief Compares two Parallax-based depths
+ * @return true if a is below b according to this order
+ */
 bool DepthfulEntityComparator::compareParallax(const DepthfulEntity::DepthUnion::ParallaxDepth & a, const DepthfulEntity::DepthUnion::ParallaxDepth & b)
 {
     return a.depth == b.depth ? a.subDepth < b.subDepth : (a.depth < b.depth);
 }
 
+/**
+ * @brief Compares two Layer-based depths
+ * @return true if a is below b according to this order
+ */
 bool DepthfulEntityComparator::compareLayers(const DepthfulEntity::DepthUnion::LayerDepth & a, const DepthfulEntity::DepthUnion::LayerDepth & b)
 {
     return a.layer == b.layer ? a.level < b.level : a.layer > b.layer;
 }
 
+/**
+ * @brief Computes the X position of this entity on the screen, assuming it is using Parallax depth (meaning the position on scren is affected by that depth), based on a certain camera position
+ * @param camera the camera used to compute objects positions relative to the screen
+ * @param x the in-game X position of this entity
+ * @return The X position of this entity on the screen
+ */
 inline int DepthfulEntity::getParallaxXOnScreen(const Camera & camera, int x) const
 {
 	return camera.getXOnScreen(x, depth.parallax.depth);
 }
 
+/**
+ * @brief Computes the Y position of this entity on the screen, assuming it is using Parallax depth (meaning the position on scren is affected by that depth), based on a certain camera position
+ * @param camera the camera used to compute objects positions relative to the screen
+ * @param x the in-game Y position of this entity
+ * @return The Y position of this entity on the screen
+ */
 int DepthfulEntity::getParallaxYOnScreen(const Camera & camera, int y) const
 {
 	return camera.getYOnScreen(y, depth.parallax.depth);
 }
 
+/**
+ * @brief Computes the X position of this entity on the screen, assuming it is using Layer depth (meaning the position on scren is not affected by any parallax effect), based on a certain camera position
+ * @param camera the camera used to compute objects positions relative to the screen
+ * @param x the in-game X position of this entity
+ * @return The X position of this entity on the screen
+ */
 int DepthfulEntity::getMainplaneXOnScreen(const Camera & camera, int x) const
 {
 	return camera.getXOnScreen(x);
 }
 
+/**
+ * @brief Computes the Y position of this entity on the screen, assuming it is using Layer depth (meaning the position on scren is not affected by any parallax effect), based on a certain camera position
+ * @param camera the camera used to compute objects positions relative to the screen
+ * @param x the in-game Y position of this entity
+ * @return The Y position of this entity on the screen
+ */
 int DepthfulEntity::getMainplaneYOnScreen(const Camera & camera, int y) const
 {
 	return camera.getXOnScreen(y);
 }
+
 
 int DepthfulEntity::getXOnScreen(const Camera & camera, int x) const
 {
@@ -192,6 +231,11 @@ int DepthfulEntity::getYOnScreen(const Camera & camera, int y) const
 	return depth_type == DepthType::PARALLAX ? getParallaxYOnScreen(camera, y) : getMainplaneYOnScreen(camera, y);
 }
 
+/**
+ * @brief Converts a given parallax depth into a valid one. Valid depths are always positive ; if a negative or null value is supplied, it is converted to Infinity
+ * @param depth 
+ * @return DepthfulEntity::depth_t 
+ */
 DepthfulEntity::depth_t DepthfulEntity::validateDepth(DepthfulEntity::depth_t depth)
 {
     return (depth <= 0) ? infinite_depth : depth;
