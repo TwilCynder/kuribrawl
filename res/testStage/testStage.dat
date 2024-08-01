@@ -4,4 +4,4 @@ Test Stage
 1000 800 # Camera limit box size
 
 p 0 100 700 platform
-b bg 400 400 -1
+b bg 0 0 2
