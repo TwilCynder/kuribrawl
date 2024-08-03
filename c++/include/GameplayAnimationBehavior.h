@@ -1,8 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 class EntityAnimation;
+class Champion;
+class GameplayAnimationBehaviorUnresolved;
 
 /**
  * @brief Describes how an animation should impact the behavior of a Fighter ; that is, what happens when this animation is being played and some events occur.  
@@ -45,11 +48,14 @@ class GameplayAnimationBehavior {
             } normal;
 
             struct {
-                EntityAnimation& anim;  ///< The animation to transition to
+                const EntityAnimation* anim;  ///< The animation to transition to
                 int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
     };
+
+    GameplayAnimationBehavior() = default;
+    GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved&, const Champion&);
 
     protected:
 
@@ -63,5 +69,48 @@ class GameplayAnimationBehavior {
 
     EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
     std::vector<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
+};
 
+/**
+ * @brief Contains the same information as a GameplayAnimationBehavior, in a different (less optimal) state. 
+ * 
+ * The way this class is organized makes it better fit for collecting the data from a DataFile ; 
+ * it does not contain the same *data*, but all the information it contains is enough to fully initialize any GameplayAnimationBehavior.
+ * 
+ * The data might be in a state that is not suitable for GameplayAnimationBehavior intialization, until finalize() is called
+ */
+struct GameplayAnimationBehaviorUnresolved {
+    using EndingBehavior = GameplayAnimationBehavior::EndingBehavior;
+    using LandingBehaviorType = GameplayAnimationBehavior::LandingBehaviorType;
+
+        struct LandingBehavior {
+        LandingBehaviorType type = LandingBehaviorType::NORMAL;
+        union {
+            /**
+             * @brief Data specific to normal landing behavior
+             */
+            struct {
+                int duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
+            } normal;
+
+            struct {
+                std::string anim_name;
+                int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
+            } animation;
+        };
+    };
+
+    struct LandingBehaviorWindow {
+        LandingBehavior behavior;
+        int frame = 0;
+    };
+
+    EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
+    std::vector<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
+
+    class LandingBehaviorWindowComparator {
+        bool operator()(const LandingBehaviorWindow&, const LandingBehaviorWindow&) const;
+    };
+
+    void finalize();
 };
