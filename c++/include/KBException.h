@@ -36,6 +36,11 @@ class KBFatalExplicit : public KBFatal {
     explicit KBFatalExplicit(const std::string&& error_message);
     explicit KBFatalExplicit(const char* error_message);
     const char* userMessage() const;
+
+    template<typename T, typename... Args>
+    explicit KBFatalExplicit(const char* format, T arg1, Args... args) : 
+      KBFatalExplicit(Kuribrawl::formatString(format, arg1, args...))
+    {}
 };
 
 class KBFatalDetailed : public KBFatal {

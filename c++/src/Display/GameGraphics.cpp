@@ -14,8 +14,9 @@ void GameGraphics::add(DepthfulEntity& entity){
     entities.emplace_back(entity);
 }
 
+constexpr DepthfulEntityComparator comp;
 void GameGraphics::draw(SDL_Renderer* target, const Camera& cam){
-    std::sort(entities.begin(), entities.end(), DepthfulEntityComparator());
+    std::sort(entities.begin(), entities.end(), comp);
 
     for (auto entity : entities){
         entity.get().draw(target, cam);
