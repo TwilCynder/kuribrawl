@@ -13,7 +13,7 @@ constexpr GameplayAnimationBehaviorUnresolved::LandingBehaviorWindowComparator c
  * 
  */
 void GameplayAnimationBehaviorUnresolved::finalize() {
-    std::sort(landing_behavior.begin(), landing_behavior.end(), comp);
+    landing_behavior.sort(comp);
 }
 
 /**
@@ -40,7 +40,7 @@ GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBeha
         case LandingBehaviorType::NORMAL:
             window.behavior.normal.duration = window_base.behavior.normal.duration;
             break;
-        case LandingBehaviorType::ANIMATION:
+        case LandingBehaviorType::ANIMATION:{
             window.behavior.animation.duration = window_base.behavior.animation.duration;
 
             const EntityAnimation* anim = champion.getAnimation(window_base.behavior.animation.anim_name);
@@ -50,8 +50,22 @@ GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBeha
             }
 
             window.behavior.animation.anim = anim;
+            break;
+        }
         default:
             break;
         }
+    }
+}
+
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior()
+{
+    type = LandingBehaviorType::NORMAL;
+    normal.duration = -1;
+}
+
+GameplayAnimationBehaviorUnresolved::LandingBehavior::~LandingBehavior(){
+    if (type == LandingBehaviorType::ANIMATION){
+        animation.anim_name.~basic_string();
     }
 }

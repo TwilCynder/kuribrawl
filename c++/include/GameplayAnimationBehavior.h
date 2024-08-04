@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <list>
 #include <string>
 
 class EntityAnimation;
@@ -83,8 +84,8 @@ struct GameplayAnimationBehaviorUnresolved {
     using EndingBehavior = GameplayAnimationBehavior::EndingBehavior;
     using LandingBehaviorType = GameplayAnimationBehavior::LandingBehaviorType;
 
-        struct LandingBehavior {
-        LandingBehaviorType type = LandingBehaviorType::NORMAL;
+    struct LandingBehavior {
+        LandingBehaviorType type;
         union {
             /**
              * @brief Data specific to normal landing behavior
@@ -98,17 +99,22 @@ struct GameplayAnimationBehaviorUnresolved {
                 int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
+
+        LandingBehavior();
+        ~LandingBehavior();
     };
 
     struct LandingBehaviorWindow {
         LandingBehavior behavior;
         int frame = 0;
+
     };
 
     EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
-    std::vector<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
+    std::list<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
 
     class LandingBehaviorWindowComparator {
+        public:
         bool operator()(const LandingBehaviorWindow&, const LandingBehaviorWindow&) const;
     };
 
