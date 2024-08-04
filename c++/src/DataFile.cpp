@@ -509,9 +509,9 @@ DataFile::DataReadingResult DataFile::readAnimationData(AnimationBase& anim, Uin
         
         case FILEMARKER_FRAMEINFO: {
             Debug::out << "Reading frame info at 0x" << Log::hex(tell()) << '\n';
-            Uint8 byte = readValue<Uint8>();
-            context.current_frame = anim.getFrame(byte);
-            context.frame_id = byte;
+            Uint16 value = readValue<Uint16>();
+            context.current_frame = anim.getFrame(value);
+            context.frame_id = value;
         }
         return DataReadingResult::SET_FRAME;
         
@@ -684,6 +684,7 @@ void DataFile::readAnimationFile(AnimationBase& anim){
 
     anim.setSpritesheet(readTexture());
 
+    Uint16 word;
     Uint8 byte = readValue<Uint8>();
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -692,8 +693,8 @@ void DataFile::readAnimationFile(AnimationBase& anim){
         case FILEMARKER_DESCRIPTORSTART:
             Debug::out << "Reading animation descriptor at 0x" << Log::hex(tell()) << '\n';
 
-            readData(&byte);
-            anim.initFrames(byte);
+            readData(&word);
+            anim.initFrames(word);
             
             do {
                 readData(&byte);
@@ -737,6 +738,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 
     anim.setSpritesheet(readTexture());
 
+    Uint16 word;
     Uint8 byte = readValue<Uint8>();
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -745,8 +747,8 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
         case FILEMARKER_DESCRIPTORSTART:
             Debug::out << "Reading animation descriptor at 0x" << Log::hex(tell()) << '\n';
 
-            readData(&byte);
-            anim.initFrames(byte);
+            readData(&word);
+            anim.initFrames(word);
             
             do {
                 readData(&byte);

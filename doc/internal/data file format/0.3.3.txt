@@ -1,0 +1,110 @@
+Structure des fichiers de données de jeu (twl).
+Systèmes affectés par cette spécification :
+- datafile maker
+- kuribrawl
+
+Notes : Une valeur équivalente au maximum du type de la valeur signifie la valeur par défaut (quand applicable, selon indications du document format fichier source)
+
+Version du format : 0.3.3
+
+- Signature : 0x54 54 54 54
+- 1 octet version majeure
+- 1 octet version mineure
+- 1 octet révision
+- {
+- Fichier : 
+- - - 1 octet type (0 : animation, 2 : champion, 4 : image, 5 : autres)
+- - - string : tag du fichier
+- - - 4 octets : longueur du fichier
+- - - Données
+- - - [0xFE
+- - - Descripteur]
+- - - 0xFF
+- }*
+
+>Descripteur de fichier Animation
+- 2 octets : nombre de frames
+- [0x01
+- 8 octets : vitesse]
+- {infos de frame :
+- - - 0x02
+- - - 2 octets n° de frame
+- - - [0x20
+- - - 2 octets durée]
+- - - [0x21
+- - - 2 octets : x origine
+- - - 2 octets : y origine]
+- - - [0x22
+- - - 1 octet mode
+- - - 8 octets composante x
+- - - 8 octets composante y
+- - - ]
+- |
+- infos de hurtbox : 
+- - - 0x03
+- - - [0x31
+- - - 2 octets n° de frame]
+- - - { MAX_SHORT_VALUE (2 octets) | 
+- - - 2 octets x
+- - - 2 octets y
+- - - 2 octets w
+- - - 2 octets h
+- - - 1 octet type (normal;protected;invincible;intangible)}
+- |
+- infos d'hitbox : 
+- - - 0x04
+- - - [0x41
+- - - 2 octets n° de frame]
+- - - 2 octets x
+- - - 2 octets y
+- - - 2 octets w
+- - - 2 octets h
+- - - 1 octet type (damage;grab;wind;special)
+- - - 8 octets damages
+- - - 2 octets angle
+- - - 8 octets base_knockback
+- - - 8 octets scalink_knockback
+- - - 1 octet hitID
+- - - 1 octet priority
+- }*
+
+>Données de champion
+- Nom (UTF-8 String) 
+- Variables gameplay (à la suite, séparées par des espaces)
+- {
+- Infos de move :
+- - - 0x02
+- - - nom du move (nt-string)
+- - - [0x20
+- - - 1 octet landing lag]
+- |
+- Infos de multimove  NI
+- - - 0x03
+- - - {2 octets frame de fin de part
+- - - 2 octets frame de début de part}
+- - - 0x31
+- }*
+
+>Données de stage
+- Nom (UTF-8 String)
+- Variables de gameplay
+{
+- Infos de plateforme : 
+- - - 0x01
+- - - 2 octets x
+- - - 2 octets y
+- - - 2 octets w
+- - - [0x10
+- - - animation (null-terminated string)]
+- |
+- Infos d'élément de background (facultatif) (NI)
+- - - 0x02
+- - - animation (null-terminated string)
+- - - {MAX_SHORT_VALUE (2 octets) |
+- - - 2 octets x
+- - - 2 octets y
+- - - 2 octets profondeur (parallax)}
+}
+
+
+/!\ TOUT STRING DE PLUS DE 127 CARACTERES FERA PLANTER LE JEU ATM
