@@ -66,6 +66,21 @@ Version du format : 0.3.3
 - - - 8 octets scalink_knockback
 - - - 1 octet hitID
 - - - 1 octet priority
+- |
+- landing behavior
+- - - 0x05
+- - - 2 octets n° de frame
+- - - {0x50
+- - - Normal landing animation :
+- - - - - 2 octets durée (< 0 == durée par défaut)
+- - - |
+- - - 0x51
+- - - Custom landing animation :
+- - - - - 2 octets durée (< 0 == durée par défaut)
+- - - - - nom de l'animation (nt-string) 
+- - - |
+- - - 0x52 (nothing)
+- - - }
 - }*
 
 >Données de champion
@@ -75,8 +90,6 @@ Version du format : 0.3.3
 - Infos de move :
 - - - 0x02
 - - - nom du move (nt-string)
-- - - [0x20
-- - - 1 octet landing lag]
 - |
 - Infos de multimove  NI
 - - - 0x03
