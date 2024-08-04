@@ -2,6 +2,9 @@
 #include "SDL2/SDL.h"
 #include "CBoxVectors.h"
 #include "AnimationEndAction.h"
+#include "Types/Data.h"
+
+using namespace Kuribrawl::Types;
 
 class Animation;
 class Fighter;
@@ -31,7 +34,7 @@ class AnimationPlayerBase {
     void advance(bool loop);
 
     protected:
-    int current_frame; ///< Index of the current frame.
+    frame_index_t current_frame; ///< Index of the current frame.
     const Animation* model;   ///< The Animation that is running.
                                     /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
     

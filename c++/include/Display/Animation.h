@@ -5,8 +5,10 @@
 #include "Frame.h"
 #include "Util/util.h"
 #include "AnimationEndAction.h"
+#include "Types/Data.h"
 
 using namespace Kuribrawl;
+using namespace Kuribrawl::Types;
 struct Frame;
 
 /**
@@ -19,7 +21,7 @@ class AnimationBase {
     public:
     friend class AnimationPlayerBase;
 
-    void initFrames(int n);
+    void initFrames(frame_index_t n);
 
     AnimationBase();
     AnimationBase(SDL_Texture* spritesheet);
@@ -29,13 +31,13 @@ class AnimationBase {
     void setSpritesheet(SDL_Texture* spritesheet);
     SDL_Texture* getSpritesheet() const ;
     bool is_initialized()const;
-    int getNbFrames();
-    Frame* getFrame(int n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
+    frame_index_t getNbFrames();
+    Frame* getFrame(frame_index_t n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
     void setBaseSpeed(double speed);
     double getBaseSpeed();
 
-    void draw(SDL_Renderer* target, int x, int y, int frame)const;
-    void draw(SDL_Renderer* target, int x, int y, int frame, Kuribrawl::Side facing)const;
+    void draw(SDL_Renderer* target, int x, int y, frame_index_t frame)const;
+    void draw(SDL_Renderer* target, int x, int y, frame_index_t frame, Kuribrawl::Side facing)const;
 
     bool operator==(const AnimationBase&) const;
     std::weak_ordering operator<=>(const AnimationBase&) const;

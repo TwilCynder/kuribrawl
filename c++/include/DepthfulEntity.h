@@ -5,6 +5,8 @@
 #include "Display/Drawable.h"
 #include <ostream>
 
+using namespace Kuribrawl;
+
 /**
  * @brief An in-game entity that has a depth in the 3D space.
  *

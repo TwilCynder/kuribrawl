@@ -3,6 +3,9 @@
 #include "EntityFrame.h"
 #include "CBoxVectors.h"
 #include "AnimationEndAction.h"
+#include "Types/Data.h"
+
+using namespace Kuribrawl::Types;
 
 class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<EntityAnimation> {
     public:
@@ -12,18 +15,18 @@ class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<Ent
     EntityAnimation(SDL_Texture* spritesheet, int nFrames);
     ~EntityAnimation();
 
-    void initFrames(int n);
-    EntityFrame* getEntityFrame (int n);
-    const EntityFrame& getEntityFrame(int n) const;
+    void initFrames(frame_index_t n);
+    EntityFrame* getEntityFrame (frame_index_t);
+    const EntityFrame& getEntityFrame(frame_index_t) const;
 
     bool hasHitboxes() const;
-    const std::vector<Hitbox>&  getHitboxes (int frame) const;
-    const std::vector<Hurtbox>& getHurtboxes(int frame) const;
-    const EntityFrame::FrameMovement& getFrameMovement(int frame) const;
-    Hitbox*  addHitbox (int frame);
-    void addHitbox(int frame, int, int, int, int);
-    Hurtbox* addHurtbox(int frame);
-    void addHurtbox(int frame, int, int, int, int);
+    const std::vector<Hitbox>&  getHitboxes (frame_index_t frame) const;
+    const std::vector<Hurtbox>& getHurtboxes(frame_index_t frame) const;
+    const EntityFrame::FrameMovement& getFrameMovement(frame_index_t frame) const;
+    Hitbox*  addHitbox (frame_index_t frame);
+    void addHitbox(frame_index_t frame, int, int, int, int);
+    Hurtbox* addHurtbox(frame_index_t frame);
+    void addHurtbox(frame_index_t frame, int, int, int, int);
 
     
     template <typename... Args> requires EntityAnimationEndActionValidArg<EntityAnimation, Args...>

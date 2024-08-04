@@ -2,6 +2,7 @@
 
 #include <limits>
 
+namespace Kuribrawl {
 namespace Types {
     using depth_t = double;
     using subDepth_t = long;
@@ -16,4 +17,5 @@ namespace Types {
         ABOVE_FOREGROUND_DECORATION, //sometimes dynamic elements need to go above the small decorations
         FOREGROUND //always drawn above all else
     };
+}
 }

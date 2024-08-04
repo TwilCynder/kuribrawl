@@ -80,7 +80,7 @@ SDL_Texture* AnimationBase::getSpritesheet() const {
  * @param n
  */
 
-void AnimationBase::initFrames(int n){
+void AnimationBase::initFrames(frame_index_t n){
     if (n < 1){
         throw KBFatal("Tried to init AnimationBase with 0 frames");
     }
@@ -120,7 +120,7 @@ bool AnimationBase::is_initialized() const {
  * @return int
  */
 
-int AnimationBase::getNbFrames(){
+frame_index_t AnimationBase::getNbFrames(){
     return nb_frames;
 }
 
@@ -131,7 +131,7 @@ int AnimationBase::getNbFrames(){
  * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the AnimationBase exists.
  */
 
-Frame* AnimationBase::getFrame(int n){
+Frame* AnimationBase::getFrame(frame_index_t n){
     return &frames[n];
 }
 
@@ -168,7 +168,7 @@ double AnimationBase::getBaseSpeed(){
  * @param frame index of the frame.
  */
 
-void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame)const{
+void AnimationBase::draw(SDL_Renderer* target, int x, int y, frame_index_t frame)const{
     return draw(target, x, y, frame, Kuribrawl::Side::RIGHT);
 }
 
@@ -181,7 +181,7 @@ void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame)const{
  * @param frame index of the frame.
  * @param facing orientation of the frame
  */
-void AnimationBase::draw(SDL_Renderer* target, int x, int y, int frame, Kuribrawl::Side facing)const{
+void AnimationBase::draw(SDL_Renderer* target, int x, int y, frame_index_t frame, Kuribrawl::Side facing)const{
     if (!this->spritesheet) return;
 
     if (frame > nb_frames) {

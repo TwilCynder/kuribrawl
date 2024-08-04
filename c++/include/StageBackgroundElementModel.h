@@ -2,6 +2,8 @@
 #include "Util/structures.h"
 #include "Types/GameTypes.h"
 
+using namespace Kuribrawl;
+
 class Animation;
 
 struct StageBackgroundElementModel {

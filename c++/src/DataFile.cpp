@@ -11,6 +11,9 @@
 #include "Util/stringOperations.h"
 #include "KBDebug/Debug.h"
 #include "KBDebug/DebugTime.h"
+#include "Types/Data.h"
+
+using namespace Kuribrawl::Types;
 
 #define FILE_SIGNATURE 0x54545454
 #define FILEFORMAT_MAJOR 0
@@ -684,7 +687,7 @@ void DataFile::readAnimationFile(AnimationBase& anim){
 
     anim.setSpritesheet(readTexture());
 
-    Uint16 word;
+    frame_index_t fi;
     Uint8 byte = readValue<Uint8>();
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -693,8 +696,8 @@ void DataFile::readAnimationFile(AnimationBase& anim){
         case FILEMARKER_DESCRIPTORSTART:
             Debug::out << "Reading animation descriptor at 0x" << Log::hex(tell()) << '\n';
 
-            readData(&word);
-            anim.initFrames(word);
+            readData(&fi);
+            anim.initFrames(fi);
             
             do {
                 readData(&byte);
@@ -738,7 +741,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
 
     anim.setSpritesheet(readTexture());
 
-    Uint16 word;
+    frame_index_t fi;
     Uint8 byte = readValue<Uint8>();
     switch (byte){
         case FILEMARKER_INTERFILE:
@@ -747,8 +750,8 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
         case FILEMARKER_DESCRIPTORSTART:
             Debug::out << "Reading animation descriptor at 0x" << Log::hex(tell()) << '\n';
 
-            readData(&word);
-            anim.initFrames(word);
+            readData(&fi);
+            anim.initFrames(fi);
             
             do {
                 readData(&byte);

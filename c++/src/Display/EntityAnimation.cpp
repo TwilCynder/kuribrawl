@@ -22,7 +22,7 @@ EntityAnimation::EntityAnimation(SDL_Texture* spritesheet, int nFrames) : Entity
 EntityAnimation::~EntityAnimation(){
 }
 
-void EntityAnimation::initFrames(int n){
+void EntityAnimation::initFrames(frame_index_t n){
     AnimationBase::initFrames(n);
 
     entity_frames = std::make_unique<EntityFrame[]>(n);
@@ -35,11 +35,11 @@ void EntityAnimation::initFrames(int n){
  * @return Frame* a Frame. Pointer validity : frames are stored in a unique pointer, can't be invalid as long as the Animation exists.
  */
 
-EntityFrame* EntityAnimation::getEntityFrame(int n){
+EntityFrame* EntityAnimation::getEntityFrame(frame_index_t n){
     return &entity_frames[n];
 }
 
-const EntityFrame& EntityAnimation::getEntityFrame(int n) const{
+const EntityFrame& EntityAnimation::getEntityFrame(frame_index_t n) const{
     if (n > nb_frames) {
         throw KBFatal("Frame index %d out of bounds", n);
     }
@@ -71,35 +71,35 @@ bool EntityAnimation::hasHitboxes() const {
     return has_hitboxes;
 }
 
-const std::vector<Hitbox>&  EntityAnimation::getHitboxes(int frame) const {
+const std::vector<Hitbox>&  EntityAnimation::getHitboxes(frame_index_t frame) const {
     if (frame > nb_frames) {
         throw KBFatal("Frame index %d out of bounds", frame);
     }
     return entity_frames[frame].hitboxes;
 }
 
-const std::vector<Hurtbox>& EntityAnimation::getHurtboxes(int frame) const {
+const std::vector<Hurtbox>& EntityAnimation::getHurtboxes(frame_index_t frame) const {
     if (frame > nb_frames) {
         throw KBFatal("Frame index %d out of bounds", frame);
     }
     return entity_frames[frame].hurtboxes;
 }
 
-const EntityFrame::FrameMovement& EntityAnimation::getFrameMovement(int frame) const {
+const EntityFrame::FrameMovement& EntityAnimation::getFrameMovement(frame_index_t frame) const {
     if (frame > nb_frames) {
         throw KBFatal("Frame index %d out of bounds", frame);
     }
     return entity_frames[frame].movement; 
 }
 
-Hitbox* EntityAnimation::addHitbox(int frame){
+Hitbox* EntityAnimation::addHitbox(frame_index_t frame){
     if (frame > nb_frames) {
         throw KBFatal("Frame index %d out of bounds", frame);
     }
     return &entity_frames[frame].hitboxes.emplace_back();
 }
 
-void EntityAnimation::addHitbox(int frame, int x, int y, int w, int h){
+void EntityAnimation::addHitbox(frame_index_t frame, int x, int y, int w, int h){
     Hitbox* hb = addHitbox(frame);
     hb->x = x;
     hb->y = y;
@@ -109,14 +109,14 @@ void EntityAnimation::addHitbox(int frame, int x, int y, int w, int h){
     has_hitboxes = true;
 }
 
-Hurtbox* EntityAnimation::addHurtbox(int frame){
+Hurtbox* EntityAnimation::addHurtbox(frame_index_t frame){
     if (frame > nb_frames) {
         throw KBFatal("Frame index %d out of bounds", frame);
     }
     return &entity_frames[frame].hurtboxes.emplace_back();
 }
 
-void EntityAnimation::addHurtbox(int frame, int x, int y, int w, int h){
+void EntityAnimation::addHurtbox(frame_index_t frame, int x, int y, int w, int h){
     Hurtbox* hb = addHurtbox(frame);
     hb->x = x;
     hb->y = y;

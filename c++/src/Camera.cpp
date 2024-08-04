@@ -5,6 +5,7 @@
 constexpr int half_screen_w = SCREEN_WIDTH / 2;
 constexpr int half_screen_h = SCREEN_HEIGHT / 2;
 
+using namespace::Kuribrawl;
 
 Camera::Camera() :
     position{0, 0}
