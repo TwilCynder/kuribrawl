@@ -15,7 +15,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Copy latest
-        run : ./doc/public/build/copy_latest.sh
+        run : ./doc/build/copy_latest.sh
       - name: Commit changes
         shell: bash
         run: |
