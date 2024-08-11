@@ -81,6 +81,10 @@ Version du format : 0.3.3
 - - - |
 - - - 0x52 (nothing)
 - - - }
+- | 
+- end behavior
+- - - 0x06
+- - - 1 octet mode (normal;helpless;custom)
 - }*
 
 >Données de champion
