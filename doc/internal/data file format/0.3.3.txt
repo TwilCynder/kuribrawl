@@ -29,16 +29,20 @@ Version du format : 0.3.3
 - {infos de frame :
 - - - 0x02
 - - - 2 octets n° de frame
-- - - [0x20
-- - - 2 octets durée]
-- - - [0x21
+- |
+- - - 0x20
+- - - 2 octets durée
+- |
+- - - 0x21
 - - - 2 octets : x origine
-- - - 2 octets : y origine]
-- - - [0x22
+- - - 2 octets : y origine
+- |
+- infos de frame movement :
+- - - 0x22
 - - - 1 octet mode
 - - - 8 octets composante x
 - - - 8 octets composante y
-- - - ]
+- - - 
 - |
 - infos de hurtbox : 
 - - - 0x03
