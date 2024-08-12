@@ -3,6 +3,9 @@
 #include <vector>
 #include <list>
 #include <string>
+#include "Types/Data.h"
+
+using namespace Kuribrawl::Types;
 
 class EntityAnimation;
 class Champion;
@@ -45,12 +48,12 @@ class GameplayAnimationBehavior {
              * @brief Data specific to normal landing behavior
              */
             struct {
-                int duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
             } normal;
 
             struct {
                 const EntityAnimation* anim;  ///< The animation to transition to
-                int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
     };

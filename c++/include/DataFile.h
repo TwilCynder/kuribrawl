@@ -22,6 +22,9 @@ class EntityFrame;
 class Hitbox;
 class Hurtbox;
 
+class UnresolvedLoadingData;
+class UnresolvedEntityAnimationData;
+
 /**
  * @brief An opened file, treated as a Kuribrawl Data File.
  * Kuribrawl Data files are composed of an header and a sucession of independent **Data Chunks**.
@@ -90,9 +93,9 @@ class DataFile {
     void readVersion();
     DataType readDataType();
     char* readFileTag();
-    void readAnimation(GameData&);
+    void readAnimation(GameData&, UnresolvedLoadingData&);
     void readAnimationFile(AnimationBase& anim);
-    void readEntityAnimationFile(EntityAnimation& anim);
+    void readEntityAnimationFile(EntityAnimation& anim, UnresolvedEntityAnimationData&);
     void readChampionValues(Champion& champion);
     void readChampionFile(Champion& champion);
     void readStageValues(StageModel& stage);
@@ -105,7 +108,7 @@ class DataFile {
     };
 
     DataReadingResult readAnimationData(AnimationBase&, Uint8 marker, AnimationParsingData& );
-    bool readEntityAnimationData(EntityAnimation&, Uint8 marker, AnimationParsingData&, EntityAnimationParsingData& );
+    bool readEntityAnimationData(EntityAnimation&, Uint8 marker, AnimationParsingData&, EntityAnimationParsingData&, UnresolvedEntityAnimationData&);
 
     template<typename T>
     void readData(T* res);
