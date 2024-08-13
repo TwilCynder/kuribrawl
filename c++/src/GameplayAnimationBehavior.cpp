@@ -64,6 +64,24 @@ GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior()
     normal.duration = -1;
 }
 
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(LandingBehaviorType t_)
+{
+    type = t_;
+}
+
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(duration_t duration)
+{
+    type = LandingBehaviorType::NORMAL;
+    normal.duration = duration;
+}
+
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(std::string &&anim_name, duration_t duration = -1)
+{
+    type = LandingBehaviorType::ANIMATION;
+    animation.anim_name = std::move(anim_name);
+    animation.duration = duration;
+}
+
 GameplayAnimationBehaviorUnresolved::LandingBehavior::~LandingBehavior(){
     if (type == LandingBehaviorType::ANIMATION){
         animation.anim_name.~basic_string();

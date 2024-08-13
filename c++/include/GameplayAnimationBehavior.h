@@ -94,16 +94,19 @@ struct GameplayAnimationBehaviorUnresolved {
              * @brief Data specific to normal landing behavior
              */
             struct {
-                int duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
             } normal;
 
             struct {
                 std::string anim_name;
-                int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
 
         LandingBehavior();
+        LandingBehavior(LandingBehaviorType);
+        LandingBehavior(duration_t duration);
+        LandingBehavior(std::string&& anim_name, duration_t duration = -1);
         ~LandingBehavior();
     };
 
