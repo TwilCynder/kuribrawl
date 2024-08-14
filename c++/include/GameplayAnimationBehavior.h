@@ -101,9 +101,7 @@ struct GameplayAnimationBehaviorUnresolved {
             } normal;
 
             struct {
-                struct {
-                    std::string anim_name;
-                } string_container;
+                std::string anim_name;
                 
                 duration_t duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
