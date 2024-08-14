@@ -3,7 +3,10 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <memory>
 #include "Types/Data.h"
+
+#include "KBDebug/Debug.h"
 
 using namespace Kuribrawl::Types;
 
@@ -98,7 +101,10 @@ struct GameplayAnimationBehaviorUnresolved {
             } normal;
 
             struct {
-                std::string anim_name;
+                struct {
+                    std::string anim_name;
+                } string_container;
+                
                 duration_t duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
@@ -112,7 +118,13 @@ struct GameplayAnimationBehaviorUnresolved {
 
     struct LandingBehaviorWindow {
         LandingBehavior behavior;
-        int frame = 0;
+        frame_index_t frame = 0;
+
+        template <typename ...Args>
+        LandingBehaviorWindow(frame_index_t frame_, Args&&... args):
+            behavior(std::forward<Args>(args)...), 
+            frame(frame_)
+        {Debug::log("================= Using template ============");} 
 
     };
 

@@ -43,10 +43,10 @@ GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBeha
         case LandingBehaviorType::ANIMATION:{
             window.behavior.animation.duration = window_base.behavior.animation.duration;
 
-            const EntityAnimation* anim = champion.getAnimation(window_base.behavior.animation.anim_name);
+            const EntityAnimation* anim = champion.getAnimation(window_base.behavior.animation.string_container.anim_name);
 
             if (!anim){
-                throw new KBFatalExplicit("In fighter animation behavior configuration : behavior refers to animation %s, which does not exist for champion %s", window_base.behavior.animation.anim_name, champion.getDisplayName());
+                throw new KBFatalExplicit("In fighter animation behavior configuration : behavior refers to animation %s, which does not exist for champion %s", window_base.behavior.animation.string_container.anim_name, champion.getDisplayName());
             }
 
             window.behavior.animation.anim = anim;
@@ -67,23 +67,30 @@ GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior()
 GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(LandingBehaviorType t_)
 {
     type = t_;
+
+    Debug::log("====================== type constructor");
 }
 
 GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(duration_t duration)
 {
     type = LandingBehaviorType::NORMAL;
     normal.duration = duration;
+
+    Debug::log("====================== duration_t constructor");
 }
 
-GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(std::string &&anim_name, duration_t duration = -1)
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(std::string &&anim_name, duration_t duration)
 {
     type = LandingBehaviorType::ANIMATION;
-    animation.anim_name = std::move(anim_name);
+    
+    animation.string_container = {std::move(anim_name)};
     animation.duration = duration;
+
+    Debug::log("====================== std::string&& constructor");
 }
 
 GameplayAnimationBehaviorUnresolved::LandingBehavior::~LandingBehavior(){
     if (type == LandingBehaviorType::ANIMATION){
-        animation.anim_name.~basic_string();
+        animation.string_container.anim_name.~basic_string();
     }
 }

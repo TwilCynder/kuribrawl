@@ -701,6 +701,34 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
             Debug::out << " - Mode : " << (int)mode << '\n'; 
         }
         break;
+        case FILEMARKER_LANDINGINFO:{
+            Debug::out << "Reading landing info at 0x" << Log::hex(tell()) << '\n';
+
+            frame_index_t frame = readValue<frame_index_t>();
+            auto mode = readValue<uint8_t>();
+            //GameplayAnimationBehavior::LandingBehaviorType mode = static_cast<GameplayAnimationBehavior::LandingBehaviorType>(readValue<uint8_t>());
+
+            switch(mode){
+                case FILEMARKER_LANDING_NORMAL:{
+                    duration_t duration = readValue<uint16_t>();
+                    uead.gabu.landing_behavior.emplace_back(frame, duration);
+                    Debug::sout << " - Mode  : NORMAL | " << frame << duration << '\n';
+                }
+                break;
+                case FILEMARKER_LANDING_ANIMATION:{
+                    duration_t duration = readValue<uint16_t>();
+                    readString();
+                    uead.gabu.landing_behavior.emplace_back(frame, std::string(readBuffer), duration);
+                }
+                break;
+                case FILEMARKER_LANDING_NOTHING:{
+                    uead.gabu.landing_behavior.emplace_back(frame, GameplayAnimationBehavior::LandingBehaviorType::NOTHING);
+                }
+
+            }
+
+        }
+        break;
         default:
             Debug::out << "READ : Unexpected byte at 0x" << std::hex << (tell() - 1) << ", expected animation information type identifier, found " << (int)marker << '\n';
             throw KBFatalDetailed(
