@@ -108,23 +108,33 @@ struct GameplayAnimationBehaviorUnresolved {
         };
 
         LandingBehavior();
-        LandingBehavior(LandingBehaviorType);
-        LandingBehavior(duration_t duration);
-        LandingBehavior(std::string&& anim_name, duration_t duration = -1);
         ~LandingBehavior();
+        protected:
+
+        /*LandingBehavior(LandingBehaviorType);
+        LandingBehavior(duration_t duration);
+        LandingBehavior(std::string&& anim_name, duration_t duration = -1);*/
+
     };
 
     struct LandingBehaviorWindow {
         LandingBehavior behavior;
         frame_index_t frame = 0;
 
+        LandingBehaviorWindow(frame_index_t frame);
+        /*
         template <typename ...Args>
         LandingBehaviorWindow(frame_index_t frame_, Args&&... args):
             behavior(std::forward<Args>(args)...), 
             frame(frame_)
         {Debug::log("================= Using template ============");} 
+        */
 
     };
+
+    void add_landing_window_normal(frame_index_t, duration_t);
+    void add_landing_window_animation(frame_index_t, std::string&&, duration_t);
+    void add_landing_window_nothing(frame_index_t);
 
     EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
     std::list<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
@@ -135,4 +145,7 @@ struct GameplayAnimationBehaviorUnresolved {
     };
 
     void finalize();
+
+    private:
+    LandingBehaviorWindow& add_landing_window(frame_index_t);
 };

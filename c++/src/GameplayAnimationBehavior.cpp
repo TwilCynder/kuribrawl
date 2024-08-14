@@ -12,8 +12,35 @@ constexpr GameplayAnimationBehaviorUnresolved::LandingBehaviorWindowComparator c
  * @brief Finalizes the data, making it suitable for conversion to GameplayAnimationBehavior
  * 
  */
-void GameplayAnimationBehaviorUnresolved::finalize() {
+void GameplayAnimationBehaviorUnresolved::finalize()
+{
     landing_behavior.sort(comp);
+}
+
+GameplayAnimationBehaviorUnresolved::LandingBehaviorWindow &GameplayAnimationBehaviorUnresolved::add_landing_window(frame_index_t frame)
+{
+    return landing_behavior.emplace_back(frame);
+}
+
+void GameplayAnimationBehaviorUnresolved::add_landing_window_normal(frame_index_t frame, duration_t duration)
+{
+    auto& window = add_landing_window(frame);
+    window.behavior.type = LandingBehaviorType::NORMAL;
+    window.behavior.normal.duration = duration;
+}
+
+void GameplayAnimationBehaviorUnresolved::add_landing_window_animation(frame_index_t frame, std::string && anim_name, duration_t duration)
+{
+    auto& window = add_landing_window(frame);
+    window.behavior.type = LandingBehaviorType::ANIMATION;
+    window.behavior.normal.duration = duration;
+    new (&window.behavior.animation.anim_name) std::string(std::move(anim_name));
+}
+
+void GameplayAnimationBehaviorUnresolved::add_landing_window_nothing(frame_index_t frame)
+{
+    auto& window = add_landing_window(frame);
+    window.behavior.type = LandingBehaviorType::NOTHING;
 }
 
 /**
@@ -59,39 +86,30 @@ GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBeha
 }
 
 GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior()
-{
-    type = LandingBehaviorType::NORMAL;
-    normal.duration = -1;
-}
+{}
 
-GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(LandingBehaviorType t_)
-{
-    type = t_;
+/*
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(LandingBehaviorType t_):
+    type(t_)
+{}
 
-    Debug::log("====================== type constructor");
-}
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(duration_t duration):
+    type(LandingBehaviorType::NORMAL),
+    normal{duration}
+{}
 
-GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(duration_t duration)
-{
-    type = LandingBehaviorType::NORMAL;
-    normal.duration = duration;
-
-    Debug::log("====================== duration_t constructor");
-}
-
-GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(std::string &&anim_name, duration_t duration)
-{
-    type = LandingBehaviorType::ANIMATION;
-    new(&animation.anim_name) std::string(std::move(anim_name));
-    animation.duration = duration;
-
-    Debug::log("====================== std::string&& constructor");
-}
+GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior(std::string &&anim_name, duration_t duration):
+    type(LandingBehaviorType::ANIMATION),
+    animation{std::move(anim_name), duration}
+{}
+*/
 
 GameplayAnimationBehaviorUnresolved::LandingBehavior::~LandingBehavior(){
-    Debug::log("DESTRUCTEUR");
     if (type == LandingBehaviorType::ANIMATION){
-        Debug::log("DESTRUCTEUR ANIMATION");
         animation.anim_name.~basic_string();
     }
 }
+
+GameplayAnimationBehaviorUnresolved::LandingBehaviorWindow::LandingBehaviorWindow(frame_index_t frame_):
+    frame(frame_)
+{}

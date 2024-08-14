@@ -711,20 +711,19 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
             switch(mode){
                 case FILEMARKER_LANDING_NORMAL:{
                     duration_t duration = readValue<uint16_t>();
-                    uead.gabu.landing_behavior.emplace_back(frame, duration);
+                    uead.gabu.add_landing_window_normal(frame, duration);
                     Debug::sout << " - Mode  : NORMAL | " << frame << duration << '\n';
                 }
                 break;
                 case FILEMARKER_LANDING_ANIMATION:{
-                    duration_t duration = readValue<uint16_t>();
+                    duration_t duration = readValue<int16_t>();
                     readString();
-                    uead.gabu.landing_behavior.emplace_back(frame, std::string(readBuffer), duration);
+                    uead.gabu.add_landing_window_animation(frame, std::string(readBuffer), duration);
                 }
                 break;
                 case FILEMARKER_LANDING_NOTHING:{
-                    uead.gabu.landing_behavior.emplace_back(frame, GameplayAnimationBehavior::LandingBehaviorType::NOTHING);
+                    uead.gabu.add_landing_window_nothing(frame);
                 }
-
             }
 
         }
