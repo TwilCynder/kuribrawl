@@ -4,6 +4,7 @@
 #include "CBoxVectors.h"
 #include "AnimationEndAction.h"
 #include "Types/Data.h"
+#include "GameplayAnimationBehavior.h"
 
 using namespace Kuribrawl::Types;
 
@@ -38,6 +39,7 @@ class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<Ent
     void setNextAnimation(const EntityAnimation*);
     const EntityAnimation* getNextAnimation() const;
 
+    GameplayAnimationBehavior gameplay_behavior;
     private:
     std::unique_ptr<EntityFrame[]> entity_frames;
     bool has_hitboxes;

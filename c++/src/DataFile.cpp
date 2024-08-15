@@ -39,17 +39,10 @@ struct UnresolvedEntityAnimationData {
 struct UnresolvedLoadingData {
     std::map<std::string, std::map<std::string, UnresolvedEntityAnimationData>> champion_anims;
 
-    UnresolvedEntityAnimationData& getChampionAnimData(std::string&& champion_name, std::string&& anim_name, EntityAnimation& anim){
-        auto& champion_map = champion_anims[champion_name];
-        auto [it, success] = champion_map.try_emplace(anim_name, anim);
-        return it->second;
-    }
+    UnresolvedEntityAnimationData& getChampionAnimData(std::string&& champion_name, std::string&& anim_name, EntityAnimation& anim);
+    UnresolvedEntityAnimationData& getChampionAnimData(const std::string& champion_name, const std::string& anim_name, EntityAnimation& anim);
 
-    UnresolvedEntityAnimationData& getChampionAnimData(const std::string& champion_name, const std::string& anim_name, EntityAnimation& anim){
-        auto& champion_map = champion_anims[champion_name];
-        auto [it, success] = champion_map.try_emplace(anim_name, anim);
-        return it->second;
-    }
+    void apply(GameData&);
 };
 
 
@@ -963,12 +956,49 @@ void DataFile::read(App& app){
                 break;
         }
     }
+
+    uld.apply(app.gameData());
+
     Debug::out << "Loading time : " << chrono.endSec() << " secs.\n";
     Debug::log("=========== Data file loading finished ==============");
 
-    app.gameData().checkData();
+    GameData& gd = app.gameData();
+    gd.checkData();
+
 }
 
 bool DataFile::ready(){
     return file != 0;
+}
+
+UnresolvedEntityAnimationData& UnresolvedLoadingData::getChampionAnimData(std::string&& champion_name, std::string&& anim_name, EntityAnimation& anim){
+    auto& champion_map = champion_anims[champion_name];
+    auto [it, success] = champion_map.try_emplace(anim_name, anim);
+    return it->second;
+}
+
+UnresolvedEntityAnimationData& UnresolvedLoadingData::getChampionAnimData(const std::string& champion_name, const std::string& anim_name, EntityAnimation& anim){
+    auto& champion_map = champion_anims[champion_name];
+    auto [it, success] = champion_map.try_emplace(anim_name, anim);
+    return it->second;
+}
+
+void UnresolvedLoadingData::apply(GameData& gameData){
+    Debug::log("Applying unresolved data");
+    for (auto& [champion_name, champion_map] : champion_anims){
+        Debug::sout << "Champion :" << champion_name << '\n';
+
+        Champion* champion = gameData.getChampion(champion_name);
+
+        if (!champion){
+            throw KBFatalDetailed("Invalid data file content", "Unresolved data was created for an animation of champion %s, which was never loaded", champion_name);
+        }
+
+        for(auto& [anim_name, anim_data] : champion_map){
+            Debug::sout << "Animation :" << anim_name << '\n';
+            anim_data.gabu.finalize();
+            Debug::log("Oui");
+            anim_data.anim.gameplay_behavior.setFromUnresolved(anim_data.gabu, *champion);
+        }
+    }
 }

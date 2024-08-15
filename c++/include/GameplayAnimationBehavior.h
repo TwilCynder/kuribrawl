@@ -5,13 +5,13 @@
 #include <string>
 #include <memory>
 #include "Types/Data.h"
+#include "Display/AnimationsPool.h"
 
 #include "KBDebug/Debug.h"
 
 using namespace Kuribrawl::Types;
 
 class EntityAnimation;
-class Champion;
 class GameplayAnimationBehaviorUnresolved;
 
 /**
@@ -61,11 +61,6 @@ class GameplayAnimationBehavior {
         };
     };
 
-    GameplayAnimationBehavior() = default;
-    GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved&, const Champion&);
-
-    protected:
-
     /**
      * @brief A behavior associated with a frame ID
      */
@@ -73,9 +68,20 @@ class GameplayAnimationBehavior {
         LandingBehavior behavior;
         int frame = 0;
     };
+    using LandingBehaviorWindows = std::vector<LandingBehaviorWindow>;
+
+    GameplayAnimationBehavior() = default;
+    GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved&, const AnimationsPool<EntityAnimation>&);
+
+    void setFromUnresolved(const GameplayAnimationBehaviorUnresolved&, const AnimationsPool<EntityAnimation>&);
+
+    EndingBehavior getEndBehavior() const;
+    LandingBehaviorWindows getLandingBehavior() const;
+
+    protected:
 
     EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
-    std::vector<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
+    LandingBehaviorWindows landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
 };
 
 /**

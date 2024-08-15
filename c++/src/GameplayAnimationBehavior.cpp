@@ -51,9 +51,15 @@ void GameplayAnimationBehaviorUnresolved::add_landing_window_nothing(frame_index
  * @param base 
  * @param champion 
  */
-GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved & base, const Champion & champion):
-    end_behavior(base.end_behavior)
+GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved & base, const AnimationsPool<EntityAnimation> & anim_pool)
 {   
+    setFromUnresolved(base, anim_pool);
+}
+
+void GameplayAnimationBehavior::setFromUnresolved(const GameplayAnimationBehaviorUnresolved & base, const AnimationsPool<EntityAnimation> & anim_pool)
+{
+    end_behavior = base.end_behavior;
+
     landing_behavior.reserve(base.landing_behavior.size());
     for (auto& window_base : base.landing_behavior){
         LandingBehaviorType type = window_base.behavior.type;
@@ -68,12 +74,14 @@ GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBeha
             window.behavior.normal.duration = window_base.behavior.normal.duration;
             break;
         case LandingBehaviorType::ANIMATION:{
+            Debug::out << "-> Animation name : " << window_base.behavior.animation.anim_name << '\n';
+
             window.behavior.animation.duration = window_base.behavior.animation.duration;
 
-            const EntityAnimation* anim = champion.getAnimation(window_base.behavior.animation.anim_name);
+            const EntityAnimation* anim = anim_pool.getAnimation(window_base.behavior.animation.anim_name);
 
             if (!anim){
-                throw new KBFatalExplicit("In fighter animation behavior configuration : behavior refers to animation %s, which does not exist for champion %s", window_base.behavior.animation.anim_name, champion.getDisplayName());
+                throw KBFatalExplicit("In fighter animation behavior configuration : behavior refers to animation %s, which does not exist for the given animation pool", window_base.behavior.animation.anim_name.c_str());
             }
 
             window.behavior.animation.anim = anim;
@@ -83,6 +91,16 @@ GameplayAnimationBehavior::GameplayAnimationBehavior(const GameplayAnimationBeha
             break;
         }
     }
+}
+
+GameplayAnimationBehavior::EndingBehavior GameplayAnimationBehavior::getEndBehavior() const
+{
+    return end_behavior;
+}
+
+GameplayAnimationBehavior::LandingBehaviorWindows GameplayAnimationBehavior::getLandingBehavior() const
+{
+    return landing_behavior;
 }
 
 GameplayAnimationBehaviorUnresolved::LandingBehavior::LandingBehavior()
