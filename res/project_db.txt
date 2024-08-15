@@ -40,6 +40,8 @@ acid\landing.png
 A:acid/landing 2 5.0 c
 acid\nair.png
 A:acid/nair acid\nair_acid.dat
+acid\nair_landing.png
+A:acid/nair_landing 2 5 c
 acid\uair.png
 A:acid/uair acid\uair.dat
 acid\walk.png
