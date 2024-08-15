@@ -52,7 +52,7 @@ class KBFatalDetailed : public KBFatal {
     explicit KBFatalDetailed(const std::string&& error_message, const char* user_message);
     template<typename T, typename... Args>
     explicit KBFatalDetailed(const std::string_view& user_message, const char* error_format, T error_arg1, Args... error_args):
-      KBFatalDetailed(std::move(Kuribrawl::formatString(error_format, error_arg1, error_args...))) {}
+      KBFatalDetailed(user_message, std::move(Kuribrawl::formatString(error_format, error_arg1, error_args...))) {}
 
     const char* userMessage() const;
 
