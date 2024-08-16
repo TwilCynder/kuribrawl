@@ -89,7 +89,7 @@ void Fighter::changeAnimation(const EntityAnimation* anim){
 
 
     if (transition){   
-        current_animation.setAnimation(transition, anim);
+        current_animation.setAnimationWithEndAction(transition, anim);
     } else {
         current_animation.setAnimation(anim);
     }
@@ -99,7 +99,7 @@ void Fighter::changeAnimation(const EntityAnimation* anim, double speed){
     const EntityAnimation* transition = model->getAnimationTransition(*current_animation.getAnimation(), *anim);
     
     if (transition){
-        current_animation.setAnimation(transition, speed, anim);
+        current_animation.setAnimationWithEndAction(transition, speed, anim);
     } else {
         current_animation.setAnimation(anim, speed);
     }

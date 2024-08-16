@@ -28,16 +28,16 @@ class EntityAnimationPlayer : public EntityAnimationPlayerBase {
     }
 
     template <typename... Args>
-    void setAnimation(const EntityAnimation* anim, Args... args){
+    void setAnimationWithEndAction(const EntityAnimation* anim, Args... args){
         setAnimation(anim);
         setEndAction(args...);
     }
+
     template <typename... Args>
-    void setAnimation(const EntityAnimation* anim, double speed, Args... args){
+    void setAnimationWithEndAction(const EntityAnimation* anim, double speed, Args... args){
         setAnimation(anim, speed);
         setEndAction(args...);
     }
-
 
     private:
 
