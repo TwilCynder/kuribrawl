@@ -5,13 +5,18 @@
 #include "Display/Animation.h"
 #include "KBDebug/Debug.h"
 #include "Display/Frame.h"
+#include "Display/AnimationPlayer.h"
+#include "EntityAnimationStateManager.h"
+#include "Display/EntityAnimation.h"
 
 /**
  * @brief Construct a new Current Animation object.
  * Creates it without an Animation to run, so it is unusable until an Animation is set.
  */
 
-AnimationPlayerBase::AnimationPlayerBase():
+template <typename A, typename StateManager>
+AnimationPlayerBase<A, StateManager>::AnimationPlayerBase():
+    AnimationEndActionOwner<A>(),
     current_frame(0),
     model(nullptr),
     animation_set(),
@@ -26,8 +31,8 @@ AnimationPlayerBase::AnimationPlayerBase():
  *
  * @param animation the Animation that will be ran at first.
  */
-
-AnimationPlayerBase::AnimationPlayerBase(const Animation* animation):
+template <typename A, typename StateManager>
+AnimationPlayerBase<A, StateManager>::AnimationPlayerBase(const A* animation):
     AnimationPlayerBase()
 {
     setAnimation(animation);
@@ -40,11 +45,13 @@ AnimationPlayerBase::AnimationPlayerBase(const Animation* animation):
  * @return false otherwise
  */
 
-bool AnimationPlayerBase::is_initialized()const{
+template <typename A, typename StateManager>
+bool AnimationPlayerBase<A, StateManager>::is_initialized()const{
     return model && model->is_initialized();
 }
 
-const Animation* AnimationPlayerBase::getAnimation() const {
+template <typename A, typename StateManager>
+const A* AnimationPlayerBase<A, StateManager>::getAnimation() const {
     return model;
 }
 
@@ -53,11 +60,13 @@ const Animation* AnimationPlayerBase::getAnimation() const {
  *
  * @return finished or not.
  */
-bool AnimationPlayerBase::is_finished() const {
+template <typename A, typename StateManager>
+bool AnimationPlayerBase<A, StateManager>::is_finished() const {
     return finished;
 }
 
-bool AnimationPlayerBase::frameChanged() const {
+template <typename A, typename StateManager>
+bool AnimationPlayerBase<A, StateManager>::frameChanged() const {
     return frame_changed;
 }
 
@@ -67,7 +76,8 @@ bool AnimationPlayerBase::frameChanged() const {
  * @param anim
  */
 
-void AnimationPlayerBase::setAnimation(const Animation* anim){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim){
     setAnimation(anim, anim->base_speed);
 }
 
@@ -78,7 +88,8 @@ void AnimationPlayerBase::setAnimation(const Animation* anim){
  * @param speed_ \ref Animation#base_speed "speed" that will be used when advancing this animation.
  */
 
-void AnimationPlayerBase::setAnimation(const Animation* anim, double speed_){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim, double speed_){
     if (!anim) return;
     model = anim;
     init();
@@ -95,7 +106,8 @@ void AnimationPlayerBase::setAnimation(const Animation* anim, double speed_){
  * For speeds that do not make each frame displayed the same amount of time, using this method while the animation has already advanced at least one frame will result in imprecisions.
  */
 
-void AnimationPlayerBase::setSpeed(double speed_){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setSpeed(double speed_){
     if (speed_){
         speed = speed_;
     } else {
@@ -128,7 +140,8 @@ void AnimationPlayerBase::setSpeed(double speed_){
  *
  */
 
-void AnimationPlayerBase::init(){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::init(){
     over = false;
     finished = false;
     reset();
@@ -138,7 +151,8 @@ void AnimationPlayerBase::init(){
  * @brief resets this Current Animation to the initial state of the current Animation.
  */
 
-void AnimationPlayerBase::reset(){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::reset(){
     current_frame = 0;
     frame_changed = true;
     current_carry = 0;
@@ -149,7 +163,8 @@ void AnimationPlayerBase::reset(){
  *
  */
 
-void AnimationPlayerBase::start(){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::start(){
     Frame* f = &(model->frames[current_frame]);
     if (f->duration){
         timeleft = f->duration;
@@ -163,7 +178,8 @@ void AnimationPlayerBase::start(){
  *
  */
 
-void AnimationPlayerBase::advance(bool loop){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::advance(bool loop){
     if (speed != -1 && is_initialized()){
         
         if (animation_set){
@@ -188,7 +204,8 @@ void AnimationPlayerBase::advance(bool loop){
  * Updates the timeleft for the current frame, and the carry if needed.
  */
 
-void AnimationPlayerBase::nextFrame(bool loop){
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::nextFrame(bool loop){
     if (!model->loop && over) return;
     
     if (current_frame < model->nb_frames - 1){
@@ -224,8 +241,8 @@ void AnimationPlayerBase::nextFrame(bool loop){
  * @param x x position on the destination.
  * @param y y position on the destination.
  */
-
-void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y) const {
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::draw(SDL_Renderer* target, int x, int y) const {
     if (!model){
         throw KBFatal("Tried to draw non-initalized AnimationPlayerBase");
     }
@@ -233,7 +250,8 @@ void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y) const {
     model->draw(target, x, y, current_frame);
 }
 
-void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y, Kuribrawl::Side facing) const {
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::draw(SDL_Renderer* target, int x, int y, Kuribrawl::Side facing) const {
     if (!model){
         throw KBFatal("Tried to draw non-initalized AnimationPlayerBase");
     }
@@ -241,10 +259,21 @@ void AnimationPlayerBase::draw(SDL_Renderer* target, int x, int y, Kuribrawl::Si
     model->draw(target, x, y, current_frame, facing);
 }
 
-void AnimationPlayer::advance(AnimationEndAction<Animation>& end_action_){
-    AnimationPlayerBase::advance(end_action_.mode == EndAction::Mode::REPEAT);
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::advance(AnimationEndAction<A>& end_action_){
+    advance(end_action_.mode == EndAction::Mode::REPEAT);
 }
 
-void AnimationPlayer::advance(){
-    advance(end_action);
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::advance(){
+    advance(this->end_action);
 }
+
+void AnimationPlayerStateManagerBase::animationStarted(){}
+
+void AnimationPlayerStateManagerBase::frameChanged(){}
+
+void AnimationPlayerStateManagerBase::animationEnded(){}
+
+template class AnimationPlayerBase<Animation, AnimationPlayerStateManagerBase>;
+template class AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>;

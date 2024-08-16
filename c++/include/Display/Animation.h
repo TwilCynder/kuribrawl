@@ -19,6 +19,8 @@ struct Frame;
 
 class AnimationBase {
     public:
+
+    template <typename A, typename S>
     friend class AnimationPlayerBase;
 
     void initFrames(frame_index_t n);
@@ -64,5 +66,4 @@ class Animation : public AnimationBase, public AnimationEndActionOwner<Animation
         AnimationBase(args...), AnimationEndActionOwner(EndAction::repeat_tag)
     {}
 
-    friend class AnimationPlayer;
 };

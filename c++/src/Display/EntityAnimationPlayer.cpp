@@ -7,7 +7,7 @@
 using EndAction = AnimationEndAction<EntityAnimation>;
 
 EntityAnimationPlayer::EntityAnimationPlayer():
-    AnimationPlayerBase(),
+    AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>(),
     override_end_action(false)
 {
 }
@@ -18,8 +18,9 @@ EntityAnimationPlayer::EntityAnimationPlayer():
  * @param animation the Animation that will be ran at first.
  */
 
-EntityAnimationPlayer::EntityAnimationPlayer(EntityAnimation* animation):
-    AnimationPlayerBase((Animation*)animation)
+EntityAnimationPlayer::EntityAnimationPlayer(const EntityAnimation* animation):
+    AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>(animation),
+    override_end_action(false)
 {
 }
 
@@ -69,12 +70,4 @@ const EntityFrame::FrameMovement& EntityAnimationPlayer::getFrameMovement() cons
 
 const EntityAnimation* EntityAnimationPlayer::getAnimation() const {
     return model_;
-}
-
-void EntityAnimationPlayer::setAnimation(const EntityAnimation* anim){
-    setAnimation((Animation*)anim);
-}
-
-void EntityAnimationPlayer::setAnimation(const EntityAnimation* anim, double speed){
-    setAnimation((Animation*)anim, speed);
 }

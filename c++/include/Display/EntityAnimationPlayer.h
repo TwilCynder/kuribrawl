@@ -1,22 +1,20 @@
 #pragma once
 #include "AnimationPlayer.h"
 #include "EntityFrame.h"
-#include "AnimatedEntity.h"
-#include "AnimationEndAction.h"
+#include "EntityAnimationStateManager.h"
+#include "Display/EntityAnimation.h"
 
-class EntityAnimation;
-class EntityAnimationPlayer : public AnimationPlayerBase, public AnimationEndActionOwner<EntityAnimation> {
+using EntityAnimationPlayerBase = AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>;
+class EntityAnimationPlayer : public EntityAnimationPlayerBase {
     public:
 
     EntityAnimationPlayer();
-    EntityAnimationPlayer(EntityAnimation* animation);
+    EntityAnimationPlayer(const EntityAnimation* animation);
 
     const std::vector<Hurtbox>& getHurtboxes() const;
     const std::vector<Hitbox>&  getHitboxes() const;
     const EntityFrame::FrameMovement& getFrameMovement() const;
 
-    void setAnimation(const EntityAnimation* anim);
-    void setAnimation(const EntityAnimation* anim, double speed);
     int advance();
     
     const EndAction& resolveEndAction() const;
@@ -44,7 +42,4 @@ class EntityAnimationPlayer : public AnimationPlayerBase, public AnimationEndAct
     private:
 
     bool override_end_action;
-
-    using AnimationPlayerBase::getAnimation;
-    using AnimationPlayerBase::setAnimation;
 };

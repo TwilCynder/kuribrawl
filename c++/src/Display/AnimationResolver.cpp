@@ -1,4 +1,5 @@
 #include "Display/AnimationResolver.h"
+#include "Display/EntityAnimation.h"
 
 template <class A>
 AnimationResolver::Binding<A>::Binding(const AnimationsPool<A>& pool_, const std::string&& animation_name_, A& target_) :
