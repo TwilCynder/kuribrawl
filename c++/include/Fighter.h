@@ -60,7 +60,7 @@ class Fighter : public DepthfulEntity {
     const HurtboxVector& getCurrentHurtboxes() const;
     const HitboxVector&  getCurrentHitboxes () const;
 
-    Game& getGame();
+    Game& getGame() const;
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, Kuribrawl::Side facing = Kuribrawl::Side::NEUTRAL, int info = 0, bool update_anim_ = true);
@@ -85,6 +85,8 @@ class Fighter : public DepthfulEntity {
 	int  air_jump(jumpX x_type = jumpX::UndecidedX);
 
     bool is_initialized();
+
+    friend std::ostream& operator<<(std::ostream&, const Fighter&);
 
     //Debug
     int id;

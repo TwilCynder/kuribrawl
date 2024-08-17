@@ -2,6 +2,7 @@
 #include "Game.h"
 #include <map>
 #include <string>
+#include "KBDebug/DebugState.h"
 
 namespace Debug {
     /**
@@ -18,7 +19,8 @@ namespace Debug {
         {Fighter::State::DASH_TURN, "Dash turn"},
         {Fighter::State::LANDING, "Landing"},
         {Fighter::State::ATTACK, "Attacking"},
-        {Fighter::State::HITSTUN, "Hitstun"}
+        {Fighter::State::HITSTUN, "Hitstun"},
+        {Fighter::State::FREEFALL, "Free Fall"}
     };
 };
 
@@ -31,7 +33,7 @@ const static std::string stateNotFound(" (enum name not found)\n");
  * @return const std::string* 
  */
 const std::string* Debug::state_to_string_ptr(Fighter::State state){
-        auto it = state_name.find(state);
+    auto it = state_name.find(state);
     if (it == state_name.end()){
         return nullptr;
     } else {
@@ -55,43 +57,42 @@ const std::string& Debug::state_to_string(Fighter::State state){
 }
 
 /**
- * @brief Logs a state to the debug output.
+ * @brief Prints a state to an ostream
  * 
  * Uses the state name, given by state_to_string.
- * 
+ * @param os 
  * @param state 
+ * @return std::ostream& 
  */
-void Debug::log(Fighter::State state){
-    std::cout << state_to_string(state) << '\n' << std::flush;
-}
+std::ostream& operator<<(std::ostream& os, Fighter::State state){
+    return os << Debug::state_to_string(state);
+};
 
 /**
- * @brief \ref Debug::log(Fighter::State) "Logs a state" to the debug output, and a frame index.  
- * 
- * @param state 
+ * @brief Prints a frame index, i.e. a number in the frame index format.
  * @param frame 
  */
-void Debug::log(Fighter::State state, int frame){
-    cout << '[' << frame << "] ";
-    log(state);
+void Debug::printFrame(int frame)
+{
+    out << '[' << frame << ']';
 }
 
 /**
- * @brief Logs info about a Fighter to the debug output, aka its \ref Fighter::State "State" and name.
- * 
- * @param fighter 
- */
-
-void Debug::log(Fighter& fighter){
-    log(fighter.getState(), fighter.getGame().getFrame());
-}
-
-/**
- * @brief Logs a state and the current frame of the game in which a certain Fighter is.
+ * @brief Logs a state and identity info about a FIghter (ID)
  * 
  * @param state 
  * @param fighter the fighter used to get the Game.
  */
-void Debug::log(Fighter::State state, Fighter& fighter){
-    log(state, fighter.getGame().getFrame());
+void Debug::log(Fighter::State state, const Fighter& fighter){
+    out << fighter << '@' << state << '\n';
+}
+
+/**
+ * @brief Logs info about a Fighter to the debug output, aka its \ref Fighter::State "State" and ID.
+ * 
+ * @param fighter 
+ */
+
+void Debug::logState(const Fighter& fighter){
+    logFrame(fighter.getGame().getFrame(), fighter.getState(), fighter);
 }
