@@ -18,8 +18,6 @@ Stage::Stage(const StageModel& m) :
     for (const PlatformModel& platform_model: platform_models){
         platforms.emplace_back(platform_model);
     }
-
-    Debug::log(platforms.size());
 }
 
 const StageModel& Stage::getModel() const {

@@ -2,7 +2,6 @@
 #include "Game.h"
 #include <map>
 #include <string>
-#include "KBDebug/DebugState.h"
 
 namespace Debug {
     /**
@@ -95,4 +94,9 @@ void Debug::log(Fighter::State state, const Fighter& fighter){
 
 void Debug::logState(const Fighter& fighter){
     logFrame(fighter.getGame().getFrame(), fighter.getState(), fighter);
+}
+
+void Debug::logFrame(Fighter::State state, const Fighter & fighter)
+{
+    logFrame(fighter.getGame().getFrame(), state, fighter);
 }

@@ -9,7 +9,7 @@
 #include "sdlHelper.h"
 
 void App::startTestGame(){
-	Debug::log("=====Starting game=====");
+	Debug::log("--------- ===== Starting game ===== --------");
 
 	//portsManager.openAllControllers(this->controllersData()); //plus besoin car on a des events deviceadded au lancement
 

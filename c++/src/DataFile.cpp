@@ -951,7 +951,6 @@ void DataFile::read(App& app){
                 readStageFile(app.gameData().tryStage(tag));
                 break;
             case DataFile::DataType::NONE:
-                Debug::log("-None");
             default:
                 break;
         }
@@ -997,7 +996,6 @@ void UnresolvedLoadingData::apply(GameData& gameData){
         for(auto& [anim_name, anim_data] : champion_map){
             Debug::sout << "Animation :" << anim_name << '\n';
             anim_data.gabu.finalize();
-            Debug::log("Oui");
             anim_data.anim.gameplay_behavior.setFromUnresolved(anim_data.gabu, *champion);
         }
     }

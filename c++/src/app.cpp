@@ -148,8 +148,6 @@ bool App::loadGameFile(const char* name){
 void App::loadRessources(){
 	//SDL_i
 	SDL_Texture* test = IMG_LoadTexture(renderer, "oracle.png");
-	Debug::log(test);
-	Debug::log("--66--");
 
 	if (!loadGameFile("data.twl"))
 	if (!loadGameFile("../res/data.twl"))
@@ -275,11 +273,11 @@ void App::handleEvents(){
 				stop();
 				break;
 			case SDL_JOYDEVICEADDED:
-				Debug::log("DEVICE FCKING ADDED ===========================");
+				Debug::log("NEW DEVICE WOOOOOO =========================================================");
 				handleDeviceAdded(event.jdevice);
 				break;
 			case SDL_JOYDEVICEREMOVED:
-				Debug::log("DEVICE FCKING REMOVED ===========================");
+				Debug::log("DID SOMEONE JUST FUCKING UNPLUG THEIR CONTROLLER ===========================");
 				handleDeviceRemoved(event.jdevice);
 				break;
 			case SDL_JOYBUTTONDOWN:

@@ -34,9 +34,7 @@ namespace Kuribrawl {
         using base_type::map;
 
         template <class C>
-        __DoubleKeyMap(std::initializer_list<C> init){
-            Debug::log("Construcion");
-        }
+        __DoubleKeyMap(std::initializer_list<C> init){}
 
         ref_key make_key_ref(const K1& k1, const K2& k2) const {
             return ref_key(k1, k2);

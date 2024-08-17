@@ -115,7 +115,7 @@ PlayerFighter* Game::addFighter(Champion* model){
  * @return Fighter* the Fighter created (and added).
  */
 PlayerFighter* Game::addFighter(Champion* model, int x, int y){
-    Debug::log("added fighter");
+    Debug::log("Added fighter");
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y);
 
