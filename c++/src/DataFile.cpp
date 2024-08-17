@@ -10,7 +10,7 @@
 #include "Util/util.h"
 #include "Util/stringOperations.h"
 #include "KBDebug/Debug.h"
-#include "KBDebug/DebugTime.h"
+#include "KBDebug/Chrono.h"
 #include "Types/Data.h"
 #include "GameplayAnimationBehavior.h"
 
@@ -916,7 +916,7 @@ void DataFile::separateTag(const Kuribrawl::string_view& tag, Kuribrawl::string_
 void DataFile::read(App& app){
     Debug::log("====== Reading data file ==============");
 
-    DebugTime chrono;
+    Chrono chrono;
     chrono.start();
 
     UnresolvedLoadingData uld;

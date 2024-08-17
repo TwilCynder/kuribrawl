@@ -7,7 +7,7 @@
 #include "StageModel.h"
 #include "KBDebug/Debug.h"
 #include "CollisionBoxes.h"
-#include "KBDebug/DebugTime.h"
+#include "KBDebug/Chrono.h"
 #include "GameConfiguration.h"
 #include "PlayerConfiguration.h"
 #include "Util/Text/TextureFont.h"

@@ -5,7 +5,7 @@
 #include "Random.h"
 #include "messageBox.h"
 #include <ctime>
-#include "KBDebug/DebugTime.h"
+#include "KBDebug/Chrono.h"
 
 int main(int argc, char** argv) try {
 

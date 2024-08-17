@@ -1,7 +1,7 @@
 #include "Port.h"
 #include "InputManager.h"
 #include "KBDebug/Debug.h"
-#include "KBDebug/DebugInput.h"
+#include "KBDebug/DebugMiscGameplay.h"
 #include "app.h"
 #include "Binding.h"
 #include "ControllersData.h"

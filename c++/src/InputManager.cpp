@@ -1,6 +1,6 @@
 #include "InputManager.h"
 #include "KBDebug/Debug.h"
-#include "KBDebug/DebugInput.h"
+#include "KBDebug/DebugMiscGameplay.h"
 #include "PlayerFighter.h"
 #include "macros.h"
 
