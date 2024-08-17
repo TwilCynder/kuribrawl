@@ -4,7 +4,7 @@
 
 bool GameplayAnimationBehaviorUnresolved::LandingBehaviorWindowComparator::operator()(const LandingBehaviorWindow & a, const LandingBehaviorWindow & b) const
 {
-    return a.frame - b.frame;
+    return a.frame < b.frame;
 }
 
 constexpr GameplayAnimationBehaviorUnresolved::LandingBehaviorWindowComparator comp;
@@ -98,7 +98,7 @@ GameplayAnimationBehavior::EndingBehavior GameplayAnimationBehavior::getEndBehav
     return end_behavior;
 }
 
-GameplayAnimationBehavior::LandingBehaviorWindows GameplayAnimationBehavior::getLandingBehavior() const
+const GameplayAnimationBehavior::LandingBehaviorWindows& GameplayAnimationBehavior::getLandingBehavior() const
 {
     return landing_behavior;
 }

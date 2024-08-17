@@ -1,6 +1,7 @@
 #include "PlayerFighter.h"
 #include "Ground.h"
 #include "KBDebug/Debug.h"
+#include "KBDebug/DebugMiscGameplay.h"
 
 int PlayerFighter::InputHandler_Jump(RegisteredInput& input){
     if (paused) return InputHandlerResult::POSTPONE;
@@ -42,12 +43,11 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
         return InputHandlerResult::DISMISSED;
     }
 
-    Debug::log("ATTACK INPUT");
-    Debug::log((int)input.direction);
-    Debug::log((int)Kuribrawl::DirectionToDirectionIG(input.direction, facing));
+    direction = Kuribrawl::DirectionToDirectionIG(input.direction, facing);
+
+    Debug::out << "ATTACK INPUT | Stick direction : " << input.direction << " | Relative direction : " << direction << '\n';
 
     if (!grounded){
-        direction = Kuribrawl::DirectionToDirectionIG(input.direction, facing);
         //direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
 
         switch (direction){
