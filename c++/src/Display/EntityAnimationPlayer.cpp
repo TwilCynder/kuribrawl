@@ -69,9 +69,18 @@ const EntityFrame::FrameMovement& EntityAnimationPlayer::getFrameMovement() cons
     return model->getEntityFrame(current_frame).movement;
 }
 
-const GameplayAnimationBehavior::EndingBehavior EntityAnimationPlayer::getEndBehavior()
+const GameplayAnimationBehavior::EndingBehavior EntityAnimationPlayer::getEndBehavior() const
 {
     return model->gameplay_behavior.getEndBehavior();
+}
+
+const GameplayAnimationBehavior::LandingBehavior* EntityAnimationPlayer::getLandingBehavior() const
+{
+    if (this->is_initialized() && state_manager.currentLandingWindow != model->gameplay_behavior.getLandingBehavior().end()){
+        return &state_manager.currentLandingWindow->behavior;
+    } else {
+        return nullptr;
+    }
 }
 
 const EntityAnimation* EntityAnimationPlayer::getAnimation() const {

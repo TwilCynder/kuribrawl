@@ -11,6 +11,8 @@ using namespace Kuribrawl::Types;
 class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<EntityAnimation> {
     public:
 
+    using LandingBehavior = GameplayAnimationBehavior::LandingBehavior;
+
     EntityAnimation();
     EntityAnimation(SDL_Texture* spritesheet);
     EntityAnimation(SDL_Texture* spritesheet, int nFrames);

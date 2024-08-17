@@ -4,12 +4,12 @@
 #include "GameplayAnimationBehavior.h"
 
 
-class EntityAnimationStateManager : public AnimationPlayerStateManagerBase {
+struct EntityAnimationStateManager : public AnimationPlayerStateManagerBase {
     using GAB = GameplayAnimationBehavior;
 
     GAB::LandingBehaviorWindows::const_iterator currentLandingWindow;
 
     public:
-    void animationStarted();
-    void frameChanged();
+    void animationStarted(const EntityAnimation&);
+    void frameChanged(const EntityAnimation&, frame_index_t frame_index);
 };

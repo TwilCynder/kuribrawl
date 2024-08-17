@@ -8,10 +8,10 @@
 
 using namespace Kuribrawl::Types;
 
-class AnimationPlayerStateManagerBase {
-    void animationStarted();
-    void frameChanged();
-    void animationEnded();
+struct AnimationPlayerStateManagerBase {
+    void animationStarted(const Animation&);
+    void frameChanged(const Animation&, frame_index_t frame_index);
+    void animationEnded(const Animation&);
 };
 
 

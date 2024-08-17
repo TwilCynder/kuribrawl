@@ -145,6 +145,8 @@ void AnimationPlayerBase<A, StateManager>::init(){
     over = false;
     finished = false;
     reset();
+
+
 }
 
 /**
@@ -171,6 +173,8 @@ void AnimationPlayerBase<A, StateManager>::start(){
     } else if (speed != -1){
         timeleft = frame_multiplier;
     }
+
+    state_manager.animationStarted(*model);
 }
 
 /**
@@ -211,6 +215,7 @@ void AnimationPlayerBase<A, StateManager>::nextFrame(bool loop){
     if (current_frame < model->nb_frames - 1){
         current_frame++;
         frame_changed = true;
+        state_manager.frameChanged(*model, current_frame);
     } else {
         finished = true;
         if (loop){
@@ -269,11 +274,11 @@ void AnimationPlayerBase<A, StateManager>::advance(){
     advance(this->end_action);
 }
 
-void AnimationPlayerStateManagerBase::animationStarted(){}
+void AnimationPlayerStateManagerBase::animationStarted(const Animation&){}
 
-void AnimationPlayerStateManagerBase::frameChanged(){}
+void AnimationPlayerStateManagerBase::frameChanged(const Animation&, frame_index_t frame_index){}
 
-void AnimationPlayerStateManagerBase::animationEnded(){}
+void AnimationPlayerStateManagerBase::animationEnded(const Animation&){}
 
 template class AnimationPlayerBase<Animation, AnimationPlayerStateManagerBase>;
 template class AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>;

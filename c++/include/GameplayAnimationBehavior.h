@@ -76,7 +76,7 @@ class GameplayAnimationBehavior {
     void setFromUnresolved(const GameplayAnimationBehaviorUnresolved&, const AnimationsPool<EntityAnimation>&);
 
     EndingBehavior getEndBehavior() const;
-    LandingBehaviorWindows getLandingBehavior() const;
+    const LandingBehaviorWindows& getLandingBehavior() const;
 
     protected:
 
