@@ -56,7 +56,7 @@ class Logger {
         return *this;
     }
 
-        template <class T, std::ostream&(T::*F)(std::ostream&) const>
+    template <class T, std::ostream&(T::*F)(std::ostream&) const>
     Logger& operator<<(const ConstLogWrapper<T, F> lw){
         stream = &lw(*stream);
         return *this;

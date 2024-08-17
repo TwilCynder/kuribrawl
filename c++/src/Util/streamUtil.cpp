@@ -1,7 +1,6 @@
 #include <cctype>
 #include "Util/streamUtil.h"
 #include "Util/stringOperations.h"
-#include "streamUtil.h"
 
 void Kuribrawl::printFixed(std::ostream& l, const char* str, size_t len){
     const char * const bound = str + len;
