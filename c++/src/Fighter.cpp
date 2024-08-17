@@ -447,14 +447,26 @@ void Fighter::updateState(){
             break;
         case State::ATTACK:
             if (current_animation.is_finished()){
-                switch (current_move->end_behavior){
-                    case Move::EndBehavior::NORMAL:
-                        setState(Fighter::State::IDLE);
+                Debug::out << "Animation end behavior : " << (int)current_animation.getEndBehavior() << '\n';
+                switch (current_animation.getEndBehavior()){
+                    case GameplayAnimationBehavior::EndingBehavior::CUSTOM:
+                        throw KBFatalExplicit("CUSTOM end mode is not supported yet. Shouldn't have been present in a loaded animation anyway, this is weird");
                         break;
-                    case Move::EndBehavior::FREEFALL:
+                    case GameplayAnimationBehavior::EndingBehavior::HELPLESS:
                         setState(Fighter::State::FREEFALL);
                         break;
+                    case GameplayAnimationBehavior::EndingBehavior::IDLE:
+                        switch (current_move->end_behavior){
+                            case Move::EndBehavior::NORMAL:
+                                setState(Fighter::State::IDLE);
+                                break;
+                            case Move::EndBehavior::FREEFALL:
+                                setState(Fighter::State::FREEFALL);
+                                break;
+                        }
+                        break;
                 }
+
             }
             break;
         default:
@@ -506,7 +518,7 @@ const HitboxVector& Fighter::getCurrentHitboxes() const{
  * 
  */
 
-Game& Fighter::getGame(){
+Game& Fighter::getGame() const{
     return game;
 }
 
@@ -538,7 +550,7 @@ Fighter::State Fighter::getState() const {
  */
 
 void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing_, int info, bool update_anim_){
-    //Debug::log(s, *this);
+    Debug::logFrame(s, *this);
     state = s;
     state_info = info;
     update_anim = update_anim_;
@@ -547,6 +559,7 @@ void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing_, int info
     state_timer = 0;
     paused = 0;
     checkStateDuration();
+
 }
 
 void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim){
@@ -582,4 +595,9 @@ bool Fighter::attack(const Move& move){
 
 void Fighter::setID(int id){
     this->id = id;
+}
+
+std::ostream &operator<<(std::ostream &os, const Fighter &f)
+{
+    return os << "Fighter <" << f.id << '>';
 }

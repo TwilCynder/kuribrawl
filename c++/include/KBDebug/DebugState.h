@@ -13,9 +13,10 @@ namespace Debug
     void printFrame(int frame);
     void logState(const Fighter&);
 
-    template <typename... Args>
-    void logFrame(int frame, Args&&... args){
+    void logFrame(Fighter::State state, const Fighter&);
+    template <typename... Args> void logFrame(int frame, Args&&... args){
         printFrame(frame);
+        out << ' ';
         log(args...);
     }
 } // namespace Debug

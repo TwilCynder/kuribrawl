@@ -14,6 +14,7 @@ class EntityAnimationPlayer : public EntityAnimationPlayerBase {
     const std::vector<Hurtbox>& getHurtboxes() const;
     const std::vector<Hitbox>&  getHitboxes() const;
     const EntityFrame::FrameMovement& getFrameMovement() const;
+    const GameplayAnimationBehavior::EndingBehavior getEndBehavior();
 
     int advance();
     

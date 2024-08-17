@@ -1,6 +1,7 @@
 #include "KBDebug/Debug.h"
 #include "Display/EntityAnimationPlayer.h"
 #include "Display/EntityAnimation.h"
+#include "Display/EntityAnimationPlayer.h"
 
 #define model_ ((EntityAnimation*)model)
 
@@ -57,17 +58,22 @@ int EntityAnimationPlayer::advance(){
 }
 
 const std::vector<Hurtbox>& EntityAnimationPlayer::getHurtboxes() const {
-    return model_->getHurtboxes(current_frame);
+    return model->getHurtboxes(current_frame);
 }
 
 const std::vector<Hitbox>& EntityAnimationPlayer::getHitboxes() const {
-    return model_->getHitboxes(current_frame);
+    return model->getHitboxes(current_frame);
 }
 
 const EntityFrame::FrameMovement& EntityAnimationPlayer::getFrameMovement() const {
-    return model_->getEntityFrame(current_frame)->movement;
+    return model->getEntityFrame(current_frame).movement;
+}
+
+const GameplayAnimationBehavior::EndingBehavior EntityAnimationPlayer::getEndBehavior()
+{
+    return model->gameplay_behavior.getEndBehavior();
 }
 
 const EntityAnimation* EntityAnimationPlayer::getAnimation() const {
-    return model_;
+    return model;
 }

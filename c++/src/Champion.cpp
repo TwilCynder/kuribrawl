@@ -325,7 +325,8 @@ const std::map<Champion::DefaultAnimation, std::string> Champion::default_animat
     {Champion::DefaultAnimation::AIR_JUMP_FORWARD, "air_jump_f"},
     {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, "air_jump_b"},
     {Champion::DefaultAnimation::HITSTUN, "hurt"},
-    {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, "air_idle_after_hurt"}
+    {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, "air_idle_after_hurt"},
+    {Champion::DefaultAnimation::FREEFALL, "freefall"}
     //a voir pour les animations tumble
     //pour le landing lag ce sera spécial aussi
 };
