@@ -1,6 +1,7 @@
 #include <cctype>
 #include "Util/streamUtil.h"
 #include "Util/stringOperations.h"
+#include "streamUtil.h"
 
 void Kuribrawl::printFixed(std::ostream& l, const char* str, size_t len){
     const char * const bound = str + len;
@@ -37,3 +38,7 @@ void Kuribrawl::printReadable(std::ostream& l, const char* str, size_t len){
     }
 }
 
+std::ostream &operator<<(std::ostream & os, std::function<void(std::ostream &)> f)
+{   
+    f(os);
+}
