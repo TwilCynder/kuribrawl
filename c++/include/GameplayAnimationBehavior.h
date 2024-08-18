@@ -156,7 +156,12 @@ struct GameplayAnimationBehaviorUnresolved {
     LandingBehaviorWindow& add_landing_window(frame_index_t);
 };
 
+/*
 template<>
-struct EnumInfo<GameplayAnimationBehavior::LandingBehaviorType>{static const EnumTypeTraits<GameplayAnimationBehavior::LandingBehaviorType>::names_type names;};
+extern const EnumTypeTraits<GameplayAnimationBehavior::LandingBehaviorType>::names_type enum_names<GameplayAnimationBehavior::LandingBehaviorType>;
+*/
+
 template<>
-struct EnumInfo<GameplayAnimationBehavior::EndingBehavior>{static const EnumTypeTraits<GameplayAnimationBehavior::EndingBehavior>::names_type names;};
+struct EnumInfo<GameplayAnimationBehavior::LandingBehaviorType>{static const EnumNamesType<GameplayAnimationBehavior::LandingBehaviorType> names;};
+template<>
+struct EnumInfo<GameplayAnimationBehavior::EndingBehavior>{static const EnumNamesType<GameplayAnimationBehavior::EndingBehavior> names;};

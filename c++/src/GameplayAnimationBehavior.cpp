@@ -132,13 +132,13 @@ GameplayAnimationBehaviorUnresolved::LandingBehaviorWindow::LandingBehaviorWindo
     frame(frame_)
 {}
 
-const EnumTypeTraits<GameplayAnimationBehavior::LandingBehaviorType>::names_type EnumInfo<GameplayAnimationBehavior::LandingBehaviorType>::names = {
+const EnumNamesType<GameplayAnimationBehavior::LandingBehaviorType> EnumInfo<GameplayAnimationBehavior::LandingBehaviorType>::names = {
     {GameplayAnimationBehavior::LandingBehaviorType::NORMAL, "Normal"},
     {GameplayAnimationBehavior::LandingBehaviorType::ANIMATION, "Animation"},
     {GameplayAnimationBehavior::LandingBehaviorType::NOTHING, "Custom"},
 };
 
-const EnumTypeTraits<GameplayAnimationBehavior::EndingBehavior>::names_type EnumInfo<GameplayAnimationBehavior::EndingBehavior>::names = {
+const EnumNamesType<GameplayAnimationBehavior::EndingBehavior> EnumInfo<GameplayAnimationBehavior::EndingBehavior>::names = {
     {GameplayAnimationBehavior::EndingBehavior::IDLE, "Normal"},
     {GameplayAnimationBehavior::EndingBehavior::HELPLESS, "Free Fall"},
     {GameplayAnimationBehavior::EndingBehavior::CUSTOM, "Custom"},

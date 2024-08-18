@@ -12,6 +12,8 @@ class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<Ent
     public:
 
     using LandingBehavior = GameplayAnimationBehavior::LandingBehavior;
+    using LandingBehaviorType = GameplayAnimationBehavior::LandingBehaviorType;
+    using EndingBehavior = GameplayAnimationBehavior::EndingBehavior;
 
     EntityAnimation();
     EntityAnimation(SDL_Texture* spritesheet);

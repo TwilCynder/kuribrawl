@@ -5,8 +5,8 @@
 #include "Util/streamUtil.h"
 
 template<>
-struct EnumInfo<Input>{static const EnumTypeTraits<Input>::names_type names;};
-const EnumTypeTraits<Input>::names_type EnumInfo<Input>::names = {
+struct EnumInfo<Input>{static const EnumNamesType<Input> names;};
+const EnumNamesType<Input> EnumInfo<Input>::names = {
     {Input::NONE, "None"},
     {Input::ATTACK, "Attack"},
     {Input::SPECIAL, "Special"},
@@ -20,8 +20,8 @@ const EnumTypeTraits<Input>::names_type EnumInfo<Input>::names = {
 };
 
 template<>
-struct EnumInfo<Kuribrawl::Direction>{static const EnumTypeTraits<Kuribrawl::Direction>::names_type names;};
-const EnumTypeTraits<Kuribrawl::Direction>::names_type EnumInfo<Kuribrawl::Direction>::names = {
+struct EnumInfo<Kuribrawl::Direction>{static const EnumNamesType<Kuribrawl::Direction> names;};
+const EnumNamesType<Kuribrawl::Direction> EnumInfo<Kuribrawl::Direction>::names = {
     {Kuribrawl::Direction::NONE, "Neutral"},
     {Kuribrawl::Direction::LEFT, "Left"},
     {Kuribrawl::Direction::RIGHT, "Right"},
@@ -30,8 +30,8 @@ const EnumTypeTraits<Kuribrawl::Direction>::names_type EnumInfo<Kuribrawl::Direc
 };
 
 template<>
-struct EnumInfo<Kuribrawl::DirectionIG>{static const EnumTypeTraits<Kuribrawl::DirectionIG>::names_type names;};
-const EnumTypeTraits<Kuribrawl::DirectionIG>::names_type EnumInfo<Kuribrawl::DirectionIG>::names = {
+struct EnumInfo<Kuribrawl::DirectionIG>{static const EnumNamesType<Kuribrawl::DirectionIG> names;};
+const EnumNamesType<Kuribrawl::DirectionIG> EnumInfo<Kuribrawl::DirectionIG>::names = {
     {Kuribrawl::DirectionIG::NONE, "Neutral"},
     {Kuribrawl::DirectionIG::FORWARD, "Forward"},
     {Kuribrawl::DirectionIG::BACK, "Back"},
