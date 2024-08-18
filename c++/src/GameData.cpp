@@ -144,8 +144,7 @@ void GameData::finalizeChampionsInitialization(){
     ChampionsMap::iterator it;
     for (it = champions.begin(); it != champions.end(); it++)
     {
-        it->second.initDefaultAnimations();
-        it->second.finalizeMoves();
+        it->second.finalize();
     }
 }
 

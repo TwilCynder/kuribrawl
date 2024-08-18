@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <array>
 #include <unordered_set>
 #include "Util/containers_util.h"
 #include "SDL2/SDL.h"
@@ -9,6 +10,7 @@
 #include "Move.h"
 #include "Display/EntityAnimation.h"
 #include "Util/DoubleKeyMap.h"
+#include "FighterStates.h"
 
 /**
  * @brief A character of the game.
@@ -103,8 +105,10 @@ class Champion : public AnimationsPool<EntityAnimation> {
         Values();
     };
 
+    using StateDurations_t = std::array<duration_t, (size_t)Kuribrawl::FighterState::STATES>;
+
     Champion(const std::string& name_);
-    Champion(const std::string&& name_);
+    Champion(std::string&& name_);
     Champion(const std::string_view& name_);
     const std::string& getName();
     const EntityAnimation* getDefaultAnimation(const DefaultAnimation state) const;
@@ -123,6 +127,8 @@ class Champion : public AnimationsPool<EntityAnimation> {
     const Move* getDefaultMove(DefaultMoves) const;
     void initDefaultMoves();
     void finalizeMoves();
+
+    void finalize();
 
     void setDisplayName(const char* display_name);
     const std::string& getDisplayName() const;
@@ -151,5 +157,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     std::map<std::string, Move, std::less<>> moves;
 
     Kuribrawl::DynamicMatrixST<const EntityAnimation*, const EntityAnimation*> transition_matrix;
+
+    StateDurations_t state_durations;
 };
 

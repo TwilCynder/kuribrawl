@@ -16,11 +16,12 @@
  *
  * @param name_ The internal name.
  */
-Champion::Champion(const std::string& name_):
-    name(name_),
+Champion::Champion(std::string&& name_):
+    name(std::move(name_)),
     default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL)),
     default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL)),
-    transition_matrix()
+    transition_matrix(),
+    state_durations()
 {
     initDefaultMoves();
 }
@@ -30,10 +31,8 @@ Champion::Champion(const std::string& name_):
  *
  * @param name_ The internal name.
  */
-Champion::Champion(const std::string&& name_):
-    name(std::move(name_)),
-    default_animations(std::make_unique<const EntityAnimation*[]>((int)DefaultAnimation::TOTAL)),
-    default_moves(std::make_unique<const Move* []>((int)DefaultMoves::TOTAL))
+Champion::Champion(const std::string& name_):
+    Champion(std::string(name))
 {
     initDefaultMoves();
 }
@@ -188,6 +187,23 @@ void Champion::finalizeMoves(){
             move.animation = anim;
         }
     }
+}
+
+void Champion::finalize(){
+    initDefaultAnimations();
+    finalizeMoves();
+
+    for (int i = 0; i < (int)Kuribrawl::FighterState::STATES; i++){
+        state_durations[i] = -1;
+    }
+    state_durations[(int)Kuribrawl::FighterState::JUMPSQUAT] = values.jump_squat_duration;
+    state_durations[(int)Kuribrawl::FighterState::DASH_START] = values.dash_start_duration;
+    state_durations[(int)Kuribrawl::FighterState::DASH_TURN] = values.dash_turn_duration;
+    state_durations[(int)Kuribrawl::FighterState::DASH_STOP] = values.dash_stop_duration;
+    state_durations[(int)Kuribrawl::FighterState::LANDING] = values.landing_duration;
+    state_durations[(int)Kuribrawl::FighterState::LANDING_LAG] = values.landing_duration;
+    state_durations[(int)Kuribrawl::FighterState::GUARD_START] = values.guard_start_duration;
+    state_durations[(int)Kuribrawl::FighterState::GUARD_STOP] = values.guard_stop_duration;
 }
 
 const EntityAnimation* Champion::resolveDefaultAnimation(Champion::DefaultAnimation id, std::unordered_set<Champion::DefaultAnimation>& already_seen){
