@@ -28,7 +28,16 @@ void Fighter::groundCollision(){
     
     Debug::out << "Ground collision from fighter " << this->id << '\n' << std::flush;
 
-    if (state == Fighter::State::ATTACK && current_move->landing_lag != -1){
+    if (state == Fighter::State::ATTACK){
+
+        const EntityAnimation::LandingBehavior* anim_land_behavior = current_animation.getLandingBehavior();
+
+        if (anim_land_behavior){
+            Debug::log("=========== LANDING ===========");
+            Debug::log(anim_land_behavior->type);
+        }
+
+
         setAnimation(Champion::DefaultAnimation::LANDING, current_move->landing_lag);
     } else {
         setAnimation(Champion::DefaultAnimation::LANDING);

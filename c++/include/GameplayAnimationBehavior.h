@@ -6,7 +6,7 @@
 #include <memory>
 #include "Types/Data.h"
 #include "Display/AnimationsPool.h"
-
+#include "Util/EnumInfo.h"
 #include "KBDebug/Debug.h"
 
 using namespace Kuribrawl::Types;
@@ -155,3 +155,8 @@ struct GameplayAnimationBehaviorUnresolved {
     private:
     LandingBehaviorWindow& add_landing_window(frame_index_t);
 };
+
+template<>
+struct EnumInfo<GameplayAnimationBehavior::LandingBehaviorType>{static const EnumTypeTraits<GameplayAnimationBehavior::LandingBehaviorType>::names_type names;};
+template<>
+struct EnumInfo<GameplayAnimationBehavior::EndingBehavior>{static const EnumTypeTraits<GameplayAnimationBehavior::EndingBehavior>::names_type names;};
