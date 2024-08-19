@@ -102,7 +102,7 @@ class Fighter : public DepthfulEntity {
 
     void applyAirAccel(int direction);
 
-    //void updateAnimation();
+    void updateAnimation();
     void changeAnimation(const EntityAnimation*);
     void changeAnimation(const EntityAnimation*, double speed);
 

@@ -159,7 +159,7 @@ const Move* Champion::getDefaultMove(DefaultMoves move) const {
     return (default_moves[(int)move]);
 }
 
-duration_t Champion::getStateDuration(Kuribrawl::FighterState s) const{
+double Champion::getStateDuration(Kuribrawl::FighterState s) const{
     return state_durations[(int)s];
 }
 
@@ -379,6 +379,7 @@ const std::map<Champion::DefaultAnimation, Champion::DefaultAnimation> Champion:
     {Champion::DefaultAnimation::AIR_JUMP_FORWARD, Champion::DefaultAnimation::AIR_JUMP},
     {Champion::DefaultAnimation::AIR_JUMP_BACKWARD, Champion::DefaultAnimation::AIR_JUMP},
     {Champion::DefaultAnimation::AIR_IDLE_AFTER_HIT, Champion::DefaultAnimation::AIR_IDLE},
+    {Champion::DefaultAnimation::LANDING_LAG, Champion::DefaultAnimation::LANDING}
 };
 
 const Kuribrawl::DynamicMatrixST<Champion::DefaultAnimation, std::string> Champion::default_transition_animations_names = {{

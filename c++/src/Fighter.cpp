@@ -97,11 +97,21 @@ void Fighter::changeAnimation(const EntityAnimation* anim){
 void Fighter::changeAnimation(const EntityAnimation* anim, double speed){
     const EntityAnimation* transition = model->getAnimationTransition(*current_animation.getAnimation(), *anim);
     
-    if (transition){
-        current_animation.setAnimationWithEndAction(transition, speed, anim);
+    if (speed < 0){
+        if (transition){
+            current_animation.setAnimationWithEndAction(transition, anim);
+        } else {
+            current_animation.setAnimation(anim);
+        }
     } else {
-        current_animation.setAnimation(anim, speed);
+        if (transition){
+            current_animation.setAnimationWithEndAction(transition, speed, anim);
+        } else {
+            current_animation.setAnimation(anim, speed);
+        }
     }
+
+
 }
 
 void Fighter::setAnimation(const EntityAnimation* anim) {
@@ -438,6 +448,7 @@ void Fighter::updateState(){
             }
             break;
         case State::LANDING:
+        case State::LANDING_LAG:
             if (current_animation.is_finished()){
                 setState(State::IDLE);
             }
@@ -506,35 +517,16 @@ void Fighter::trySetAnimFromState(Fighter::State state_){
             duration_t state_duration = model->getStateDuration(state_);
             anim = model->getDefaultAnimation((Champion::DefaultAnimation)state_);
             if (anim)
-                if (state_duration > -1){
-                    setAnimation(anim, state_duration);
-                } else {
-                    setAnimation(anim);
-                }    
+                setAnimation(anim, state_duration);
+
     }
 }
 
-/*
+
 void Fighter::updateAnimation(){
-    const EntityAnimation* anim;
-    switch(state){
-        case State::IDLE:
-            anim = (grounded) ? 
-                model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
-                (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
-            
-            if (anim)
-                setAnimation(anim);
-            break;
-        case State::HITSTUN:
-            break;
-        default:
-            anim = model->getDefaultAnimation((Champion::DefaultAnimation)state);
-            if (anim)
-                setAnimation(anim);
-    }
+    trySetAnimFromState(state);
 }
-*/
+
 
 const HurtboxVector& Fighter::getCurrentHurtboxes() const{
     return current_animation.getHurtboxes();
@@ -597,21 +589,15 @@ void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing_, int info
 }
 
 void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim, double speed){
-    if (speed == -1){
-        setAnimation(anim);
-    } else {
-        setAnimation(anim, speed);
-    }
+    setAnimation(anim);
+    setAnimation(anim, speed);
     
     setState(s, facing, info, false);
 }
 
 void Fighter::setState(const State s, Kuribrawl::Side facing, int info, const EntityAnimation &anim, double speed){
-    if (speed == -1){
-        setAnimation(&anim);
-    } else {
-        setAnimation(&anim, speed);
-    }
+    setAnimation(&anim);
+    setAnimation(&anim, speed);
     
     setState(s, facing, info, false);
 }

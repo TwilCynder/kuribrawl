@@ -34,11 +34,35 @@ void Fighter::groundCollision(){
 
         if (anim_land_behavior){
             Debug::log("=========== LANDING ===========");
-            Debug::log(anim_land_behavior->type);
+            Debug::out << "Landing type : " << anim_land_behavior->type;
+            
+            switch (anim_land_behavior->type){
+                case EntityAnimation::LandingBehaviorType::NORMAL:{
+                    setState(State::LANDING_LAG, Kuribrawl::Side::NEUTRAL, 0, false);
+                    double landing_duration = anim_land_behavior->normal.duration;
+                    if (landing_duration > -1){
+                        setAnimation(Champion::DefaultAnimation::LANDING_LAG, landing_duration);
+                    } else {
+                        setAnimation(Champion::DefaultAnimation::LANDING_LAG);
+                    }
+                }
+                break;
+
+                case EntityAnimation::LandingBehaviorType::ANIMATION:{
+                    setState(State::LANDING_LAG, Kuribrawl::Side::NEUTRAL, 0, false);
+                    double landing_duration = anim_land_behavior->animation.duration;
+                    if (landing_duration > -1){
+                        setAnimation(anim_land_behavior->animation.anim, landing_duration);
+                    } else {
+                        setAnimation(anim_land_behavior->animation.anim);
+                    }
+                }
+                break;
+            }
+        } else {
+            setAnimation(Champion::DefaultAnimation::LANDING);
         }
-
-
-        setAnimation(Champion::DefaultAnimation::LANDING, current_move->landing_lag);
+        
     } else {
         setAnimation(Champion::DefaultAnimation::LANDING);
     }

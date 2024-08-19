@@ -105,7 +105,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
         Values();
     };
 
-    using StateDurations_t = std::array<duration_t, (size_t)Kuribrawl::FighterState::STATES>;
+    using StateDurations_t = std::array<double, (size_t)Kuribrawl::FighterState::STATES>;
 
     Champion(const std::string& name_);
     Champion(std::string&& name_);
@@ -125,7 +125,7 @@ class Champion : public AnimationsPool<EntityAnimation> {
     Move& tryMove(const char* name);
     Move& tryMove(std::string&& name);
     const Move* getDefaultMove(DefaultMoves) const;
-    duration_t getStateDuration(Kuribrawl::FighterState) const;
+    double getStateDuration(Kuribrawl::FighterState) const;
 
     void initDefaultMoves();
     void finalizeMoves();
