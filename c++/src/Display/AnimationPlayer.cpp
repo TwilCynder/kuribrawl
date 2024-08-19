@@ -70,6 +70,31 @@ bool AnimationPlayerBase<A, StateManager>::frameChanged() const {
     return frame_changed;
 }
 
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::changeAnimation(const A *anim){
+    changeAnimation(anim, anim->base_speed);
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::changeAnimation(const A *anim, double speed_){
+    if (!anim) return;
+    model = anim;
+    setSpeed(speed_);
+    animation_set = true;
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim){
+    changeAnimation(anim);
+    running = false;
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim, double speed_){
+    changeAnimation(anim, speed_);
+    running = false;
+}
+
 /**
  * @brief Sets the ran Animation.
  * Delegates to setAnimation(Animation*, double) with the Animation's default speed.
@@ -90,13 +115,27 @@ void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim){
 
 template <typename A, typename StateManager>
 void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim, double speed_){
-    if (!anim) return;
-    model = anim;
-    init();
-    setSpeed(speed_);
-    start();
+    changeAnimation(anim, speed_);
+    start_();
+}
 
-    animation_set = true;
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::start_(){
+    initAnim();
+    initRun();
+    running = true;
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::start(){
+    if (!running){
+        start_();
+    }
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::pause(){
+    running = false;
 }
 
 /**
@@ -108,6 +147,7 @@ void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim, double sp
 
 template <typename A, typename StateManager>
 void AnimationPlayerBase<A, StateManager>::setSpeed(double speed_){
+
     if (speed_){
         speed = speed_;
     } else {
@@ -141,10 +181,9 @@ void AnimationPlayerBase<A, StateManager>::setSpeed(double speed_){
  */
 
 template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::init(){
+void AnimationPlayerBase<A, StateManager>::initAnim(){
     over = false;
     finished = false;
-    reset();
 
 
 }
@@ -166,7 +205,9 @@ void AnimationPlayerBase<A, StateManager>::reset(){
  */
 
 template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::start(){
+void AnimationPlayerBase<A, StateManager>::initRun(){
+    reset();
+
     Frame* f = &(model->frames[current_frame]);
     if (f->duration){
         timeleft = f->duration;
@@ -184,7 +225,7 @@ void AnimationPlayerBase<A, StateManager>::start(){
 
 template <typename A, typename StateManager>
 void AnimationPlayerBase<A, StateManager>::advance(bool loop){
-    if (speed != -1 && is_initialized()){
+    if (speed != -1 && is_initialized() && running){
         
         if (animation_set){
             frame_changed = true;
@@ -220,7 +261,7 @@ void AnimationPlayerBase<A, StateManager>::nextFrame(bool loop){
         finished = true;
         if (loop){
             reset();
-            start();
+            initRun();
         } else {
             over = true;
         }

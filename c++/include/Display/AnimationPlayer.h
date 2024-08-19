@@ -35,8 +35,12 @@ class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     bool is_finished() const;
     bool frameChanged() const;
     const A* getAnimation() const;
+    void setAnimationPaused(const A* anim);
+    void setAnimationPaused(const A* anim, double speed);
     void setAnimation(const A* anim);
     void setAnimation(const A* anim, double speed);
+    void start();
+    void pause();
     void setSpeed(double speed);
     void advance(bool loop);
 
@@ -46,6 +50,11 @@ class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     void advance(AnimationEndAction<A>&); 
 
     protected:
+    void changeAnimation(const A* anim);
+    void changeAnimation(const A* anim, double speed);
+
+    void start_();
+
     frame_index_t current_frame; ///< Index of the current frame.
     const A* model;   ///< The Animation that is running.
                                     /**< Pointer validity : can be invalidated if an Animation is deleted or moved (should not happend while a AnimationPlayer instance exists)*/
@@ -55,6 +64,7 @@ class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     bool over; ///< True if the animation is finished and didn't loop.
     bool frame_changed; ///< True if the frame just changed
                         /**<Guarantees that the current frame has been set, but does not guaranteed that it actuzlly changed (the old value may be the new value)*/
+    bool running; ///< If false, the animation doesnt progress
 
     StateManager state_manager;
 
@@ -69,8 +79,8 @@ class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     void nextFrame(bool loop);
     void reset();
     //void startFrame();
-    void init();
-    void start();
+    void initAnim();
+    void initRun();
 };
 
 using AnimationPlayer = AnimationPlayerBase<Animation, AnimationPlayerStateManagerBase>;
