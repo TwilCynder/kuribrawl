@@ -39,7 +39,7 @@ class Fighter : public DepthfulEntity {
     void applyPhysics(Game&);
     //States
     void updateState();
-    void checkUpdateAnimation();
+    //void checkUpdateAnimation();
     //Debug
     void writeDebugInfo(AdvancedTextDisplayer& out);
     bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
@@ -54,7 +54,8 @@ class Fighter : public DepthfulEntity {
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, Kuribrawl::Side facing = Kuribrawl::Side::NEUTRAL, int info = 0, bool update_anim_ = true);
-    void setState(const State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim);
+    void setState(const State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim, double speed = -1);
+    void setState(const State s, Kuribrawl::Side facing, int info, const EntityAnimation& anim, double speed = -1);
     bool attack(const Move&);
     const EntityAnimation* getCurrentAnimation() const;
     void setAnimation(Champion::DefaultAnimation);
@@ -85,7 +86,7 @@ class Fighter : public DepthfulEntity {
     State state;        ///< Current State.
     int state_info;     ///< Additional data that can be set when a state is started.
     int state_timer;    ///< Number of frames this the current state was started.
-    bool update_anim;   ///< Whether the animation should be updated according to the current state.
+    //bool update_anim;   ///< Whether the animation should be updated according to the current state, and if so the duration of the animation
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the AnimationPlayer will be updated.\ Is decremented each frame.
     enum class GroundInteraction{
         NONE,   ///< Do nothing, normal collision
@@ -101,7 +102,7 @@ class Fighter : public DepthfulEntity {
 
     void applyAirAccel(int direction);
 
-    void updateAnimation();
+    //void updateAnimation();
     void changeAnimation(const EntityAnimation*);
     void changeAnimation(const EntityAnimation*, double speed);
 
@@ -118,8 +119,9 @@ class Fighter : public DepthfulEntity {
     void setAnimation(const EntityAnimation* anim);
     void setAnimation(const EntityAnimation* anim, double speed);
     bool startMove(const Move&);
-    bool isStateFinished(int stateDuration);
-    void checkStateDuration();
+    //bool isStateFinished(int stateDuration);
+    //void checkStateDuration();
+    void trySetAnimFromState(Fighter::State);
 	virtual jumpY decideGroundedJumpYType() const = 0;
     virtual jumpX decideJumpXType() const = 0;
 

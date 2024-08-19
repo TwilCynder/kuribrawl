@@ -125,9 +125,10 @@ class Champion : public AnimationsPool<EntityAnimation> {
     Move& tryMove(const char* name);
     Move& tryMove(std::string&& name);
     const Move* getDefaultMove(DefaultMoves) const;
+    duration_t getStateDuration(Kuribrawl::FighterState) const;
+
     void initDefaultMoves();
     void finalizeMoves();
-
     void finalize();
 
     void setDisplayName(const char* display_name);

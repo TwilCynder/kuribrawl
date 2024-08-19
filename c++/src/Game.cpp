@@ -210,12 +210,14 @@ void Game::updateStates(){
  * @brief \ref Fighter#updateAnimation "Updates the Animation" of every Fighter.
  * 
  */
+/*
 void Game::updateAnimations(){
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->checkUpdateAnimation();
     }
 }
+*/
 
 /**
  * @brief \ref Fighter#applyPhysics "Processes physics mechanics " on every Fighter.
@@ -475,8 +477,8 @@ void Game::step(SDL_Renderer* render_target){
     updateInputsState();
     updateStates();
     resolveInputs();
-    updateAnimations();
-    //From this point on every animation change must be done manually   
+    //updateAnimations();
+    //[OUTDATED] From this point on every animation change must be done manually   
     applyPhysics();
     hitDetection();
     draw(render_target);

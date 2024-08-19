@@ -33,8 +33,7 @@ Fighter::Fighter(Game& game, Champion* model_):
  * @param y_ the y position on the stage thet Fighter will spawn at.
  */
 Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
-    state(State::IDLE),
-    update_anim(true),
+    //update_anim(true),
     paused(false),
     ground_interaction(GroundInteraction::NONE),
     facing(Kuribrawl::Side::NEUTRAL),
@@ -51,7 +50,7 @@ Fighter::Fighter(Game& game_, Champion* model_, int x_, int y_):
     speed.x = 0.0;
     speed.y = 0.0;
 
-    //setAnimation(Champion::DefaultAnimation::IDLE);
+    setState(State::IDLE, Kuribrawl::Side::LEFT);
 
     id = Random::get_int();
 }
@@ -365,10 +364,12 @@ int Fighter::air_jump(jumpX x_type){
  * @param duration value used as the duration (usually one of the Champion's fixed value)
  * @return true if the duration is -1 and the current animation was finished, or if the timer state has reached the duration.
  */
+/*
 bool Fighter::isStateFinished(int duration){
     return (duration == -1) ? current_animation.is_finished() : state_timer >= duration;
 }
-
+*/
+/*
 void Fighter::checkStateDuration(){
     switch (state){
         case State::JUMPSQUAT:
@@ -401,6 +402,7 @@ void Fighter::checkStateDuration(){
             break;
     }
 }
+*/
 
 /**
  * @brief Checks if any change of state should be made based on the current state and the \ref Fighter#state_time "state timer".
@@ -416,27 +418,27 @@ void Fighter::updateState(){
 
     switch (state){
         case State::JUMPSQUAT:
-            if (isStateFinished(model->values.jump_squat_duration)){
+            if (current_animation.is_finished()){
                 ground_jump(static_cast<jumpX>(state_info & 0b11), (state_info & 0b100) ? jumpY::Short : jumpY::UndecidedY);
             }
             break;
         case State::DASH_START:
-            if (isStateFinished(model->values.dash_start_duration)){
+            if (current_animation.is_finished()){
                 setState(State::DASH);
             }
             break;
         case State::DASH_STOP:
-            if (isStateFinished(model->values.dash_stop_duration)){
+            if (current_animation.is_finished()){
                 setState(State::IDLE);
             }
             break;
         case State::DASH_TURN:
-            if (isStateFinished(model->values.dash_turn_duration)){
+            if (current_animation.is_finished()){
                 setState(State::DASH);
             }
             break;
         case State::LANDING:
-            if (isStateFinished(model->values.landing_duration)){
+            if (current_animation.is_finished()){
                 setState(State::IDLE);
             }
             break;
@@ -478,13 +480,41 @@ void Fighter::updateState(){
  * @brief If this current Animation should be updated, changes it based on the current state.
  * Also indicates that the current Animation doesn't need to be updated anymore.
  */
+/*
 void Fighter::checkUpdateAnimation(){
     if (update_anim){
         updateAnimation();
         update_anim = false;
     }
 }
+*/
 
+void Fighter::trySetAnimFromState(Fighter::State state_){
+    const EntityAnimation* anim;
+    switch(state_){
+        case State::IDLE:
+            anim = (grounded) ? 
+                model->getDefaultAnimation(Champion::DefaultAnimation::IDLE) : 
+                (state_info == 1) ? model->getDefaultAnimation(Champion::DefaultAnimation::JUMP) : model->getDefaultAnimation(Champion::DefaultAnimation::AIR_IDLE);
+            
+            if (anim)
+                setAnimation(anim);
+            break;
+        case State::HITSTUN:
+            break;
+        default:
+            duration_t state_duration = model->getStateDuration(state_);
+            anim = model->getDefaultAnimation((Champion::DefaultAnimation)state_);
+            if (anim)
+                if (state_duration > -1){
+                    setAnimation(anim, state_duration);
+                } else {
+                    setAnimation(anim);
+                }    
+    }
+}
+
+/*
 void Fighter::updateAnimation(){
     const EntityAnimation* anim;
     switch(state){
@@ -504,6 +534,7 @@ void Fighter::updateAnimation(){
                 setAnimation(anim);
     }
 }
+*/
 
 const HurtboxVector& Fighter::getCurrentHurtboxes() const{
     return current_animation.getHurtboxes();
@@ -553,17 +584,35 @@ void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing_, int info
     Debug::logFrame(s, *this);
     state = s;
     state_info = info;
-    update_anim = update_anim_;
+    //update_anim = update_anim_;
     if (facing_ != Kuribrawl::Side::NEUTRAL) facing = facing_;
 
     state_timer = 0;
     paused = 0;
-    checkStateDuration();
+    //checkStateDuration();
 
+    if (update_anim_){
+        trySetAnimFromState(s);
+    }
 }
 
-void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim){
-    setAnimation(anim);
+void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim, double speed){
+    if (speed == -1){
+        setAnimation(anim);
+    } else {
+        setAnimation(anim, speed);
+    }
+    
+    setState(s, facing, info, false);
+}
+
+void Fighter::setState(const State s, Kuribrawl::Side facing, int info, const EntityAnimation &anim, double speed){
+    if (speed == -1){
+        setAnimation(&anim);
+    } else {
+        setAnimation(&anim, speed);
+    }
+    
     setState(s, facing, info, false);
 }
 

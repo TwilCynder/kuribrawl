@@ -159,6 +159,10 @@ const Move* Champion::getDefaultMove(DefaultMoves move) const {
     return (default_moves[(int)move]);
 }
 
+duration_t Champion::getStateDuration(Kuribrawl::FighterState s) const{
+    return state_durations[(int)s];
+}
+
 /**
  * @brief Returns the Animation associated with a certain \ref Fighter#State "fighter state", if there is any.
  *
