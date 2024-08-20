@@ -19,7 +19,7 @@ TextDisplayer::TextDisplayer(int x, int y, TextureFont& font_) :
  * @param s 
  */
 inline void TextDisplayer::displayString(const std::string& s){
-    font.displayString(s, pos.x, pos.y);
+    font.displayStringRef(s, pos.x, pos.y);
 }
 
 /**

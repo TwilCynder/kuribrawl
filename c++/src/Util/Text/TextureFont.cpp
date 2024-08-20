@@ -70,7 +70,11 @@ inline void TextureFont::displayChar(char c, int x, int y, SDL_Renderer* target)
  * @param y 
  * @param target The rendering target.
  */
-void TextureFont::displayString(const std::string& s, int& x, int& y, SDL_Renderer* target) const{
+void TextureFont::displayString(const std::string& s, int x, int y, SDL_Renderer* target) const{
+    displayStringRef(s, x, y, target);
+}
+
+void TextureFont::displayStringRef(const std::string& s, int& x, int& y, SDL_Renderer* target) const{
     target = (target) ? target : renderer;
     for (char c : s){
         displayChar(c, x, y, target);
@@ -78,6 +82,10 @@ void TextureFont::displayString(const std::string& s, int& x, int& y, SDL_Render
     }
 }
 
+void TextureFont::displayStringCentered(const std::string &s, int x, int y, SDL_Renderer *target) const {
+    int width = s.length() * char_size.w;
+    displayString(s, x - width / 2, y, target);
+}
 /**
  * @brief Returns wheter this texture font is ready to use.  
  * Cases where this returns false are usually error cases.  

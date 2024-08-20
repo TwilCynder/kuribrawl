@@ -281,7 +281,7 @@ void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
 
     //Drawing ID
     const Kuribrawl::Vector& frame_size = current_animation.getAnimation()->getFrameSize();
-    Kuribrawl::Text::displayText(std::to_string(id), x, y - frame_size.y - Kuribrawl::Text::getDebugFont()->char_size.h, target);
+    Kuribrawl::Text::displayTextCentered(std::to_string(id), x, y - frame_size.y - Kuribrawl::Text::getDebugFont()->char_size.h, target);
 
     #endif
 }

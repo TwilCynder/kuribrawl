@@ -12,6 +12,7 @@ namespace Kuribrawl {
         
         FontSPtr& getDebugFont();
 
-        void displayText(const std::string&, int x, int y, SDL_Renderer* target);
+        void displayText(const std::string&, int x, int y, SDL_Renderer* target = NULL);
+        void displayTextCentered(const std::string&, int x, int y, SDL_Renderer* target = NULL);
     }
 }

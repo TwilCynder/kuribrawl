@@ -23,6 +23,11 @@ namespace Text {
         if (default_debug_font)
             default_debug_font->displayString(s, x, y, target);
     }
+
+    void displayTextCentered(const std::string & s, int x, int y, SDL_Renderer *target){
+        if (default_debug_font)
+            default_debug_font->displayStringCentered(s, x, y, target);
+    }
 }
 }
 
