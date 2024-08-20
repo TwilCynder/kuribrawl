@@ -14,6 +14,7 @@
 
 #include "KBDebug/Debug.h"
 #include "KBDebug/DebugState.h"
+#include "Display/DisplayText.h"
 
 /**
  * @brief Construct a new Fighter at position 0, 0
@@ -272,8 +273,15 @@ void Fighter::draw(SDL_Renderer* target, const Camera& cam) const{
     }
 
     //Drawing position
+    int x = getXOnScreen(cam, position.x);
+    int y = getYOnScreen(cam, position.y);
+
     SDL_SetRenderDrawColor(target, 0, 0, 255, 255);
     SDL_Drawing::drawCross(target, cam.getXOnScreen(position.x), cam.getYOnScreen(position.y), 10);
+
+    //Drawing ID
+    const Kuribrawl::Vector& frame_size = current_animation.getAnimation()->getFrameSize();
+    Kuribrawl::Text::displayText(std::to_string(id), x, y - frame_size.y - Kuribrawl::Text::getDebugFont()->char_size.h, target);
 
     #endif
 }

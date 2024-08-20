@@ -217,7 +217,7 @@ int DepthfulEntity::getMainplaneXOnScreen(const Camera & camera, int x) const
  */
 int DepthfulEntity::getMainplaneYOnScreen(const Camera & camera, int y) const
 {
-	return camera.getXOnScreen(y);
+	return camera.getYOnScreen(y);
 }
 
 

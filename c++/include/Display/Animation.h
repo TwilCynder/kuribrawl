@@ -32,6 +32,7 @@ class AnimationBase {
 
     void setSpritesheet(SDL_Texture* spritesheet);
     SDL_Texture* getSpritesheet() const ;
+    const Vector& getFrameSize() const;
     bool is_initialized()const;
     frame_index_t getNbFrames();
     Frame* getFrame(frame_index_t n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
