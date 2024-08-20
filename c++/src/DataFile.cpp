@@ -703,7 +703,7 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
 
             switch(mode){
                 case FILEMARKER_LANDING_NORMAL:{
-                    duration_t duration = readValue<uint16_t>();
+                    duration_t duration = readValue<int16_t>();
                     uead.gabu.add_landing_window_normal(frame, duration);
                     Debug::sout << " - Mode  : NORMAL | " << frame << duration << '\n';
                 }
