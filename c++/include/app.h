@@ -106,7 +106,8 @@ class App
     void print_report(Logger&);
 
     //Debug
-    std::unique_ptr<TextureFont> debugFont;
+    std::shared_ptr<TextureFont> debugFont;
     std::unique_ptr<AnchoredTextDisplayer> debug_text_displayer;
+    void drawText(const std::string s, int x, int y);
     void drawDebugInfo();
 };

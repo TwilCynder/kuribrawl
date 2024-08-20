@@ -17,6 +17,7 @@
 #include "messageBox.h"
 #include "Random.h"
 #include "Util/Text/TextDisplayer.h"
+#include "Display/DisplayText.h"
 
 #define PORTS_NB 4
 
@@ -183,8 +184,10 @@ void App::init(){
 	SDL_Texture* debug_font_texture = assets_.textures.get("font_oracle");
 	//SDL_Texture* debug_font = IMG_LoadTexture(renderer, "oracle.png");
 	if (!debug_font_texture) throw KBFatalDetailed(Kuribrawl::formatString("Cannot find the debug font: %s", IMG_GetError()), "Missing font");
-	debugFont = make_unique<TextureFont>(TextureFont(debug_font_texture, renderer, {8, 11}));
+	debugFont = make_shared<TextureFont>(TextureFont(debug_font_texture, renderer, {8, 11}));
 	debug_text_displayer = make_unique<AnchoredTextDisplayer>(SCREEN_WIDTH - 88, 20, *debugFont);
+
+	Kuribrawl::Text::setDebugFont(debugFont);
 }
 
 void App::close(){
@@ -238,8 +241,14 @@ Duration App::getLowestWait(){
 	return min;
 }
 
-void App::drawDebugInfo(){
-	debug_text_displayer->reset();
+void App::drawText(const std::string s, int x, int y)
+{
+	debugFont->displayString(s, x, y, renderer);
+}
+
+void App::drawDebugInfo()
+{
+    debug_text_displayer->reset();
 	*debug_text_displayer << getLowestWait();
 }
 
