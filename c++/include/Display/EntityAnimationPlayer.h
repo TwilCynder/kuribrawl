@@ -16,19 +16,7 @@ class EntityAnimationPlayer : public EntityAnimationPlayerBase {
     const EntityFrame::FrameMovement& getFrameMovement() const;
     const GameplayAnimationBehavior::EndingBehavior getEndBehavior() const;
     const GameplayAnimationBehavior::LandingBehavior* getLandingBehavior() const;
-
-    int advance();
-    
-    const EndAction& resolveEndAction() const;
-    
-    const EntityAnimation* getAnimation() const;
-
-    template <typename... Args> requires EntityAnimationEndActionValidArg<EntityAnimation, Args...>
-    void setEndAction(Args... args){
-        end_action.set(args...);
-        override_end_action = true;
-    }
-
+    /*
     template <typename... Args>
     void setAnimationWithEndAction(const EntityAnimation* anim, Args... args){
         setAnimation(anim);
@@ -40,8 +28,9 @@ class EntityAnimationPlayer : public EntityAnimationPlayerBase {
         setAnimation(anim, speed);
         setEndAction(args...);
     }
+    */
 
     private:
 
-    bool override_end_action;
+    //bool override_end_action;
 };

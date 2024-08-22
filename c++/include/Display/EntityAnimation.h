@@ -8,7 +8,8 @@
 
 using namespace Kuribrawl::Types;
 
-class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<EntityAnimation> {
+class EntityAnimation;
+class EntityAnimation : public AnimationBaseWithEndAction<EntityAnimation> {
     public:
 
     using LandingBehavior = GameplayAnimationBehavior::LandingBehavior;
@@ -32,16 +33,6 @@ class EntityAnimation : public AnimationBase, public AnimationEndActionOwner<Ent
     void addHitbox(frame_index_t frame, int, int, int, int);
     Hurtbox* addHurtbox(frame_index_t frame);
     void addHurtbox(frame_index_t frame, int, int, int, int);
-
-    
-    template <typename... Args> requires EntityAnimationEndActionValidArg<EntityAnimation, Args...>
-    void setEndAction(Args... args){
-        end_action.set(args...);
-    }
-
-    const EndAction& getEndAction() const;
-    void setNextAnimation(const EntityAnimation*);
-    const EntityAnimation* getNextAnimation() const;
 
     GameplayAnimationBehavior gameplay_behavior;
     private:

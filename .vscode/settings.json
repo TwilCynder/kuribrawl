@@ -68,7 +68,8 @@
         "shared_mutex": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "*.def": "cpp"
     },
     "java.project.sourcePaths": [
         "tools\\editor\\javaEditor\\src"

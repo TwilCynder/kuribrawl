@@ -3,13 +3,9 @@
 #include "Display/EntityAnimation.h"
 #include "Display/EntityAnimationPlayer.h"
 
-#define model_ ((EntityAnimation*)model)
-
-using EndAction = AnimationEndAction<EntityAnimation>;
 
 EntityAnimationPlayer::EntityAnimationPlayer():
-    AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>(),
-    override_end_action(false)
+    AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>()
 {
 }
 
@@ -20,42 +16,8 @@ EntityAnimationPlayer::EntityAnimationPlayer():
  */
 
 EntityAnimationPlayer::EntityAnimationPlayer(const EntityAnimation* animation):
-    AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>(animation),
-    override_end_action(false)
-{
-}
-
-const EndAction& EntityAnimationPlayer::resolveEndAction() const {
-    return (override_end_action) ? end_action : model_->getEndAction();
-};
-
-
-int EntityAnimationPlayer::advance(){
-    const EndAction& current_end_action = resolveEndAction();
-
-    AnimationPlayerBase::advance(current_end_action.mode == EndAction::Mode::REPEAT);
-
-    if (finished){
-        override_end_action = false;
-        switch (current_end_action.mode){
-        case EndAction::Mode::REPEAT :
-        case EndAction::Mode::NONE   :
-            break;
-        case EndAction::Mode::RETURN_CODE:
-            return current_end_action.data.code;
-        case EndAction::Mode::START_ANIMATION:
-        {
-            const EntityAnimation* next;
-            next = current_end_action.data.next_anim;  
-            if (next != nullptr){
-                setAnimation(next);
-            }
-        }
-        break;
-    }
-    }
-    return 0;
-}
+    AnimationPlayerBase<EntityAnimation, EntityAnimationStateManager>(animation)
+{}
 
 const std::vector<Hurtbox>& EntityAnimationPlayer::getHurtboxes() const {
     return model->getHurtboxes(current_frame);
@@ -81,8 +43,4 @@ const GameplayAnimationBehavior::LandingBehavior* EntityAnimationPlayer::getLand
     } else {
         return nullptr;
     }
-}
-
-const EntityAnimation* EntityAnimationPlayer::getAnimation() const {
-    return model;
 }

@@ -24,6 +24,7 @@ template <typename A, typename StateManager>
 //requires std::is_base_of_v<AnimationBase, A> && std::is_base_of_v<AnimationPlayerStateManagerBase, StateManager>
 class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     public:
+    using EndAction = AnimationEndAction<A>;
 
     AnimationPlayerBase();
     AnimationPlayerBase(const A* animation);
@@ -31,27 +32,46 @@ class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     void draw(SDL_Renderer* target, int x, int y) const; 
     void draw(SDL_Renderer* target, int x, int y, Kuribrawl::Side facing) const;
 
-    bool is_initialized() const;
-    bool is_finished() const;
-    bool frameChanged() const;
     const A* getAnimation() const;
     void setAnimationPaused(const A* anim);
     void setAnimationPaused(const A* anim, double speed);
     void setAnimation(const A* anim);
     void setAnimation(const A* anim, double speed);
+    void setAnimationPaused(const A* anim, const EndAction&);
+    void setAnimationPaused(const A* anim, double speed, const EndAction&);
+    void setAnimation(const A* anim, const EndAction&);
+    void setAnimation(const A* anim, double speed, const EndAction&);
+
+    inline void setEndAction(const EndAction&);
+    template <typename... Args> requires AnimationEndActionValidArg<A, Args...>
+    void setEndAction(Args... args){
+        this->end_action.set(args...);
+        override_end_action = true;
+    }
+    inline void unsetEndAction();
+    const EndAction& getPlayerEndAction() const;
+    const EndAction& getFinalEndAction() const;
+
+    void setSpeed(double speed);
+    bool is_initialized() const;
+    bool is_finished() const;
+    bool frameChanged() const;
+
     void start();
     void pause();
-    void setSpeed(double speed);
-    void advance(bool loop);
-
-    using EndAction = AnimationEndActionOwner<A>::EndAction;
-
-    void advance();
-    void advance(AnimationEndAction<A>&); 
+    int advance(const EndAction&); 
+    int advance();
 
     protected:
-    void changeAnimation(const A* anim);
-    void changeAnimation(const A* anim, double speed);
+    inline void changeAnimation(const A* anim);
+    inline void changeAnimation(const A* anim, double speed);
+
+    inline void setAnimationPaused_(const A* anim);
+    inline void setAnimationPaused_(const A* anim, double speed);
+    inline void setAnimation_(const A* anim);
+    inline void setAnimation_(const A* anim, double speed);
+
+    const EndAction& resolveEndAction() const;
 
     void start_();
 
@@ -65,6 +85,8 @@ class AnimationPlayerBase : public AnimationEndActionOwner<A>{
     bool frame_changed; ///< True if the frame just changed
                         /**<Guarantees that the current frame has been set, but does not guaranteed that it actuzlly changed (the old value may be the new value)*/
     bool running; ///< If false, the animation doesnt progress
+
+    bool override_end_action;
 
     StateManager state_manager;
 

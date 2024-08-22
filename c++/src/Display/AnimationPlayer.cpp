@@ -22,7 +22,8 @@ AnimationPlayerBase<A, StateManager>::AnimationPlayerBase():
     animation_set(),
     finished(false),
     over(false),
-    frame_changed(false)
+    frame_changed(false),
+    override_end_action(false)
 {
 }
 
@@ -55,6 +56,76 @@ const A* AnimationPlayerBase<A, StateManager>::getAnimation() const {
     return model;
 }
 
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimation(const A *anim){
+    setAnimation_(anim);
+    unsetEndAction();
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimation(const A *anim, double speed){
+    setAnimation_(anim, speed);
+    unsetEndAction();
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim){
+    setAnimationPaused_(anim);
+    unsetEndAction();
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim, double speed){
+    setAnimationPaused_(anim, speed);
+    unsetEndAction();
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim, const EndAction& ea){
+    setAnimation_(anim);
+    setEndAction(ea);
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim, double speed, const EndAction& ea){
+    setAnimation_(anim, speed);
+    setEndAction(ea);
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A* anim, const EndAction& ea){
+    setAnimationPaused_(anim);
+    setEndAction(ea);
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A* anim, double speed, const EndAction& ea){
+    setAnimationPaused_(anim, speed);
+    setEndAction(ea);
+}
+
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setEndAction(const EndAction& ea){
+    override_end_action = true;
+    this->end_action = ea;
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::unsetEndAction(){
+    override_end_action = false;
+}
+
+template <typename A, typename StateManager>
+const AnimationEndAction<A>& AnimationPlayerBase<A, StateManager>::getPlayerEndAction() const {
+    return this->end_action;
+}
+
+template <typename A, typename StateManager>
+const AnimationEndAction<A>& AnimationPlayerBase<A, StateManager>::getFinalEndAction() const {
+    return this->resolveEndAction();
+}
+
 /**
  * @brief Retur whether the animation just finished (even if it looped).
  *
@@ -83,18 +154,6 @@ void AnimationPlayerBase<A, StateManager>::changeAnimation(const A *anim, double
     animation_set = true;
 }
 
-template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim){
-    changeAnimation(anim);
-    running = false;
-}
-
-template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim, double speed_){
-    changeAnimation(anim, speed_);
-    running = false;
-}
-
 /**
  * @brief Sets the ran Animation.
  * Delegates to setAnimation(Animation*, double) with the Animation's default speed.
@@ -102,7 +161,7 @@ void AnimationPlayerBase<A, StateManager>::setAnimationPaused(const A *anim, dou
  */
 
 template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim){
+void AnimationPlayerBase<A, StateManager>::setAnimation_(const A* anim){
     setAnimation(anim, anim->base_speed);
 }
 
@@ -114,9 +173,21 @@ void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim){
  */
 
 template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::setAnimation(const A* anim, double speed_){
+void AnimationPlayerBase<A, StateManager>::setAnimation_(const A* anim, double speed_){
     changeAnimation(anim, speed_);
     start_();
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused_(const A *anim){
+    changeAnimation(anim);
+    running = false;
+}
+
+template <typename A, typename StateManager>
+void AnimationPlayerBase<A, StateManager>::setAnimationPaused_(const A *anim, double speed_){
+    changeAnimation(anim, speed_);
+    running = false;
 }
 
 template <typename A, typename StateManager>
@@ -224,7 +295,8 @@ void AnimationPlayerBase<A, StateManager>::initRun(){
  */
 
 template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::advance(bool loop){
+int AnimationPlayerBase<A, StateManager>::advance(const EndAction& end_action_){
+
     if (speed != -1 && is_initialized() && running){
         
         if (animation_set){
@@ -238,10 +310,32 @@ void AnimationPlayerBase<A, StateManager>::advance(bool loop){
         timeleft--;
         if (timeleft <= 0){
             current_carry += base_carry;
-            nextFrame(loop);
+            nextFrame(end_action_.repeat());
+        }
+
+        if (finished){
+            override_end_action = false;
+            switch (end_action_.mode){
+                case EndAction::Mode::REPEAT :
+                case EndAction::Mode::NONE   :
+                    break;
+                case EndAction::Mode::RETURN_CODE:
+                    return end_action_.data.code;
+                case EndAction::Mode::START_ANIMATION:
+                {
+                    const A* next;
+                    next = end_action_.data.next_anim;  
+                    if (next != nullptr){
+                        setAnimation(next);
+                    }
+                }
+                break;
+            }
         }
 
     }
+
+    return 0;
 }
 
 /**
@@ -258,6 +352,7 @@ void AnimationPlayerBase<A, StateManager>::nextFrame(bool loop){
         frame_changed = true;
         state_manager.frameChanged(*model, current_frame);
     } else {
+        Debug::log("QIUEBFUJYBQVYUJBVQY =======================");
         finished = true;
         if (loop){
             reset();
@@ -306,14 +401,20 @@ void AnimationPlayerBase<A, StateManager>::draw(SDL_Renderer* target, int x, int
 }
 
 template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::advance(AnimationEndAction<A>& end_action_){
-    advance(end_action_.mode == EndAction::Mode::REPEAT);
+int AnimationPlayerBase<A, StateManager>::advance(){
+    return advance(resolveEndAction());
 }
 
-template <typename A, typename StateManager>
-void AnimationPlayerBase<A, StateManager>::advance(){
-    advance(this->end_action);
-}
+template<typename A, typename StateManager>
+const AnimationPlayerBase<A, StateManager>::EndAction& AnimationPlayerBase<A, StateManager>::resolveEndAction() const {
+    return (override_end_action) ? this->end_action : model->getEndAction();
+};
+
+
+
+// ================================================================
+
+
 
 void AnimationPlayerStateManagerBase::animationStarted(const Animation&){}
 

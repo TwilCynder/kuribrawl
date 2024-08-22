@@ -341,6 +341,7 @@ void App::setFrameRate(int fr){
 		throw KBFatal("Attemp to use invalid framerate %d", fr);
 	}
 	framerate = fr;
+	Debug::out << "Framerate changed : " << fr << '\n' << std::flush;
 	update_frame_duration();
 }
 

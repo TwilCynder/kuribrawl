@@ -89,7 +89,7 @@ void Fighter::changeAnimation(const EntityAnimation* anim){
 
 
     if (transition){   
-        current_animation.setAnimationWithEndAction(transition, anim);
+        current_animation.setAnimation(transition, EntityAnimationEndAction_(anim));
     } else {
         current_animation.setAnimation(anim);
     }
@@ -100,13 +100,13 @@ void Fighter::changeAnimation(const EntityAnimation* anim, double speed){
     
     if (speed < 0){
         if (transition){
-            current_animation.setAnimationWithEndAction(transition, anim);
+            current_animation.setAnimation(transition, EntityAnimationEndAction_(anim));
         } else {
             current_animation.setAnimation(anim);
         }
     } else {
         if (transition){
-            current_animation.setAnimationWithEndAction(transition, speed, anim);
+            current_animation.setAnimation(transition, speed, EntityAnimationEndAction_(anim));
         } else {
             current_animation.setAnimation(anim, speed);
         }
@@ -457,7 +457,9 @@ void Fighter::updateState(){
             break;
         case State::LANDING:
         case State::LANDING_LAG:
+            Debug::out << "Fighter " << id << " is in landing state\n" << std::flush;
             if (current_animation.is_finished()){
+                Debug::out << ("End Landing ") << id << '\n';
                 setState(State::IDLE);
             }
             break;

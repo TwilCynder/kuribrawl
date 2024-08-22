@@ -60,6 +60,39 @@ class AnimationBase {
     
 };
 
+template <typename A>
+class AnimationBaseWithEndAction : public AnimationBase, public AnimationEndActionOwner<A> {
+    public:
+    using EndAction = AnimationEndAction<A>;
+
+    template <typename... Args>
+    AnimationBaseWithEndAction(Args...args):
+        AnimationBase(args...), AnimationEndActionOwner<A>(EndAction::repeat_tag)
+    {}
+
+    template <typename... Args> requires AnimationEndActionValidArg<A, Args...>
+    void setEndAction(Args... args){
+        this->end_action.set(args...);
+    }
+
+    const EndAction& getEndAction() const{
+        return this->end_action;
+    }
+    void setNextAnimation(const A* anim){
+        setEndAction(anim);
+    }
+    const A* getNextAnimation() const{
+        return (this->end_action.mode == EndAction::Mode::START_ANIMATION) ? this->end_action.data.next_anim : nullptr;
+    }
+};
+
+class Animation;
+class Animation : public AnimationBaseWithEndAction<Animation>{
+    public:
+    using AnimationBaseWithEndAction::AnimationBaseWithEndAction;
+};
+
+/*
 class Animation : public AnimationBase, public AnimationEndActionOwner<Animation> {
     public:
     template <typename... Args>
@@ -68,3 +101,4 @@ class Animation : public AnimationBase, public AnimationEndActionOwner<Animation
     {}
 
 };
+*/
