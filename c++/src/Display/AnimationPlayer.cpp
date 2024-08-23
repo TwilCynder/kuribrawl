@@ -162,7 +162,7 @@ void AnimationPlayerBase<A, StateManager>::changeAnimation(const A *anim, double
 
 template <typename A, typename StateManager>
 void AnimationPlayerBase<A, StateManager>::setAnimation_(const A* anim){
-    setAnimation(anim, anim->base_speed);
+    setAnimation_(anim, anim->base_speed);
 }
 
 /**
@@ -180,8 +180,7 @@ void AnimationPlayerBase<A, StateManager>::setAnimation_(const A* anim, double s
 
 template <typename A, typename StateManager>
 void AnimationPlayerBase<A, StateManager>::setAnimationPaused_(const A *anim){
-    changeAnimation(anim);
-    running = false;
+    setAnimationPaused_(anim, anim->base_speed);
 }
 
 template <typename A, typename StateManager>
@@ -352,7 +351,6 @@ void AnimationPlayerBase<A, StateManager>::nextFrame(bool loop){
         frame_changed = true;
         state_manager.frameChanged(*model, current_frame);
     } else {
-        Debug::log("QIUEBFUJYBQVYUJBVQY =======================");
         finished = true;
         if (loop){
             reset();

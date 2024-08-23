@@ -33,7 +33,6 @@ void Fighter::groundCollision(){
         const EntityAnimation::LandingBehavior* anim_land_behavior = current_animation.getLandingBehavior();
 
         if (anim_land_behavior){
-            Debug::log("=========== LANDING ===========");
             Debug::out << "Landing type : " << anim_land_behavior->type;
             
             switch (anim_land_behavior->type){

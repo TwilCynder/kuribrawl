@@ -87,7 +87,6 @@ const EntityAnimation* Fighter::getCurrentAnimation() const {
 void Fighter::changeAnimation(const EntityAnimation* anim){
     const EntityAnimation* transition = model->getAnimationTransition(*current_animation.getAnimation(), *anim);
 
-
     if (transition){   
         current_animation.setAnimation(transition, EntityAnimationEndAction_(anim));
     } else {
@@ -97,7 +96,7 @@ void Fighter::changeAnimation(const EntityAnimation* anim){
 
 void Fighter::changeAnimation(const EntityAnimation* anim, double speed){
     const EntityAnimation* transition = model->getAnimationTransition(*current_animation.getAnimation(), *anim);
-    
+
     if (speed < 0){
         if (transition){
             current_animation.setAnimation(transition, EntityAnimationEndAction_(anim));
@@ -599,14 +598,12 @@ void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing_, int info
 }
 
 void Fighter::setState(const Fighter::State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim, double speed){
-    setAnimation(anim);
     setAnimation(anim, speed);
     
     setState(s, facing, info, false);
 }
 
 void Fighter::setState(const State s, Kuribrawl::Side facing, int info, const EntityAnimation &anim, double speed){
-    setAnimation(&anim);
     setAnimation(&anim, speed);
     
     setState(s, facing, info, false);
