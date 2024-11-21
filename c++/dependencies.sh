@@ -1,5 +1,6 @@
 #! /bin/bash
 
+cd "${BASH_SOURCE%/*}"
 cat ./dependencies/pkglist_base.txt
 printf "\n"
 
@@ -12,6 +13,7 @@ do
         '-d' | '--dev' | '--opt') 
             devpkgs=true  
             ;;
+        '-h | '--help) echo "Usage : $(basename "$0") [ucrt] \nOutputs a newline-separated list of pacman packages" ;;
         *) mode=$var    
     esac
 done

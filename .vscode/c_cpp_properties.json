@@ -1,12 +1,11 @@
 {
     "configurations": [
         {
-            "name": "Win32 C++20",
+            "name": "MSYS C++20",
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/c++/include",
-                "${msys_dir}/include/**",
-                "${MSYSTEM_PREFIX}/include"
+                "${MSYSTEM_PREFIX}/include/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -15,7 +14,27 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.18362.0",
-            "compilerPath": "${msys_dir}/bin/g++.exe",
+            "compilerPath": "${MSYSTEM_PREFIX}/bin/g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "gnu++20",
+            "intelliSenseMode": "windows-gcc-x64",
+            "configurationProvider": "ms-vscode.cpptools"
+        },
+        {
+            "name": "MSYS C++20 MP",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/c++/include",
+                "${MSYS_PATH}/include/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "${MSYS_PATH}/bin/g++.exe",
             "cStandard": "c11",
             "cppStandard": "gnu++20",
             "intelliSenseMode": "windows-gcc-x64",
