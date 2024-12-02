@@ -4,8 +4,6 @@
 #include "Util/EnumInfo.h"
 #include "Util/streamUtil.h"
 
-template<>
-struct EnumInfo<Input>{static const EnumNamesType<Input> names;};
 const EnumNamesType<Input> EnumInfo<Input>::names = {
     {Input::NONE, "None"},
     {Input::ATTACK, "Attack"},
@@ -19,8 +17,6 @@ const EnumNamesType<Input> EnumInfo<Input>::names = {
     {Input::RIGHT, "Right"}
 };
 
-template<>
-struct EnumInfo<Kuribrawl::Direction>{static const EnumNamesType<Kuribrawl::Direction> names;};
 const EnumNamesType<Kuribrawl::Direction> EnumInfo<Kuribrawl::Direction>::names = {
     {Kuribrawl::Direction::NONE, "Neutral"},
     {Kuribrawl::Direction::LEFT, "Left"},
@@ -29,8 +25,6 @@ const EnumNamesType<Kuribrawl::Direction> EnumInfo<Kuribrawl::Direction>::names 
     {Kuribrawl::Direction::DOWN, "Down"}
 };
 
-template<>
-struct EnumInfo<Kuribrawl::DirectionIG>{static const EnumNamesType<Kuribrawl::DirectionIG> names;};
 const EnumNamesType<Kuribrawl::DirectionIG> EnumInfo<Kuribrawl::DirectionIG>::names = {
     {Kuribrawl::DirectionIG::NONE, "Neutral"},
     {Kuribrawl::DirectionIG::FORWARD, "Forward"},

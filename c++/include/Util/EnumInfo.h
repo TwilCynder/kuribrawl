@@ -63,3 +63,9 @@ requires std::is_enum_v<E> && NamedEnum<E>
 std::ostream& operator<<(std::ostream& os, E evalue){
     return os << log_enum_name(evalue);
 }
+
+template <typename E>
+requires std::is_enum_v<E> && (!NamedEnum<E>)
+std::ostream& operator<<(std::ostream& os, E evalue){
+    return os << (int)evalue;
+}
