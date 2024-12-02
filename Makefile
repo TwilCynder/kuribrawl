@@ -1,7 +1,7 @@
 .PHONY: game all editor start
 
 export NOCLEAR = ""
-RELEASE=""
+RELEASE=
 
 all: all_ end
 all_: start game editor dfm 
