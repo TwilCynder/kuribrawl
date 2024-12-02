@@ -71,7 +71,7 @@
         "complex": "cpp"
     },
     "java.project.sourcePaths": [
-        "tools\\editor\\javaEditor\\src"
+        "tools/editor/javaEditor/src"
     ],
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
