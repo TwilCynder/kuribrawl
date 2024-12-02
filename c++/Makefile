@@ -36,7 +36,6 @@ relstart:
 deploy:
 	mkdir -p ../release/kuribrawl
 	cp kuribrawl.exe ../release/kuribrawl/kuribrawl.exe
-	cp ../res/data.twl ../release/kuribrawl/data.twl
 
 release: relstart all deploy
 

@@ -3,12 +3,14 @@
 #include <string>
 #include "SDL2/SDL_render.h"
 #include "Util/stringOperations.h"
+#include "Display/Animation.h"
 
 /**
  * @brief Class containing any number of Animations, each associated with a name (string identifier)
  *
  */
 template <class A>
+//requires std::is_base_of_v<AnimationBase, A>
 class AnimationsPool {
 
     protected:

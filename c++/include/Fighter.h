@@ -9,6 +9,7 @@
 #include "InputManager.h"
 #include "gameActions.h"
 #include "Champion.h"
+#include "FighterStates.h"
 #include "Util/StaticList.h"
 
 #define MAX_FIGHTERS_HIT 12
@@ -28,18 +29,7 @@ class Stage;
 class Fighter : public DepthfulEntity {
     public:
 
-    /**
-     * @brief The situation of a Fighter, definind the actions they can take and the behavior of the Fighter as an entity.  
-     * See [states.md](md_doc_files_states.html).  
-     * A Fighter can have only one State at a time.
-     * A state being "started" means that the current state of a Fighter was set to this state.
-     * @note States don't care about whether a Fighter is on the ground or not, certain states can very well be used no matter that ; what defines if a Fighter is grounded or not is
-     * its \ref Fighter#grounded "grounded" attribute, which is updated each frame (based of course on terrain collision)
-     */
-    enum class State {
-        #include "states.enum"
-        STATES          ///< Never used, is (because of how enums work) the total number of states.
-    };
+    using State = Kuribrawl::FighterState;
 
     Fighter(Game& game, Champion* model_);
     Fighter(Game& game, Champion* model_, int x, int y);
@@ -49,7 +39,7 @@ class Fighter : public DepthfulEntity {
     void applyPhysics(Game&);
     //States
     void updateState();
-    void checkUpdateAnimation();
+    //void checkUpdateAnimation();
     //Debug
     void writeDebugInfo(AdvancedTextDisplayer& out);
     bool drawDebugInfo(SDL_Renderer*, SDL_Rect& displayArea);
@@ -60,11 +50,12 @@ class Fighter : public DepthfulEntity {
     const HurtboxVector& getCurrentHurtboxes() const;
     const HitboxVector&  getCurrentHitboxes () const;
 
-    Game& getGame();
+    Game& getGame() const;
     const Champion& getChampion();
     State getState() const;
     void setState(const State s, Kuribrawl::Side facing = Kuribrawl::Side::NEUTRAL, int info = 0, bool update_anim_ = true);
-    void setState(const State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim);
+    void setState(const State s, Kuribrawl::Side facing, int info, Champion::DefaultAnimation anim, double speed = -1);
+    void setState(const State s, Kuribrawl::Side facing, int info, const EntityAnimation& anim, double speed = -1);
     bool attack(const Move&);
     const EntityAnimation* getCurrentAnimation() const;
     void setAnimation(Champion::DefaultAnimation);
@@ -86,6 +77,8 @@ class Fighter : public DepthfulEntity {
 
     bool is_initialized();
 
+    friend std::ostream& operator<<(std::ostream&, const Fighter&);
+
     //Debug
     int id;
 
@@ -93,7 +86,7 @@ class Fighter : public DepthfulEntity {
     State state;        ///< Current State.
     int state_info;     ///< Additional data that can be set when a state is started.
     int state_timer;    ///< Number of frames this the current state was started.
-    bool update_anim;   ///< Whether the animation should be updated according to the current state.
+    //bool update_anim;   ///< Whether the animation should be updated according to the current state, and if so the duration of the animation
     int paused;         ///< If >0, no gameplay property (like speed, position, state timer, etc) as well as the AnimationPlayer will be updated.\ Is decremented each frame.
     enum class GroundInteraction{
         NONE,   ///< Do nothing, normal collision
@@ -126,8 +119,9 @@ class Fighter : public DepthfulEntity {
     void setAnimation(const EntityAnimation* anim);
     void setAnimation(const EntityAnimation* anim, double speed);
     bool startMove(const Move&);
-    bool isStateFinished(int stateDuration);
-    void checkStateDuration();
+    //bool isStateFinished(int stateDuration);
+    //void checkStateDuration();
+    void trySetAnimFromState(Fighter::State);
 	virtual jumpY decideGroundedJumpYType() const = 0;
     virtual jumpX decideJumpXType() const = 0;
 

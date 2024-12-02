@@ -28,6 +28,10 @@ acid\dash_turn.png
 A:acid/dash_turn 3 14.0 c
 acid\fair.png
 A:acid/fair acid\fair.dat
+acid\fair_landing.png
+A:acid/fair_landing acid\fair_landing.dat
+acid\freefall.png
+A:acid/freefall 1 -1.0 c
 acid\hurt.png
 A:acid/hurt 1 -1.0 c
 acid\idle.png
@@ -40,6 +44,8 @@ acid\landing.png
 A:acid/landing 2 5.0 c
 acid\nair.png
 A:acid/nair acid\nair_acid.dat
+acid\nair_landing.png
+A:acid/nair_landing 2 5.0 c
 acid\uair.png
 A:acid/uair acid\uair.dat
 acid\walk.png

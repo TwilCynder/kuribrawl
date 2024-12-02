@@ -10,19 +10,41 @@
 #include "Util/util.h"
 #include "Util/stringOperations.h"
 #include "KBDebug/Debug.h"
-#include "KBDebug/DebugTime.h"
+#include "KBDebug/Chrono.h"
 #include "Types/Data.h"
+#include "GameplayAnimationBehavior.h"
 
 using namespace Kuribrawl::Types;
 
 #define FILE_SIGNATURE 0x54545454
 #define FILEFORMAT_MAJOR 0
-#define FILEFORMAT_MINOR 2
-#define FILEFORMAT_REVISION 0
+#define FILEFORMAT_MINOR 3
+#define FILEFORMAT_REVISION 3
 #include "fileMarkers.h"
 
 constexpr std::string_view error_message = "File Loading : invalid data file content";
 constexpr bool string_pointers_assumptions = true;
+
+struct UnresolvedEntityAnimationData {
+    GameplayAnimationBehaviorUnresolved gabu;
+    EntityAnimation& anim;
+
+    UnresolvedEntityAnimationData(EntityAnimation& anim_) : anim(anim_) {}
+};
+
+/**
+ * @brief Data useful for initializing Game Data, that needs to be stored until a later stage of the loading after it's read.
+ * 
+ */
+struct UnresolvedLoadingData {
+    std::map<std::string, std::map<std::string, UnresolvedEntityAnimationData>> champion_anims;
+
+    UnresolvedEntityAnimationData& getChampionAnimData(std::string&& champion_name, std::string&& anim_name, EntityAnimation& anim);
+    UnresolvedEntityAnimationData& getChampionAnimData(const std::string& champion_name, const std::string& anim_name, EntityAnimation& anim);
+
+    void apply(GameData&);
+};
+
 
 /**
  * @brief Reads data to the given buffer.
@@ -556,7 +578,7 @@ DataFile::DataReadingResult DataFile::readAnimationData(AnimationBase& anim, Uin
 
  */
 
-bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataFile::AnimationParsingData& anim_context, DataFile::EntityAnimationParsingData& context){
+bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataFile::AnimationParsingData& anim_context, DataFile::EntityAnimationParsingData& context, UnresolvedEntityAnimationData& uead){
     DataReadingResult result = readAnimationData(anim, marker, anim_context);
 
 
@@ -664,6 +686,41 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
             }
         }
         break;
+        case FILEMARKER_ANIM_END_INFO:{
+            Debug::out << "Reading ending info at 0x" << Log::hex(tell()) << '\n';
+            uint8_t mode = readValue<uint8_t>();
+            uead.gabu.end_behavior = (GameplayAnimationBehavior::EndingBehavior)mode;
+
+            Debug::out << " - Mode : " << (int)mode << '\n'; 
+        }
+        break;
+        case FILEMARKER_LANDINGINFO:{
+            Debug::out << "Reading landing info at 0x" << Log::hex(tell()) << '\n';
+
+            frame_index_t frame = readValue<frame_index_t>();
+            auto mode = readValue<uint8_t>();
+            //GameplayAnimationBehavior::LandingBehaviorType mode = static_cast<GameplayAnimationBehavior::LandingBehaviorType>(readValue<uint8_t>());
+
+            switch(mode){
+                case FILEMARKER_LANDING_NORMAL:{
+                    duration_t duration = readValue<int16_t>();
+                    uead.gabu.add_landing_window_normal(frame, duration);
+                    Debug::sout << " - Mode  : NORMAL | " << frame << duration << '\n';
+                }
+                break;
+                case FILEMARKER_LANDING_ANIMATION:{
+                    duration_t duration = readValue<int16_t>();
+                    readString();
+                    uead.gabu.add_landing_window_animation(frame, std::string(readBuffer), duration);
+                }
+                break;
+                case FILEMARKER_LANDING_NOTHING:{
+                    uead.gabu.add_landing_window_nothing(frame);
+                }
+            }
+
+        }
+        break;
         default:
             Debug::out << "READ : Unexpected byte at 0x" << std::hex << (tell() - 1) << ", expected animation information type identifier, found " << (int)marker << '\n';
             throw KBFatalDetailed(
@@ -732,7 +789,7 @@ void DataFile::readAnimationFile(AnimationBase& anim){
  * @param anim the anim that was created or updated based on this Data Chunk
  */
 
-void DataFile::readEntityAnimationFile(EntityAnimation& anim){
+void DataFile::readEntityAnimationFile(EntityAnimation& anim, UnresolvedEntityAnimationData& uead){
     //int value;
     bool leave_loop = false;
     EntityAnimationParsingData entity_anim_context;
@@ -755,7 +812,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
             
             do {
                 readData(&byte);
-                leave_loop = readEntityAnimationData(anim, byte, anim_context, entity_anim_context);
+                leave_loop = readEntityAnimationData(anim, byte, anim_context, entity_anim_context, uead);
                 
             } while (!leave_loop);
             
@@ -767,7 +824,7 @@ void DataFile::readEntityAnimationFile(EntityAnimation& anim){
     }
 }
 
-void DataFile::readAnimation(GameData& gd){
+void DataFile::readAnimation(GameData& gd, UnresolvedLoadingData& uld){
     //tag = readFileTag();
     //entity = tag;
     //element = separateTag(tag);
@@ -783,8 +840,12 @@ void DataFile::readAnimation(GameData& gd){
     Debug::out << "- Reading Animation  : " << entity << " / " << element << '\n';
 
     switch (prefix){
-        case FILEMARKER_ANIMATIONPOOL_CHAMPION:
-            readEntityAnimationFile(gd.tryChampion(entity).tryAnimation(element));
+        case FILEMARKER_ANIMATIONPOOL_CHAMPION:{
+
+            EntityAnimation& anim = gd.tryChampion(entity).tryAnimation(element);
+            readEntityAnimationFile(anim, uld.getChampionAnimData(entity, element, anim));
+        }
+            
             break;
         case FILEMARKER_ANIMATIONPOOL_STAGE:
             readAnimationFile(gd.tryStage(entity).tryAnimation(element.data()));
@@ -855,8 +916,10 @@ void DataFile::separateTag(const Kuribrawl::string_view& tag, Kuribrawl::string_
 void DataFile::read(App& app){
     Debug::log("====== Reading data file ==============");
 
-    DebugTime chrono;
+    Chrono chrono;
     chrono.start();
+
+    UnresolvedLoadingData uld;
 
     if (!checkSignature()) throw KBFatal("Couldn't open data file : wrong signature !");
     readVersion();
@@ -870,7 +933,7 @@ void DataFile::read(App& app){
     while (!eof()){
         switch (readDataType()){
             case DataFile::DataType::ANIMATION:
-                readAnimation(app.gameData());
+                readAnimation(app.gameData(), uld);
                 break;
             case DataFile::DataType::CHAMPION:
                 tag = readFileTag();
@@ -888,17 +951,52 @@ void DataFile::read(App& app){
                 readStageFile(app.gameData().tryStage(tag));
                 break;
             case DataFile::DataType::NONE:
-                Debug::log("-None");
             default:
                 break;
         }
     }
+
+    uld.apply(app.gameData());
+
     Debug::out << "Loading time : " << chrono.endSec() << " secs.\n";
     Debug::log("=========== Data file loading finished ==============");
 
-    app.gameData().checkData();
+    GameData& gd = app.gameData();
+    gd.checkData();
+
 }
 
 bool DataFile::ready(){
     return file != 0;
+}
+
+UnresolvedEntityAnimationData& UnresolvedLoadingData::getChampionAnimData(std::string&& champion_name, std::string&& anim_name, EntityAnimation& anim){
+    auto& champion_map = champion_anims[champion_name];
+    auto [it, success] = champion_map.try_emplace(anim_name, anim);
+    return it->second;
+}
+
+UnresolvedEntityAnimationData& UnresolvedLoadingData::getChampionAnimData(const std::string& champion_name, const std::string& anim_name, EntityAnimation& anim){
+    auto& champion_map = champion_anims[champion_name];
+    auto [it, success] = champion_map.try_emplace(anim_name, anim);
+    return it->second;
+}
+
+void UnresolvedLoadingData::apply(GameData& gameData){
+    Debug::log("Applying unresolved data");
+    for (auto& [champion_name, champion_map] : champion_anims){
+        Debug::sout << "Champion :" << champion_name << '\n';
+
+        Champion* champion = gameData.getChampion(champion_name);
+
+        if (!champion){
+            throw KBFatalDetailed("Invalid data file content", "Unresolved data was created for an animation of champion %s, which was never loaded", champion_name);
+        }
+
+        for(auto& [anim_name, anim_data] : champion_map){
+            Debug::sout << "Animation :" << anim_name << '\n';
+            anim_data.gabu.finalize();
+            anim_data.anim.gameplay_behavior.setFromUnresolved(anim_data.gabu, *champion);
+        }
+    }
 }

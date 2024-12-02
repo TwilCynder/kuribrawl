@@ -7,7 +7,7 @@
 #include "StageModel.h"
 #include "KBDebug/Debug.h"
 #include "CollisionBoxes.h"
-#include "KBDebug/DebugTime.h"
+#include "KBDebug/Chrono.h"
 #include "GameConfiguration.h"
 #include "PlayerConfiguration.h"
 #include "Util/Text/TextureFont.h"
@@ -115,7 +115,7 @@ PlayerFighter* Game::addFighter(Champion* model){
  * @return Fighter* the Fighter created (and added).
  */
 PlayerFighter* Game::addFighter(Champion* model, int x, int y){
-    Debug::log("added fighter");
+    Debug::log("Added fighter");
     Fighteriterator it = fighters.before_begin();
     it = fighters.emplace_after(it, *this, model, x, y);
 
@@ -210,12 +210,14 @@ void Game::updateStates(){
  * @brief \ref Fighter#updateAnimation "Updates the Animation" of every Fighter.
  * 
  */
+/*
 void Game::updateAnimations(){
     Fighteriterator it;
     for (it = fighters.begin(); it != fighters.end(); ++it){
         it->checkUpdateAnimation();
     }
 }
+*/
 
 /**
  * @brief \ref Fighter#applyPhysics "Processes physics mechanics " on every Fighter.
@@ -475,8 +477,8 @@ void Game::step(SDL_Renderer* render_target){
     updateInputsState();
     updateStates();
     resolveInputs();
-    updateAnimations();
-    //From this point on every animation change must be done manually   
+    //updateAnimations();
+    //[OUTDATED] From this point on every animation change must be done manually   
     applyPhysics();
     hitDetection();
     draw(render_target);

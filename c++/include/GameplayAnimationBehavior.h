@@ -3,9 +3,15 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <memory>
+#include "Types/Data.h"
+#include "Display/AnimationsPool.h"
+#include "Util/EnumInfo.h"
+#include "KBDebug/Debug.h"
+
+using namespace Kuribrawl::Types;
 
 class EntityAnimation;
-class Champion;
 class GameplayAnimationBehaviorUnresolved;
 
 /**
@@ -45,20 +51,15 @@ class GameplayAnimationBehavior {
              * @brief Data specific to normal landing behavior
              */
             struct {
-                int duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
             } normal;
 
             struct {
                 const EntityAnimation* anim;  ///< The animation to transition to
-                int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
     };
-
-    GameplayAnimationBehavior() = default;
-    GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved&, const Champion&);
-
-    protected:
 
     /**
      * @brief A behavior associated with a frame ID
@@ -67,9 +68,20 @@ class GameplayAnimationBehavior {
         LandingBehavior behavior;
         int frame = 0;
     };
+    using LandingBehaviorWindows = std::vector<LandingBehaviorWindow>;
+
+    GameplayAnimationBehavior() = default;
+    GameplayAnimationBehavior(const GameplayAnimationBehaviorUnresolved&, const AnimationsPool<EntityAnimation>&);
+
+    void setFromUnresolved(const GameplayAnimationBehaviorUnresolved&, const AnimationsPool<EntityAnimation>&);
+
+    EndingBehavior getEndBehavior() const;
+    const LandingBehaviorWindows& getLandingBehavior() const;
+
+    protected:
 
     EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
-    std::vector<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
+    LandingBehaviorWindows landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
 };
 
 /**
@@ -91,24 +103,44 @@ struct GameplayAnimationBehaviorUnresolved {
              * @brief Data specific to normal landing behavior
              */
             struct {
-                int duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
+                duration_t duration; ///< Duration of the landing animation ; a duration of -1 indicates the default duration of the animation
             } normal;
 
             struct {
                 std::string anim_name;
-                int duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
+                
+                duration_t duration; ///< Duration of the specified animation ; a duration of -1 indicates the default duration of the animation
             } animation;
         };
 
         LandingBehavior();
         ~LandingBehavior();
+        protected:
+
+        /*LandingBehavior(LandingBehaviorType);
+        LandingBehavior(duration_t duration);
+        LandingBehavior(std::string&& anim_name, duration_t duration = -1);*/
+
     };
 
     struct LandingBehaviorWindow {
         LandingBehavior behavior;
-        int frame = 0;
+        frame_index_t frame = 0;
+
+        LandingBehaviorWindow(frame_index_t frame);
+        /*
+        template <typename ...Args>
+        LandingBehaviorWindow(frame_index_t frame_, Args&&... args):
+            behavior(std::forward<Args>(args)...), 
+            frame(frame_)
+        {Debug::log("================= Using template ============");} 
+        */
 
     };
+
+    void add_landing_window_normal(frame_index_t, duration_t);
+    void add_landing_window_animation(frame_index_t, std::string&&, duration_t);
+    void add_landing_window_nothing(frame_index_t);
 
     EndingBehavior end_behavior = EndingBehavior::IDLE; ///< See ::EndingBehavior
     std::list<LandingBehaviorWindow> landing_behavior; ///< The different landing behaviors that take effect at different windows. Each behavior is associated with the frame it takes effect at. 
@@ -119,4 +151,17 @@ struct GameplayAnimationBehaviorUnresolved {
     };
 
     void finalize();
+
+    private:
+    LandingBehaviorWindow& add_landing_window(frame_index_t);
 };
+
+/*
+template<>
+extern const EnumTypeTraits<GameplayAnimationBehavior::LandingBehaviorType>::names_type enum_names<GameplayAnimationBehavior::LandingBehaviorType>;
+*/
+
+template<>
+struct EnumInfo<GameplayAnimationBehavior::LandingBehaviorType>{static const EnumNamesType<GameplayAnimationBehavior::LandingBehaviorType> names;};
+template<>
+struct EnumInfo<GameplayAnimationBehavior::EndingBehavior>{static const EnumNamesType<GameplayAnimationBehavior::EndingBehavior> names;};

@@ -1,10 +1,10 @@
 #pragma once
 
+// okay look this is a struct nothing is private but you SHOULD NOT modify the fields yourself
+//just read them and use the "set()" methods
+//your fault if you fuck it up
 template <class A>
 struct AnimationEndAction {
-    // okay look this is a struct nothing is private but you SHOULD NOT modify the fields yourself
-    //just read them and use the "set()" methods
-    //your fault if you fuck it up
     static struct repeat{} repeat_tag;
 
     enum class Mode {
@@ -44,6 +44,10 @@ struct AnimationEndAction {
         data.next_anim = anim_ ;
     }
 
+    bool repeat() const {
+        return mode == Mode::REPEAT;
+    }
+
     template<typename T>
     AnimationEndAction& operator =(T arg){
         set(arg);
@@ -52,7 +56,7 @@ struct AnimationEndAction {
 };
 
 template <class A, typename... Args>
-concept EntityAnimationEndActionValidArg = requires (Args ...args, AnimationEndAction<A> ea) {
+concept AnimationEndActionValidArg = requires (Args ...args, AnimationEndAction<A> ea) {
     ea.set(args...);
 };
 
@@ -73,3 +77,9 @@ class AnimationEndActionOwner {
         end_action(args...)
     {}
 };
+
+class Animation;
+class EntityAnimation;
+
+using AnimationEndAction_ = AnimationEndAction<Animation>;
+using EntityAnimationEndAction_ = AnimationEndAction<EntityAnimation>;

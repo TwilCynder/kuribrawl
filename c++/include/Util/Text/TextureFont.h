@@ -25,7 +25,9 @@ class TextureFont {
 
     void getCharPos(char c, SDL_Rect& result) const;
 
-    void displayString(const std::string& s, int& x, int& y, SDL_Renderer* target = NULL) const;
+    void displayString(const std::string& s, int x, int y, SDL_Renderer* target = NULL) const;
+    void displayStringRef(const std::string& s, int& x, int& y, SDL_Renderer* target = NULL) const;
+    void displayStringCentered(const std::string& s, int x, int y, SDL_Renderer* target = NULL) const;
 
     bool isInitialized() const;
 };

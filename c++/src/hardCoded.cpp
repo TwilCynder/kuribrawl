@@ -23,8 +23,8 @@ void HardCoded::initControllersData(ControllersData& data){
     Binding* input_binding = c->getDefaultBinding();
     input_binding->buttons[SDL_CONTROLLER_BUTTON_A] = Input::ATTACK;
     input_binding->buttons[SDL_CONTROLLER_BUTTON_B] = Input::SPECIAL;
-    input_binding->buttons[SDL_CONTROLLER_BUTTON_Y] = Input::JUMP;
-    input_binding->buttons[SDL_CONTROLLER_BUTTON_X] = Input::SHORTHOP;
+    input_binding->buttons[SDL_CONTROLLER_BUTTON_X] = Input::JUMP;
+    input_binding->buttons[SDL_CONTROLLER_BUTTON_Y] = Input::SHORTHOP;
     input_binding->buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = Input::GRAB;
     input_binding->buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = Input::GRAB;
     input_binding->triggers[TRIGGER_LEFT] = Input::GUARD;

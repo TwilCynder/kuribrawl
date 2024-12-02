@@ -144,8 +144,7 @@ void GameData::finalizeChampionsInitialization(){
     ChampionsMap::iterator it;
     for (it = champions.begin(); it != champions.end(); it++)
     {
-        it->second.initDefaultAnimations();
-        it->second.finalizeMoves();
+        it->second.finalize();
     }
 }
 
@@ -155,6 +154,14 @@ void GameData::checkData() const {
         Debug::out << "- " << name << '\n';
         for (const auto & [name, animation] : champion){
             Debug::out << "  - " << name << " : " << animation.getSpritesheet() << '\n';
+            /*Debug::out << "  - - - end : " << (int)animation.gameplay_behavior.getEndBehavior() << '\n';
+            for (auto window : animation.gameplay_behavior.getLandingBehavior()){
+                GameplayAnimationBehavior::LandingBehaviorType type = window.behavior.type;
+                Debug::sout << "  - - - Landing window : frame" << window.frame << "| type" << (int)type << '\n';
+                if (type == GameplayAnimationBehavior::LandingBehaviorType::ANIMATION){
+                    Debug::out << "  - - - - - Animation : " << window.behavior.animation.anim->getSpritesheet() << '\n';
+                }
+            }*/
         }
     }
     Debug::log("Verifying stages : ");

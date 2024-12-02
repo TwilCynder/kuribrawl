@@ -17,6 +17,7 @@
 #include "messageBox.h"
 #include "Random.h"
 #include "Util/Text/TextDisplayer.h"
+#include "Display/DisplayText.h"
 
 #define PORTS_NB 4
 
@@ -148,8 +149,6 @@ bool App::loadGameFile(const char* name){
 void App::loadRessources(){
 	//SDL_i
 	SDL_Texture* test = IMG_LoadTexture(renderer, "oracle.png");
-	Debug::log(test);
-	Debug::log("--66--");
 
 	if (!loadGameFile("data.twl"))
 	if (!loadGameFile("../res/data.twl"))
@@ -185,8 +184,10 @@ void App::init(){
 	SDL_Texture* debug_font_texture = assets_.textures.get("font_oracle");
 	//SDL_Texture* debug_font = IMG_LoadTexture(renderer, "oracle.png");
 	if (!debug_font_texture) throw KBFatalDetailed(Kuribrawl::formatString("Cannot find the debug font: %s", IMG_GetError()), "Missing font");
-	debugFont = make_unique<TextureFont>(TextureFont(debug_font_texture, renderer, {8, 11}));
+	debugFont = make_shared<TextureFont>(TextureFont(debug_font_texture, renderer, {8, 11}));
 	debug_text_displayer = make_unique<AnchoredTextDisplayer>(SCREEN_WIDTH - 88, 20, *debugFont);
+
+	Kuribrawl::Text::setDebugFont(debugFont);
 }
 
 void App::close(){
@@ -240,8 +241,14 @@ Duration App::getLowestWait(){
 	return min;
 }
 
-void App::drawDebugInfo(){
-	debug_text_displayer->reset();
+void App::drawText(const std::string s, int x, int y)
+{
+	debugFont->displayString(s, x, y, renderer);
+}
+
+void App::drawDebugInfo()
+{
+    debug_text_displayer->reset();
 	*debug_text_displayer << getLowestWait();
 }
 
@@ -275,11 +282,11 @@ void App::handleEvents(){
 				stop();
 				break;
 			case SDL_JOYDEVICEADDED:
-				Debug::log("DEVICE FCKING ADDED ===========================");
+				Debug::log("NEW DEVICE WOOOOOO =========================================================");
 				handleDeviceAdded(event.jdevice);
 				break;
 			case SDL_JOYDEVICEREMOVED:
-				Debug::log("DEVICE FCKING REMOVED ===========================");
+				Debug::log("DID SOMEONE JUST FUCKING UNPLUG THEIR CONTROLLER ===========================");
 				handleDeviceRemoved(event.jdevice);
 				break;
 			case SDL_JOYBUTTONDOWN:
@@ -334,6 +341,7 @@ void App::setFrameRate(int fr){
 		throw KBFatal("Attemp to use invalid framerate %d", fr);
 	}
 	framerate = fr;
+	Debug::out << "Framerate changed : " << fr << '\n' << std::flush;
 	update_frame_duration();
 }
 

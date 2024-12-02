@@ -28,8 +28,35 @@ void Fighter::groundCollision(){
     
     Debug::out << "Ground collision from fighter " << this->id << '\n' << std::flush;
 
-    if (state == Fighter::State::ATTACK && current_move->landing_lag != -1){
-        setAnimation(Champion::DefaultAnimation::LANDING, current_move->landing_lag);
+    if (state == Fighter::State::ATTACK){
+
+        const EntityAnimation::LandingBehavior* anim_land_behavior = current_animation.getLandingBehavior();
+
+        if (anim_land_behavior){
+            Debug::out << "Landing type : " << anim_land_behavior->type;
+            
+            switch (anim_land_behavior->type){
+                case EntityAnimation::LandingBehaviorType::NORMAL:{
+                    setState(State::LANDING_LAG, Kuribrawl::Side::NEUTRAL, 0, false);
+                    double landing_duration = anim_land_behavior->normal.duration;
+                    Debug::log(anim_land_behavior->normal.duration);
+                    setAnimation(Champion::DefaultAnimation::LANDING_LAG, landing_duration);
+
+                }
+                break;
+
+                case EntityAnimation::LandingBehaviorType::ANIMATION:{
+                    setState(State::LANDING_LAG, Kuribrawl::Side::NEUTRAL, 0, false);
+                    double landing_duration = anim_land_behavior->animation.duration;
+                    setAnimation(anim_land_behavior->animation.anim, landing_duration);
+
+                }
+                break;
+            }
+        } else {
+            setAnimation(Champion::DefaultAnimation::LANDING);
+        }
+        
     } else {
         setAnimation(Champion::DefaultAnimation::LANDING);
     }

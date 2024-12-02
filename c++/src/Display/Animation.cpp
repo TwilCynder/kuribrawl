@@ -71,6 +71,9 @@ SDL_Texture* AnimationBase::getSpritesheet() const {
     return spritesheet;
 }
 
+const Vector &AnimationBase::getFrameSize() const{
+    return display;
+}
 /**
  * @brief Initializes this AnimationBase's frames.
  * This function creates the frames array (until it's called, the array is a NULL pointer).

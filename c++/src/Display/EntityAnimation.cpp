@@ -1,11 +1,9 @@
 #include "Display/EntityAnimation.h"
 #include "KBDebug/Debug.h"
 
-using EndAction = AnimationEndAction<EntityAnimation>;
 
 EntityAnimation::EntityAnimation():
-    AnimationBase(),
-    AnimationEndActionOwner<EntityAnimation>(EndAction::repeat_tag),
+    AnimationBaseWithEndAction<EntityAnimation>(),
     entity_frames(nullptr),
     has_hitboxes(false)
 {
@@ -44,27 +42,6 @@ const EntityFrame& EntityAnimation::getEntityFrame(frame_index_t n) const{
         throw KBFatal("Frame index %d out of bounds", n);
     }
     return entity_frames[n];
-}
-
-const EndAction& EntityAnimation::getEndAction() const {
-    return end_action;
-}
-
-/**
- * @brief DEPRECATED. Sets the \ref Animation#next "next animation".
- * The next animation is an Animation that will be started once this one finishes.
- */
-void EntityAnimation::setNextAnimation(const EntityAnimation* anim){
-    setEndAction(anim);
-}
-
-/**
- * @brief DEPRECATED.
- * 
- * @return const Animation* 
- */
-const EntityAnimation* EntityAnimation::getNextAnimation() const {
-    return (end_action.mode == EndAction::Mode::START_ANIMATION) ? end_action.data.next_anim : nullptr;
 }
 
 bool EntityAnimation::hasHitboxes() const {

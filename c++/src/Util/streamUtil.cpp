@@ -37,3 +37,8 @@ void Kuribrawl::printReadable(std::ostream& l, const char* str, size_t len){
     }
 }
 
+std::ostream &operator<<(std::ostream & os, std::function<void(std::ostream &)> f)
+{   
+    f(os);
+    return os;
+}

@@ -19,6 +19,8 @@ struct Frame;
 
 class AnimationBase {
     public:
+
+    template <typename A, typename S>
     friend class AnimationPlayerBase;
 
     void initFrames(frame_index_t n);
@@ -30,6 +32,7 @@ class AnimationBase {
 
     void setSpritesheet(SDL_Texture* spritesheet);
     SDL_Texture* getSpritesheet() const ;
+    const Vector& getFrameSize() const;
     bool is_initialized()const;
     frame_index_t getNbFrames();
     Frame* getFrame(frame_index_t n); //Pointer validity : frames are stored in a unique pointer, can't be invalid as long as returns a frame of this animation
@@ -57,6 +60,39 @@ class AnimationBase {
     
 };
 
+template <typename A>
+class AnimationBaseWithEndAction : public AnimationBase, public AnimationEndActionOwner<A> {
+    public:
+    using EndAction = AnimationEndAction<A>;
+
+    template <typename... Args>
+    AnimationBaseWithEndAction(Args...args):
+        AnimationBase(args...), AnimationEndActionOwner<A>(EndAction::repeat_tag)
+    {}
+
+    template <typename... Args> requires AnimationEndActionValidArg<A, Args...>
+    void setEndAction(Args... args){
+        this->end_action.set(args...);
+    }
+
+    const EndAction& getEndAction() const{
+        return this->end_action;
+    }
+    void setNextAnimation(const A* anim){
+        setEndAction(anim);
+    }
+    const A* getNextAnimation() const{
+        return (this->end_action.mode == EndAction::Mode::START_ANIMATION) ? this->end_action.data.next_anim : nullptr;
+    }
+};
+
+class Animation;
+class Animation : public AnimationBaseWithEndAction<Animation>{
+    public:
+    using AnimationBaseWithEndAction::AnimationBaseWithEndAction;
+};
+
+/*
 class Animation : public AnimationBase, public AnimationEndActionOwner<Animation> {
     public:
     template <typename... Args>
@@ -64,5 +100,5 @@ class Animation : public AnimationBase, public AnimationEndActionOwner<Animation
         AnimationBase(args...), AnimationEndActionOwner(EndAction::repeat_tag)
     {}
 
-    friend class AnimationPlayer;
 };
+*/

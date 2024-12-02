@@ -41,7 +41,7 @@ class Game {
     void updateInputsState();
     void resolveInputs();
     void updateStates();
-    void updateAnimations();
+    //void updateAnimations();
     void hitDetection();
     void updateCameraPosition(SDL_Renderer* target);
 

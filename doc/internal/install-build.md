@@ -41,7 +41,11 @@ Once the packages are installed, running `make` in this directory will compile a
 I also recommend installing GDB. You can do so by running `./dependencies.sh [ucrt] -d | pacman -S --needed -` (with or without "ucrt" depending on your environment).
 
 #### Side note : VSCode C++ Intellisense
-Note that the Visual Studio Code C/C++ configuration file included in the repo relies on an environment variable named "msys_dir" to find the compiler and includePath's. You'll need to set this environment variable for C++ Intellisense to work in the Windows configuration.
+For VSCode Intellisense, two configurations are provided : MSYS [C++ version], and MSYS [C++ version] MP, which differ only in how they get their include and compiler path : 
+- The first one relies on the MSYSTEM_PREFIX variable, which should be set automatically as long as you launch VSCode from a MSYS terminal
+- The second one (MP) relies on a user-defined MSYS_PATH variable, which should point to the root path of your msys environement (so either /mingw64 or /ucrt64).   
+
+If you're always launching VSCode from your UCRT64 or MINGW64 terminal, use the first config ; use the second one otherwise.
 
 # Tools
 The Kuribrawl project includes the game itself as well as several smaller programs (more information on that coming soon). These programs are located in a submodule repository, under the name `tools`. If you did not use git to obtain the source, or did not clone the submodules, you need to either install the submodule with `git submodule update --init`, or download it at `https://gitlab.com/TwilCynder/kuribrawl-tools`

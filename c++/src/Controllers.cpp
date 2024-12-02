@@ -296,6 +296,7 @@ bool Controller::initButtonMapping()
         controller_buttons_mapping[i] = SDL_CONTROLLER_BUTTON_INVALID;
     }
 
+    Debug::log("Controller mapping : ");
     Debug::log(SDL_GameControllerMapping(gamecontroller));
     for (unsigned int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++){
         SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForButton(gamecontroller, static_cast<SDL_GameControllerButton>(i));
@@ -316,6 +317,5 @@ bool Controller::initButtonMapping()
     if (controller_buttons_mapping.size() > needed_size){
         controller_buttons_mapping.resize(needed_size);
     }
-    Debug::log(controller_buttons_mapping[3]);
     return true;
 }

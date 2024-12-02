@@ -26,7 +26,7 @@ Game& GameManager::start(GameConfiguration& config){
 
 Game& GameManager::start(GameConfSPtr& config){
     reset (new Game(config));
-    Debug::log("Post reset");
+    Debug::log("Reset done");
     return *get();
 }
 
