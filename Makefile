@@ -3,7 +3,8 @@
 export NOCLEAR = ""
 RELEASE=""
 
-all: game editor dfm end
+all: all_ end
+all_: start game editor dfm 
 
 clearterminal:
 	clear
@@ -15,10 +16,9 @@ release_:
 	@mkdir -p release/game
 	$(eval RELEASE := "release")
 
-release: release_ all
+release: release_ all_ data end
 
 start: clearterminal
-	@mkdir -p release
 
 game: start 
 	@printf "\n\033[1;33mBuilding Kuribrawl\n\033[0m"
@@ -32,9 +32,8 @@ dfm: start
 	$(MAKE) $(RELEASE) -C "./tools/gamefile manager"
 
 data: 
-	cd res
-	./DFM.exe
-	cd ..
+	@printf "\n\033[1;33mBuilding Game Data using the DFM\n\033[0m"
+	(@cd res ; pwd ; ./DFM.exe)
 	cp ../res/data.twl ../release/kuribrawl/data.twl
 
 end: 
