@@ -47,7 +47,33 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
 
     Debug::out << "ATTACK INPUT | Stick direction : " << input.direction << " | Relative direction : " << direction << '\n';
 
-    if (!grounded){
+    if (grounded){
+        switch (direction){
+            case DirectionIG::NONE:
+                Debug::log("Jab");
+                moveID = MoveID::Jab;
+                break;
+            case DirectionIG::UP:
+                Debug::log("Utilt");
+                moveID = MoveID::UTilt;
+                break;
+            case DirectionIG::DOWN:
+                moveID = MoveID::DTilt;
+                Debug::log("Dtilt");
+                break;
+            case DirectionIG::FORWARD:
+                moveID = MoveID::Ftilt;
+                Debug::log("Ftilt");
+                break;
+            case DirectionIG::BACK:
+                facing = -facing;
+                moveID = MoveID::Ftilt;
+                Debug::log("Reverse Ftilt");
+                break;
+            default:
+                break;
+        }
+    } else {
         //direction = (input.data & 1) ? Kuribrawl::DirectionToDirectionIG((Direction)(input.data >> 1), facing) : getControlDirection4IG();
 
         switch (direction){
@@ -75,10 +101,11 @@ int PlayerFighter::InputHandler_Attack(RegisteredInput& input){
                 break;
         }
 
-        const Move* move = getChampion().getDefaultMove(moveID);
-        Debug::out << "Move : " << move << '\n';
-        attack(*move);
     }
+
+    const Move* move = getChampion().getDefaultMove(moveID);
+    Debug::out << "Move : " << move << '\n';
+    attack(*move);
 
     return InputHandlerResult::HANDLED;
 }

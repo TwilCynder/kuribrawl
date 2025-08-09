@@ -703,6 +703,7 @@ bool DataFile::readEntityAnimationData(EntityAnimation& anim, Uint8 marker,DataF
                 case FILEMARKER_LANDING_ANIMATION:{
                     duration_t duration = readValue<int16_t>();
                     readString();
+                    Debug::sout << " - Mode  : ANIMATION | " << frame << readBuffer << duration << '\n';
                     uead.gabu.add_landing_window_animation(frame, std::string(readBuffer), duration);
                 }
                 break;
