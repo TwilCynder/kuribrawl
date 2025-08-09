@@ -33,8 +33,11 @@ dfm: start
 
 data: 
 	@printf "\n\033[1;33mBuilding Game Data using the DFM\n\033[0m"
-	(@cd res ; pwd ; ./DFM.exe)
-	cp ../res/data.twl ../release/kuribrawl/data.twl
-
+	@(cd res; ./DFM.exe)
+	@if [[ ! -z $(RELEASE) ]]; then \
+		printf "\n\033[1;33mCopying Game Data to the release folder\n\033[0m"; \
+		mkdir -p release/game; \
+		cp ./res/data.twl release/game/data.twl; \
+	fi
 end: 
 	@printf "\033[0;32m\033[1m======== Build successful ! ========\n\033[0m"

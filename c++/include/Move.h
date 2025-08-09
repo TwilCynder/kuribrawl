@@ -11,11 +11,6 @@ struct Move {
         EXTEND ///< Move keeps going and fighter is still considered as on the the ground until the move end (will be a fucking pain to implement)
     };
 
-    enum struct LandBehavior {
-        NORMAL, ///< Interrupt the move and go into the LANDING state
-        KEEP ///< Keep going while the fighter is now on the ground
-    };
-
     enum struct EndBehavior{
         NORMAL, ///< Go into IDLE state
         FREEFALL
@@ -28,8 +23,7 @@ struct Move {
     const EntityAnimation* animation; //nullptr if no animation
 
     //Keep in mind that with the right edgeBehavior/landBehavior, any grounded move can be done airborne, and any aerial move can be done on the ground
-    EdgeBehavior edge_behavior;
-    LandBehavior land_behavior;
-    EndBehavior  end_behavior ;
-    int landing_lag;
+    //EdgeBehavior edge_behavior;
+    //LandBehavior land_behavior;
+    //EndBehavior  end_behavior ;
 };

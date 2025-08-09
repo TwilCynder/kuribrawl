@@ -372,14 +372,6 @@ void DataFile::readChampionFile(Champion& champion){
                 current_move = &champion.tryMove(readBuffer);
                 Debug::out << "Move : " << readBuffer << '\n' << std::flush;
                 break;
-            case FILEMARKER_LANDINGLAG:
-                if (!current_move){
-                    throw KBFatalDetailed("Landing lag info present before any move info"s, error_message);
-                }
-                readData(&byte);
-                current_move->landing_lag = byte;
-                Debug::out << "Landing lag : " << (int)byte << '\n' << std::flush;
-                break;
             case FILEMARKER_INTERFILE:
                 Debug::log("Interfile");
                 leave_loop = true;
