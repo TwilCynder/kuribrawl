@@ -478,15 +478,7 @@ void Fighter::updateState(){
                         setState(Fighter::State::FREEFALL);
                         break;
                     case GameplayAnimationBehavior::EndingBehavior::IDLE:
-                        switch (current_move->end_behavior){
-                            case Move::EndBehavior::NORMAL:
-                                setState(Fighter::State::IDLE);
-                                break;
-                            case Move::EndBehavior::FREEFALL:
-                                setState(Fighter::State::FREEFALL);
-                                break;
-                        }
-                        break;
+                        setState(Fighter::State::IDLE);
                 }
 
             }
