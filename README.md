@@ -1,5 +1,5 @@
 # kuribrawl
-A platform fighter (fighting game with a platforming aspect, aka Smash-Like) inspired mostly by Rivals of Aether, traditional fighters, and of course Super Smash .
+A platform fighter (fighting game with a platforming aspect, aka Smash-Like) inspired mostly by Rivals of Aether, traditional fighters, and of course Super Smash Bros.
 
 Written in C++ with its own engine (only me, gcc and the SDL library, which is, as it turns out, not the best idea i've had), the game aims to offer extensive Mod support (allowing anyone to create their characters, among other types of content), using Lua scripts.
 

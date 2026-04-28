@@ -20,7 +20,7 @@ Pour des raisons de simplicité (et parce que le contexte 2D finira par nous l'i
 On définit la propriété z d'un plan P de décor comme pp.z avec pp un point quelconque de P, tous les points de P ayant la même composante z.  
 La distance entre C et un plan de décor quelconque P est |C.position.z| - |P.z|.
 
-Pour des raisons de simplicité de l'explication, on s'intéresse ici uniquement aux positions et distances sur les axes X et Z (c'est à dire qu'on ne considère que le plan XZ), toute distance ou déplacement sur l'axe Y fonctionnant comme sur l'axe X. On peut donc ne considérer que deux dimensions des vecteurs en général,  et un seul angle de la caméra ; les plans parallèles à l'axe Y (c'est à dire tous les plans considérés ici) deviennent des droites. L'écran devient également un segment au lieu d'un plan.
+Pour des raisons de simplicité de l'explication, on s'intéresse ici uniquement aux positions et distances sur les axes X et Z, toute distance ou déplacement sur l'axe Y fonctionnant comme sur l'axe X. On peut donc ne considérer que deux dimensions des vecteurs en général,  et un seul angle de la caméra ; les plans parallèles à l'axe Y (c'est à dire tous les plans considérés ici) deviennent des droites. L'écran devient également un segment au lieu d'un plan.
 
 On définit les **Limites de vue** horizontales d'une caméra C comme les deux demi-droites l1 et l2 partant de C.position, de direction d tq :
 - l1 et l2 sont, comme tous les objets considérés ici, sur le plan XZ.
@@ -30,7 +30,7 @@ On définit les **Limites de vue** horizontales d'une caméra C comme les deux d
 D'un point de vue concret, il faut comprendre que tous les points situés entre l1 et l2 seront affichés à l'écran.
 
 Soient bgauche(C, P) et bdroite(C, P) les intersections entre P et C.l1 et C.l2 respectivement.  
-On définit une **Projection de caméra** C sur un plan P Pr(C, P) comme le segment entre bgauche et bdroite. Par définition de C.l1 et C.l2 (et par extension, de la caméra), tout point de Pr(C, P) sera affiché à l'écran.
+On définit une **Projection de caméra** C sur un plan P Pr(C, P) comme le segment entre bgauche(C, P) et bdroite(C, P). Par définition de C.l1 et C.l2 (et par extension, de la caméra), tout point de Pr(C, P) sera affiché à l'écran.
 
 Soit SW la largeur de l'écran, en pixels.  
 On définit **position relative à l'écran** d'un point pp, pr(C, pp), tq pour P' le plan de décor passant par pp, pr = (pp.x - bgauche(C, P').x) / (bgauche(C, P').x - bdroite(C, P').x). On note que pr app [0, 1] <=> pp est entre C.l1 et C.l2, donc un point n'est affiché que si sa position relative app [0, 1] ; pp est affiché sur l'écran à la position px(pp) = pr(C, pp) * SW.
