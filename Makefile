@@ -1,7 +1,7 @@
 .PHONY: game all editor start
 
 export NOCLEAR = ""
-RELEASE=
+RELEASE?=
 
 all: all_ end
 all_: start game editor dfm 
@@ -16,7 +16,7 @@ release_:
 	@mkdir -p release/game
 	$(eval RELEASE := "release")
 
-release: release_ all_ data end
+release: release_ all_ data end_
 
 start: clearterminal
 
@@ -33,11 +33,11 @@ dfm: start
 
 data: 
 	@printf "\n\033[1;33mBuilding Game Data using the DFM\n\033[0m"
-	@(cd res; ./DFM.exe)
-	@if [[ ! -z $(RELEASE) ]]; then \
+	@./launch.sh dfm
+	@if [[ ! -z "$(RELEASE)" ]]; then \
 		printf "\n\033[1;33mCopying Game Data to the release folder\n\033[0m"; \
 		mkdir -p release/game; \
 		cp ./res/data.twl release/game/data.twl; \
 	fi
-end: 
+end_: 
 	@printf "\033[0;32m\033[1m======== Build successful ! ========\n\033[0m"
